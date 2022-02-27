@@ -1,0 +1,6 @@
+<launch>
+
+    <arg name="robot" default="panda_arm_with_ropes.xml" />
+    <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" args="$(arg robot)" />
+
+</launch>

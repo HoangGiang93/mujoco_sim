@@ -1,0 +1,16 @@
+<launch>
+    <rosparam command="load" file="$(find mujoco_sim)/config/panda_arm.yaml"/>
+
+    <include file="$(find mujoco_sim)/launch/mujoco_sim.launch" />
+    
+    <param name="robot_description" command="$(find xacro)/xacro $(find franka_description)/robots/panda_arm.urdf" />
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui">
+        <remap from="/joint_states" to="/mujoco/desired_joint_states"/>
+    </node>
+    <node name="joint_state_publisher" pkg="mujoco_sim" type="joint_state_publisher.py" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <remap from="/joint_states" to="/mujoco/joint_states"/>
+    </node>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mujoco_sim)/rviz_config/rviz_config.rviz" />
+
+</launch>

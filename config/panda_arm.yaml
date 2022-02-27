@@ -1,0 +1,29 @@
+mujoco:
+  n_dof: 7
+
+  joint_trajectory_controller:
+    joints: &joints
+      - panda_joint1
+      - panda_joint2
+      - panda_joint3
+      - panda_joint4
+      - panda_joint5
+      - panda_joint6
+      - panda_joint7
+    controller_gains:
+      Kp: [2000, 2000, 2000, 2000, 2000, 2000, 2000]
+      Kv: [50, 50, 50, 50, 50, 50, 50]
+      Ki: [100, 100, 100, 100, 100, 100, 100]
+  
+  joint_state_publisher:
+    joints: *joints
+    publish_rate: 60
+
+  follow_joint_trajectory_feedback_publisher:
+    joints: 
+      - panda_joint1
+      - panda_joint3
+      - panda_joint5
+      - panda_joint7
+    publish_rate: 10
+  

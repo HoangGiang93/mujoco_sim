@@ -1,0 +1,35 @@
+<mujoco model="panda_arm_with_ropes">
+    <include file="panda_arm.xml"/>
+
+    <size nconmax="50" njmax="300" nstack="50000"/>
+
+    <worldbody>
+        <composite prefix="C_1" type="grid" count="8 1 1" spacing="0.1" offset="0.3 -0.1 1">
+            <joint kind="main" damping="0.001"/>
+            <tendon kind="main" width="0.01"/>
+            <pin coord="0"/>
+            <geom size=".02" rgba=".8 .2 .1 1"/>
+        </composite>
+
+        <composite prefix="C_2" type="grid" count="8 1 1" spacing="0.1" offset="0.6 0.2 1">
+            <joint kind="main" damping="0.001"/>
+            <tendon kind="main" width="0.01"/>
+            <pin coord="0"/>
+            <geom size=".02" rgba=".8 .2 .1 1"/>
+        </composite>
+
+        <composite prefix="C_3" type="grid" count="8 1 1" spacing="0.1" offset="0.6 -0.1 1">
+            <joint kind="main" damping="0.001"/>
+            <tendon kind="main" width="0.01"/>
+            <pin coord="0"/>
+            <geom size=".02" rgba=".8 .2 .1 1"/>
+        </composite>
+
+        <composite prefix="C_4" type="grid" count="8 1 1" spacing="0.1" offset="0.3 0.2 1">
+            <joint kind="main" damping="0.001"/>
+            <tendon kind="main" width="0.01"/>
+            <pin coord="0"/>
+            <geom size=".02" rgba=".8 .2 .1 1"/>
+        </composite>
+    </worldbody>
+</mujoco>
