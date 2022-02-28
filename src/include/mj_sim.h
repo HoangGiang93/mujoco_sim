@@ -13,18 +13,16 @@ public:
 public:
     void init();
 
-    void sparse2dense(mjtNum *mat_dense, mjtNum *mat_sparse);
-
     void computed_torque_controller();
 
 public:
-    static std::vector<int> q_idx;
+    static std::vector<std::string> q_names;
     static double sim_start;
 
-    mjtNum *q_init;
-    static mjtNum *q_ref;
-    static mjtNum *dq_ref;
-    static mjtNum *ddq_ref;
+    static std::map<std::string, mjtNum> q_inits;
+    static std::map<std::string, mjtNum> q_refs;
+    static std::map<std::string, mjtNum> dq_refs;
+    static std::map<std::string, mjtNum> ddq_refs;
 
     static std::vector<double> Kp;
     static std::vector<double> Kv;
@@ -32,5 +30,8 @@ public:
 
 private:
     int n_dof;
-    mjtNum *e_sum;
+    std::map<std::string, mjtNum> e_sum;
+    mjtNum *M;
+    mjtNum *u;
+    mjtNum *tau;
 };

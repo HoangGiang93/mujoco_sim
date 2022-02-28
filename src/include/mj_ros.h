@@ -33,11 +33,9 @@ private:
 
     ros::Publisher joint_state_pub;
     double joint_state_pub_rate;
-    std::vector<int> joint_state_pub_idx;
 
     ros::Publisher follow_joint_traj_feedback_pub;
     double follow_joint_traj_feedback_pub_rate;
-    std::vector<int> follow_joint_traj_feedback_q_idx;
 
     sensor_msgs::JointState joint_state_msg;
     control_msgs::FollowJointTrajectoryFeedback follow_joint_traj_feedback_msg;

@@ -1,6 +1,4 @@
 mujoco:
-  n_dof: 7
-
   joint_trajectory_controller:
     joints: &joints
       - panda_joint1
@@ -20,10 +18,6 @@ mujoco:
     publish_rate: 60
 
   follow_joint_trajectory_feedback_publisher:
-    joints: 
-      - panda_joint1
-      - panda_joint3
-      - panda_joint5
-      - panda_joint7
+    joints: *joints
     publish_rate: 10
   
