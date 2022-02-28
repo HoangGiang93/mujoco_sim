@@ -23,24 +23,21 @@ void MjSim::init()
 {
     sim_start = d->time;
 
-    M = (mjtNum *)malloc(m->nv * m->nv * sizeof(mjtNum));
-    u = (mjtNum *)malloc(m->nv * sizeof(mjtNum *)); 
+    u = (mjtNum *)malloc(m->nv * sizeof(mjtNum *)); mju_zero(u, m->nv);
     tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *)); mju_zero(tau, m->nv);
 
-    mjtNum q_init_array[m->nv];
+    mjtNum q_init_array[m->nv] = {0.};
     for (std::string q_name : q_names)
     {
         int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, q_name.c_str());
         e_sum[q_name] = 0.;
-        q_inits[q_name] = 0.;
-        q_refs[q_name] = 0.;
+        q_refs[q_name] = q_inits[q_name];
         dq_refs[q_name] = 0.;
         ddq_refs[q_name] = 0.;
         q_init_array[idx] = q_inits[q_name];
     }
     mju_copy(d->qpos, q_init_array, m->nq);
-    
-    mj_step(m, d);
+    mj_forward(m, d);
 }
 
 void MjSim::computed_torque_controller()

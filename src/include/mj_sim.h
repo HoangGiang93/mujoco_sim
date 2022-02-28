@@ -29,9 +29,7 @@ public:
     static std::vector<double> Ki;
 
 private:
-    int n_dof;
     std::map<std::string, mjtNum> e_sum;
-    mjtNum *M;
     mjtNum *u;
     mjtNum *tau;
 };

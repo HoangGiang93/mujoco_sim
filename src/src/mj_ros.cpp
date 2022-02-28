@@ -10,6 +10,10 @@ MjRos::MjRos()
 void MjRos::init(ros::NodeHandle &n)
 {
     ros_start = ros::Time().now();
+    if (!n.getParam("/mujoco/init_positions", MjSim::q_inits))
+    {
+        mju_warning("Couldn't find states in /mujoco/init_positions, set default to 0");
+    }
 
     if (!n.getParam("/mujoco/joint_trajectory_controller/joints", MjSim::q_names))
     {
