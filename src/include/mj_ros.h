@@ -14,6 +14,8 @@ class MjRos
 public:
     MjRos();
 
+    ~MjRos();
+
 public:
     void init(ros::NodeHandle &n);
 

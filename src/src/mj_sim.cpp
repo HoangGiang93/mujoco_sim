@@ -58,4 +58,10 @@ void MjSim::computed_torque_controller()
     }
     
     mju_copy(d->qfrc_applied, tau, m->nv);
+
+    // for (std::string q_name : q_names)
+    // {
+    //     int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, q_name.c_str());
+    //     d->qvel[idx] = q_refs[q_name];
+    // }
 }

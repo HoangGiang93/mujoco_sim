@@ -12,32 +12,22 @@ static MjRos mj_ros;
   static MjVisual mj_visual;
 #endif
 
-// Path
-std::string ros_path = ros::package::getPath("mujoco_sim");
-std::string xml_file = "panda_arm_with_ropes.xml";
-
 #define REDUCE 0.5
 
 void load_model(int argc, char **argv)
 {
-  // load and compile model
-  char error[1000] = "Could not load binary model";
-
-  std::string xml_path;
   // check command-line arguments
-  if (argc < 2)
+  if (argc != 2)
   {
-    xml_path = ros_path + "/model/" + xml_file;
-  }
-  else
-  {
-    xml_path = ros_path + "/model/" + argv[1];
+    mju_error("\n Usage:  model.xml\n");
   }
 
-  m = mj_loadXML(xml_path.c_str(), 0, error, 1000);
+  char error[1000] = "Could not load binary model";
+  // load and compile model
+  m = mj_loadXML(argv[1], 0, error, 1000);
   if (!m)
   {
-    mju_error_s("Load model error: %s", error);
+    mju_error_s("Could not load model file '%s'", argv[1]);
   }
 
   // make data
@@ -51,7 +41,7 @@ void controller(const mjModel *m, mjData *d)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "mujoco_sim");
+  ros::init(argc, argv, "mujoco_sim", ros::init_options::AnonymousName);
 
   load_model(argc, argv);
 

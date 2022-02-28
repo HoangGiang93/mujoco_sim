@@ -43,7 +43,7 @@ void controller(const mjModel *m, mjData *d)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "mujoco_sim");
+  ros::init(argc, argv, "mujoco_sim", ros::init_options::AnonymousName);
 
   load_model(argc, argv);
 

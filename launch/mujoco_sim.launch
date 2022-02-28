@@ -1,6 +1,6 @@
 <launch>
 
     <arg name="robot" />
-    <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" args="$(arg robot)" />
+    <node name="$(anon mujoco_sim)" pkg="mujoco_sim" type="mujoco_sim" output="screen" args="$(arg robot)" />
 
 </launch>

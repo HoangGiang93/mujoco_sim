@@ -7,58 +7,64 @@ MjRos::MjRos()
 {
 }
 
+MjRos::~MjRos()
+{
+    joint_trajectory_points_sub.shutdown();
+    joint_state_pub.shutdown();
+    follow_joint_traj_feedback_pub.shutdown();
+}
+
 void MjRos::init(ros::NodeHandle &n)
 {
     ros_start = ros::Time().now();
-    if (!n.getParam("/mujoco/init_positions", MjSim::q_inits))
+    if (!n.getParam("init_positions", MjSim::q_inits))
     {
-        mju_warning("Couldn't find states in /mujoco/init_positions, set default to 0");
+        mju_warning_s("Couldn't find states in %s/init_positions, set default to 0", n.getNamespace().c_str());
     }
 
-    if (!n.getParam("/mujoco/joint_trajectory_controller/joints", MjSim::q_names))
+    if (!n.getParam("joint_trajectory_controller/joints", MjSim::q_names))
     {
-        mju_error("Couldn't find joints in /mujoco/joint_trajectory_controller/joints");
+        mju_error_s("Couldn't find joints in %s/joint_trajectory_controller/joints", n.getNamespace().c_str());
     }
 
-    if (!n.getParam("/mujoco/joint_trajectory_controller/controller_gains/Kp", MjSim::Kp) || MjSim::Kp.size() != MjSim::q_names.size())
+    if (!n.getParam("joint_trajectory_controller/controller_gains/Kp", MjSim::Kp) || MjSim::Kp.size() != MjSim::q_names.size())
     {
-        mju_warning_i("Couldn't find enough Kp in /mujoco/joint_trajectory_controller/controller_gains/Kp, set to default (2000 x %d)", MjSim::q_names.size());
+        mju_warning_s("Couldn't find enough Kp in %s/joint_trajectory_controller/controller_gains/Kp, set to default (2000)", n.getNamespace().c_str());
         MjSim::Kp = std::vector<double>(MjSim::q_names.size(), 2000);
     }
-    if (!n.getParam("/mujoco/joint_trajectory_controller/controller_gains/Kv", MjSim::Kv))
+    if (!n.getParam("joint_trajectory_controller/controller_gains/Kv", MjSim::Kv) || MjSim::Kv.size() != MjSim::q_names.size())
     {
-        mju_warning_i("Couldn't find enough Kv in /mujoco/joint_trajectory_controller/controller_gains/Kv, set to default (50 x %d)", MjSim::q_names.size());
+        mju_warning_s("Couldn't find enough Kv in %s/joint_trajectory_controller/controller_gains/Kv, set to default (50)", n.getNamespace().c_str());
         MjSim::Kv = std::vector<double>(MjSim::q_names.size(), 50);
     }
-    if (!n.getParam("/mujoco/joint_trajectory_controller/controller_gains/Ki", MjSim::Ki))
+    if (!n.getParam("joint_trajectory_controller/controller_gains/Ki", MjSim::Ki) || MjSim::Ki.size() != MjSim::q_names.size())
     {
-        mju_warning_i("Couldn't find enough Ki in /mujoco/joint_trajectory_controller/controller_gains/Ki, set to default (100 x %d)", MjSim::q_names.size());
-        MjSim::Ki = std::vector<double>(MjSim::q_names.size(), 100);
+        mju_warning_s("Couldn't find enough Ki in %s/joint_trajectory_controller/controller_gains/Ki, set to default (0)", n.getNamespace().c_str());
+        MjSim::Ki = std::vector<double>(MjSim::q_names.size(), 0);
     }
     
-
-    joint_trajectory_points_sub = n.subscribe("mujoco/joint_trajectory_points", 10, &MjRos::set_joint_trajectory_point_callback, this);
-    joint_state_pub = n.advertise<sensor_msgs::JointState>("mujoco/joint_states", 10);
-    follow_joint_traj_feedback_pub = n.advertise<control_msgs::FollowJointTrajectoryFeedback>("mujoco/follow_joint_trajectory/feedback", 10);
+    joint_trajectory_points_sub = n.subscribe("joint_trajectory_points", 10, &MjRos::set_joint_trajectory_point_callback, this);
+    joint_state_pub = n.advertise<sensor_msgs::JointState>("joint_states", 10);
+    follow_joint_traj_feedback_pub = n.advertise<control_msgs::FollowJointTrajectoryFeedback>("follow_joint_trajectory/feedback", 10);
 
     joint_state_msg = sensor_msgs::JointState();
-    if (!n.getParam("/mujoco/joint_state_publisher/joints", joint_state_msg.name))
+    if (!n.getParam("joint_state_publisher/joints", joint_state_msg.name))
     {
-        mju_error("Couldn't find joints in /mujoco/joint_state_publisher/joints");
+        mju_error_s("Couldn't find joints in %s/joint_state_publisher/joints", n.getNamespace().c_str());
     }
     std::size_t joint_state_msg_size = joint_state_msg.name.size();
     joint_state_msg.position = std::vector<double>(joint_state_msg_size, 0.);
     joint_state_msg.velocity = std::vector<double>(joint_state_msg_size, 0.);
     joint_state_msg.effort = std::vector<double>(joint_state_msg_size, 0.);
-    if (!n.getParam("/mujoco/joint_state_publisher/publish_rate", joint_state_pub_rate))
+    if (!n.getParam("joint_state_publisher/publish_rate", joint_state_pub_rate))
     {
         joint_state_pub_rate = 60;
     }
     
     follow_joint_traj_feedback_msg = control_msgs::FollowJointTrajectoryFeedback();
-    if (!n.getParam("/mujoco/follow_joint_trajectory_feedback_publisher/joints", follow_joint_traj_feedback_msg.joint_names))
+    if (!n.getParam("follow_joint_trajectory_feedback_publisher/joints", follow_joint_traj_feedback_msg.joint_names))
     {
-        mju_error("Couldn't find joints in /mujoco/follow_joint_trajectory_feedback_publisher/joints");
+        mju_error_s("Couldn't find joints in %s/follow_joint_trajectory_feedback_publisher/joints", n.getNamespace().c_str());
     }
     std::size_t follow_joint_traj_feedback_msg_size = follow_joint_traj_feedback_msg.joint_names.size();
     follow_joint_traj_feedback_msg.desired.positions = std::vector<double>(follow_joint_traj_feedback_msg_size, 0.);
@@ -73,7 +79,7 @@ void MjRos::init(ros::NodeHandle &n)
     follow_joint_traj_feedback_msg.error.velocities = std::vector<double>(follow_joint_traj_feedback_msg_size, 0.);
     follow_joint_traj_feedback_msg.error.accelerations = std::vector<double>(follow_joint_traj_feedback_msg_size, 0.);
     follow_joint_traj_feedback_msg.error.effort = std::vector<double>(follow_joint_traj_feedback_msg_size, 0.);
-    if (!n.getParam("/mujoco/follow_joint_trajectory_feedback_publisher/publish_rate", follow_joint_traj_feedback_pub_rate))
+    if (!n.getParam("mujoco/follow_joint_trajectory_feedback_publisher/publish_rate", follow_joint_traj_feedback_pub_rate))
     {
         follow_joint_traj_feedback_pub_rate = 10;
     }
