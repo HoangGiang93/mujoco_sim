@@ -3,7 +3,7 @@
 #include "mj_model.h"
 #include "vector"
 #include "string"
-#include "mj_ros.h"
+#include "map"
 
 class MjSim
 {
@@ -28,8 +28,10 @@ public:
     static std::vector<double> Kv;
     static std::vector<double> Ki;
 
+    static mjtNum *u;
+
 private:
     std::map<std::string, mjtNum> e_sum;
-    mjtNum *u;
+    
     mjtNum *tau;
 };

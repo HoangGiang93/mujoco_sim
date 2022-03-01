@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   roslib
+  controller_manager
 )
 
 ## System dependencies are found with CMake's conventions
@@ -121,17 +122,23 @@ include_directories(
 )
 
 ## Declare a C++ library
+add_library(${PROJECT_NAME}_hw_interface_lib
+  ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp
+  ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
+  ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
+)
+
 add_library(${PROJECT_NAME}_lib
+  ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_visual.cpp
-  ${PROJECT_SOURCE_DIR}/src/src/mj_ros.cpp
 )
 
 add_library(${PROJECT_NAME}_headless_lib
+  ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp 
   ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
-  ${PROJECT_SOURCE_DIR}/src/src/mj_ros.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -156,6 +163,7 @@ add_executable(${PROJECT_NAME}_headless src/mujoco_sim_headless.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_lib

@@ -1,17 +1,16 @@
 #define VISUAL
 
-#include "mj_model.h"
 #include "mj_sim.h"
 #ifdef VISUAL
 #include "mj_visual.h"
 #endif
-#include "mj_ros.h"
+#include "mj_hw_interface.h"
+#include "controller_manager/controller_manager.h"
 #include "thread"
 
 static MjSim mj_sim;
-static MjRos mj_ros;
 #ifdef VISUAL
-  static MjVisual mj_visual;
+static MjVisual mj_visual;
 #endif
 
 #define REDUCE 0.5
@@ -36,6 +35,28 @@ void load_model(int argc, char **argv)
   d = mj_makeData(m);
 }
 
+void ros_run(void)
+{
+  MjHWInterface mj_hw_interface;
+  controller_manager::ControllerManager controller_manager(&mj_hw_interface);
+
+  ros::AsyncSpinner spinner(1);
+  spinner.start();
+
+  const ros::Time time_start = ros::Time::now();
+  ros::Time time = ros::Time::now();
+  ros::Duration period;
+  while (ros::ok())
+  {
+    period = ros::Time::now() - time;
+    time = ros::Time::now();
+
+    mj_hw_interface.read(time, period);
+    controller_manager.update(time, period);
+    mj_hw_interface.write(time, period);
+  }
+}
+
 void controller(const mjModel *m, mjData *d)
 {
   mj_sim.computed_torque_controller();
@@ -44,22 +65,18 @@ void controller(const mjModel *m, mjData *d)
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mujoco_sim", ros::init_options::AnonymousName);
+  ros::NodeHandle n;
 
   load_model(argc, argv);
-
-  ros::NodeHandle n;
-  mj_ros.init(n);
   mj_sim.init();
-
 #ifdef VISUAL
   mj_visual.init();
 #endif
 
-  mjcb_control = controller;
+  std::thread ros_thread(ros_run);
 
-  std::thread publish_joint_state_thread(&MjRos::publish_joint_state, &mj_ros);
-  std::thread publish_follow_joint_traj_feedback_thread(&MjRos::publish_follow_joint_traj_feedback, &mj_ros);
-  
+  mjcb_control = controller;
+  const ros::Time time_start = ros::Time::now();
   while (ros::ok())
   {
 #ifdef VISUAL
@@ -70,14 +87,14 @@ int main(int argc, char **argv)
 #endif
 
     mjtNum simstart = d->time;
-    
+
     while (d->time - simstart < 1.0 / 60.0)
     {
       mtx.lock();
       mj_step(m, d);
       mtx.unlock();
     }
-    double error = (ros::Time().now().toSec() - MjRos::ros_start.toSec()) - (d->time - MjSim::sim_start);
+    double error = ((ros::Time::now() - time_start).toSec()) - (d->time - MjSim::sim_start);
     m->opt.timestep *= 1 + mju_pow(mju_abs(error), REDUCE) * mju_sign(error);
 
 #ifdef VISUAL
@@ -88,9 +105,7 @@ int main(int argc, char **argv)
 #ifdef VISUAL
   mj_visual.terminate();
 #endif
-
-  publish_joint_state_thread.join();
-  publish_follow_joint_traj_feedback_thread.join();
+  ros_thread.join();
 
   // free MuJoCo model and data, deactivate
   mj_deleteData(d);
