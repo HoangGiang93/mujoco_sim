@@ -13,25 +13,17 @@ public:
 public:
     void init();
 
-    void computed_torque_controller();
+    void controller();
 
 public:
     static std::vector<std::string> q_names;
-    static double sim_start;
 
     static std::map<std::string, mjtNum> q_inits;
-    static std::map<std::string, mjtNum> q_refs;
-    static std::map<std::string, mjtNum> dq_refs;
-    static std::map<std::string, mjtNum> ddq_refs;
-
-    static std::vector<double> Kp;
-    static std::vector<double> Kv;
-    static std::vector<double> Ki;
 
     static mjtNum *u;
 
-private:
-    std::map<std::string, mjtNum> e_sum;
-    
+    static mjtNum sim_start;
+
+private:    
     mjtNum *tau;
 };

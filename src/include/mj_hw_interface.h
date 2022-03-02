@@ -24,7 +24,7 @@ private:
 
     // Hardware interfaces
     hardware_interface::JointStateInterface joint_state_interface;
-    std::map<std::string, hardware_interface::EffortJointInterface> effort_joint_interfaces;
+    hardware_interface::EffortJointInterface effort_joint_interface;
 
 private:
     std::size_t num_joints;
