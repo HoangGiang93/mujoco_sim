@@ -15,15 +15,17 @@ public:
     ~MjHWInterface();
 
 public:
-    void read(const ros::Time &, const ros::Duration &period) override;
+    void read();
 
-    void write(const ros::Time &, const ros::Duration &period) override;
+    void write();
 
 private:
     ros::NodeHandle n;
 
     // Hardware interfaces
     hardware_interface::JointStateInterface joint_state_interface;
+    hardware_interface::PositionJointInterface position_joint_interface;
+    hardware_interface::VelocityJointInterface velocity_joint_interface;
     hardware_interface::EffortJointInterface effort_joint_interface;
 
 private:

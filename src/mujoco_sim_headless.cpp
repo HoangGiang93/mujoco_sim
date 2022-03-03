@@ -59,8 +59,8 @@ int main(int argc, char **argv)
   spinner.start();
 
   const ros::Time ros_start = ros::Time::now();
-  ros::Time last_sim_time;
-  ros::Time last_write_sim_time;
+  ros::Time last_sim_time = ros_start;
+  ros::Time last_write_sim_time = ros_start;
 
   while (ros::ok())
   {
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     mjtNum sim_step_start = d->time;
     while (d->time - sim_step_start < 1.0 / 60.0)
     {
-      ros::Time sim_time = (ros::Time)d->time;
+      ros::Time sim_time = (ros::Time)(ros_start.toSec() + d->time);
       ros::Duration sim_period = sim_time - last_sim_time;
 
       mj_step1(m, d);
@@ -85,13 +85,13 @@ int main(int argc, char **argv)
         last_sim_time = sim_time;
 
         // update the robot simulation with the state of the mujoco model
-        mj_hw_interface.read(sim_time, sim_period);
+        mj_hw_interface.read();
 
         // compute the controller commands
         controller_manager.update(sim_time, sim_period);
       }
       // update the mujoco model with the result of the controller
-      mj_hw_interface.write(sim_time, sim_time - last_write_sim_time);
+      mj_hw_interface.write();
       last_write_sim_time = sim_time;
 
       mj_step2(m, d);

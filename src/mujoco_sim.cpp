@@ -87,13 +87,13 @@ int main(int argc, char **argv)
         last_sim_time = sim_time;
 
         // update the robot simulation with the state of the mujoco model
-        mj_hw_interface.read(sim_time, sim_period);
+        mj_hw_interface.read();
 
         // compute the controller commands
         controller_manager.update(sim_time, sim_period);
       }
       // update the mujoco model with the result of the controller
-      mj_hw_interface.write(sim_time, sim_time - last_write_sim_time);
+      mj_hw_interface.write();
       last_write_sim_time = sim_time;
 
       mj_step2(m, d);
