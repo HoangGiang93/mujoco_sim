@@ -12,7 +12,7 @@ MjHWInterface::MjHWInterface()
         mju_warning_s("Couldn't find joints and positions in %s/init_positions, set default to 0", n.getNamespace().c_str());
     }
 
-    num_joints = MjSim::q_names.size();
+    std::size_t num_joints = MjSim::q_names.size();
     joint_positions.resize(num_joints, 0.);
     joint_velocities.resize(num_joints, 0.);
     joint_efforts.resize(num_joints, 0.);
@@ -54,5 +54,4 @@ void MjHWInterface::write(const ros::Time& time, const ros::Duration& period)
         int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::q_names[i].c_str());
         MjSim::u[idx] = joint_efforts_command[i];
     }
-    
 }

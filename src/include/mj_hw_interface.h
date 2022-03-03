@@ -27,8 +27,6 @@ private:
     hardware_interface::EffortJointInterface effort_joint_interface;
 
 private:
-    std::size_t num_joints;
-
     // States
     std::vector<double> joint_positions;
     std::vector<double> joint_velocities;
