@@ -61,8 +61,8 @@ int main(int argc, char **argv)
   spinner.start();
 
   const ros::Time ros_start = ros::Time::now();
-  ros::Time last_sim_time;
-  ros::Time last_write_sim_time;
+  ros::Time last_sim_time = ros_start;
+  ros::Time last_write_sim_time = ros_start;
 
   while (ros::ok())
   {
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     mjtNum sim_step_start = d->time;
     while (d->time - sim_step_start < 1.0 / 60.0)
     {
-      ros::Time sim_time = (ros::Time)d->time;
+      ros::Time sim_time = (ros::Time)(ros_start.toSec() + d->time);
       ros::Duration sim_period = sim_time - last_sim_time;
 
       mj_step1(m, d);
