@@ -62,7 +62,6 @@ int main(int argc, char **argv)
 
   const ros::Time ros_start = ros::Time::now();
   ros::Time last_sim_time = ros_start;
-  ros::Time last_write_sim_time = ros_start;
 
   while (ros::ok())
   {
@@ -94,13 +93,12 @@ int main(int argc, char **argv)
       }
       // update the mujoco model with the result of the controller
       mj_hw_interface.write();
-      last_write_sim_time = sim_time;
 
       mj_step2(m, d);
     }
 
     // Change timestep when out of sync
-    double error = ((ros::Time::now() - ros_start).toSec()) - (d->time - MjSim::sim_start);
+    double error = (ros::Time::now() - ros_start).toSec() - (d->time - MjSim::sim_start);
     if (mju_abs(error) > 0.01)
     {
       m->opt.timestep *= 1 + mju_pow(mju_abs(error), REDUCE) * mju_sign(error);
