@@ -21,13 +21,11 @@ void MjSim::init()
     
     tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *)); mju_zero(tau, m->nv);
 
-    mjtNum q_init_array[m->nv] = {0.};
-    for (std::string q_name : q_names)
+    for (const std::string q_name : q_names)
     {
         int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, q_name.c_str());
-        q_init_array[idx] = q_inits[q_name];
+        d->qpos[idx] = q_inits[q_name];
     }
-    mju_copy(d->qpos, q_init_array, m->nq);
     mj_forward(m, d);
 }
 
