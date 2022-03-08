@@ -15,7 +15,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "GLFW/glfw3.h"
+#include "glfw3.h"
 #include "mujoco.h"
 
 // MuJoCo data structures

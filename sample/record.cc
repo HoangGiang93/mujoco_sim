@@ -26,7 +26,7 @@
   OSMesaContext ctx;
   unsigned char buffer[10000000];
 #else
-  #include <GLFW/glfw3.h>
+  #include "glfw3.h"
 #endif
 
 #include "array_safety.h"
