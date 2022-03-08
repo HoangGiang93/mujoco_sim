@@ -162,19 +162,19 @@ add_executable(${PROJECT_NAME}_headless src/mujoco_sim_headless.cpp)
 target_link_libraries(${PROJECT_NAME}
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_lib
-  ${PROJECT_SOURCE_DIR}/bin/libglfw.so.3
-  ${PROJECT_SOURCE_DIR}/bin/libmujoco210.so
-  ${PROJECT_SOURCE_DIR}/bin/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
+  ${PROJECT_SOURCE_DIR}/lib/libglfw.so.3
+  ${PROJECT_SOURCE_DIR}/lib/libmujoco.so
+  ${PROJECT_SOURCE_DIR}/lib/libGLEW.so.2.2
+  ${PROJECT_SOURCE_DIR}/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
   GL
   m
-  glew
 )
 
 target_link_libraries(${PROJECT_NAME}_headless
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_headless_lib
-  ${PROJECT_SOURCE_DIR}/bin/libmujoco210nogl.so
-  ${PROJECT_SOURCE_DIR}/bin/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
+  ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
+  ${PROJECT_SOURCE_DIR}/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
 )
 
 
