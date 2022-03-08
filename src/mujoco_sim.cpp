@@ -57,7 +57,7 @@ int main(int argc, char **argv)
   MjHWInterface mj_hw_interface;
   controller_manager::ControllerManager controller_manager(&mj_hw_interface);
 
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(3);
   spinner.start();
 
   const ros::Time ros_start = ros::Time::now();
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
       mj_step1(m, d);
       // check if we should update the controllers
-      if (d->time > 0.1 && sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz, start from 0.1s to avoid unstable
+      if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz, start from 0.1s to avoid unstable
       {
         // store simulation time
         last_sim_time = sim_time;
@@ -99,9 +99,13 @@ int main(int argc, char **argv)
 
     // Change timestep when out of sync
     double error = (ros::Time::now() - ros_start).toSec() - (d->time - MjSim::sim_start);
-    if (mju_abs(error) > 0.01)
+    if (mju_abs(error) > 0.1)
     {
       m->opt.timestep *= 1 + mju_pow(mju_abs(error), REDUCE) * mju_sign(error);
+      if (m->opt.timestep > 0.01)
+      {
+        m->opt.timestep = 0.01;
+      }
     }
 
 #ifdef VISUAL

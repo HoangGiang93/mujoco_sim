@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   roslib
   controller_manager
+  tf2_ros
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES 
-  CATKIN_DEPENDS roscpp std_msgs roslib
+  CATKIN_DEPENDS roscpp std_msgs roslib tf2_ros
 #  DEPENDS system_lib
 )
 
@@ -116,18 +117,12 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
+  ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
   ${PROJECT_SOURCE_DIR}/src/include
-  ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_hw_interface_lib
-  ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp
-  ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
-  ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
-)
-
 add_library(${PROJECT_NAME}_lib
   ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
@@ -169,6 +164,7 @@ target_link_libraries(${PROJECT_NAME}
   ${PROJECT_NAME}_lib
   ${PROJECT_SOURCE_DIR}/bin/libglfw.so.3
   ${PROJECT_SOURCE_DIR}/bin/libmujoco210.so
+  ${PROJECT_SOURCE_DIR}/bin/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
   GL
   m
   glew
@@ -178,6 +174,7 @@ target_link_libraries(${PROJECT_NAME}_headless
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/bin/libmujoco210nogl.so
+  ${PROJECT_SOURCE_DIR}/bin/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
 )
 
 

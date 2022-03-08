@@ -7,6 +7,8 @@
 #include "hardware_interface/joint_state_interface.h"
 #include "hardware_interface/joint_command_interface.h"
 
+#include "tf2_ros/transform_broadcaster.h"
+
 class MjHWInterface : public hardware_interface::RobotHW
 {
 public:
@@ -38,4 +40,9 @@ private:
     // std::vector<double> joint_positions_command;
     // std::vector<double> joint_velocities_command;
     std::vector<double> joint_efforts_command;
+
+    // Sensor data
+    std::vector<std::string> object_names;
+
+    tf2_ros::TransformBroadcaster br;
 };
