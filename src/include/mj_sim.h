@@ -13,6 +13,10 @@ public:
 public:
     void init();
 
+    void init_malloc();
+
+    void add_data(std::string data_xml_path);
+
     void controller();
 
 public:

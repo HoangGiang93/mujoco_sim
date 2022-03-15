@@ -29,9 +29,10 @@ public:
 
     void terminate();
 
-private:
+public:
     GLFWwindow *window = NULL; 
-
+    
+private:
     static mjvCamera cam;  // abstract camera
     static mjvOption opt;  // visualization options
     static mjvScene scn;   // abstract scene

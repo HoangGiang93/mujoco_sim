@@ -5,8 +5,9 @@
 #include "mj_visual.h"
 #endif
 #include "mj_hw_interface.h"
-#include "controller_manager/controller_manager.h"
-#include "thread"
+#include <controller_manager/controller_manager.h>
+#include <thread>
+#include <ros/package.h>
 
 static MjSim mj_sim;
 #ifdef VISUAL
@@ -35,6 +36,20 @@ void load_model(int argc, char **argv)
   d = mj_makeData(m);
 }
 
+#ifdef VISUAL
+// keyboard callback
+void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
+{
+  if (act == GLFW_PRESS && key == GLFW_KEY_SPACE)
+  {
+    std::string path = ros::package::getPath("mujoco_sim");
+    std::string file_name = "ball.xml";
+    std::string data_xml_path = path + "/model/tmp/" + file_name;
+    mj_sim.add_data(data_xml_path);
+  }
+}
+#endif
+
 void controller(const mjModel *m, mjData *d)
 {
   mj_sim.controller();
@@ -48,12 +63,14 @@ int main(int argc, char **argv)
   load_model(argc, argv);
 
   mj_sim.init();
+
 #ifdef VISUAL
   mj_visual.init();
+  glfwSetKeyCallback(mj_visual.window, keyboard);
 #endif
 
   mjcb_control = controller;
-  
+
   MjHWInterface mj_hw_interface;
   controller_manager::ControllerManager controller_manager(&mj_hw_interface);
 
