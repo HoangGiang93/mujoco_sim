@@ -165,7 +165,7 @@ target_link_libraries(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/lib/libglfw.so.3
   ${PROJECT_SOURCE_DIR}/lib/libmujoco.so
   ${PROJECT_SOURCE_DIR}/lib/libGLEW.so.2.2
-  ${PROJECT_SOURCE_DIR}/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
+  /opt/ros/noetic/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
   GL
   m
 )
@@ -174,7 +174,7 @@ target_link_libraries(${PROJECT_NAME}_headless
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
-  ${PROJECT_SOURCE_DIR}/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
+  /opt/ros/noetic/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
 )
 
 
