@@ -11,11 +11,6 @@ mjtNum *MjSim::u = NULL;
 
 mjtNum MjSim::sim_start;
 
-MjSim::MjSim()
-{
-
-}
-
 void MjSim::init_malloc()
 {
     u = (mjtNum *)malloc(m->nv * sizeof(mjtNum *)); mju_zero(u, m->nv);

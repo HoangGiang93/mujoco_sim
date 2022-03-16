@@ -8,7 +8,7 @@
 class MjSim
 {
 public:
-    MjSim();
+    MjSim() = default;
 
 public:
     void init();

@@ -106,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES 
-  CATKIN_DEPENDS roscpp std_msgs roslib tf2_ros
+  CATKIN_DEPENDS roscpp std_msgs roslib
 #  DEPENDS system_lib
 )
 
@@ -125,6 +125,7 @@ include_directories(
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_lib
   ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp
+  ${PROJECT_SOURCE_DIR}/src/src/mj_ros.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_visual.cpp
@@ -132,6 +133,7 @@ add_library(${PROJECT_NAME}_lib
 
 add_library(${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/src/src/mj_hw_interface.cpp 
+  ${PROJECT_SOURCE_DIR}/src/src/mj_ros.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/src/mj_sim.cpp
 )
@@ -165,7 +167,6 @@ target_link_libraries(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/lib/libglfw.so.3
   ${PROJECT_SOURCE_DIR}/lib/libmujoco.so
   ${PROJECT_SOURCE_DIR}/lib/libGLEW.so.2.2
-  /opt/ros/noetic/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
   GL
   m
 )
@@ -174,7 +175,6 @@ target_link_libraries(${PROJECT_NAME}_headless
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
-  /opt/ros/noetic/lib/libtf2_ros.so # Fix bug undefined reference to `tf2_ros::TransformBroadcaster::TransformBroadcaster()
 )
 
 

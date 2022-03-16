@@ -12,11 +12,6 @@ bool MjVisual::button_right = false;
 double MjVisual::lastx = 0;
 double MjVisual::lasty = 0;
 
-MjVisual::MjVisual()
-{
-
-}
-
 void MjVisual::init()
 {
     // init GLFW

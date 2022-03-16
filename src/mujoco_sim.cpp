@@ -4,6 +4,7 @@
 #ifdef VISUAL
 #include "mj_visual.h"
 #endif
+#include "mj_ros.h"
 #include "mj_hw_interface.h"
 #include <controller_manager/controller_manager.h>
 #include <thread>
@@ -61,8 +62,10 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   load_model(argc, argv);
-
+  
+  MjRos mj_ros;
   mj_sim.init();
+  mj_ros.init();
 
 #ifdef VISUAL
   mj_visual.init();
@@ -112,6 +115,7 @@ int main(int argc, char **argv)
       mj_hw_interface.write();
 
       mj_step2(m, d);
+      mj_ros.tick();
     }
 
     // Change timestep when out of sync

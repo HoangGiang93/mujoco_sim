@@ -7,7 +7,7 @@
 class MjVisual
 {
 public:
-    MjVisual();
+    MjVisual() = default;
 
 public:
     void init();
