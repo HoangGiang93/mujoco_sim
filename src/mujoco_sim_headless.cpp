@@ -9,7 +9,6 @@
 #include <ros/package.h>
 
 static MjSim mj_sim;
-static MjRos mj_ros;
 #ifdef VISUAL
 static MjVisual mj_visual;
 #endif
@@ -61,7 +60,8 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   load_model(argc, argv);
-
+  
+  MjRos mj_ros;
   mj_sim.init();
   mj_ros.init();
 
