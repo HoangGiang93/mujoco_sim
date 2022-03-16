@@ -4,6 +4,7 @@
 
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <visualization_msgs/Marker.h>
 
 class MjRos
 {

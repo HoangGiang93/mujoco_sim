@@ -26,17 +26,62 @@ void MjRos::init()
 void MjRos::update()
 {
     ros::Rate loop_rate(60);
+    ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 0);
     while (ros::ok())
     {
-        geometry_msgs::TransformStamped transform;
-        transform.header.stamp = ros::Time::now();
-        transform.header.frame_id = "map";
+        visualization_msgs::Marker marker;
+        marker.header.frame_id = "map";
+        marker.header.stamp = ros::Time();
+        marker.id = 0;
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.color.a = 1.0;
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+        marker.color.b = 0.0;
+
         std::string object_name;
         for (int idx = 1; idx < m->nbody; idx++)
         {
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, idx);
             if(std::find(link_names.begin(), link_names.end(), object_name) == link_names.end()) 
             {
+                int geom_idx = m->body_geomadr[idx];
+                if (geom_idx != -1)
+                {
+                    marker.id++;
+                    int size_idx[2] = {0, 0};
+                    switch (m->geom_type[geom_idx])
+                    {
+                    case mjtGeom::mjGEOM_SPHERE:
+                        marker.type = visualization_msgs::Marker::SPHERE;
+                        break;
+
+                    case mjtGeom::mjGEOM_BOX:
+                        marker.type = visualization_msgs::Marker::CUBE;
+                        size_idx[0] = 1;
+                        size_idx[1] = 2;
+                        break;
+                    
+                    default:
+                        break;
+                    }
+                    marker.scale.x = m->geom_size[3*geom_idx]*2;
+                    marker.scale.y = m->geom_size[3*geom_idx+size_idx[0]]*2;
+                    marker.scale.z = m->geom_size[3*geom_idx+size_idx[1]]*2;
+                    marker.pose.position.x = d->xpos[3*idx];
+                    marker.pose.position.y = d->xpos[3*idx+1];
+                    marker.pose.position.z = d->xpos[3*idx+2];
+                    marker.pose.orientation.x = d->xquat[4*idx+1];
+                    marker.pose.orientation.y = d->xquat[4*idx+2];
+                    marker.pose.orientation.z = d->xquat[4*idx+3];
+                    marker.pose.orientation.w = d->xquat[4*idx];
+                    vis_pub.publish(marker);
+                }
+
+                geometry_msgs::TransformStamped transform;
+                transform.header.stamp = ros::Time::now();
+                transform.header.frame_id = "map";
+
                 transform.child_frame_id = object_name;
                 transform.transform.translation.x = d->xpos[3*idx];
                 transform.transform.translation.y = d->xpos[3*idx+1];
