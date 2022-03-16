@@ -13,7 +13,7 @@ public:
 public:
     void init();
 
-    void tick();
+    void update();
 
 private:
     ros::NodeHandle n;
@@ -21,5 +21,5 @@ private:
     tf2_ros::TransformBroadcaster br;
 
     // Sensor data
-    std::vector<std::string> object_names;
+    std::vector<std::string> link_names;
 };

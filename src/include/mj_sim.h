@@ -20,7 +20,7 @@ public:
     void controller();
 
 public:
-    static std::vector<std::string> q_names;
+    static std::vector<std::string> joint_names;
 
     static std::map<std::string, mjtNum> q_inits;
 

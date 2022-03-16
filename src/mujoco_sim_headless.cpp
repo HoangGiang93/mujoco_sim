@@ -62,9 +62,9 @@ int main(int argc, char **argv)
   load_model(argc, argv);
   
   MjRos mj_ros;
-  mj_sim.init();
   mj_ros.init();
-
+  mj_sim.init();
+  
 #ifdef VISUAL
   mj_visual.init();
   glfwSetKeyCallback(mj_visual.window, keyboard);
@@ -80,6 +80,8 @@ int main(int argc, char **argv)
 
   const ros::Time ros_start = ros::Time::now();
   ros::Time last_sim_time = ros_start;
+
+  std::thread ros_thread(&MjRos::update, mj_ros);
 
   while (ros::ok())
   {
@@ -113,7 +115,6 @@ int main(int argc, char **argv)
       mj_hw_interface.write();
 
       mj_step2(m, d);
-      mj_ros.tick();
     }
 
     // Change timestep when out of sync
@@ -136,6 +137,8 @@ int main(int argc, char **argv)
   mj_visual.terminate();
 #endif
 
+  ros_thread.join();
+  
   // free MuJoCo model and data, deactivate
   mj_deleteData(d);
   mj_deleteModel(m);

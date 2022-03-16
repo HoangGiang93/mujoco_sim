@@ -12,4 +12,4 @@ all:
 	rm *.o
 
 test:
-	g++ $(COMMON) test.cc    	-lmujoco -lGL -lGLEW ../lib/libglfw.so.3			-o ../bin/test
+	g++ $(COMMON) test.cc    	-lmujoco -lGL -lGLEW ../lib/libglfw.so.3 -ltinyxml  -o ../bin/test

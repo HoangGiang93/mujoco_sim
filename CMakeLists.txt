@@ -169,12 +169,14 @@ target_link_libraries(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/lib/libGLEW.so.2.2
   GL
   m
+  tinyxml2
 )
 
 target_link_libraries(${PROJECT_NAME}_headless
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
+  tinyxml2
 )
 
 

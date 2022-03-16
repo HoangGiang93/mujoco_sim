@@ -14,6 +14,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <tinyxml.h>
 
 #include "glfw3.h"
 #include "mujoco.h"
@@ -32,6 +33,7 @@ bool button_middle = false;
 bool button_right = false;
 double lastx = 0;
 double lasty = 0;
+int idx = 0;
 
 void load_data(const char *filename)
 {
@@ -50,64 +52,103 @@ void load_data(const char *filename)
 
 void add_data(const char *filename)
 {
-  FILE *fptr;
-  int i = 0;
-  char buff[255];
-  char content[10000];
+  TiXmlDocument doc("../model/test/current.xml");
+	if (doc.LoadFile())
+	{
+		TiXmlElement* pElem = doc.FirstChildElement()->FirstChildElement();
 
-  fptr = fopen("../model/test/current.xml", "r");
+    while (strcmp(pElem->Value(), "worldbody") != 0 && pElem != nullptr)
+    {
+      pElem = pElem->NextSiblingElement();
+    }
+
+    TiXmlElement* body = pElem->FirstChildElement();
+    
+    while (body != nullptr)
+    {
+      if (strcmp(body->Value(), "body") == 0)
+      {
+        TiXmlAttribute* name = body->FirstAttribute();
+        while (name != nullptr)
+        {
+          if (strcmp(name->Name(), "name") == 0)
+          {
+            printf("%s\n", name->Value());
+            name->SetValue(std::string(name->Value()) + "_" + std::to_string(idx++));
+            break;
+          }
+          name = name->Next();
+        }
+      }
+      body = body->NextSiblingElement();
+    }
+    doc.SaveFile("../model/test/test.xml");
+	}
+	else
+	{
+		printf("Failed to load file \"%s\"\n", "../model/test/current.xml");
+	}
+
+  // FILE *fptr;
+  // int i = 0;
+  // char buff[255];
+  // char content[10000];
+
+
+
+  // fptr = fopen("../model/test/current.xml", "r");
   
-  if (fgets(buff, 255, fptr))
-  {
-    strcat(content, buff);
-  }
-  strcat(content, "\t<include file=\"");
-  strcat(content, filename);
-  strcat(content, "\"/>\n");
-  while (fgets(buff, 255, fptr))
-  {
-    strcat(content, buff);
-  }
-  fclose(fptr);
+  // if (fgets(buff, 255, fptr))
+  // {
+  //   strcat(content, buff);
+  // }
+  // strcat(content, "\t<include file=\"");
+  // strcat(content, filename);
+  // strcat(content, "\"/>\n");
+  // while (fgets(buff, 255, fptr))
+  // {
+  //   strcat(content, buff);
+  // }
+  // fclose(fptr);
 
-  fptr = fopen("../model/test/tmp.xml", "w");
-  fprintf(fptr, "%s", content);
-  fclose(fptr);
+  // fptr = fopen("../model/test/new.xml", "w");
+  // fprintf(fptr, "%s", content);
+  // fclose(fptr);
 
   // load and compile model
-  char error[1000] = "Could not load binary model";
-  mjModel*m_new = mj_loadXML("../model/test/tmp.xml", 0, error, 1000);
-  if (!m_new) {
-    mju_error_s("Load model error: %s", error);
-  }
+  // char error[1000] = "Could not load binary model";
+  // mjModel*m_new = mj_loadXML("../model/test/new.xml", 0, error, 1000);
+  // if (!m_new) {
+  //   mju_error_s("Load model error: %s", error);
+  // }
 
-  // make data
-  mjData *d_new = mj_makeData(m_new);
-  d_new->time = d->time;
+  // // make data
+  // mjData *d_new = mj_makeData(m_new);
+  // d_new->time = d->time;
 
-  mju_copy(d_new->qpos, d->qpos, m->nq);
+  // mju_copy(d_new->qpos, d->qpos, m->nq);
 
-  mju_copy(d_new->qvel, d->qvel, m->nv);
-  mju_copy(d_new->qacc_warmstart, d->qacc_warmstart, m->nv);
-  mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->nv);
-  mju_copy(d_new->qacc, d->qacc, m->nv);
+  // mju_copy(d_new->qvel, d->qvel, m->nv);
+  // mju_copy(d_new->qacc_warmstart, d->qacc_warmstart, m->nv);
+  // mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->nv);
+  // mju_copy(d_new->qacc, d->qacc, m->nv);
 
-  mju_copy(d_new->act, d->act, m->na);
-  mju_copy(d_new->act_dot, d->act_dot, m->na);
-  mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->na);
-  mju_copy(d_new->qacc, d->qacc, m->na);
+  // mju_copy(d_new->act, d->act, m->na);
+  // mju_copy(d_new->act_dot, d->act_dot, m->na);
+  // mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->na);
+  // mju_copy(d_new->qacc, d->qacc, m->na);
   
-  mju_copy(d_new->xfrc_applied, d->xfrc_applied, m->nbody * 6);
+  // mju_copy(d_new->xfrc_applied, d->xfrc_applied, m->nbody * 6);
   
-  mju_copy(d_new->mocap_pos,  d->mocap_pos,  3*m->nmocap);
-  mju_copy(d_new->mocap_quat, d->mocap_quat, 4*m->nmocap);
+  // mju_copy(d_new->mocap_pos,  d->mocap_pos,  3*m->nmocap);
+  // mju_copy(d_new->mocap_quat, d->mocap_quat, 4*m->nmocap);
 
-  mju_copy(d_new->userdata, d->userdata, m->nuserdata);
+  // mju_copy(d_new->userdata, d->userdata, m->nuserdata);
 
-  mju_copy(d_new->sensordata, d->sensordata, m->nsensordata);
+  // mju_copy(d_new->sensordata, d->sensordata, m->nsensordata);
   
-  d = d_new;
-  m = mj_copyModel(NULL, m_new);
+  // d = d_new;
+  // m = mj_copyModel(NULL, m_new);
 }
 
 // keyboard callback
