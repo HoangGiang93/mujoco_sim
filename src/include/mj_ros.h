@@ -36,6 +36,4 @@ private:
     geometry_msgs::TransformStamped transform;
 
     tf2_ros::TransformBroadcaster br;
-    
-    std::vector<std::string> link_names;
 };

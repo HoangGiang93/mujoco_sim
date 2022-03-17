@@ -41,10 +41,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
 {
   if (act == GLFW_PRESS && key == GLFW_KEY_SPACE)
   {
-    std::string path = ros::package::getPath("mujoco_sim");
-    std::string file_name = "ball.xml";
-    std::string data_xml_path = path + "/model/tmp/" + file_name;
-    mj_sim.add_data(data_xml_path);
+    MjSim::add_data();
   }
 }
 #endif

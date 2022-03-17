@@ -3,7 +3,7 @@
 #include <tinyxml2.h>
 #include <ros/package.h>
 
-void MjRos::init()
+void MjRos::init() 
 {
     n = ros::NodeHandle();
     if (!n.getParam("joint_names", MjSim::joint_names))
@@ -21,14 +21,15 @@ void MjRos::init()
     {
         joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
         link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_idx]);
-        link_names.push_back(link_name);
+        MjSim::link_names.push_back(link_name);
     }
 
-    object_gen_sub = n.subscribe("create_object", 1000, &MjRos::object_gen_callback, this);
+    object_gen_sub = n.subscribe("create_object", 1, &MjRos::object_gen_callback, this);
 }
 
 void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
 {
+    // Create add.xml
     std::string path = ros::package::getPath("mujoco_sim");
     tinyxml2::XMLDocument object_xml_doc;
     tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
@@ -88,9 +89,63 @@ void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
                                 std::to_string(msg.pose.orientation.z))
                                    .c_str());
 
-    object_xml_doc.SaveFile((path + "/model/tmp/object.xml").c_str());
+    object_xml_doc.SaveFile((path + "/model/tmp/add.xml").c_str());
 
-    MjSim::add_data(path + "/model/tmp/object.xml");
+    // Save current.xml
+    std::string current_xml = "current.xml";
+    std::string current_xml_path = path + "/model/tmp/" + current_xml;
+
+    char error[1000] = "Could not load binary model";
+    mj_saveLastXML(current_xml_path.c_str(), m, error, 1000);
+
+    // Modify current.xml
+    tinyxml2::XMLDocument current_xml_doc;
+    if (current_xml_doc.LoadFile(current_xml_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_warning_s("Failed to load file \"%s\"\n", current_xml_path.c_str());
+        return;
+    }
+    worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
+    while (worldbody_element != nullptr)
+    {
+        if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+        {
+        body_element = worldbody_element->FirstChildElement();
+        while (body_element != nullptr)
+        {
+            if (strcmp(body_element->Value(), "body") == 0)
+            {
+            const char *body_name = body_element->Attribute("name");
+            if (body_name != nullptr && std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end())
+            {
+                int body_idx = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
+                body_element->SetAttribute("pos",
+                                                (std::to_string(d->xpos[3 * body_idx]) + " " +
+                                                std::to_string(d->xpos[3 * body_idx + 1]) + " " +
+                                                std::to_string(d->xpos[3 * body_idx + 2]))
+                                                    .c_str());
+                body_element->SetAttribute("quat",
+                                                (std::to_string(d->xquat[4 * body_idx]) + " " +
+                                                std::to_string(d->xquat[4 * body_idx + 1]) + " " +
+                                                std::to_string(d->xquat[4 * body_idx + 2]) + " " +
+                                                std::to_string(d->xquat[4 * body_idx + 3]))
+                                                    .c_str());
+            }
+            }
+            body_element = body_element->NextSiblingElement();
+        }
+        }
+        worldbody_element = worldbody_element->NextSiblingElement();
+    }
+
+    // Add add.xml to current.xml
+    tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
+    tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
+    include_element->SetAttribute("file", "add.xml");
+    current_element->LinkEndChild(include_element);
+    current_xml_doc.SaveFile(current_xml_path.c_str());
+
+    MjSim::add_data();
 }
 
 void MjRos::update()
@@ -107,7 +162,7 @@ void MjRos::update()
         for (int body_idx = 1; body_idx < m->nbody; body_idx++)
         {
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx);
-            if (std::find(link_names.begin(), link_names.end(), object_name) == link_names.end())
+            if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
                 publish_markers(body_idx, object_name);
 
