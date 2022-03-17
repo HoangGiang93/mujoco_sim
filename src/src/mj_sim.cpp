@@ -10,6 +10,8 @@ std::map<std::string, mjtNum> MjSim::q_inits;
 
 mjtNum *MjSim::u = NULL;
 
+mjtNum *MjSim::tau = NULL;
+
 mjtNum MjSim::sim_start;
 
 void MjSim::init_malloc()
@@ -36,18 +38,19 @@ void MjSim::init()
 
 void MjSim::add_data(const std::string data_xml_path)
 {
-  mtx.lock();
   std::string path = ros::package::getPath("mujoco_sim");
 
   tinyxml2::XMLDocument data_xml_doc;
   if (data_xml_doc.LoadFile(data_xml_path.c_str()) != tinyxml2::XML_SUCCESS)
   {
-    mju_error_s("Failed to load file \"%s\"\n", data_xml_path.c_str());
+    mju_warning_s("Failed to load file \"%s\"\n", data_xml_path.c_str());
+    return;
   }
   tinyxml2::XMLElement *data_element = data_xml_doc.FirstChildElement();
   if (strcmp(data_element->Value(), "mujoco") != 0)
   {
-    mju_error_s("Failed to read file \"%s\", first tag should be <mujoco>\n", data_xml_path.c_str());
+    mju_warning_s("Failed to read file \"%s\", first tag should be <mujoco>\n", data_xml_path.c_str());
+    return;
   }
   data_element = data_element->FirstChildElement();
   static int idx = 0;
@@ -60,12 +63,7 @@ void MjSim::add_data(const std::string data_xml_path)
       {
         if (strcmp(worldbody_element->Value(), "body") == 0)
         {
-          if (const char *name = worldbody_element->Attribute("name"))
-          {
-            std::string name_with_idx = std::string(name) + "_" + std::to_string(idx++);
-            worldbody_element->SetAttribute("name", name_with_idx.c_str());
-          }
-          else
+          if (worldbody_element->Attribute("name") == nullptr)
           {
             std::string name_with_idx = "object_" + std::to_string(idx++);
             worldbody_element->SetAttribute("name", name_with_idx.c_str());
@@ -88,7 +86,8 @@ void MjSim::add_data(const std::string data_xml_path)
   tinyxml2::XMLDocument current_xml_doc;
   if (current_xml_doc.LoadFile(current_xml_path.c_str()) != tinyxml2::XML_SUCCESS)
   {
-    mju_error_s("Failed to load file \"%s\"\n", current_xml_path.c_str());
+    mju_warning_s("Failed to load file \"%s\"\n", current_xml_path.c_str());
+    return;
   }
 
   tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
@@ -97,13 +96,15 @@ void MjSim::add_data(const std::string data_xml_path)
   include_element->SetAttribute("file", add_xml.c_str());
   current_element->LinkEndChild(include_element);
   current_xml_doc.SaveFile(current_xml_path.c_str());
-
+  
   mjModel *m_new = mj_loadXML(current_xml_path.c_str(), 0, error, 1000);
   if (!m_new)
   {
-    mju_error_s("Load model error: %s", error);
+    mju_warning_s("Load model error: %s", error);
+    return;
   }
-
+  
+  mtx.lock();
   // make data
   mjData *d_new = mj_makeData(m_new);
   d_new->time = d->time;

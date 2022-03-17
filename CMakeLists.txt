@@ -10,6 +10,7 @@ project(mujoco_sim)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  mujoco_msgs
   roslib
   controller_manager
   tf2_ros
