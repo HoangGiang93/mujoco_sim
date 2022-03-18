@@ -49,7 +49,7 @@ void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
   {
     rtf_des *= 2;
   }
-  if (act == GLFW_PRESS && key == GLFW_KEY_KP_SUBTRACT && rtf_des > 1/8)
+  if (act == GLFW_PRESS && key == GLFW_KEY_KP_SUBTRACT && rtf_des > 1 / 8)
   {
     rtf_des /= 2;
   }
@@ -101,36 +101,29 @@ void simulate()
     static std::deque<double> last_ros_time;
     static int i = 0;
     double diff;
+    double ros_time;
+    do
+    {
+      ros_time = (ros::Time::now() - ros_start).toSec();
+      diff = ros_time - d->time/rtf_des;
+    } while (diff < 1E-3);
+    last_ros_time.push_front(ros_time);
+    last_sim_time.push_front(d->time);
     if (i == num_step)
     {
-      double ros_time_diff;
-      double sim_time_diff;
-      do
-      {
-        ros_time_diff = ros::Time::now().toSec() - ros_start.toSec() - last_ros_time.back();
-        sim_time_diff = d->time - last_sim_time.back();
-        diff = ros_time_diff - sim_time_diff/rtf_des;
-      } while (diff < 1E-3);
+      double ros_time_diff = ros_time - last_ros_time.back();
+      double sim_time_diff = d->time - last_sim_time.back();
       rtf = sim_time_diff / ros_time_diff;
-      last_ros_time.push_front((ros::Time::now() - ros_start).toSec());
       last_ros_time.pop_back();
-      last_sim_time.push_front(d->time);
       last_sim_time.pop_back();
     }
     else
     {
-      double ros_time;
-      do
-      {
-        ros_time = ros::Time::now().toSec();
-        diff = ros_time - sim_time.toSec();
-      } while (diff < 1E-3);
-      rtf = sim_time.toSec() / ros_time;
-      last_ros_time.push_front(ros_time - ros_start.toSec());
-      last_sim_time.push_front(d->time);
+      rtf = d->time / ros_time;
+
       i++;
     }
-    
+
     // m->opt.timestep *= 1 + mju_pow(mju_abs(diff), REDUCE) * mju_sign(diff);
   }
 }
@@ -141,11 +134,11 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   load_model(argc, argv);
-  
+
   MjRos mj_ros;
   mj_ros.init();
   mj_sim.init();
-  
+
 #ifdef VISUAL
   mj_visual.init();
   glfwSetKeyCallback(mj_visual.window, keyboard);
@@ -184,7 +177,7 @@ int main(int argc, char **argv)
 
   ros_thread.join();
   sim_thread.join();
-  
+
   // free MuJoCo model and data, deactivate
   mj_deleteData(d);
   mj_deleteModel(m);
