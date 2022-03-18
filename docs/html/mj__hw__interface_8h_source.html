@@ -79,41 +79,42 @@ $(function() {
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &lt;hardware_interface/joint_state_interface.h&gt;</span></div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;hardware_interface/joint_command_interface.h&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="classMjHWInterface.html">   10</a></span>&#160;<span class="keyword">class </span><a class="code" href="classMjHWInterface.html">MjHWInterface</a> : <span class="keyword">public</span> hardware_interface::RobotHW</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;{</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    <a class="code" href="classMjHWInterface.html#a10c07fc008d25919ae5989c5e0c293a8">MjHWInterface</a>();</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <a class="code" href="classMjHWInterface.html#ab633a47702853e9c7dd1d00f19f3f84f">~MjHWInterface</a>();</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjHWInterface.html#a8963dad3dd1c9616fdebb10b87c2656e">read</a>();</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjHWInterface.html#ad4714d683f19cbd3f5f697d405b3bfdf">write</a>();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    ros::NodeHandle n;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="comment">// Hardware interfaces</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    hardware_interface::JointStateInterface joint_state_interface;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="comment">// hardware_interface::PositionJointInterface position_joint_interface;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="comment">// hardware_interface::VelocityJointInterface velocity_joint_interface;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    hardware_interface::EffortJointInterface effort_joint_interface;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">// States</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    std::vector&lt;double&gt; joint_positions;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::vector&lt;double&gt; joint_velocities;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    std::vector&lt;double&gt; joint_efforts;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">// Commands</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_positions_command;</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_velocities_command;</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    std::vector&lt;double&gt; joint_efforts_command;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;};</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160; </div>
+<div class="line"><a name="l00011"></a><span class="lineno"><a class="line" href="classMjHWInterface.html">   11</a></span>&#160;<span class="keyword">class </span><a class="code" href="classMjHWInterface.html">MjHWInterface</a> : <span class="keyword">public</span> hardware_interface::RobotHW</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    <a class="code" href="classMjHWInterface.html#a10c07fc008d25919ae5989c5e0c293a8">MjHWInterface</a>();</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="classMjHWInterface.html#ab633a47702853e9c7dd1d00f19f3f84f">~MjHWInterface</a>();</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjHWInterface.html#a8963dad3dd1c9616fdebb10b87c2656e">read</a>();</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjHWInterface.html#ad4714d683f19cbd3f5f697d405b3bfdf">write</a>();</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    ros::NodeHandle n;</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <span class="comment">// Hardware interfaces</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    hardware_interface::JointStateInterface joint_state_interface;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="comment">// hardware_interface::PositionJointInterface position_joint_interface;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="comment">// hardware_interface::VelocityJointInterface velocity_joint_interface;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    hardware_interface::EffortJointInterface effort_joint_interface;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="comment">// States</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    std::vector&lt;double&gt; joint_positions;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    std::vector&lt;double&gt; joint_velocities;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    std::vector&lt;double&gt; joint_efforts;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// Commands</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_positions_command;</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_velocities_command;</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::vector&lt;double&gt; joint_efforts_command;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="amj__sim_8h_html"><div class="ttname"><a href="mj__sim_8h.html">mj_sim.h</a></div></div>
-<div class="ttc" id="aclassMjHWInterface_html"><div class="ttname"><a href="classMjHWInterface.html">MjHWInterface</a></div><div class="ttdef"><b>Definition:</b> mj_hw_interface.h:10</div></div>
+<div class="ttc" id="aclassMjHWInterface_html"><div class="ttname"><a href="classMjHWInterface.html">MjHWInterface</a></div><div class="ttdef"><b>Definition:</b> mj_hw_interface.h:11</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_ab633a47702853e9c7dd1d00f19f3f84f"><div class="ttname"><a href="classMjHWInterface.html#ab633a47702853e9c7dd1d00f19f3f84f">MjHWInterface::~MjHWInterface</a></div><div class="ttdeci">~MjHWInterface()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:34</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_ad4714d683f19cbd3f5f697d405b3bfdf"><div class="ttname"><a href="classMjHWInterface.html#ad4714d683f19cbd3f5f697d405b3bfdf">MjHWInterface::write</a></div><div class="ttdeci">void write()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:50</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_a10c07fc008d25919ae5989c5e0c293a8"><div class="ttname"><a href="classMjHWInterface.html#a10c07fc008d25919ae5989c5e0c293a8">MjHWInterface::MjHWInterface</a></div><div class="ttdeci">MjHWInterface()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:3</div></div>
