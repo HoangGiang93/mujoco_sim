@@ -6,7 +6,6 @@
 #include "mj_hw_interface.h"
 #include <controller_manager/controller_manager.h>
 #include <thread>
-#include <ros/package.h>
 
 static MjSim mj_sim;
 #ifdef VISUAL
