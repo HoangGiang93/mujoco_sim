@@ -10,6 +10,3 @@ all:
 	gcc -c -O2 -mavx -I../include ../sample/uitools.c
 	g++ $(COMMON) uitools.o simulate.cc -lmujoco -lGL -lGLEW ../lib/libglfw.so.3 	-o ../bin/simulate
 	rm *.o
-
-test:
-	g++ $(COMMON) test.cc    	-lmujoco -lGL -lGLEW ../lib/libglfw.so.3 -ltinyxml  -o ../bin/test
