@@ -6,6 +6,7 @@
 #include "mj_ros.h"
 
 #include <controller_manager/controller_manager.h>
+#include <experimental/filesystem>
 #include <thread>
 
 static MjSim mj_sim;
@@ -142,6 +143,11 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     load_model(argc, argv);
+    std::experimental::filesystem::path mujoco_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/meshes";
+    std::experimental::filesystem::path current_model_path = argv[1];
+    current_model_path = current_model_path.parent_path() / "meshes";
+
+    copy(current_model_path, mujoco_model_path);
 
     MjRos mj_ros;
     mj_ros.init();
@@ -185,6 +191,8 @@ int main(int argc, char **argv)
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);
     mj_deleteModel(m);
+
+    std::experimental::filesystem::remove_all(mujoco_model_path);
 
     return 0;
 }

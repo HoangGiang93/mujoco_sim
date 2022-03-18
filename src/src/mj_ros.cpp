@@ -8,7 +8,6 @@ ros::Time MjRos::ros_start;
 
 MjRos::~MjRos()
 {
-    object_gen_sub.shutdown();
 }
 
 void MjRos::init()
@@ -73,6 +72,14 @@ void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
         geom_element->SetAttribute("size", msg.scale.x);
         break;
 
+    case mujoco_msgs::ModelState::CYLINDER:
+        geom_element->SetAttribute("type", "cylinder");
+        geom_element->SetAttribute("size",
+                                   (std::to_string(msg.scale.x) + " " +
+                                    std::to_string(msg.scale.y))
+                                       .c_str());
+        break;
+
     default:
         break;
     }
@@ -135,18 +142,31 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
     int geom_idx = m->body_geomadr[body_idx];
     if (geom_idx != -1)
     {
-        int size_idx[2] = {0, 0};
         switch (m->geom_type[geom_idx])
         {
-        case mjtGeom::mjGEOM_SPHERE:
-            marker.type = visualization_msgs::Marker::SPHERE;
-            break;
-
         case mjtGeom::mjGEOM_BOX:
             marker.type = visualization_msgs::Marker::CUBE;
-            size_idx[0] = 1;
-            size_idx[1] = 2;
+            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.y = m->geom_size[3 * geom_idx + 1] * 2;
+            marker.scale.z = m->geom_size[3 * geom_idx + 2] * 2;
             break;
+
+        case mjtGeom::mjGEOM_SPHERE:
+            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
+            break;
+
+        case mjtGeom::mjGEOM_CYLINDER:
+            marker.type = visualization_msgs::Marker::CYLINDER;
+            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.y = m->geom_size[3 * geom_idx + 1] * 2;
+            break;
+
+        case mjtGeom::mjGEOM_MESH:
+            marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/meshes/" + object_name + ".dae";
+            marker.scale.x = 1;
+            marker.scale.y = 1;
+            marker.scale.z = 1;
 
         default:
             break;
@@ -159,9 +179,6 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
         marker.color.r = m->geom_rgba[4 * geom_idx];
         marker.color.g = m->geom_rgba[4 * geom_idx + 1];
         marker.color.b = m->geom_rgba[4 * geom_idx + 2];
-        marker.scale.x = m->geom_size[3 * geom_idx] * 2;
-        marker.scale.y = m->geom_size[3 * geom_idx + size_idx[0]] * 2;
-        marker.scale.z = m->geom_size[3 * geom_idx + size_idx[1]] * 2;
         marker.pose.position.x = d->xpos[3 * body_idx];
         marker.pose.position.y = d->xpos[3 * body_idx + 1];
         marker.pose.position.z = d->xpos[3 * body_idx + 2];

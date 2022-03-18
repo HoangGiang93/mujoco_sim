@@ -186,6 +186,7 @@ target_link_libraries(${PROJECT_NAME}
   GL
   m
   tinyxml2
+  stdc++fs
 )
 
 target_link_libraries(${PROJECT_NAME}_headless
@@ -193,6 +194,7 @@ target_link_libraries(${PROJECT_NAME}_headless
   ${PROJECT_NAME}_headless_lib
   ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
   tinyxml2
+  stdc++fs
 )
 
 
