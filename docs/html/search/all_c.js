@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['window_37',['window',['../classMjVisual.html#a9e524761f07bbead6f694bb08993683a',1,'MjVisual']]],
-  ['write_38',['write',['../classMjHWInterface.html#ad4714d683f19cbd3f5f697d405b3bfdf',1,'MjHWInterface']]]
+  ['u_42',['u',['../classMjSim.html#aa810b31343a0c16940cf482e29d504d0',1,'MjSim']]],
+  ['update_43',['update',['../classMjRos.html#ae23469f95794e23e0050bde0e5341762',1,'MjRos']]]
 ];

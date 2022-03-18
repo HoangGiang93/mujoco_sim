@@ -1,4 +1,6 @@
 <map id="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/include/mj_ros.h" name="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/include/mj_ros.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,192,61"/>
-<area shape="rect" id="node2" href="$mj__ros_8cpp.html" title=" " alt="" coords="9,109,188,165"/>
+<area shape="rect" id="node1" title=" " alt="" coords="208,5,395,61"/>
+<area shape="rect" id="node2" href="$mj__ros_8cpp.html" title=" " alt="" coords="5,109,184,165"/>
+<area shape="rect" id="node3" href="$mujoco__sim_8cpp.html" title=" " alt="" coords="208,109,395,165"/>
+<area shape="rect" id="node4" href="$mujoco__sim__headless_8cpp.html" title=" " alt="" coords="419,109,669,165"/>
 </map>

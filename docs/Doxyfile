@@ -27,8 +27,8 @@ GENERATE_LATEX          = NO
 #---------------------------------------------------------------------------
 INPUT                  =    ../src/src \
 INPUT                       ../src/include \
-INPUT                       ../../mujoco_sim.cpp \
-INPUT                       ../../mujoco_sim_headless.cpp \
+INPUT                       ../src/mujoco_sim.cpp \
+INPUT                       ../src/mujoco_sim_headless.cpp \
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \

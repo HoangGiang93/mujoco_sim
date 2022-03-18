@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['terminate_69',['terminate',['../classMjVisual.html#afc60b7a1494273fa5a831750fb55310b',1,'MjVisual']]]
+  ['read_79',['read',['../classMjHWInterface.html#a8963dad3dd1c9616fdebb10b87c2656e',1,'MjHWInterface']]],
+  ['render_80',['render',['../classMjVisual.html#aa7c69f9eabba9382d7a4b95d3a6eef36',1,'MjVisual']]]
 ];
