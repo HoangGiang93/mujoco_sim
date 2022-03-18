@@ -1,4 +1,6 @@
-*bin
+bin
+model/tmp/add.xml
+model/tmp/current.xml
 
 # Prerequisites
 *.d

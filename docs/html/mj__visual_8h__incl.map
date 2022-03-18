@@ -1,11 +1,10 @@
 <map id="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/include/mj_visual.h" name="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/include/mj_visual.h">
-<area shape="rect" id="node1" title=" " alt="" coords="65,5,271,61"/>
-<area shape="rect" id="node2" href="$mj__model_8h.html" title=" " alt="" coords="45,184,144,211"/>
-<area shape="rect" id="node5" title=" " alt="" coords="133,109,203,136"/>
-<area shape="rect" id="node6" href="$mj__sim_8h.html" title=" " alt="" coords="228,109,311,136"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,259,88,285"/>
-<area shape="rect" id="node4" title=" " alt="" coords="112,259,176,285"/>
-<area shape="rect" id="node7" title=" " alt="" coords="169,184,231,211"/>
-<area shape="rect" id="node8" title=" " alt="" coords="256,184,315,211"/>
-<area shape="rect" id="node9" title=" " alt="" coords="339,184,389,211"/>
+<area shape="rect" id="node1" title=" " alt="" coords="141,5,347,61"/>
+<area shape="rect" id="node2" href="$mj__sim_8h.html" title=" " alt="" coords="152,109,235,136"/>
+<area shape="rect" id="node8" title=" " alt="" coords="259,109,330,136"/>
+<area shape="rect" id="node3" href="$mj__model_8h.html" title=" " alt="" coords="45,184,144,211"/>
+<area shape="rect" id="node6" title=" " alt="" coords="168,184,219,211"/>
+<area shape="rect" id="node7" title=" " alt="" coords="243,184,306,211"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,259,88,285"/>
+<area shape="rect" id="node5" title=" " alt="" coords="112,259,176,285"/>
 </map>

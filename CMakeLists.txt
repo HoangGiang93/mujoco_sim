@@ -16,6 +16,21 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
 )
 
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    # set output file
+    set(DOXYGEN_OUT ${PROJECT_SOURCE_DIR}/docs/Doxyfile)
+
+    # note the option ALL which allows to build the docs together with the application
+    add_custom_target( doc_doxygen ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/docs
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
+else (DOXYGEN_FOUND)
+  message("Doxygen need to be installed to generate the doxygen documentation")
+endif (DOXYGEN_FOUND)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
