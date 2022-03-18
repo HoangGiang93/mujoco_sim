@@ -116,7 +116,8 @@ void MjRos::update()
     ros::Rate loop_rate(60);
     vis_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 0);
     marker.header.frame_id = "map";
-    marker.action = visualization_msgs::Marker::ADD;
+    marker.action = visualization_msgs::Marker::MODIFY;
+    marker.header.stamp = ros::Time();
 
     transform.header.frame_id = "map";
     while (ros::ok())
@@ -142,23 +143,30 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
     int geom_idx = m->body_geomadr[body_idx];
     if (geom_idx != -1)
     {
+
         switch (m->geom_type[geom_idx])
         {
         case mjtGeom::mjGEOM_BOX:
             marker.type = visualization_msgs::Marker::CUBE;
+            marker.mesh_resource = "";
             marker.scale.x = m->geom_size[3 * geom_idx] * 2;
             marker.scale.y = m->geom_size[3 * geom_idx + 1] * 2;
             marker.scale.z = m->geom_size[3 * geom_idx + 2] * 2;
             break;
 
         case mjtGeom::mjGEOM_SPHERE:
+            marker.type = visualization_msgs::Marker::SPHERE;
+            marker.mesh_resource = "";
             marker.scale.x = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.y = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.z = m->geom_size[3 * geom_idx] * 2;
             break;
 
         case mjtGeom::mjGEOM_CYLINDER:
             marker.type = visualization_msgs::Marker::CYLINDER;
             marker.scale.x = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.y = m->geom_size[3 * geom_idx + 1] * 2;
+            marker.scale.y = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.z = m->geom_size[3 * geom_idx + 1] * 2;
             break;
 
         case mjtGeom::mjGEOM_MESH:
@@ -172,9 +180,7 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
             break;
         }
 
-        marker.header.stamp = ros::Time::now();
         marker.ns = object_name;
-        marker.id = body_idx;
         marker.color.a = m->geom_rgba[4 * geom_idx + 3];
         marker.color.r = m->geom_rgba[4 * geom_idx];
         marker.color.g = m->geom_rgba[4 * geom_idx + 1];
