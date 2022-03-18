@@ -1,9 +1,8 @@
 #include "mj_sim.h"
-#include <iostream>
-#include <ros/package.h>
-#include <string.h>
-#include <tinyxml2.h>
+
 #include <algorithm>
+#include <ros/package.h>
+#include <tinyxml2.h>
 
 std::vector<std::string> MjSim::joint_names;
 
@@ -11,17 +10,17 @@ std::vector<std::string> MjSim::link_names;
 
 std::map<std::string, mjtNum> MjSim::q_inits;
 
-mjtNum *MjSim::u = NULL;
-
 mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
 
+MjSim::~MjSim()
+{
+  free(tau);
+}
+
 void MjSim::init_malloc()
 {
-  u = (mjtNum *)malloc(m->nv * sizeof(mjtNum *));
-  mju_zero(u, m->nv);
-
   tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *));
   mju_zero(tau, m->nv);
 }
@@ -140,12 +139,5 @@ void MjSim::add_data()
 
 void MjSim::controller()
 {
-  mj_mulM(m, d, tau, u);
-  for (const std::string joint_name : joint_names)
-  {
-    int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-    tau[idx] += d->qfrc_bias[idx];
-  }
-
   mju_copy(d->qfrc_applied, tau, m->nv);
 }

@@ -21,7 +21,7 @@ MjHWInterface::MjHWInterface()
 
         // hardware_interface::JointHandle joint_handle_velocity(joint_state_interface.getHandle(MjSim::joint_names[i]), &joint_velocities_command[i]);
         // velocity_joint_interface.registerHandle(joint_handle_velocity);
-        
+
         hardware_interface::JointHandle joint_handle_effort(joint_state_interface.getHandle(MjSim::joint_names[i]), &joint_efforts_command[i]);
         effort_joint_interface.registerHandle(joint_handle_effort);
     }
@@ -33,7 +33,6 @@ MjHWInterface::MjHWInterface()
 
 MjHWInterface::~MjHWInterface()
 {
-
 }
 
 void MjHWInterface::read()
@@ -49,10 +48,16 @@ void MjHWInterface::read()
 
 void MjHWInterface::write()
 {
-    mju_zero(MjSim::u, m->nv);
+    mjtNum u[m->nv] = {0.};
     for (std::size_t i = 0; i < MjSim::joint_names.size(); i++)
     {
         const int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
-        MjSim::u[idx] = joint_efforts_command[i];
+        u[idx] = joint_efforts_command[i];
+    }
+    mj_mulM(m, d, MjSim::tau, u);
+    for (const std::string joint_name : MjSim::joint_names)
+    {
+        int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        MjSim::tau[idx] += d->qfrc_bias[idx];
     }
 }

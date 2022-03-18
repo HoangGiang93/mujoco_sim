@@ -1,13 +1,15 @@
 #pragma once
 
-#include "mj_model.h"
-#include "glfw3.h"
 #include "mj_sim.h"
+
+#include <glfw3.h>
 
 class MjVisual
 {
 public:
     MjVisual() = default;
+
+    ~MjVisual();
 
 public:
     void init();
@@ -30,8 +32,8 @@ public:
     void terminate();
 
 public:
-    GLFWwindow *window = NULL; 
-    
+    GLFWwindow *window = NULL;
+
 private:
     static mjvCamera cam;  // abstract camera
     static mjvOption opt;  // visualization options

@@ -1,14 +1,16 @@
 #pragma once
 
 #include "mj_model.h"
-#include "vector"
-#include "string"
-#include "map"
+
+#include <map>
+#include <vector>
 
 class MjSim
 {
 public:
     MjSim() = default;
+
+    ~MjSim();
 
 public:
     void init();
@@ -26,10 +28,7 @@ public:
 
     static std::map<std::string, mjtNum> q_inits;
 
-    static mjtNum *u;
-
     static mjtNum sim_start;
 
-private:    
     static mjtNum *tau;
 };

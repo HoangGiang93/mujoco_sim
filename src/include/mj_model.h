@@ -1,7 +1,8 @@
 #pragma once
 
 #include "mujoco.h"
-#include "mutex"
+
+#include <mutex>
 
 // MuJoCo data structures
 extern mjModel *m; // MuJoCo model

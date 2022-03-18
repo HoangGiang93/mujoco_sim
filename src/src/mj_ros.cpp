@@ -1,10 +1,20 @@
 #include "mj_ros.h"
-#include <algorithm>
-#include <tinyxml2.h>
-#include <ros/package.h>
 
-void MjRos::init() 
+#include <algorithm>
+#include <ros/package.h>
+#include <tinyxml2.h>
+
+ros::Time MjRos::ros_start;
+
+MjRos::~MjRos()
 {
+    object_gen_sub.shutdown();
+}
+
+void MjRos::init()
+{
+    ros_start = ros::Time::now();
+
     n = ros::NodeHandle();
     if (!n.getParam("joint_names", MjSim::joint_names))
     {
