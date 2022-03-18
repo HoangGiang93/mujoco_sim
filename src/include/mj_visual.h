@@ -25,7 +25,7 @@ public:
 
     bool is_window_closed();
 
-    void render();
+    void render(double sim_time, double ros_time);
 
     void terminate();
 

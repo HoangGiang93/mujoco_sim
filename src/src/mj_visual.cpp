@@ -101,7 +101,7 @@ bool MjVisual::is_window_closed()
     return glfwWindowShouldClose(window);
 }
 
-void MjVisual::render()
+void MjVisual::render(double sim_time, double ros_time)
 {
     // get framebuffer viewport
     mjrRect viewport = {0, 0, 0, 0};
@@ -114,10 +114,17 @@ void MjVisual::render()
     // print simulation time
     mjrRect rect1 = {0, viewport.height-50, 300, 50};
     mjrRect rect2 = {0, viewport.height-100, 300, 50};
-    std::string sim_time_text =  "Simulation time: " + std::to_string(d->time - MjSim::sim_start);
+    mjrRect rect3 = {0, viewport.height-150, 300, 50};
+    mjrRect rect4 = {0, viewport.height-200, 300, 50};
+    std::string sim_time_text =  "Simulation time: " + std::to_string(sim_time);
+    std::string ros_time_text = "ROS time: " + std::to_string(ros_time);
+    std::string rtf_text = "Real-time factor: " + std::to_string(rtf);
     std::string time_step_text = "Time step: " + std::to_string(m->opt.timestep);
+    
     mjr_label(rect1, 0, sim_time_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);
-    mjr_label(rect2, 0, time_step_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);
+    mjr_label(rect2, 0, ros_time_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);
+    mjr_label(rect3, 0, rtf_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);
+    mjr_label(rect4, 0, time_step_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);
 
     // swap OpenGL buffers (blocking call due to v-sync)
     glfwSwapBuffers(window);

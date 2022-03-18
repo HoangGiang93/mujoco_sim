@@ -15,7 +15,7 @@ static MjSim mj_sim;
 static MjVisual mj_visual;
 #endif
 
-#define REDUCE 0.5
+#define REDUCE 2
 
 void load_model(int argc, char **argv)
 {
@@ -45,12 +45,94 @@ void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
   {
     MjSim::add_data();
   }
+  if (act == GLFW_PRESS && key == GLFW_KEY_KP_ADD && rtf_des < 8)
+  {
+    rtf_des *= 2;
+  }
+  if (act == GLFW_PRESS && key == GLFW_KEY_KP_SUBTRACT && rtf_des > 1/8)
+  {
+    rtf_des /= 2;
+  }
 }
 #endif
 
 void controller(const mjModel *m, mjData *d)
 {
   mj_sim.controller();
+}
+
+void simulate()
+{
+  MjHWInterface mj_hw_interface;
+  controller_manager::ControllerManager controller_manager(&mj_hw_interface);
+
+  ros::AsyncSpinner spinner(3);
+  spinner.start();
+  const ros::Time ros_start = ros::Time::now();
+  ros::Time last_sim_time = ros_start;
+  while (ros::ok())
+  {
+    ros::Time sim_time = (ros::Time)(ros_start.toSec() + d->time);
+    ros::Duration sim_period = sim_time - last_sim_time;
+
+    mtx.lock();
+    mj_step1(m, d);
+    // check if we should update the controllers
+    if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz, start from 0.1s to avoid unstable
+    {
+      // store simulation time
+      last_sim_time = sim_time;
+
+      // update the robot simulation with the state of the mujoco model
+      mj_hw_interface.read();
+
+      // compute the controller commands
+      controller_manager.update(sim_time, sim_period);
+    }
+    // update the mujoco model with the result of the controller
+    mj_hw_interface.write();
+
+    mj_step2(m, d);
+    mtx.unlock();
+
+    // Change timestep when out of sync
+    int num_step = 10000;
+    static std::deque<double> last_sim_time;
+    static std::deque<double> last_ros_time;
+    static int i = 0;
+    double diff;
+    if (i == num_step)
+    {
+      double ros_time_diff;
+      double sim_time_diff;
+      do
+      {
+        ros_time_diff = ros::Time::now().toSec() - ros_start.toSec() - last_ros_time.back();
+        sim_time_diff = d->time - last_sim_time.back();
+        diff = ros_time_diff - sim_time_diff/rtf_des;
+      } while (diff < 1E-3);
+      rtf = sim_time_diff / ros_time_diff;
+      last_ros_time.push_front((ros::Time::now() - ros_start).toSec());
+      last_ros_time.pop_back();
+      last_sim_time.push_front(d->time);
+      last_sim_time.pop_back();
+    }
+    else
+    {
+      double ros_time;
+      do
+      {
+        ros_time = ros::Time::now().toSec();
+        diff = ros_time - sim_time.toSec();
+      } while (diff < 1E-3);
+      rtf = sim_time.toSec() / ros_time;
+      last_ros_time.push_front(ros_time - ros_start.toSec());
+      last_sim_time.push_front(d->time);
+      i++;
+    }
+    
+    // m->opt.timestep *= 1 + mju_pow(mju_abs(diff), REDUCE) * mju_sign(diff);
+  }
 }
 
 int main(int argc, char **argv)
@@ -71,17 +153,13 @@ int main(int argc, char **argv)
 
   mjcb_control = controller;
 
-  MjHWInterface mj_hw_interface;
-  controller_manager::ControllerManager controller_manager(&mj_hw_interface);
-
-  ros::AsyncSpinner spinner(3);
-  spinner.start();
-
   const ros::Time ros_start = ros::Time::now();
-  ros::Time last_sim_time = ros_start;
-
   std::thread ros_thread(&MjRos::update, mj_ros);
 
+  // start simulation thread
+  std::thread sim_thread(simulate);
+
+  mjtNum sim_step_start = d->time;
   while (ros::ok())
   {
 #ifdef VISUAL
@@ -91,45 +169,13 @@ int main(int argc, char **argv)
     }
 #endif
 
-    mjtNum sim_step_start = d->time;
-    while (d->time - sim_step_start < 1.0 / 60.0)
+    if (d->time - sim_step_start > 1.0 / 60.0)
     {
-      ros::Time sim_time = (ros::Time)(ros_start.toSec() + d->time);
-      ros::Duration sim_period = sim_time - last_sim_time;
-
-      mj_step1(m, d);
-      // check if we should update the controllers
-      if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz, start from 0.1s to avoid unstable
-      {
-        // store simulation time
-        last_sim_time = sim_time;
-
-        // update the robot simulation with the state of the mujoco model
-        mj_hw_interface.read();
-
-        // compute the controller commands
-        controller_manager.update(sim_time, sim_period);
-      }
-      // update the mujoco model with the result of the controller
-      mj_hw_interface.write();
-
-      mj_step2(m, d);
-    }
-
-    // Change timestep when out of sync
-    double error = (ros::Time::now() - ros_start).toSec() - (d->time - MjSim::sim_start);
-    if (mju_abs(error) > 0.1)
-    {
-      m->opt.timestep *= 1 + mju_pow(mju_abs(error), REDUCE) * mju_sign(error);
-      if (m->opt.timestep > 0.01)
-      {
-        m->opt.timestep = 0.01;
-      }
-    }
-
 #ifdef VISUAL
-    mj_visual.render();
+      mj_visual.render(d->time - MjSim::sim_start, (ros::Time::now() - ros_start).toSec());
+      sim_step_start = d->time;
 #endif
+    }
   }
 
 #ifdef VISUAL
@@ -137,6 +183,7 @@ int main(int argc, char **argv)
 #endif
 
   ros_thread.join();
+  sim_thread.join();
   
   // free MuJoCo model and data, deactivate
   mj_deleteData(d);
