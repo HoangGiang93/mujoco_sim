@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['update_43',['update',['../classMjRos.html#ae23469f95794e23e0050bde0e5341762',1,'MjRos']]]
+  ['tau_42',['tau',['../classMjSim.html#a1b22b4acbcbc8d870ad07f6de414402f',1,'MjSim']]],
+  ['terminate_43',['terminate',['../classMjVisual.html#afc60b7a1494273fa5a831750fb55310b',1,'MjVisual']]]
 ];

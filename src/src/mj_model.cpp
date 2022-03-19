@@ -8,3 +8,5 @@ std::mutex mtx;
 double rtf_des = 1;
 
 double rtf = 0.0;
+
+std::string file_name;

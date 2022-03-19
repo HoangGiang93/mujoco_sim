@@ -143,9 +143,11 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     load_model(argc, argv);
-    std::experimental::filesystem::path mujoco_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/meshes";
     std::experimental::filesystem::path current_model_path = argv[1];
-    current_model_path = current_model_path.parent_path() / "meshes";
+    std::experimental::filesystem::path mujoco_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/meshes";
+    file_name = current_model_path.filename().c_str();
+    mujoco_model_path = mujoco_model_path / file_name / "/";
+    current_model_path = current_model_path.parent_path() / "meshes" / file_name / "/";
 
     copy(current_model_path, mujoco_model_path);
 

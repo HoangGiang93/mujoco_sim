@@ -13,3 +13,5 @@ extern std::mutex mtx;
 extern double rtf_des;
 
 extern double rtf;
+
+extern std::string file_name;
