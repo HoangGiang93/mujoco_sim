@@ -9,4 +9,5 @@ double rtf_des = 1;
 
 double rtf = 0.0;
 
-std::string model_name;
+std::experimental::filesystem::path model_path;
+std::experimental::filesystem::path tmp_model_path;

@@ -15,13 +15,28 @@ void MjRos::init()
     ros_start = ros::Time::now();
 
     n = ros::NodeHandle();
+    std::string ns = n.getNamespace();
     if (!n.getParam("joint_names", MjSim::joint_names))
     {
-        mju_error_s("Couldn't find joint_names in %s/joint_names", n.getNamespace().c_str());
+        if (ns == "/")
+        {
+            mju_warning("Couldn't find joint names in /joint_names");
+        }
+        else
+        {
+            mju_warning_s("Couldn't find joint names in %s/joint_names", ns.c_str());
+        }
     }
     if (!n.getParam("init_positions", MjSim::q_inits))
     {
-        mju_warning_s("Couldn't find joints and positions in %s/init_positions, set default to 0", n.getNamespace().c_str());
+        if (ns == "/")
+        {
+            mju_warning("Couldn't find joints and positions in /init_positions, set default to 0");
+        }
+        else
+        {
+            mju_warning_s("Couldn't find joints and positions in %s/init_positions, set default to 0", ns.c_str());
+        }
     }
 
     int joint_idx;
@@ -171,7 +186,7 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_name + "/meshes/" + object_name + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_path.stem().string() + "/meshes/" + object_name + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;

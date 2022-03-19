@@ -17,6 +17,7 @@ mjtNum MjSim::sim_start;
 MjSim::~MjSim()
 {
   free(tau);
+  std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
 void MjSim::init_malloc()
@@ -25,8 +26,16 @@ void MjSim::init_malloc()
   mju_zero(tau, m->nv);
 }
 
+void MjSim::init_tmp()
+{
+  tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path.stem().string() + "/meshes";
+  std::experimental::filesystem::create_directories(tmp_model_path);
+  copy(model_path.parent_path() / model_path.stem().c_str() / "meshes", tmp_model_path);
+}
+
 void MjSim::init()
 {
+  init_tmp();
   init_malloc();
   sim_start = d->time;
 

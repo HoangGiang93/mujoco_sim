@@ -15,6 +15,8 @@ public:
 public:
     void init();
 
+    void init_tmp();
+
     static void init_malloc();
 
     static void add_data();

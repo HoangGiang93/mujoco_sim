@@ -4,7 +4,6 @@
 #include <cstring>
 #include <experimental/filesystem>
 #include <ros/package.h>
-#include <ros/ros.h>
 #include <tinyxml2.h>
 #include <urdf/model.h>
 
