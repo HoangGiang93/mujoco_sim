@@ -41,3 +41,25 @@ source ~/mujoco_ws/devel/setup.bash         # source new overlay
 1) Import robot from **URDF**
 
 [![Watch the video]()](https://user-images.githubusercontent.com/64316740/159138084-c8cad813-6d55-4dab-874d-82870c793484.mp4)
+
+2) Control the robot
+
+mujoco_sim integrates hardware interfaces from http://wiki.ros.org/ros_control. Currently only **effort-based joints** are supported, so PID gains are required. It's recommended to set the parameters as ```{p: 2000, i: 100, d: 50}```
+
+Here are some examples:
+  1) Joint position controller
+
+[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139781-3c3bc83f-d6df-46ac-a679-e7591d252b85.mp4)
+
+  2) Joint velocity controller
+
+[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139857-8beef478-e300-44c8-86b1-e1d28ce41519.mp4)
+
+  3) Joint trajectory controller (using [test_trajectory](https://github.com/PickNikRobotics/ros_control_boilerplate/blob/noetic-devel/src/tools/test_trajectory.cpp) from http://wiki.ros.org/ros_control_boilerplate)
+
+[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139999-4913c350-a5e7-4218-973d-2e73525f06cd.mp4)
+
+  4) Cartesian trajectory controller (using [giskard](http://giskard.de/wiki:tutorials), a cool framework for constraint- and optimization-based robot motion control, which is **highly recommended**)
+
+[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159140897-b5781e0e-e5e6-4473-89ef-03b5c79241c4.mp4)
+
