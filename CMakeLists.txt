@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   controller_manager
   tf2_ros
+  urdf
 )
 
 find_package(Doxygen)
@@ -166,11 +167,12 @@ add_library(ui_tools_lib
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+add_executable(mujoco_compile src/mujoco_compile.cpp)
 add_executable(${PROJECT_NAME} src/mujoco_sim.cpp)
 add_executable(${PROJECT_NAME}_headless src/mujoco_sim_headless.cpp)
 
 add_executable(simulate sample/simulate.cc)
-add_executable(compile sample/compile.cc)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -204,6 +206,13 @@ target_link_libraries(${PROJECT_NAME}_headless
   stdc++fs
 )
 
+target_link_libraries(mujoco_compile
+  ${catkin_LIBRARIES}
+  ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
+  tinyxml2
+  stdc++fs
+)
+
 target_link_libraries(simulate
   ${catkin_LIBRARIES}
   ui_tools_lib
@@ -212,11 +221,6 @@ target_link_libraries(simulate
   GL
   GLEW
   pthread
-)
-
-target_link_libraries(compile
-  ${catkin_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/lib/libmujoco_nogl.so
 )
 
 #############

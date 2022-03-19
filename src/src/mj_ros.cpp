@@ -171,7 +171,7 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/meshes/" + file_name + "/" + object_name + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_name + "/meshes/" + object_name + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;

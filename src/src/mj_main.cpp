@@ -144,12 +144,13 @@ int main(int argc, char **argv)
 
     load_model(argc, argv);
     std::experimental::filesystem::path current_model_path = argv[1];
-    std::experimental::filesystem::path mujoco_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/meshes";
-    file_name = current_model_path.filename().c_str();
-    mujoco_model_path = mujoco_model_path / file_name / "/";
-    current_model_path = current_model_path.parent_path() / "meshes" / file_name / "/";
+    std::experimental::filesystem::path tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp";
+    model_name = current_model_path.stem().c_str();
+    tmp_model_path = tmp_model_path / model_name / "meshes";
+    std::experimental::filesystem::create_directories(tmp_model_path);
+    current_model_path = current_model_path.parent_path() / model_name / "meshes";
 
-    copy(current_model_path, mujoco_model_path);
+    copy(current_model_path, tmp_model_path);
 
     MjRos mj_ros;
     mj_ros.init();
@@ -194,7 +195,7 @@ int main(int argc, char **argv)
     mj_deleteData(d);
     mj_deleteModel(m);
 
-    std::experimental::filesystem::remove_all(mujoco_model_path);
+    std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
 
     return 0;
 }
