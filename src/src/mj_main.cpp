@@ -82,7 +82,7 @@ void simulate()
             mtx.lock();
             mj_step1(m, d);
             // check if we should update the controllers
-            if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz, start from 0.1s to avoid unstable
+            if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz
             {
                 // store simulation time
                 last_sim_time = sim_time;
