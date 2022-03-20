@@ -1,3 +1,23 @@
+// Copyright (c) 2022, Hoang Giang Nguyen - Institute for Artificial Intelligence, University Bremen
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include "mj_ros.h"
 
 #include <algorithm>
@@ -27,7 +47,7 @@ void MjRos::init()
             mju_warning_s("Couldn't find joint names in %s/joint_names", ns.c_str());
         }
     }
-    if (!n.getParam("init_positions", MjSim::q_inits))
+    if (MjSim::joint_names.size() != 0 && !n.getParam("init_positions", MjSim::q_inits))
     {
         if (ns == "/")
         {
@@ -126,9 +146,9 @@ void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
     MjSim::add_data();
 }
 
-void MjRos::update()
+void MjRos::update(double frequency = 60)
 {
-    ros::Rate loop_rate(60);
+    ros::Rate loop_rate(frequency); // Publish with 60 Hz
     vis_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 0);
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
@@ -158,7 +178,6 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
     int geom_idx = m->body_geomadr[body_idx];
     if (geom_idx != -1)
     {
-
         switch (m->geom_type[geom_idx])
         {
         case mjtGeom::mjGEOM_BOX:

@@ -1,3 +1,23 @@
+// Copyright (c) 2022, Hoang Giang Nguyen - Institute for Artificial Intelligence, University Bremen
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include "mj_sim.h"
 
 #include <algorithm>
@@ -20,13 +40,13 @@ MjSim::~MjSim()
   std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
-void MjSim::init_malloc()
+void init_malloc()
 {
-  tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *));
-  mju_zero(tau, m->nv);
+  MjSim::tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *));
+  mju_zero(MjSim::tau, m->nv);
 }
 
-void MjSim::init_tmp()
+void init_tmp()
 {
   tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path.stem().string() + "/meshes";
   std::experimental::filesystem::create_directories(tmp_model_path);

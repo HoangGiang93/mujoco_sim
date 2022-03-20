@@ -87,41 +87,41 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;    <a class="code" href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">~MjRos</a>();</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">init</a>();</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#ae23469f95794e23e0050bde0e5341762">update</a>();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="keywordtype">void</span> object_gen_callback(<span class="keyword">const</span> mujoco_msgs::ModelState &amp;msg);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordtype">void</span> publish_markers(<span class="keywordtype">int</span> body_idx, std::string object_name);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    <span class="keywordtype">void</span> publish_tf(<span class="keywordtype">int</span> body_idx, std::string object_name);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">   30</a></span>&#160;    <span class="keyword">static</span> ros::Time <a class="code" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">ros_start</a>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    ros::NodeHandle n;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    ros::Subscriber object_gen_sub;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    visualization_msgs::Marker marker;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    ros::Publisher vis_pub;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    geometry_msgs::TransformStamped transform;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    tf2_ros::TransformBroadcaster br;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">init</a>();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#acd3054fd4ee8a09961d76cf26e297f6c">update</a>(<span class="keywordtype">double</span> frequency);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keywordtype">void</span> object_gen_callback(<span class="keyword">const</span> mujoco_msgs::ModelState &amp;msg);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> publish_markers(<span class="keywordtype">int</span> body_idx, std::string object_name);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">void</span> publish_tf(<span class="keywordtype">int</span> body_idx, std::string object_name);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">   59</a></span>&#160;    <span class="keyword">static</span> ros::Time <a class="code" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">ros_start</a>;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    ros::NodeHandle n;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    ros::Subscriber object_gen_sub;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    visualization_msgs::Marker marker;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    ros::Publisher vis_pub;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    geometry_msgs::TransformStamped transform;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    tf2_ros::TransformBroadcaster br;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassMjRos_html_ae23469f95794e23e0050bde0e5341762"><div class="ttname"><a href="classMjRos.html#ae23469f95794e23e0050bde0e5341762">MjRos::update</a></div><div class="ttdeci">void update()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:129</div></div>
 <div class="ttc" id="amj__sim_8h_html"><div class="ttname"><a href="mj__sim_8h.html">mj_sim.h</a></div></div>
+<div class="ttc" id="aclassMjRos_html_acd3054fd4ee8a09961d76cf26e297f6c"><div class="ttname"><a href="classMjRos.html#acd3054fd4ee8a09961d76cf26e297f6c">MjRos::update</a></div><div class="ttdeci">void update(double frequency)</div><div class="ttdoc">Update publishers.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:129</div></div>
 <div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:9</div></div>
 <div class="ttc" id="aclassMjRos_html"><div class="ttname"><a href="classMjRos.html">MjRos</a></div><div class="ttdef"><b>Definition:</b> mj_ros.h:10</div></div>
-<div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdef"><b>Definition:</b> mj_ros.h:30</div></div>
+<div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdoc">Start time of ROS.</div><div class="ttdef"><b>Definition:</b> mj_ros.h:59</div></div>
 <div class="ttc" id="aclassMjRos_html_a07f40261e2c2734408dba24e52e6a397"><div class="ttname"><a href="classMjRos.html#a07f40261e2c2734408dba24e52e6a397">MjRos::MjRos</a></div><div class="ttdeci">MjRos()=default</div></div>
-<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:13</div></div>
+<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdoc">Initialize publishers, subscribers and MjRos members from rosparam.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:13</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
