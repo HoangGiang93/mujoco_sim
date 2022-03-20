@@ -67,3 +67,6 @@ Here are some examples:
 ```
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
 ```
+
+## Software architecture
+![Picture](docs/html/mj__main_8cpp__incl.png)
