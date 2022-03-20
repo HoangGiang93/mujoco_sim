@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 
     mjcb_control = controller;
 
-    std::thread ros_thread(&MjRos::update, mj_ros);
+    std::thread ros_thread(&MjRos::update, mj_ros, 60);
 
     // start simulation thread
     std::thread sim_thread(simulate);
