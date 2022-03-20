@@ -63,7 +63,7 @@ Here are some examples:
 
 [![Watch the video]()](https://user-images.githubusercontent.com/64316740/159140897-b5781e0e-e5e6-4473-89ef-03b5c79241c4.mp4)
 
-- Run the whole pick-and-place demo (using [giskard](http://giskard.de/wiki:tutorials), please update the following [wstool](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall))
+- Run the whole pick-and-place demo (using [giskard](http://giskard.de/wiki:tutorials), please update the following [.rosinstall](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall))
 ```
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
 ```
