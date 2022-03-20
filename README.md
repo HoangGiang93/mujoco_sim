@@ -33,7 +33,7 @@ rosdep install --ignore-src --from-paths .  # install dependencies available thr
 4) Build packages
 ```
 cd ~/mujoco_ws                              # go to the workspace directory
-catkin_make                                 # build packages (or catkin_make)
+catkin_make                                 # build packages (or catkin build)
 source ~/mujoco_ws/devel/setup.bash         # source new overlay
 ```
 
@@ -63,3 +63,10 @@ Here are some examples:
 
 [![Watch the video]()](https://user-images.githubusercontent.com/64316740/159140897-b5781e0e-e5e6-4473-89ef-03b5c79241c4.mp4)
 
+- Run the whole pick-and-place demo (using [giskard](http://giskard.de/wiki:tutorials), please update the following [.rosinstall](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall))
+```
+wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
+```
+
+## Software architecture
+![Picture](docs/html/mj__main_8cpp__incl.png)
