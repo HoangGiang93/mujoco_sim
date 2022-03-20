@@ -33,7 +33,7 @@ rosdep install --ignore-src --from-paths .  # install dependencies available thr
 4) Build packages
 ```
 cd ~/mujoco_ws                              # go to the workspace directory
-catkin_make                                 # build packages (or catkin_make)
+catkin_make                                 # build packages (or catkin build)
 source ~/mujoco_ws/devel/setup.bash         # source new overlay
 ```
 
