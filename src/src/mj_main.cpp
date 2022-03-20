@@ -100,7 +100,7 @@ void simulate()
             mtx.unlock();
         }
 
-        // Change timestep when out of sync
+        // Calculate real time factor
         int num_step = mju_ceil(0.1 / m->opt.timestep);
         static std::deque<double> last_sim_time;
         static std::deque<double> last_ros_time;
@@ -132,6 +132,7 @@ void simulate()
             i++;
         }
 
+        // Change timestep when out of sync
         // m->opt.timestep *= 1 + mju_pow(mju_abs(diff), 2) * mju_sign(diff);
     }
 }
