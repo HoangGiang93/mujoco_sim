@@ -51,6 +51,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>mujoco_msgs</build_depend>
   <build_depend>roslib</build_depend>
   <build_depend>controller_manager</build_depend>
   <build_depend>tf2_ros</build_depend>

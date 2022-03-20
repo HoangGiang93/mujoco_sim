@@ -48,9 +48,10 @@ void init_malloc()
 
 void init_tmp()
 {
-  tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path.stem().string() + "/meshes";
+  std::string model_path_tail = model_path.stem().string() + "/meshes";
+  tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path_tail;
   std::experimental::filesystem::create_directories(tmp_model_path);
-  copy(model_path.parent_path() / model_path.stem().c_str() / "meshes", tmp_model_path);
+  copy(model_path.parent_path() / model_path_tail, tmp_model_path);
 }
 
 void MjSim::init()
