@@ -57,6 +57,7 @@ MjHWInterface::~MjHWInterface()
 
 void MjHWInterface::read()
 {
+    mj_inverse(m, d);
     for (std::size_t i = 0; i < MjSim::joint_names.size(); i++)
     {
         const int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
