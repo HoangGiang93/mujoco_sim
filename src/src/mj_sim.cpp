@@ -28,34 +28,83 @@ std::vector<std::string> MjSim::joint_names;
 
 std::vector<std::string> MjSim::link_names;
 
-std::map<std::string, mjtNum> MjSim::q_inits;
-
 mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
 
 MjSim::~MjSim()
 {
-  free(tau);
+  mju_free(tau);
   std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
-void init_malloc()
+void get_joint_names(tinyxml2::XMLElement *parent_body_element)
 {
-  MjSim::tau = (mjtNum *)malloc(m->nv * sizeof(mjtNum *));
-  mju_zero(MjSim::tau, m->nv);
+  for (tinyxml2::XMLElement *joint_element = parent_body_element->FirstChildElement();
+       joint_element != nullptr;
+       joint_element = joint_element->NextSiblingElement())
+  {
+    if (strcmp(joint_element->Value(), "joint") == 0)
+    {
+      MjSim::joint_names.push_back(joint_element->Attribute("name"));
+    }
+  }
+}
+
+void get_body_element(tinyxml2::XMLElement *parent_body_element)
+{
+  for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement();
+       body_element != nullptr;
+       body_element = body_element->NextSiblingElement())
+  {
+    if (strcmp(body_element->Value(), "body") == 0)
+    {
+      get_joint_names(body_element);
+      get_body_element(body_element);
+    }
+  }
+}
+
+void set_joint_names()
+{
+  tinyxml2::XMLDocument xml_doc;
+  if (xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+  {
+    mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+    return;
+  }
+  for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
+       worldbody_element != nullptr;
+       worldbody_element = worldbody_element->NextSiblingElement())
+  {
+    if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+    {
+      get_body_element(worldbody_element);
+    }
+  }
 }
 
 void init_tmp()
 {
   std::string model_path_tail = model_path.stem().string() + "/meshes";
   tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path_tail;
+  if (std::experimental::filesystem::exists(tmp_model_path))
+  {
+    std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
+  }
   std::experimental::filesystem::create_directories(tmp_model_path);
   copy(model_path.parent_path() / model_path_tail, tmp_model_path);
 }
 
+void init_malloc()
+{
+  MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
+  mju_zero(MjSim::tau, m->nv);
+}
+
 void MjSim::init()
 {
+  set_joint_names();
   init_tmp();
   init_malloc();
   sim_start = d->time;
@@ -63,9 +112,7 @@ void MjSim::init()
   for (const std::string joint_name : joint_names)
   {
     int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-    d->qpos[idx] = q_inits[joint_name];
   }
-  mj_forward(m, d);
 }
 
 void MjSim::add_data()

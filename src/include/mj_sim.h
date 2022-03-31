@@ -57,8 +57,6 @@ public:
 
     static std::vector<std::string> link_names;
 
-    static std::map<std::string, mjtNum> q_inits;
-
     static mjtNum sim_start;
 
     static mjtNum *tau;

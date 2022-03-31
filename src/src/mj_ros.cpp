@@ -34,31 +34,6 @@ void MjRos::init()
 {
     ros_start = ros::Time::now();
 
-    n = ros::NodeHandle();
-    std::string ns = n.getNamespace();
-    if (!n.getParam("joint_names", MjSim::joint_names))
-    {
-        if (ns == "/")
-        {
-            mju_warning("Couldn't find joint names in /joint_names");
-        }
-        else
-        {
-            mju_warning_s("Couldn't find joint names in %s/joint_names", ns.c_str());
-        }
-    }
-    if (MjSim::joint_names.size() != 0 && !n.getParam("init_positions", MjSim::q_inits))
-    {
-        if (ns == "/")
-        {
-            mju_warning("Couldn't find joints and positions in /init_positions, set default to 0");
-        }
-        else
-        {
-            mju_warning_s("Couldn't find joints and positions in %s/init_positions, set default to 0", ns.c_str());
-        }
-    }
-
     int joint_idx;
     std::string link_name;
     for (const std::string joint_name : MjSim::joint_names)
@@ -68,6 +43,7 @@ void MjRos::init()
         MjSim::link_names.push_back(link_name);
     }
 
+    n = ros::NodeHandle();
     object_gen_sub = n.subscribe("create_object", 1, &MjRos::object_gen_callback, this);
 }
 

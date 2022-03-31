@@ -165,10 +165,11 @@ int main(int argc, char **argv)
     load_model(argc, argv);
     model_path = argv[1];
 
-    MjRos mj_ros;
-    mj_ros.init();
     mj_sim.init();
 
+    MjRos mj_ros;
+    mj_ros.init();
+    
 #ifdef VISUAL
     mj_visual.init();
     glfwSetKeyCallback(mj_visual.window, keyboard);
