@@ -140,7 +140,7 @@ void load_urdf(const char *input, const char *output)
                 urdf::Mesh &mesh = dynamic_cast<urdf::Mesh &>(*collision->geometry);
                 mesh.filename.erase(0, 9);
                 std::experimental::filesystem::path mesh_path = mesh.filename.c_str();
-                const char *file_name = mesh_path.filename().c_str();
+                std::string file_name = mesh_path.filename();
                 std::experimental::filesystem::path ros_pkg = mesh_path;
                 while (ros_pkg.has_parent_path() && ros_pkg.parent_path().has_parent_path())
                 {
@@ -149,10 +149,9 @@ void load_urdf(const char *input, const char *output)
                 ros_pkg = ros_pkg.relative_path();
                 std::experimental::filesystem::path ros_pkg_path = ros::package::getPath(ros_pkg);
                 mesh_path = ros_pkg_path.parent_path() / mesh_path.string();
-
                 if (std::experimental::filesystem::exists(meshes_path / file_name))
                 {
-                    ROS_WARN("File [%s] from [%s] already exists in [%s], ignore", file_name, mesh_path.c_str(), meshes_path.c_str());
+                    ROS_WARN("File [%s] from [%s] already exists in [%s], ignore", file_name.c_str(), mesh_path.c_str(), meshes_path.c_str());
                 }
                 else
                 {
