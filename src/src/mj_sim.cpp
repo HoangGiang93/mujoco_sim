@@ -134,12 +134,16 @@ void MjSim::add_data()
     return;
   }
   tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
-  while (worldbody_element != nullptr)
+  for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
+       worldbody_element != nullptr;
+       worldbody_element = worldbody_element->NextSiblingElement())
   {
     if (strcmp(worldbody_element->Value(), "worldbody") == 0)
     {
-      tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement();
-      while (body_element != nullptr)
+
+      for (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement();
+           body_element != nullptr;
+           body_element = body_element->NextSiblingElement())
       {
         if (strcmp(body_element->Value(), "body") == 0)
         {
@@ -160,10 +164,8 @@ void MjSim::add_data()
                                            .c_str());
           }
         }
-        body_element = body_element->NextSiblingElement();
       }
     }
-    worldbody_element = worldbody_element->NextSiblingElement();
   }
 
   // Add add.xml to current.xml
