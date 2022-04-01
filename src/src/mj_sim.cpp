@@ -38,7 +38,7 @@ MjSim::~MjSim()
   std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
-void get_joint_names(tinyxml2::XMLElement *parent_body_element)
+static void get_joint_names(tinyxml2::XMLElement *parent_body_element)
 {
   for (tinyxml2::XMLElement *joint_element = parent_body_element->FirstChildElement();
        joint_element != nullptr;
@@ -51,7 +51,7 @@ void get_joint_names(tinyxml2::XMLElement *parent_body_element)
   }
 }
 
-void get_body_element(tinyxml2::XMLElement *parent_body_element)
+static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 {
   for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement();
        body_element != nullptr;
@@ -65,7 +65,7 @@ void get_body_element(tinyxml2::XMLElement *parent_body_element)
   }
 }
 
-void set_joint_names()
+static void set_joint_names()
 {
   tinyxml2::XMLDocument xml_doc;
   if (xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
@@ -84,7 +84,7 @@ void set_joint_names()
   }
 }
 
-void init_tmp()
+static void init_tmp()
 {
   std::string model_path_tail = model_path.stem().string() + "/meshes";
   tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path_tail;
@@ -96,7 +96,7 @@ void init_tmp()
   copy(model_path.parent_path() / model_path_tail, tmp_model_path);
 }
 
-void init_malloc()
+static void init_malloc()
 {
   MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
   mju_zero(MjSim::tau, m->nv);
