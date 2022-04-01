@@ -117,6 +117,7 @@ void simulate()
             mj_hw_interface.write();
 
             mj_step2(m, d);
+            mj_sim.set_mimic_joint();
             mtx.unlock();
         }
 

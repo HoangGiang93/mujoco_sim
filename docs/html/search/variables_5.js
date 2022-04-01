@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sim_5fstart_99',['sim_start',['../classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd',1,'MjSim']]]
+  ['offset_109',['offset',['../structMimicJoint.html#a78f75b44afdc104d972ed55a46accf97',1,'MimicJoint']]]
 ];

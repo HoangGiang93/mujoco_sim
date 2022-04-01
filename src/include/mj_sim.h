@@ -25,6 +25,13 @@
 #include <map>
 #include <vector>
 
+struct MimicJoint
+{
+    std::string from_joint;
+    mjtNum multiplier;
+    mjtNum offset;
+};
+
 class MjSim
 {
 public:
@@ -45,6 +52,12 @@ public:
      */
     void controller();
 
+    /**
+     * @brief Set the mimic joint position
+     * 
+     */
+    void set_mimic_joint();
+
 public:
     /**
      * @brief Spawn new data from file
@@ -55,9 +68,11 @@ public:
 public:
     static std::vector<std::string> joint_names;
 
+    static std::map<std::string, MimicJoint> mimic_joints;
+
     static std::vector<std::string> link_names;
 
     static mjtNum sim_start;
 
-    static mjtNum *tau;
+    static mjtNum *tau;    
 };

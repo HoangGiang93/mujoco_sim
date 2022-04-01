@@ -26,6 +26,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <visualization_msgs/Marker.h>
+#include <urdf/model.h>
 
 class MjRos
 {
@@ -91,3 +92,16 @@ private:
 
     tf2_ros::TransformBroadcaster br;
 };
+
+/**
+ * @brief This function `urdf::Model::initParamWithNodeHandle` should be inside the implementation file, but c++ doesn't want to compile...
+ * It makes no sense to put it here, I know...
+ * If anyone know how to fix this, please kindly tell me, you will earn a lot of respect from me and my friends :) May your name be honoured!
+ * 
+ * @param urdf_model The urdf model to be initialized
+ * @param n The node handle
+ */
+void init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n)
+{
+    urdf_model.initParamWithNodeHandle("robot_description", n);
+}

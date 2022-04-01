@@ -45,6 +45,20 @@ void MjRos::init()
 
     n = ros::NodeHandle();
     object_gen_sub = n.subscribe("create_object", 1, &MjRos::object_gen_callback, this);
+
+    urdf::Model urdf_model;
+    init_urdf(urdf_model, n); // this looks so retared...
+    for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
+    {
+        if (joint.second->mimic != nullptr)
+        {
+            MimicJoint mimic_joint;
+            mimic_joint.from_joint = joint.second->mimic->joint_name;
+            mimic_joint.multiplier = joint.second->mimic->multiplier;
+            mimic_joint.offset = joint.second->mimic->offset;
+            MjSim::mimic_joints[joint.first] = mimic_joint;
+        }
+    }
 }
 
 void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)

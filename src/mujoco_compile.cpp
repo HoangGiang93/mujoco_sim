@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "mujoco.h"
+
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
@@ -26,8 +28,6 @@
 #include <ros/package.h>
 #include <tinyxml2.h>
 #include <urdf/model.h>
-
-#include "mujoco.h"
 
 // help
 const char helpstring[] =
@@ -116,8 +116,6 @@ void load_urdf(const char *input, const char *output)
     std::experimental::filesystem::path input_file_path = input;
     std::experimental::filesystem::path output_file_path = output;
 
-    ros::NodeHandle n;
-
     urdf::Model model;
     if (!model.initFile(input_file_path))
     {
@@ -149,7 +147,7 @@ void load_urdf(const char *input, const char *output)
                 ros_pkg = ros_pkg.relative_path();
                 std::experimental::filesystem::path ros_pkg_path = ros::package::getPath(ros_pkg);
                 mesh_path = ros_pkg_path.parent_path() / mesh_path.string();
-                
+
                 if (std::experimental::filesystem::exists(meshes_path / file_name))
                 {
                     ROS_WARN("File [%s] from [%s] already exists in [%s], ignore", file_name.c_str(), mesh_path.c_str(), meshes_path.c_str());
