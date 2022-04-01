@@ -110,6 +110,77 @@ int filetype(const char *filename)
     }
 }
 
+// fix_inertia
+void fix_inertia(const std::experimental::filesystem::path &model_urdf_path)
+{
+    tinyxml2::XMLDocument doc;
+    if (doc.LoadFile(model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
+    }
+    bool fix = false;
+    for (tinyxml2::XMLElement *link = doc.FirstChildElement()->FirstChildElement();
+         link != nullptr;
+         link = link->NextSiblingElement())
+    {
+        if (strcmp(link->Value(), "link") == 0)
+        {
+            for (tinyxml2::XMLElement *inertial = link->FirstChildElement();
+                 inertial != nullptr;
+                 inertial = inertial->NextSiblingElement())
+            {
+                if (strcmp(inertial->Value(), "inertial") == 0)
+                {
+                    for (tinyxml2::XMLElement *inertia = inertial->FirstChildElement();
+                         inertia != nullptr;
+                         inertia = inertia->NextSiblingElement())
+                    {
+                        if (strcmp(inertia->Value(), "inertia") == 0)
+                        {
+                            float ixx = inertia->FloatAttribute("ixx");
+                            float ixy = inertia->FloatAttribute("ixy");
+                            float ixz = inertia->FloatAttribute("ixz");
+                            float iyy = inertia->FloatAttribute("iyy");
+                            float iyz = inertia->FloatAttribute("iyz");
+                            float izz = inertia->FloatAttribute("izz");
+                            mjtNum mat[9] = {ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz};
+                            mjtNum eigval[3];
+                            mjtNum eigVec[9];
+                            mjtNum quat[4];
+                            mju_eig3(eigval, eigVec, quat, mat);
+                            float i1 = eigval[0];
+                            float i2 = eigval[1];
+                            float i3 = eigval[2];
+                            if ((i1 + i2 < i3) || (i2 + i3 < i1) || (i3 + i1 < i2))
+                            {
+                                mju_warning_s("Inertia of link %s must satisfy A + B >= C, set to default value", link->Attribute("name"));
+                                ixx = 0.01;
+                                ixy = 0.0;
+                                ixz = 0.0;
+                                iyy = 0.01;
+                                iyz = 0.0;
+                                izz = 0.01;
+                                inertia->SetAttribute("ixx", ixx);
+                                inertia->SetAttribute("ixy", ixy);
+                                inertia->SetAttribute("ixz", ixz);
+                                inertia->SetAttribute("iyy", iyy);
+                                inertia->SetAttribute("iyz", iyz);
+                                inertia->SetAttribute("izz", izz);
+                                fix = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (fix)
+    {
+        doc.SaveFile(model_urdf_path.c_str());
+    }
+    
+}
+
 // modify input file
 void load_urdf(const char *input, const char *output)
 {
@@ -161,6 +232,8 @@ void load_urdf(const char *input, const char *output)
     }
 
     std::experimental::filesystem::path model_urdf_path = meshes_path / input_file_path.filename();
+
+    fix_inertia(model_urdf_path);
 
     // load model
     m = mj_loadXML(model_urdf_path.c_str(), 0, error, 1000);
