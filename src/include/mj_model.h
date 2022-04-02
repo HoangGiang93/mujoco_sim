@@ -22,7 +22,7 @@
 
 #include "mujoco.h"
 
-#include <experimental/filesystem>
+#include <boost/filesystem.hpp>
 #include <mutex>
 
 // MuJoCo data structures
@@ -35,6 +35,10 @@ extern double rtf_des;
 
 extern double rtf;
 
-extern std::experimental::filesystem::path model_path;
+extern boost::filesystem::path model_path;
 
-extern std::experimental::filesystem::path tmp_model_path;
+extern boost::filesystem::path tmp_model_path;
+
+extern boost::filesystem::path tmp_mesh_path;
+
+extern boost::filesystem::path config_path;

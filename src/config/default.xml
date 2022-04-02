@@ -1,0 +1,15 @@
+<mujoco>
+  <option timestep="0.001" integrator="RK4" gravity="0 0 -9.81">
+    <flag sensornoise="disable" energy="enable" contact="disable"/>
+  </option>
+
+  <asset>
+    <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
+    <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2" />
+  </asset>
+
+  <worldbody>
+    <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" />
+    <light diffuse=".5 .5 .5" pos="0 0 5" dir="0 0 -1"/>
+  </worldbody>
+</mujoco>

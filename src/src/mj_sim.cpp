@@ -37,7 +37,8 @@ mjtNum MjSim::sim_start;
 MjSim::~MjSim()
 {
 	mju_free(tau);
-	std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
+	boost::filesystem::remove_all(tmp_mesh_path.parent_path().parent_path());
+	boost::filesystem::remove(tmp_model_path);
 }
 
 static void get_joint_names(tinyxml2::XMLElement *parent_body_element)
@@ -86,16 +87,53 @@ static void set_joint_names()
 	}
 }
 
+static void load_model()
+{
+	// load and compile model
+	char error[1000] = "Could not load binary model";
+	m = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
+	if (!m)
+	{
+			mju_error_s("Could not load model file '%s'", tmp_model_path.c_str());
+	}
+
+	// make data
+	d = mj_makeData(m);
+}
+
 static void init_tmp()
 {
-	std::string model_path_tail = model_path.stem().string() + "/meshes";
-	tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + model_path_tail;
-	if (std::experimental::filesystem::exists(tmp_model_path))
+	std::string model_path_tail = model_path.stem().string() + "/meshes/";
+	tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/";
+	tmp_mesh_path = tmp_model_path / model_path_tail;
+	
+	if (boost::filesystem::exists(tmp_mesh_path))
 	{
-		std::experimental::filesystem::remove_all(tmp_model_path.parent_path());
+		boost::filesystem::remove_all(tmp_mesh_path.parent_path());
 	}
-	std::experimental::filesystem::create_directories(tmp_model_path);
-	copy(model_path.parent_path() / model_path_tail, tmp_model_path);
+	boost::filesystem::create_directories(tmp_mesh_path);
+	
+	for (const boost::filesystem::directory_entry& file : boost::filesystem::directory_iterator(model_path.parent_path() / model_path_tail))
+	{
+		boost::filesystem::copy_file(file.path(), tmp_mesh_path / file.path().filename());
+	}
+	tmp_model_path /= "current.xml";
+
+	boost::filesystem::copy_file(model_path, tmp_model_path);
+
+	// Modify current.xml
+	tinyxml2::XMLDocument current_xml_doc;
+	if (current_xml_doc.LoadFile(config_path.c_str()) != tinyxml2::XML_SUCCESS)
+	{
+		mju_warning_s("Failed to load file \"%s\"\n", config_path.c_str());
+		return;
+	}
+	// Add default.xml to current.xml
+	tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
+	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
+	include_element->SetAttribute("file", boost::filesystem::relative(model_path, tmp_model_path.parent_path()).c_str());
+	current_element->LinkEndChild(include_element);
+	current_xml_doc.SaveFile(tmp_model_path.c_str());
 }
 
 static void init_malloc()
@@ -106,9 +144,10 @@ static void init_malloc()
 
 void MjSim::init()
 {
-	set_joint_names();
 	init_tmp();
+	load_model();
 	init_malloc();
+	set_joint_names();
 	sim_start = d->time;
 
 	for (const std::string joint_name : joint_names)
@@ -119,20 +158,15 @@ void MjSim::init()
 
 void MjSim::add_data()
 {
-	std::string path = ros::package::getPath("mujoco_sim");
-
 	// Save current.xml
-	std::string current_xml = "current.xml";
-	std::string current_xml_path = path + "/model/tmp/" + current_xml;
-
-	char error[1000] = "Could not load binary model";
-	mj_saveLastXML(current_xml_path.c_str(), m, error, 1000);
+	char error[1000] = "Could not save binary model";
+	mj_saveLastXML(tmp_model_path.c_str(), m, error, 1000);
 
 	// Modify current.xml
 	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(current_xml_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", current_xml_path.c_str());
+		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 		return;
 	}
 	tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
@@ -175,10 +209,10 @@ void MjSim::add_data()
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", "add.xml");
 	current_element->LinkEndChild(include_element);
-	current_xml_doc.SaveFile(current_xml_path.c_str());
+	current_xml_doc.SaveFile(tmp_model_path.c_str());
 
 	// Load current.xml
-	mjModel *m_new = mj_loadXML(current_xml_path.c_str(), 0, error, 1000);
+	mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
 	if (!m_new)
 	{
 		mju_warning_s("Load model error: %s", error);

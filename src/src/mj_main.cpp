@@ -35,26 +35,6 @@ static MjVisual mj_visual;
 
 static int i = 0;
 
-void load_model(int argc, char **argv)
-{
-    // check command-line arguments
-    if (argc != 2)
-    {
-        mju_error("\n Usage:  model.xml\n");
-    }
-
-    char error[1000] = "Could not load binary model";
-    // load and compile model
-    m = mj_loadXML(argv[1], 0, error, 1000);
-    if (!m)
-    {
-        mju_error_s("Could not load model file '%s'", argv[1]);
-    }
-
-    // make data
-    d = mj_makeData(m);
-}
-
 #ifdef VISUAL
 // keyboard callback
 void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
@@ -163,8 +143,21 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mujoco_sim");
     ros::NodeHandle n;
 
-    load_model(argc, argv);
+    // check command-line arguments
+    if (argc < 2)
+    {
+        mju_error("\n Usage:  model.xml\n");
+    }
+
     model_path = argv[1];
+    if (argc == 2)
+    {
+        config_path = ros::package::getPath("mujoco_sim") + "/src/config/default.xml";
+    }
+    else
+    {
+        config_path = argv[2];
+    }
 
     mj_sim.init();
 

@@ -1,6 +1,7 @@
 <launch>
 
     <arg name="robot" />
-    <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" args="$(arg robot)" />
+    <arg name="config" default="$(find mujoco_sim)/src/config/default.xml" />
+    <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" args="$(arg robot) $(arg config)" />
 
 </launch>

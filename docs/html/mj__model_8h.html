@@ -73,17 +73,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;mujoco.h&quot;</code><br />
-<code>#include &lt;experimental/filesystem&gt;</code><br />
+<code>#include &lt;boost/filesystem.hpp&gt;</code><br />
 <code>#include &lt;mutex&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mj_model.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="mj__model_8h__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2include_2mj__model_8h" alt=""/></div>
 <map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2include_2mj__model_8h" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2include_2mj__model_8h">
-<area shape="rect" title=" " alt="" coords="100,5,308,61"/>
+<area shape="rect" title=" " alt="" coords="88,5,296,61"/>
 <area shape="rect" title=" " alt="" coords="5,109,88,136"/>
-<area shape="rect" title=" " alt="" coords="113,109,295,136"/>
-<area shape="rect" title=" " alt="" coords="320,109,384,136"/>
+<area shape="rect" title=" " alt="" coords="113,109,271,136"/>
+<area shape="rect" title=" " alt="" coords="296,109,360,136"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -121,12 +121,30 @@ Variables</h2></td></tr>
 <tr class="separator:a995e5d130dc2d63966290bbf7de6aff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2197996e6b57e659623d3d56f5f9fd63"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#a2197996e6b57e659623d3d56f5f9fd63">rtf</a></td></tr>
 <tr class="separator:a2197996e6b57e659623d3d56f5f9fd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a472bb3b82cab7b3cae469a55ff2026cb"><td class="memItemLeft" align="right" valign="top">std::experimental::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#a472bb3b82cab7b3cae469a55ff2026cb">model_path</a></td></tr>
-<tr class="separator:a472bb3b82cab7b3cae469a55ff2026cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a697a7fa7cab425ef2c9b305441cb5567"><td class="memItemLeft" align="right" valign="top">std::experimental::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#a697a7fa7cab425ef2c9b305441cb5567">tmp_model_path</a></td></tr>
-<tr class="separator:a697a7fa7cab425ef2c9b305441cb5567"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab809d073880cebd47e7223a73bf6ca5e"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a></td></tr>
+<tr class="separator:ab809d073880cebd47e7223a73bf6ca5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#aa3242d18959d3232e36d5ed5006cd2d2">tmp_model_path</a></td></tr>
+<tr class="separator:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab296e6dbba5a0ebc6595357ce9c6bf71"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#ab296e6dbba5a0ebc6595357ce9c6bf71">tmp_mesh_path</a></td></tr>
+<tr class="separator:ab296e6dbba5a0ebc6595357ce9c6bf71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a623c7ba59d727805d73dc163c4cddb07"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8h.html#a623c7ba59d727805d73dc163c4cddb07">config_path</a></td></tr>
+<tr class="separator:a623c7ba59d727805d73dc163c4cddb07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a623c7ba59d727805d73dc163c4cddb07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a623c7ba59d727805d73dc163c4cddb07">&#9670;&nbsp;</a></span>config_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path config_path</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a5286cc4b814be39830d1733170b8ef3a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5286cc4b814be39830d1733170b8ef3a">&#9670;&nbsp;</a></span>d</h2>
 
@@ -155,14 +173,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a472bb3b82cab7b3cae469a55ff2026cb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a472bb3b82cab7b3cae469a55ff2026cb">&#9670;&nbsp;</a></span>model_path</h2>
+<a id="ab809d073880cebd47e7223a73bf6ca5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab809d073880cebd47e7223a73bf6ca5e">&#9670;&nbsp;</a></span>model_path</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::experimental::filesystem::path model_path</td>
+          <td class="memname">boost::filesystem::path model_path</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -211,14 +229,28 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a697a7fa7cab425ef2c9b305441cb5567"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a697a7fa7cab425ef2c9b305441cb5567">&#9670;&nbsp;</a></span>tmp_model_path</h2>
+<a id="ab296e6dbba5a0ebc6595357ce9c6bf71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab296e6dbba5a0ebc6595357ce9c6bf71">&#9670;&nbsp;</a></span>tmp_mesh_path</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::experimental::filesystem::path tmp_model_path</td>
+          <td class="memname">boost::filesystem::path tmp_mesh_path</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa3242d18959d3232e36d5ed5006cd2d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3242d18959d3232e36d5ed5006cd2d2">&#9670;&nbsp;</a></span>tmp_model_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path tmp_model_path</td>
         </tr>
       </table>
 </div><div class="memdoc">

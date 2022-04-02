@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['joint_5fnames_102',['joint_names',['../classMjSim.html#aedb86ffb5319a6a91b248c715118f214',1,'MjSim']]]
+  ['from_5fjoint_102',['from_joint',['../structMimicJoint.html#ad81645f21d593fe2c816310154574a40',1,'MimicJoint']]]
 ];

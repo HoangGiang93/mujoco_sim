@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['d_100',['d',['../mj__model_8cpp.html#a5286cc4b814be39830d1733170b8ef3a',1,'d():&#160;mj_model.cpp'],['../mj__model_8h.html#a5286cc4b814be39830d1733170b8ef3a',1,'d():&#160;mj_model.cpp']]]
+  ['config_5fpath_100',['config_path',['../mj__model_8cpp.html#a623c7ba59d727805d73dc163c4cddb07',1,'config_path():&#160;mj_model.cpp'],['../mj__model_8h.html#a623c7ba59d727805d73dc163c4cddb07',1,'config_path():&#160;mj_model.cpp']]]
 ];

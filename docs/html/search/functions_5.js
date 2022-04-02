@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['read_88',['read',['../classMjHWInterface.html#a8963dad3dd1c9616fdebb10b87c2656e',1,'MjHWInterface']]],
-  ['render_89',['render',['../classMjVisual.html#aa7c69f9eabba9382d7a4b95d3a6eef36',1,'MjVisual']]]
+  ['scroll_90',['scroll',['../classMjVisual.html#a73d8018c3d4ab813a3e4b822b55388cb',1,'MjVisual']]],
+  ['set_5fmimic_5fjoint_91',['set_mimic_joint',['../classMjSim.html#a36a9612086062775bc03a8621dc0f007',1,'MjSim']]],
+  ['simulate_92',['simulate',['../mj__main_8cpp.html#a1f451daf160cbacfab1e7b495789750e',1,'mj_main.cpp']]]
 ];

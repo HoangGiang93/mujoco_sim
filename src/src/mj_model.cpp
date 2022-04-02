@@ -29,5 +29,10 @@ double rtf_des = 1;
 
 double rtf = 0.0;
 
-std::experimental::filesystem::path model_path;
-std::experimental::filesystem::path tmp_model_path;
+boost::filesystem::path model_path;
+
+boost::filesystem::path tmp_model_path;
+
+boost::filesystem::path tmp_mesh_path;
+
+boost::filesystem::path config_path;
