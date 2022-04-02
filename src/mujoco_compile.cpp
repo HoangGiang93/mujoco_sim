@@ -194,9 +194,10 @@ void load_urdf(const char *input, const char *output)
     }
 
     meshes_path_string = output_file_path.stem().string() + "/meshes";
+
     boost::filesystem::create_directories(output_file_path.parent_path() / meshes_path_string);
     boost::filesystem::path meshes_path = output_file_path.parent_path() / meshes_path_string;
-    copy(input_file_path, meshes_path);
+    boost::filesystem::copy_file(input_file_path, meshes_path / input_file_path.filename());
 
     std::vector<urdf::LinkSharedPtr> links;
     model.getLinks(links);
@@ -225,7 +226,7 @@ void load_urdf(const char *input, const char *output)
                 }
                 else
                 {
-                    copy(mesh_path, meshes_path);
+                    boost::filesystem::copy_file(mesh_path, meshes_path / mesh_path.filename());
                 }
             }
         }
@@ -273,14 +274,25 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mujoco_compile");
 
     // print help if arguments are missing
-    if (argc != 3)
+    if (argc < 2)
     {
         return finish(helpstring);
     }
 
     // determine file types
     int type1 = filetype(argv[1]);
-    int type2 = filetype(argv[2]);
+    int type2;
+    std::string output;
+    if (argc == 2)
+    {
+        type2 = typeXML;
+        output = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
+    }
+    else
+    {
+        type2 = filetype(argv[2]);
+        output = argv[2];
+    }
 
     // check types
     if (type1 != typeURDF || type2 != typeXML)
@@ -288,15 +300,13 @@ int main(int argc, char **argv)
         return finish("Illegal combination of file formats");
     }
 
-    // make sure output file does not exist
-    std::FILE *fp = std::fopen(argv[2], "r");
-    if (fp)
+    // override output file if it exists
+    if (boost::filesystem::exists(output))
     {
-        std::fclose(fp);
-        return finish("Output file already exists");
+        boost::filesystem::remove(output);
     }
 
-    load_urdf(argv[1], argv[2]);
+    load_urdf(argv[1], output.c_str());
 
     // check error
     if (!m)
@@ -305,12 +315,12 @@ int main(int argc, char **argv)
     }
 
     // save model
-    if (!mj_saveLastXML(argv[2], m, error, 1000))
+    if (!mj_saveLastXML(output.c_str(), m, error, 1000))
     {
         return finish(error);
     }
 
-    modify_xml(argv[2]);
+    modify_xml(output.c_str());
 
     // finalize
     return finish("Done");

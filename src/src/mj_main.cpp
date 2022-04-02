@@ -144,20 +144,8 @@ int main(int argc, char **argv)
     ros::NodeHandle n;
 
     // check command-line arguments
-    if (argc < 2)
-    {
-        mju_error("\n Usage:  model.xml\n");
-    }
-
-    model_path = argv[1];
-    if (argc == 2)
-    {
-        config_path = ros::package::getPath("mujoco_sim") + "/src/config/default.xml";
-    }
-    else
-    {
-        config_path = argv[2];
-    }
+    model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
+    config_path = ros::package::getPath("mujoco_sim") + "/src/config/default.xml";
 
     mj_sim.init();
 

@@ -29,6 +29,10 @@ double rtf_des = 1;
 
 double rtf = 0.0;
 
+bool remove_model = true;
+
+std::string tmp_model_name = "current.xml";
+
 boost::filesystem::path model_path;
 
 boost::filesystem::path tmp_model_path;

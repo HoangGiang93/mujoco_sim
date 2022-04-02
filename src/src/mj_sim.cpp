@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <ros/package.h>
+#include <ros/param.h>
 #include <tinyxml2.h>
 
 std::vector<std::string> MjSim::joint_names;
@@ -39,6 +40,26 @@ MjSim::~MjSim()
 	mju_free(tau);
 	boost::filesystem::remove_all(tmp_mesh_path.parent_path().parent_path());
 	boost::filesystem::remove(tmp_model_path);
+	if (remove_model)
+	{
+		boost::filesystem::remove(model_path);
+	}
+}
+
+static void set_path()
+{
+	std::string model_path_string;
+	if (ros::param::get("~robot", model_path_string))
+	{
+		remove_model = false;
+		model_path = model_path_string;
+	}
+	
+	std::string config_path_string;
+	if (ros::param::get("~config", config_path_string))
+	{
+		config_path = config_path_string;
+	}
 }
 
 static void get_joint_names(tinyxml2::XMLElement *parent_body_element)
@@ -107,18 +128,25 @@ static void init_tmp()
 	tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/";
 	tmp_mesh_path = tmp_model_path / model_path_tail;
 	
-	if (boost::filesystem::exists(tmp_mesh_path))
+	if (!boost::filesystem::exists(tmp_mesh_path))
 	{
-		boost::filesystem::remove_all(tmp_mesh_path.parent_path());
+		boost::filesystem::create_directories(tmp_mesh_path);
 	}
-	boost::filesystem::create_directories(tmp_mesh_path);
-	
+
 	for (const boost::filesystem::directory_entry& file : boost::filesystem::directory_iterator(model_path.parent_path() / model_path_tail))
 	{
-		boost::filesystem::copy_file(file.path(), tmp_mesh_path / file.path().filename());
+		boost::filesystem::path des_file_path = tmp_mesh_path / file.path().filename();
+		if (!boost::filesystem::exists(des_file_path))
+		{
+			boost::filesystem::copy_file(file.path(), des_file_path);
+		}
 	}
-	tmp_model_path /= "current.xml";
+	tmp_model_path /= tmp_model_name;
 
+	if (boost::filesystem::exists(tmp_model_path))
+	{
+		boost::filesystem::remove(tmp_model_path);
+	}
 	boost::filesystem::copy_file(model_path, tmp_model_path);
 
 	// Modify current.xml
@@ -144,6 +172,7 @@ static void init_malloc()
 
 void MjSim::init()
 {
+	set_path();
 	init_tmp();
 	load_model();
 	init_malloc();

@@ -168,10 +168,12 @@ add_library(ui_tools_lib
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(mujoco_compile src/mujoco_compile.cpp)
+add_executable(mujoco_simulate sample/simulate.cc)
+
 add_executable(${PROJECT_NAME} src/mujoco_sim.cpp)
 add_executable(${PROJECT_NAME}_headless src/mujoco_sim_headless.cpp)
 
-add_executable(simulate sample/simulate.cc)
+
 
 
 ## Rename C++ executable without prefix
@@ -210,7 +212,7 @@ target_link_libraries(mujoco_compile
   tinyxml2
 )
 
-target_link_libraries(simulate
+target_link_libraries(mujoco_simulate
   ${catkin_LIBRARIES}
   ui_tools_lib
   ${PROJECT_SOURCE_DIR}/lib/libmujoco.so
