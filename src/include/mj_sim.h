@@ -53,22 +53,28 @@ public:
     void controller();
 
     /**
-     * @brief Set the mimic joint position
+     * @brief Set the mimic joint positions
      * 
      */
-    void set_mimic_joint();
+    void set_mimic_joints();
+
+    /**
+     * @brief Set the odom joint velocities
+     * 
+     */
+    void set_odom_joints();
 
 public:
     /**
      * @brief Spawn new data from file
      *
      */
-    static void add_data();
+    static void add_data(); 
 
 public:
     static std::vector<std::string> joint_names;
 
-    static std::vector<std::string> odom_joint_names;
+    static std::map<std::string, std::pair<std::string, mjtNum>> odom_joints;
 
     static std::map<std::string, MimicJoint> mimic_joints;
 

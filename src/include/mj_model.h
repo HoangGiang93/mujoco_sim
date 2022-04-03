@@ -35,12 +35,14 @@ extern double rtf_des;
 
 extern double rtf_actual;
 
-extern bool remove_model;
+extern bool use_odom_joints;
 
 extern std::string tmp_model_name;
 
 extern boost::filesystem::path model_path;
 
 extern boost::filesystem::path tmp_model_path;
+
+extern boost::filesystem::path cache_model_path;
 
 extern boost::filesystem::path config_path;

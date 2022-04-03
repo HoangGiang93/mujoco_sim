@@ -26,6 +26,8 @@
 
 ros::Time MjRos::ros_start;
 
+std::string root_name;
+
 MjRos::~MjRos()
 {
 }
@@ -46,8 +48,14 @@ void MjRos::init()
     n = ros::NodeHandle();
     object_gen_sub = n.subscribe("create_object", 1, &MjRos::object_gen_callback, this);
 
+    if (use_odom_joints)
+    {
+        cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
+    }
+
     urdf::Model urdf_model;
     init_urdf(urdf_model, n); // this looks so retared...
+    root_name = urdf_model.getRoot()->name;
     for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
     {
         if (joint.second->mimic != nullptr)
@@ -59,6 +67,17 @@ void MjRos::init()
             MjSim::mimic_joints[joint.first] = mimic_joint;
         }
     }
+}
+
+void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
+{
+    const std::string odom_z_joint_name = MjSim::odom_joints["odom_z_joint"].first;
+    const int odom_z_joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_z_joint_name.c_str());
+    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_idx];
+
+    MjSim::odom_joints["odom_x_joint"].second = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
+    MjSim::odom_joints["odom_y_joint"].second = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
+    MjSim::odom_joints["odom_z_joint"].second = msg.angular.z;
 }
 
 void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
@@ -153,11 +172,24 @@ void MjRos::update(double frequency = 60)
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
+                if (use_odom_joints && object_name == model_path.stem().string())
+                {
+                    continue;
+                }
+                
                 publish_markers(body_idx, object_name);
 
                 publish_tf(body_idx, object_name);
             }
         }
+        
+        std::string base_name = "world";
+        if (use_odom_joints)
+        {
+            base_name = model_path.stem().string();
+        }
+        publish_tf(mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str()), root_name);
+        
         ros::spinOnce();
         loop_rate.sleep();
     }

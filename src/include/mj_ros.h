@@ -24,9 +24,10 @@
 #include "mujoco_msgs/ModelState.h"
 
 #include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <visualization_msgs/Marker.h>
 #include <urdf/model.h>
+#include <visualization_msgs/Marker.h>
 
 class MjRos
 {
@@ -57,6 +58,13 @@ private:
     void object_gen_callback(const mujoco_msgs::ModelState &msg);
 
     /**
+     * @brief Control base velocity from ROS
+     * 
+     * @param msg cmd_vel message from ROS
+     */
+    void cmd_vel_callback(const geometry_msgs::Twist &msg);
+
+    /**
      * @brief Publish markers for all objects
      *
      * @param body_idx Body index of the object
@@ -82,6 +90,8 @@ public:
 private:
     ros::NodeHandle n;
 
+    ros::Subscriber cmd_vel_sub;
+
     ros::Subscriber object_gen_sub;
 
     visualization_msgs::Marker marker;
@@ -97,7 +107,7 @@ private:
  * @brief This function `urdf::Model::initParamWithNodeHandle` should be inside the implementation file, but c++ doesn't want to compile...
  * It makes no sense to put it here, I know...
  * If anyone know how to fix this, please kindly tell me, you will earn a lot of respect from me and my friends :) May your name be honoured!
- * 
+ *
  * @param urdf_model The urdf model to be initialized
  * @param n The node handle
  */

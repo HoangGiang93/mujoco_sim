@@ -97,7 +97,11 @@ void simulate()
             mj_hw_interface.write();
 
             mj_step2(m, d);
-            mj_sim.set_mimic_joint();
+            mj_sim.set_mimic_joints();
+            if (use_odom_joints)
+            {
+                mj_sim.set_odom_joints();
+            }
             mtx.unlock();
         }
 
