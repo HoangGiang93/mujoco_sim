@@ -124,7 +124,7 @@ void simulate()
         {
             double ros_time_diff = ros_time - last_ros_time.back();
             double sim_time_diff = sim_time - last_sim_time.back();
-            rtf = sim_time_diff / ros_time_diff;
+            rtf_actual = sim_time_diff / ros_time_diff;
             last_ros_time.pop_back();
             last_sim_time.pop_back();
         }
@@ -142,10 +142,6 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "mujoco_sim");
     ros::NodeHandle n;
-
-    // check command-line arguments
-    model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
-    config_path = ros::package::getPath("mujoco_sim") + "/src/config/default.xml";
 
     mj_sim.init();
 

@@ -20,23 +20,23 @@
 
 #include "mj_model.h"
 
+#include <ros/package.h>
+
 mjModel *m = NULL;
 mjData *d = NULL;
 
 std::mutex mtx;
 
-double rtf_des = 1;
+double rtf_des = 1.0;
 
-double rtf = 0.0;
+double rtf_actual = 0.0;
 
 bool remove_model = true;
 
 std::string tmp_model_name = "current.xml";
 
-boost::filesystem::path model_path;
+boost::filesystem::path model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
 
-boost::filesystem::path tmp_model_path;
+boost::filesystem::path tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/";
 
-boost::filesystem::path tmp_mesh_path;
-
-boost::filesystem::path config_path;
+boost::filesystem::path config_path = ros::package::getPath("mujoco_sim") + "/src/config/default.xml";

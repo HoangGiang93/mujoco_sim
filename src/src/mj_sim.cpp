@@ -27,6 +27,8 @@
 
 std::vector<std::string> MjSim::joint_names;
 
+std::vector<std::string> MjSim::odom_joint_names;
+
 std::map<std::string, MimicJoint> MjSim::mimic_joints;
 
 std::vector<std::string> MjSim::link_names;
@@ -34,6 +36,8 @@ std::vector<std::string> MjSim::link_names;
 mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
+
+static boost::filesystem::path tmp_mesh_path;
 
 MjSim::~MjSim()
 {
@@ -125,7 +129,6 @@ static void load_model()
 static void init_tmp()
 {
 	std::string model_path_tail = model_path.stem().string() + "/meshes/";
-	tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/";
 	tmp_mesh_path = tmp_model_path / model_path_tail;
 	
 	if (!boost::filesystem::exists(tmp_mesh_path))

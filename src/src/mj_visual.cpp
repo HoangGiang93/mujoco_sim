@@ -142,7 +142,7 @@ void MjVisual::render(double sim_time, double ros_time)
     mjrRect rect4 = {0, viewport.height - 200, 300, 50};
     std::string sim_time_text = "Simulation time: " + std::to_string(sim_time);
     std::string ros_time_text = "ROS time: " + std::to_string(ros_time);
-    std::string rtf_text = "Real-time factor: " + std::to_string(rtf);
+    std::string rtf_text = "Real-time factor: " + std::to_string(rtf_actual);
     std::string time_step_text = "Time step: " + std::to_string(m->opt.timestep);
 
     mjr_label(rect1, 0, sim_time_text.c_str(), 1, 1, 1, 0.2, 1, 1, 1, &con);

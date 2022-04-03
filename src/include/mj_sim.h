@@ -68,6 +68,8 @@ public:
 public:
     static std::vector<std::string> joint_names;
 
+    static std::vector<std::string> odom_joint_names;
+
     static std::map<std::string, MimicJoint> mimic_joints;
 
     static std::vector<std::string> link_names;
