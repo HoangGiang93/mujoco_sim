@@ -71,7 +71,7 @@ void MjRos::init()
     }
 }
 
-bool MjRos::gen_objects_service(mujoco_msgs::ModelStateServiceRequest &req, mujoco_msgs::ModelStateServiceResponse &res)
+bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_msgs::GenerateObjectResponse &res)
 {
     // Create add.xml
     tinyxml2::XMLDocument object_xml_doc;
