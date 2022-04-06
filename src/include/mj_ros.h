@@ -22,6 +22,7 @@
 
 #include "mj_sim.h"
 #include "mujoco_msgs/ModelState.h"
+#include "mujoco_msgs/ModelStateService.h"
 
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
@@ -51,15 +52,16 @@ public:
 
 private:
     /**
-     * @brief Create new data file of new object from ROS
-     *
-     * @param msg New object parameters
+     * @brief @brief Create new data file of new object from ROS
+     * 
+     * @param req New object parameters
+     * @param res Success or not
      */
-    void object_gen_callback(const mujoco_msgs::ModelState &msg);
+    bool gen_objects_service(mujoco_msgs::ModelStateServiceRequest &req, mujoco_msgs::ModelStateServiceResponse &res);
 
     /**
      * @brief Control base velocity from ROS
-     * 
+     *
      * @param msg cmd_vel message from ROS
      */
     void cmd_vel_callback(const geometry_msgs::Twist &msg);
@@ -92,7 +94,7 @@ private:
 
     ros::Subscriber cmd_vel_sub;
 
-    ros::Subscriber object_gen_sub;
+    ros::ServiceServer gen_objects_server;
 
     visualization_msgs::Marker marker;
 

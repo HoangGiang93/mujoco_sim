@@ -53,6 +53,7 @@ static void set_param()
 	if (ros::param::get("~robot", model_path_string))
 	{
 		model_path = model_path_string;
+		tmp_model_name = "current_" + model_path.filename().string();
 	}
 
 	std::string config_path_string;
@@ -250,7 +251,7 @@ void MjSim::init()
 	sim_start = d->time;
 }
 
-void MjSim::add_data()
+bool MjSim::add_data()
 {
 	// Save current.xml
 	char error[1000] = "Could not save binary model";
@@ -261,7 +262,7 @@ void MjSim::add_data()
 	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
-		return;
+		return false;
 	}
 	tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
 	for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
@@ -303,14 +304,17 @@ void MjSim::add_data()
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", "add.xml");
 	current_element->LinkEndChild(include_element);
-	current_xml_doc.SaveFile(tmp_model_path.c_str());
+	if (current_xml_doc.SaveFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	{
+		return false;
+	}
 
 	// Load current.xml
 	mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
 	if (!m_new)
 	{
 		mju_warning_s("Load model error: %s", error);
-		return;
+		return false;
 	}
 
 	mtx.lock();
@@ -344,6 +348,8 @@ void MjSim::add_data()
 
 	init_malloc();
 	mtx.unlock();
+
+	return true;
 }
 
 void MjSim::controller()

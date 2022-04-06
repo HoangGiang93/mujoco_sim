@@ -46,12 +46,14 @@ void MjRos::init()
     }
 
     n = ros::NodeHandle();
-    object_gen_sub = n.subscribe("create_object", 1, &MjRos::object_gen_callback, this);
 
     if (use_odom_joints)
     {
         cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
     }
+
+    gen_objects_server = n.advertiseService("generate_objects", &MjRos::gen_objects_service, this);
+    ROS_INFO("Started [%s] service.", gen_objects_server.getService().c_str());
 
     urdf::Model urdf_model;
     init_urdf(urdf_model, n); // this looks so retared...
@@ -69,6 +71,91 @@ void MjRos::init()
     }
 }
 
+bool MjRos::gen_objects_service(mujoco_msgs::ModelStateServiceRequest &req, mujoco_msgs::ModelStateServiceResponse &res)
+{
+    // Create add.xml
+    tinyxml2::XMLDocument object_xml_doc;
+    tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
+    object_xml_doc.LinkEndChild(root);
+
+    tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
+    root->LinkEndChild(worldbody_element);
+
+    for (const mujoco_msgs::ModelState &model_state : req.model_states)
+    {
+        tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
+        tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("joint");
+        tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
+
+        body_element->LinkEndChild(joint_element);
+        body_element->LinkEndChild(geom_element);
+        worldbody_element->LinkEndChild(body_element);
+
+        joint_element->SetAttribute("type", "free");
+
+        switch (model_state.type)
+        {
+        case mujoco_msgs::ModelState::CUBE:
+            geom_element->SetAttribute("type", "box");
+            geom_element->SetAttribute("size",
+                                       (std::to_string(model_state.scale.x) + " " +
+                                        std::to_string(model_state.scale.y) + " " +
+                                        std::to_string(model_state.scale.z))
+                                           .c_str());
+            break;
+
+        case mujoco_msgs::ModelState::SPHERE:
+            geom_element->SetAttribute("type", "sphere");
+            geom_element->SetAttribute("size", model_state.scale.x);
+            break;
+
+        case mujoco_msgs::ModelState::CYLINDER:
+            geom_element->SetAttribute("type", "cylinder");
+            geom_element->SetAttribute("size",
+                                       (std::to_string(model_state.scale.x) + " " +
+                                        std::to_string(model_state.scale.y))
+                                           .c_str());
+            break;
+
+        default:
+            break;
+        }
+
+        geom_element->SetAttribute("rgba",
+                                   (std::to_string(model_state.color.r) + " " +
+                                    std::to_string(model_state.color.g) + " " +
+                                    std::to_string(model_state.color.b) + " " +
+                                    std::to_string(model_state.color.a))
+                                       .c_str());
+
+        body_element->SetAttribute("name", model_state.name.c_str());
+
+        body_element->SetAttribute("pos",
+                                   (std::to_string(model_state.pose.position.x) + " " +
+                                    std::to_string(model_state.pose.position.y) + " " +
+                                    std::to_string(model_state.pose.position.z))
+                                       .c_str());
+
+        body_element->SetAttribute("quat",
+                                   (std::to_string(model_state.pose.orientation.w) + " " +
+                                    std::to_string(model_state.pose.orientation.x) + " " +
+                                    std::to_string(model_state.pose.orientation.y) + " " +
+                                    std::to_string(model_state.pose.orientation.z))
+                                       .c_str());
+    }
+    
+    if (object_xml_doc.SaveFile((tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        res.success = false;
+    }
+    else
+    {
+        res.success = MjSim::add_data();
+    }
+    
+    return res.success;
+}
+
 void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 {
     const std::string odom_z_joint_name = MjSim::odom_joints["odom_z_joint"].first;
@@ -78,81 +165,6 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
     MjSim::odom_joints["odom_x_joint"].second = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
     MjSim::odom_joints["odom_y_joint"].second = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
     MjSim::odom_joints["odom_z_joint"].second = msg.angular.z;
-}
-
-void MjRos::object_gen_callback(const mujoco_msgs::ModelState &msg)
-{
-    // Create add.xml
-    std::string path = ros::package::getPath("mujoco_sim");
-    tinyxml2::XMLDocument object_xml_doc;
-    tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
-    object_xml_doc.InsertFirstChild(root);
-
-    tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
-    tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
-    tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("joint");
-    tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
-
-    body_element->InsertEndChild(joint_element);
-    body_element->InsertEndChild(geom_element);
-    worldbody_element->InsertEndChild(body_element);
-    root->InsertEndChild(worldbody_element);
-
-    joint_element->SetAttribute("type", "free");
-
-    switch (msg.type)
-    {
-    case mujoco_msgs::ModelState::CUBE:
-        geom_element->SetAttribute("type", "box");
-        geom_element->SetAttribute("size",
-                                   (std::to_string(msg.scale.x) + " " +
-                                    std::to_string(msg.scale.y) + " " +
-                                    std::to_string(msg.scale.z))
-                                       .c_str());
-        break;
-
-    case mujoco_msgs::ModelState::SPHERE:
-        geom_element->SetAttribute("type", "sphere");
-        geom_element->SetAttribute("size", msg.scale.x);
-        break;
-
-    case mujoco_msgs::ModelState::CYLINDER:
-        geom_element->SetAttribute("type", "cylinder");
-        geom_element->SetAttribute("size",
-                                   (std::to_string(msg.scale.x) + " " +
-                                    std::to_string(msg.scale.y))
-                                       .c_str());
-        break;
-
-    default:
-        break;
-    }
-
-    geom_element->SetAttribute("rgba",
-                               (std::to_string(msg.color.r) + " " +
-                                std::to_string(msg.color.g) + " " +
-                                std::to_string(msg.color.b) + " " +
-                                std::to_string(msg.color.a))
-                                   .c_str());
-
-    body_element->SetAttribute("name", msg.name.c_str());
-
-    body_element->SetAttribute("pos",
-                               (std::to_string(msg.pose.position.x) + " " +
-                                std::to_string(msg.pose.position.y) + " " +
-                                std::to_string(msg.pose.position.z))
-                                   .c_str());
-
-    body_element->SetAttribute("quat",
-                               (std::to_string(msg.pose.orientation.w) + " " +
-                                std::to_string(msg.pose.orientation.x) + " " +
-                                std::to_string(msg.pose.orientation.y) + " " +
-                                std::to_string(msg.pose.orientation.z))
-                                   .c_str());
-
-    object_xml_doc.SaveFile((path + "/model/tmp/add.xml").c_str());
-
-    MjSim::add_data();
 }
 
 void MjRos::update(double frequency = 60)
@@ -176,20 +188,19 @@ void MjRos::update(double frequency = 60)
                 {
                     continue;
                 }
-                
-                publish_markers(body_idx, object_name);
-
                 publish_tf(body_idx, object_name);
+
+                publish_markers(body_idx, object_name);
             }
         }
-        
+
         std::string base_name = "world";
         if (use_odom_joints)
         {
             base_name = model_path.stem().string();
         }
         publish_tf(mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str()), root_name);
-        
+
         ros::spinOnce();
         loop_rate.sleep();
     }

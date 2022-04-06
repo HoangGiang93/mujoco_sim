@@ -69,7 +69,7 @@ public:
      * @brief Spawn new data from file
      *
      */
-    static void add_data(); 
+    static bool add_data(); 
 
 public:
     static std::vector<std::string> joint_names;
