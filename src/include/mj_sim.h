@@ -25,6 +25,10 @@
 #include <map>
 #include <vector>
 
+void load_model();
+
+void init_malloc();
+
 struct MimicJoint
 {
     std::string from_joint;

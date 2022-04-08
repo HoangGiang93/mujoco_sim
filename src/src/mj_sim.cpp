@@ -126,7 +126,7 @@ static void set_joint_names()
 	}
 }
 
-static void load_model()
+void load_model()
 {
 	// load and compile model
 	char error[1000] = "Could not load binary model";
@@ -235,7 +235,7 @@ static void init_tmp()
 	}
 }
 
-static void init_malloc()
+void init_malloc()
 {
 	MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
 	mju_zero(MjSim::tau, m->nv);

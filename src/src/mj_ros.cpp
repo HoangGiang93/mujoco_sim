@@ -52,8 +52,8 @@ void MjRos::init()
         cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
     }
 
-    gen_objects_server = n.advertiseService("generate_objects", &MjRos::gen_objects_service, this);
-    ROS_INFO("Started [%s] service.", gen_objects_server.getService().c_str());
+    spawn_objects_server = n.advertiseService("spawn_objects", &MjRos::spawn_objects_service, this);
+    ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
 
     urdf::Model urdf_model;
     init_urdf(urdf_model, n); // this looks so retared...
@@ -71,7 +71,7 @@ void MjRos::init()
     }
 }
 
-bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_msgs::GenerateObjectResponse &res)
+bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res)
 {
     // Create add.xml
     tinyxml2::XMLDocument object_xml_doc;
@@ -83,16 +83,17 @@ bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_
 
     for (const mujoco_msgs::ModelState &model_state : req.model_states)
     {
+        if (mj_name2id(m, mjtObj::mjOBJ_GEOM, model_state.name.c_str()) != -1)
+        {
+            ROS_WARN("Object [%s] already exists, ignore...", model_state.name.c_str());
+            continue;
+        }
+        
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
-        tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("joint");
+        tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
         tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
 
-        body_element->LinkEndChild(joint_element);
-        body_element->LinkEndChild(geom_element);
-        worldbody_element->LinkEndChild(body_element);
-
-        joint_element->SetAttribute("type", "free");
-
+        boost::filesystem::path object_mesh_path = model_state.name;
         switch (model_state.type)
         {
         case mujoco_msgs::ModelState::CUBE:
@@ -117,9 +118,51 @@ bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_
                                            .c_str());
             break;
 
+        case mujoco_msgs::ModelState::MESH:
+            if (object_mesh_path.extension().compare(".xml") == 0)
+            {
+                object_mesh_path = model_path.parent_path() / object_mesh_path;
+                tinyxml2::XMLDocument mesh_xml_doc;
+
+                if (mesh_xml_doc.LoadFile(object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
+                {
+                    mju_warning_s("Failed to load file \"%s\"\n", object_mesh_path.c_str());
+                    continue;
+                }
+                for (tinyxml2::XMLNode *node = mesh_xml_doc.FirstChild()->FirstChild();
+                     node != nullptr;
+                     node = node->NextSibling())
+                {
+                    tinyxml2::XMLNode *copy = node->DeepClone(&object_xml_doc);
+                    if (strcmp(copy->Value(), "asset") == 0)
+                    {
+                        continue;
+                    }
+
+                    // for (tinyxml2::XMLElement *element = copy->FirstChildElement();
+                    //      element != nullptr;
+                    //      element = element->NextSiblingElement())
+                    // {
+                    //     if (const char* mesh_path_char = element->Attribute("file"))
+                    //     {
+                    //         boost::filesystem::path mesh_path = model_path.parent_path() / mesh_path_char;
+                    //         if (boost::filesystem::exists(mesh_path))
+                    //         {
+                    //             mesh_path = boost::filesystem::relative(mesh_path, tmp_model_path.parent_path());
+                    //         }
+                    //         element->SetAttribute("file", mesh_path.c_str());
+                    //     }
+                    // }
+                    root->InsertEndChild(copy);
+                }
+            }
+            continue;
+
         default:
             break;
         }
+
+        body_element->SetAttribute("name", model_state.name.c_str());
 
         geom_element->SetAttribute("rgba",
                                    (std::to_string(model_state.color.r) + " " +
@@ -127,8 +170,6 @@ bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_
                                     std::to_string(model_state.color.b) + " " +
                                     std::to_string(model_state.color.a))
                                        .c_str());
-
-        body_element->SetAttribute("name", model_state.name.c_str());
 
         body_element->SetAttribute("pos",
                                    (std::to_string(model_state.pose.position.x) + " " +
@@ -142,8 +183,12 @@ bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_
                                     std::to_string(model_state.pose.orientation.y) + " " +
                                     std::to_string(model_state.pose.orientation.z))
                                        .c_str());
+
+        body_element->LinkEndChild(joint_element);
+        body_element->LinkEndChild(geom_element);
+        worldbody_element->LinkEndChild(body_element);
     }
-    
+
     if (object_xml_doc.SaveFile((tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
     {
         res.success = false;
@@ -152,7 +197,7 @@ bool MjRos::gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_
     {
         res.success = MjSim::add_data();
     }
-    
+
     return res.success;
 }
 

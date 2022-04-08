@@ -22,7 +22,7 @@
 
 #include "mj_sim.h"
 #include "mujoco_msgs/ModelState.h"
-#include "mujoco_msgs/GenerateObject.h"
+#include "mujoco_msgs/SpawnObject.h"
 
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
@@ -57,7 +57,7 @@ private:
      * @param req New object parameters
      * @param res Success or not
      */
-    bool gen_objects_service(mujoco_msgs::GenerateObjectRequest &req, mujoco_msgs::GenerateObjectResponse &res);
+    bool spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res);
 
     /**
      * @brief Control base velocity from ROS
@@ -94,7 +94,7 @@ private:
 
     ros::Subscriber cmd_vel_sub;
 
-    ros::ServiceServer gen_objects_server;
+    ros::ServiceServer spawn_objects_server;
 
     visualization_msgs::Marker marker;
 
