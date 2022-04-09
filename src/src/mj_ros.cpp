@@ -83,11 +83,11 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
     root->LinkEndChild(worldbody_element);
 
-    for (const mujoco_msgs::ModelState &model_state : req.model_states)
+    for (const mujoco_msgs::ObjectState &object_state : req.object_states)
     {
-        if (mj_name2id(m, mjtObj::mjOBJ_BODY, model_state.name.c_str()) != -1)
+        if (mj_name2id(m, mjtObj::mjOBJ_BODY, object_state.name.c_str()) != -1)
         {
-            ROS_WARN("Object [%s] already exists, ignore...", model_state.name.c_str());
+            ROS_WARN("Object [%s] already exists, ignore...", object_state.name.c_str());
             continue;
         }
 
@@ -95,32 +95,32 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
         tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
         tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
 
-        boost::filesystem::path object_mesh_path = model_state.name;
-        switch (model_state.type)
+        boost::filesystem::path object_mesh_path = object_state.name;
+        switch (object_state.type)
         {
-        case mujoco_msgs::ModelState::CUBE:
+        case mujoco_msgs::ObjectState::CUBE:
             geom_element->SetAttribute("type", "box");
             geom_element->SetAttribute("size",
-                                       (std::to_string(model_state.scale.x) + " " +
-                                        std::to_string(model_state.scale.y) + " " +
-                                        std::to_string(model_state.scale.z))
+                                       (std::to_string(object_state.scale.x) + " " +
+                                        std::to_string(object_state.scale.y) + " " +
+                                        std::to_string(object_state.scale.z))
                                            .c_str());
             break;
 
-        case mujoco_msgs::ModelState::SPHERE:
+        case mujoco_msgs::ObjectState::SPHERE:
             geom_element->SetAttribute("type", "sphere");
-            geom_element->SetAttribute("size", model_state.scale.x);
+            geom_element->SetAttribute("size", object_state.scale.x);
             break;
 
-        case mujoco_msgs::ModelState::CYLINDER:
+        case mujoco_msgs::ObjectState::CYLINDER:
             geom_element->SetAttribute("type", "cylinder");
             geom_element->SetAttribute("size",
-                                       (std::to_string(model_state.scale.x) + " " +
-                                        std::to_string(model_state.scale.y))
+                                       (std::to_string(object_state.scale.x) + " " +
+                                        std::to_string(object_state.scale.y))
                                            .c_str());
             break;
 
-        case mujoco_msgs::ModelState::MESH:
+        case mujoco_msgs::ObjectState::MESH:
             if (object_mesh_path.extension().compare(".xml") == 0)
             {
                 object_mesh_path = model_path.parent_path() / object_mesh_path;
@@ -164,26 +164,26 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             break;
         }
 
-        body_element->SetAttribute("name", model_state.name.c_str());
+        body_element->SetAttribute("name", object_state.name.c_str());
 
         geom_element->SetAttribute("rgba",
-                                   (std::to_string(model_state.color.r) + " " +
-                                    std::to_string(model_state.color.g) + " " +
-                                    std::to_string(model_state.color.b) + " " +
-                                    std::to_string(model_state.color.a))
+                                   (std::to_string(object_state.color.r) + " " +
+                                    std::to_string(object_state.color.g) + " " +
+                                    std::to_string(object_state.color.b) + " " +
+                                    std::to_string(object_state.color.a))
                                        .c_str());
 
         body_element->SetAttribute("pos",
-                                   (std::to_string(model_state.pose.position.x) + " " +
-                                    std::to_string(model_state.pose.position.y) + " " +
-                                    std::to_string(model_state.pose.position.z))
+                                   (std::to_string(object_state.pose.position.x) + " " +
+                                    std::to_string(object_state.pose.position.y) + " " +
+                                    std::to_string(object_state.pose.position.z))
                                        .c_str());
 
         body_element->SetAttribute("quat",
-                                   (std::to_string(model_state.pose.orientation.w) + " " +
-                                    std::to_string(model_state.pose.orientation.x) + " " +
-                                    std::to_string(model_state.pose.orientation.y) + " " +
-                                    std::to_string(model_state.pose.orientation.z))
+                                   (std::to_string(object_state.pose.orientation.w) + " " +
+                                    std::to_string(object_state.pose.orientation.x) + " " +
+                                    std::to_string(object_state.pose.orientation.y) + " " +
+                                    std::to_string(object_state.pose.orientation.z))
                                        .c_str());
 
         body_element->LinkEndChild(joint_element);
@@ -217,7 +217,7 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 void MjRos::update(double frequency = 60)
 {
     ros::Rate loop_rate(frequency); // Publish with 60 Hz
-    vis_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 0);
+    vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
     marker.header.stamp = ros::Time();

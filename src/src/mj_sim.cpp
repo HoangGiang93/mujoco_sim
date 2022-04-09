@@ -27,7 +27,7 @@
 
 std::vector<std::string> MjSim::joint_names;
 
-std::map<std::string, std::pair<std::string, mjtNum>>MjSim::odom_joints = {{"odom_x_joint", {"odom_x_joint", 0.0}}, {"odom_y_joint", {"odom_y_joint", 0.0}}, {"odom_z_joint", {"odom_z_joint", 0.0}}};
+std::map<std::string, std::pair<std::string, mjtNum>> MjSim::odom_joints = {{"odom_x_joint", {"odom_x_joint", 0.0}}, {"odom_y_joint", {"odom_y_joint", 0.0}}, {"odom_z_joint", {"odom_z_joint", 0.0}}};
 
 std::map<std::string, MimicJoint> MjSim::mimic_joints;
 
@@ -235,6 +235,95 @@ static void init_tmp()
 	}
 }
 
+static void add_new_state(mjModel *m_new, mjData *d_new)
+{
+	d_new->time = d->time;
+
+	ROS_INFO("%d", m->nq);
+	int body_id = 0;
+	while (true)
+	{
+		body_id++;
+		const char *name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+		if (name == nullptr)
+		{
+			break;
+		}		
+		ROS_INFO("%s", name);
+
+		int body_id_new = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
+		if (body_id_new == -1)
+		{
+			ROS_WARN("New body [%s] not found", name);
+			continue;
+		}
+
+		// Copy body states
+		for (int body_nr = 0; body_nr < 6; body_nr++)
+		{
+			d_new->xfrc_applied[body_id_new + body_nr] = d->xfrc_applied[body_id + body_nr];
+		}
+
+		// Copy joint states
+		int jnt_num = m->body_jntnum[body_id];
+		int jnt_num_new = m_new->body_jntnum[body_id_new];
+		if (jnt_num != jnt_num_new)
+		{
+			ROS_WARN("Old [%s] has %d joints != new [%s] has %d joints", name, jnt_num, name, jnt_num_new);
+			continue;
+		}
+		int jnt_id = m->body_jntadr[body_id];
+		int jnt_id_new = m_new->body_jntadr[body_id_new];
+		for (int jnt_nr = 0; jnt_nr < jnt_num; jnt_nr++)
+		{
+			d_new->qpos[jnt_id_new + jnt_nr] = d->qpos[jnt_id + jnt_nr];
+		}
+
+		// Copy dof states
+		int dof_num = m->body_dofnum[body_id];
+		int dof_num_new = m_new->body_dofnum[body_id_new];
+		if (dof_num != dof_num_new)
+		{
+			ROS_WARN("Old [%s] has %d dofs != new [%s] has %d dofs", name, dof_num, name, dof_num_new);
+			continue;
+		}
+		int dof_id = m->body_dofadr[body_id];
+		int dof_id_new = m_new->body_dofadr[body_id_new];
+		for (int dof_nr = 0; dof_nr < dof_num; dof_nr++)
+		{
+			d_new->qvel[dof_id_new + dof_nr] = d->qvel[dof_id + dof_nr];
+			d_new->qacc_warmstart[dof_id_new + dof_nr] = d->qacc_warmstart[dof_id + dof_nr];
+			d_new->qfrc_applied[dof_id_new + dof_nr] = d->qfrc_applied[dof_id + dof_nr];
+			d_new->qacc[dof_id_new + dof_nr] = d->qacc[dof_id + dof_nr];
+		}
+	}
+
+	// Copy activation states
+	if (m->na != 0 || m_new->na != 0)
+	{
+		ROS_WARN("Old model has %d activation states, new model has %d activation states, not supported, will be ignored...", m->na, m_new->na);
+	}
+
+	// Copy mocap bodies
+	if (m->nmocap != 0 || m_new->nmocap != 0)
+	{
+		ROS_WARN("Old model has %d mocap bodies, new model has %d mocap bodies, not supported, will be ignored...", m->nmocap, m_new->nmocap);
+	}
+
+	// Copy sensor data
+	if (m->nsensordata != m_new->nsensordata)
+	{
+		ROS_WARN("Old model has %d sensors, new model has %d sensors, not supported, will be ignored...", m->nmocap, m_new->nmocap);
+	}
+	else
+	{
+		mju_copy(d_new->sensordata, d->sensordata, m->nsensordata);
+	}
+
+	d = d_new;
+	m = m_new;
+}
+
 void init_malloc()
 {
 	MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
@@ -320,31 +409,8 @@ bool MjSim::add_data()
 	mtx.lock();
 	// make data
 	mjData *d_new = mj_makeData(m_new);
-	d_new->time = d->time;
 
-	mju_copy(d_new->qpos, d->qpos, m->nq);
-
-	mju_copy(d_new->qvel, d->qvel, m->nv);
-	mju_copy(d_new->qacc_warmstart, d->qacc_warmstart, m->nv);
-	mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->nv);
-	mju_copy(d_new->qacc, d->qacc, m->nv);
-
-	mju_copy(d_new->act, d->act, m->na);
-	mju_copy(d_new->act_dot, d->act_dot, m->na);
-	mju_copy(d_new->qfrc_applied, d->qfrc_applied, m->na);
-	mju_copy(d_new->qacc, d->qacc, m->na);
-
-	mju_copy(d_new->xfrc_applied, d->xfrc_applied, m->nbody * 6);
-
-	mju_copy(d_new->mocap_pos, d->mocap_pos, 3 * m->nmocap);
-	mju_copy(d_new->mocap_quat, d->mocap_quat, 4 * m->nmocap);
-
-	mju_copy(d_new->userdata, d->userdata, m->nuserdata);
-
-	mju_copy(d_new->sensordata, d->sensordata, m->nsensordata);
-
-	d = d_new;
-	m = m_new;
+	add_new_state(m_new, d_new);
 
 	init_malloc();
 	mtx.unlock();

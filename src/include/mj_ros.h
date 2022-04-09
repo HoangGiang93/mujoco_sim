@@ -21,7 +21,7 @@
 #pragma once
 
 #include "mj_sim.h"
-#include "mujoco_msgs/ModelState.h"
+#include "mujoco_msgs/ObjectState.h"
 #include "mujoco_msgs/SpawnObject.h"
 
 #include <geometry_msgs/TransformStamped.h>
