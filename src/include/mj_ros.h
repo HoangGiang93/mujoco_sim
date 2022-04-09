@@ -112,8 +112,18 @@ private:
  *
  * @param urdf_model The urdf model to be initialized
  * @param n The node handle
+ * @return true Successfully initialized
+ * @return false Fail to initialize
  */
-void init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n)
+bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n)
 {
-    urdf_model.initParamWithNodeHandle("robot_description", n);
+    if (n.hasParam("robot_description"))
+    {
+        return urdf_model.initParamWithNodeHandle("robot_description", n);
+    }
+    else
+    {
+        ROS_WARN("robot_description not found");
+        return false;
+    }
 }

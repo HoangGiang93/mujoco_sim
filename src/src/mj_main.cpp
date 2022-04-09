@@ -43,16 +43,6 @@ void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
     {
         MjSim::add_data();
     }
-    if (act == GLFW_PRESS && key == GLFW_KEY_BACKSPACE)
-    {
-        mtx.lock();
-        load_model();
-        init_malloc();
-        mtx.unlock();
-        i = 0;
-        MjSim::sim_start = d->time;
-        MjRos::ros_start = ros::Time::now();
-    }
     if (act == GLFW_PRESS && key == GLFW_KEY_KP_ADD && rtf_des < 4)
     {
         rtf_des *= 2;

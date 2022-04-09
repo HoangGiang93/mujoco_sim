@@ -142,14 +142,22 @@ $(function() {
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    tf2_ros::TransformBroadcaster br;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;};</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="mj__ros_8h.html#a3012f6c62b5fdde864e1eb49941e293a">  116</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="mj__ros_8h.html#a3012f6c62b5fdde864e1eb49941e293a">init_urdf</a>(urdf::Model &amp;urdf_model, <span class="keyword">const</span> ros::NodeHandle &amp;n)</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    urdf_model.initParamWithNodeHandle(<span class="stringliteral">&quot;robot_description&quot;</span>, n);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;}</div>
+<div class="line"><a name="l00118"></a><span class="lineno"><a class="line" href="mj__ros_8h.html#a0c87fc0c5caf99e8363d04b3dc1265dc">  118</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="mj__ros_8h.html#a0c87fc0c5caf99e8363d04b3dc1265dc">init_urdf</a>(urdf::Model &amp;urdf_model, <span class="keyword">const</span> ros::NodeHandle &amp;n)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;{</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordflow">if</span> (n.hasParam(<span class="stringliteral">&quot;robot_description&quot;</span>))</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <span class="keywordflow">return</span> urdf_model.initParamWithNodeHandle(<span class="stringliteral">&quot;robot_description&quot;</span>, n);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        ROS_WARN(<span class="stringliteral">&quot;robot_description not found&quot;</span>);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="amj__ros_8h_html_a0c87fc0c5caf99e8363d04b3dc1265dc"><div class="ttname"><a href="mj__ros_8h.html#a0c87fc0c5caf99e8363d04b3dc1265dc">init_urdf</a></div><div class="ttdeci">bool init_urdf(urdf::Model &amp;urdf_model, const ros::NodeHandle &amp;n)</div><div class="ttdoc">This function urdf::Model::initParamWithNodeHandle should be inside the implementation file,...</div><div class="ttdef"><b>Definition:</b> mj_ros.h:118</div></div>
 <div class="ttc" id="amj__sim_8h_html"><div class="ttname"><a href="mj__sim_8h.html">mj_sim.h</a></div></div>
-<div class="ttc" id="amj__ros_8h_html_a3012f6c62b5fdde864e1eb49941e293a"><div class="ttname"><a href="mj__ros_8h.html#a3012f6c62b5fdde864e1eb49941e293a">init_urdf</a></div><div class="ttdeci">void init_urdf(urdf::Model &amp;urdf_model, const ros::NodeHandle &amp;n)</div><div class="ttdoc">This function urdf::Model::initParamWithNodeHandle should be inside the implementation file,...</div><div class="ttdef"><b>Definition:</b> mj_ros.h:116</div></div>
-<div class="ttc" id="aclassMjRos_html_acd3054fd4ee8a09961d76cf26e297f6c"><div class="ttname"><a href="classMjRos.html#acd3054fd4ee8a09961d76cf26e297f6c">MjRos::update</a></div><div class="ttdeci">void update(double frequency)</div><div class="ttdoc">Update publishers.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:215</div></div>
+<div class="ttc" id="aclassMjRos_html_acd3054fd4ee8a09961d76cf26e297f6c"><div class="ttname"><a href="classMjRos.html#acd3054fd4ee8a09961d76cf26e297f6c">MjRos::update</a></div><div class="ttdeci">void update(double frequency)</div><div class="ttdoc">Update publishers.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:217</div></div>
 <div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:31</div></div>
 <div class="ttc" id="aclassMjRos_html"><div class="ttname"><a href="classMjRos.html">MjRos</a></div><div class="ttdef"><b>Definition:</b> mj_ros.h:33</div></div>
 <div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdoc">Start time of ROS.</div><div class="ttdef"><b>Definition:</b> mj_ros.h:90</div></div>

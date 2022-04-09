@@ -56,17 +56,19 @@ void MjRos::init()
     ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
 
     urdf::Model urdf_model;
-    init_urdf(urdf_model, n); // this looks so retared...
-    root_name = urdf_model.getRoot()->name;
-    for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
+    if (init_urdf(urdf_model, n)) // this looks so retared...
     {
-        if (joint.second->mimic != nullptr)
+        root_name = urdf_model.getRoot()->name;
+        for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
         {
-            MimicJoint mimic_joint;
-            mimic_joint.from_joint = joint.second->mimic->joint_name;
-            mimic_joint.multiplier = joint.second->mimic->multiplier;
-            mimic_joint.offset = joint.second->mimic->offset;
-            MjSim::mimic_joints[joint.first] = mimic_joint;
+            if (joint.second->mimic != nullptr)
+            {
+                MimicJoint mimic_joint;
+                mimic_joint.from_joint = joint.second->mimic->joint_name;
+                mimic_joint.multiplier = joint.second->mimic->multiplier;
+                mimic_joint.offset = joint.second->mimic->offset;
+                MjSim::mimic_joints[joint.first] = mimic_joint;
+            }
         }
     }
 }
@@ -83,12 +85,12 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
 
     for (const mujoco_msgs::ModelState &model_state : req.model_states)
     {
-        if (mj_name2id(m, mjtObj::mjOBJ_GEOM, model_state.name.c_str()) != -1)
+        if (mj_name2id(m, mjtObj::mjOBJ_BODY, model_state.name.c_str()) != -1)
         {
             ROS_WARN("Object [%s] already exists, ignore...", model_state.name.c_str());
             continue;
         }
-        
+
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
         tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
         tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
@@ -244,7 +246,12 @@ void MjRos::update(double frequency = 60)
         {
             base_name = model_path.stem().string();
         }
-        publish_tf(mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str()), root_name);
+        
+        int root_body_idx = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
+        if (root_body_idx != -1)
+        {
+            publish_tf(root_body_idx, root_name);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
