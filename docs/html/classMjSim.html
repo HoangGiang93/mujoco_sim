@@ -98,6 +98,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ab44529fa518614fdbef0bd5a70b48399"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#ab44529fa518614fdbef0bd5a70b48399">add_data</a> ()</td></tr>
 <tr class="memdesc:ab44529fa518614fdbef0bd5a70b48399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spawn new data from file.  <a href="classMjSim.html#ab44529fa518614fdbef0bd5a70b48399">More...</a><br /></td></tr>
 <tr class="separator:ab44529fa518614fdbef0bd5a70b48399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad993ae887ee3759a6fbf3b307c2c1fc4"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#ad993ae887ee3759a6fbf3b307c2c1fc4">remove_body</a> (const std::vector&lt; std::string &gt; &amp;body_names)</td></tr>
+<tr class="memdesc:ad993ae887ee3759a6fbf3b307c2c1fc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove bodies with name.  <a href="classMjSim.html#ad993ae887ee3759a6fbf3b307c2c1fc4">More...</a><br /></td></tr>
+<tr class="separator:ad993ae887ee3759a6fbf3b307c2c1fc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -220,6 +223,43 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initialize the simulation. </p>
+
+</div>
+</div>
+<a id="ad993ae887ee3759a6fbf3b307c2c1fc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad993ae887ee3759a6fbf3b307c2c1fc4">&#9670;&nbsp;</a></span>remove_body()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MjSim::remove_body </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>body_names</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Remove bodies with name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">body_names</td><td>Array of body names </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true Successfully removed </dd>
+<dd>
+false Fail to remove </dd></dl>
 
 </div>
 </div>

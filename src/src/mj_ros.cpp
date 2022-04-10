@@ -52,8 +52,11 @@ void MjRos::init()
         cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
     }
 
-    spawn_objects_server = n.advertiseService("spawn_objects", &MjRos::spawn_objects_service, this);
+    spawn_objects_server = n.advertiseService("/mujoco/spawn_objects", &MjRos::spawn_objects_service, this);
     ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
+
+    destroy_objects_server = n.advertiseService("/mujoco/destroy_objects", &MjRos::destroy_objects_service, this);
+    ROS_INFO("Started [%s] service.", destroy_objects_server.getService().c_str());
 
     urdf::Model urdf_model;
     if (init_urdf(urdf_model, n)) // this looks so retared...
@@ -140,21 +143,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                     {
                         continue;
                     }
-
-                    // for (tinyxml2::XMLElement *element = copy->FirstChildElement();
-                    //      element != nullptr;
-                    //      element = element->NextSiblingElement())
-                    // {
-                    //     if (const char* mesh_path_char = element->Attribute("file"))
-                    //     {
-                    //         boost::filesystem::path mesh_path = model_path.parent_path() / mesh_path_char;
-                    //         if (boost::filesystem::exists(mesh_path))
-                    //         {
-                    //             mesh_path = boost::filesystem::relative(mesh_path, tmp_model_path.parent_path());
-                    //         }
-                    //         element->SetAttribute("file", mesh_path.c_str());
-                    //     }
-                    // }
+                    
                     root->InsertEndChild(copy);
                 }
             }
@@ -200,6 +189,12 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
         res.success = MjSim::add_data();
     }
 
+    return res.success;
+}
+
+bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujoco_msgs::DestroyObjectResponse &res)
+{
+    res.success = MjSim::remove_body(req.names);
     return res.success;
 }
 

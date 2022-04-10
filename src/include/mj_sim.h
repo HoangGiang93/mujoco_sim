@@ -25,9 +25,7 @@
 #include <map>
 #include <vector>
 
-void load_model();
-
-void init_malloc();
+bool load_tmp_model(bool reset = true);
 
 struct MimicJoint
 {
@@ -74,6 +72,15 @@ public:
      *
      */
     static bool add_data(); 
+
+    /**
+     * @brief Remove bodies with name
+     * 
+     * @param body_names Array of body names
+     * @return true Successfully removed
+     * @return false Fail to remove
+     */
+    static bool remove_body(const std::vector<std::string> &body_names);
 
 public:
     static std::vector<std::string> joint_names;
