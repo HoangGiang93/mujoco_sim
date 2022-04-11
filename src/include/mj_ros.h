@@ -21,7 +21,9 @@
 #pragma once
 
 #include "mj_sim.h"
+#include "mujoco_msgs/ObjectInfo.h"
 #include "mujoco_msgs/ObjectState.h"
+#include "mujoco_msgs/ObjectStatus.h"
 #include "mujoco_msgs/SpawnObject.h"
 #include "mujoco_msgs/DestroyObject.h"
 

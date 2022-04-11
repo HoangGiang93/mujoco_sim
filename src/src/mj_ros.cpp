@@ -86,44 +86,46 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
     root->LinkEndChild(worldbody_element);
 
-    for (const mujoco_msgs::ObjectState &object_state : req.object_states)
+    for (const mujoco_msgs::ObjectStatus &object : req.objects)
     {
-        if (mj_name2id(m, mjtObj::mjOBJ_BODY, object_state.name.c_str()) != -1)
+        if (mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) != -1)
         {
-            ROS_WARN("Object [%s] already exists, ignore...", object_state.name.c_str());
+            ROS_WARN("Object [%s] already exists, ignore...", object.info.name.c_str());
             continue;
         }
 
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
         tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
+        body_element->LinkEndChild(joint_element);
         tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
+        tinyxml2::XMLElement *inertial_element = object_xml_doc.NewElement("inertial");
 
-        boost::filesystem::path object_mesh_path = object_state.name;
-        switch (object_state.type)
+        boost::filesystem::path object_mesh_path = object.info.mesh;
+        switch (object.info.type)
         {
-        case mujoco_msgs::ObjectState::CUBE:
+        case mujoco_msgs::ObjectInfo::CUBE:
             geom_element->SetAttribute("type", "box");
             geom_element->SetAttribute("size",
-                                       (std::to_string(object_state.scale.x) + " " +
-                                        std::to_string(object_state.scale.y) + " " +
-                                        std::to_string(object_state.scale.z))
+                                       (std::to_string(object.info.size.x) + " " +
+                                        std::to_string(object.info.size.y) + " " +
+                                        std::to_string(object.info.size.z))
                                            .c_str());
             break;
 
-        case mujoco_msgs::ObjectState::SPHERE:
+        case mujoco_msgs::ObjectInfo::SPHERE:
             geom_element->SetAttribute("type", "sphere");
-            geom_element->SetAttribute("size", object_state.scale.x);
+            geom_element->SetAttribute("size", object.info.size.x);
             break;
 
-        case mujoco_msgs::ObjectState::CYLINDER:
+        case mujoco_msgs::ObjectInfo::CYLINDER:
             geom_element->SetAttribute("type", "cylinder");
             geom_element->SetAttribute("size",
-                                       (std::to_string(object_state.scale.x) + " " +
-                                        std::to_string(object_state.scale.y))
+                                       (std::to_string(object.info.size.x) + " " +
+                                        std::to_string(object.info.size.y))
                                            .c_str());
             break;
 
-        case mujoco_msgs::ObjectState::MESH:
+        case mujoco_msgs::ObjectInfo::MESH:
             if (object_mesh_path.extension().compare(".xml") == 0)
             {
                 object_mesh_path = model_path.parent_path() / object_mesh_path;
@@ -139,11 +141,12 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                      node = node->NextSibling())
                 {
                     tinyxml2::XMLNode *copy = node->DeepClone(&object_xml_doc);
+                    // Don't copy asset, it should be included in config
                     if (strcmp(copy->Value(), "asset") == 0)
                     {
                         continue;
                     }
-                    
+
                     root->InsertEndChild(copy);
                 }
             }
@@ -153,29 +156,56 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             break;
         }
 
-        body_element->SetAttribute("name", object_state.name.c_str());
-
-        geom_element->SetAttribute("rgba",
-                                   (std::to_string(object_state.color.r) + " " +
-                                    std::to_string(object_state.color.g) + " " +
-                                    std::to_string(object_state.color.b) + " " +
-                                    std::to_string(object_state.color.a))
-                                       .c_str());
+        body_element->SetAttribute("name", object.info.name.c_str());
 
         body_element->SetAttribute("pos",
-                                   (std::to_string(object_state.pose.position.x) + " " +
-                                    std::to_string(object_state.pose.position.y) + " " +
-                                    std::to_string(object_state.pose.position.z))
+                                   (std::to_string(object.pose.position.x) + " " +
+                                    std::to_string(object.pose.position.y) + " " +
+                                    std::to_string(object.pose.position.z))
                                        .c_str());
 
         body_element->SetAttribute("quat",
-                                   (std::to_string(object_state.pose.orientation.w) + " " +
-                                    std::to_string(object_state.pose.orientation.x) + " " +
-                                    std::to_string(object_state.pose.orientation.y) + " " +
-                                    std::to_string(object_state.pose.orientation.z))
+                                   (std::to_string(object.pose.orientation.w) + " " +
+                                    std::to_string(object.pose.orientation.x) + " " +
+                                    std::to_string(object.pose.orientation.y) + " " +
+                                    std::to_string(object.pose.orientation.z))
                                        .c_str());
 
-        body_element->LinkEndChild(joint_element);
+        if (object.info.inertial.m != 0)
+        {
+            inertial_element->SetAttribute("pos", (std::to_string(object.info.inertial.com.x) + " " +
+                                                   std::to_string(object.info.inertial.com.y) + " " +
+                                                   std::to_string(object.info.inertial.com.z))
+                                                      .c_str());
+
+            inertial_element->SetAttribute("mass", object.info.inertial.m);
+
+            if (object.info.inertial.ixx != 0 ||
+                object.info.inertial.ixy != 0 ||
+                object.info.inertial.ixz != 0 ||
+                object.info.inertial.iyy != 0 ||
+                object.info.inertial.iyz != 0 ||
+                object.info.inertial.izz != 0)
+            {
+                inertial_element->SetAttribute("pos", (std::to_string(object.info.inertial.ixx) + " " +
+                                                       std::to_string(object.info.inertial.iyy) + " " +
+                                                       std::to_string(object.info.inertial.izz) + " " +
+                                                       std::to_string(object.info.inertial.ixy) + " " +
+                                                       std::to_string(object.info.inertial.ixz) + " " +
+                                                       std::to_string(object.info.inertial.iyz))
+                                                          .c_str());
+            }
+
+            body_element->LinkEndChild(inertial_element);
+        }
+
+        geom_element->SetAttribute("rgba",
+                                   (std::to_string(object.info.rgba.r) + " " +
+                                    std::to_string(object.info.rgba.g) + " " +
+                                    std::to_string(object.info.rgba.b) + " " +
+                                    std::to_string(object.info.rgba.a))
+                                       .c_str());        
+
         body_element->LinkEndChild(geom_element);
         worldbody_element->LinkEndChild(body_element);
     }
@@ -187,6 +217,34 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     else
     {
         res.success = MjSim::add_data();
+        mtx.lock();
+        for (const mujoco_msgs::ObjectStatus &object : req.objects)
+        {
+            int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str());
+            if (body_id != -1)
+            {
+                int dof_num = m->body_dofnum[body_id];
+                if (dof_num != 6)
+                {
+                    ROS_WARN("Object %s hast %d DoF, will be ignored...", object.info.name.c_str(), dof_num);
+                }
+
+                int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+                d->qvel[dof_adr] = object.velocity.linear.x;
+                d->qvel[dof_adr + 1] = object.velocity.linear.y;
+                d->qvel[dof_adr + 2] = object.velocity.linear.z;
+                d->qvel[dof_adr + 3] = object.velocity.angular.x;
+                d->qvel[dof_adr + 4] = object.velocity.angular.y;
+                d->qvel[dof_adr + 5] = object.velocity.angular.z;
+                ROS_WARN("spawn: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr + 1], d->qvel[dof_adr + 2], d->qvel[dof_adr + 3], d->qvel[dof_adr + 4], d->qvel[dof_adr + 5]);
+            }
+            else
+            {
+                ROS_WARN("Object %s not found", object.info.name.c_str());
+                res.success = res.success && false;
+            }
+        }
+        mtx.unlock();
     }
 
     return res.success;
@@ -194,8 +252,44 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
 
 bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujoco_msgs::DestroyObjectResponse &res)
 {
-    res.success = MjSim::remove_body(req.names);
-    return res.success;
+    std::vector<mujoco_msgs::ObjectState> object_states;
+    object_states.assign(req.names.size(), mujoco_msgs::ObjectState());
+
+    bool success = true;
+    for (int i = 0; i < req.names.size(); i++)
+    {
+        const char *name = req.names[i].c_str();
+        int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
+        if (body_id != -1)
+        {
+            object_states[i].name = name;
+            object_states[i].header.stamp = ros::Time::now();
+            int dof_num = m->body_dofnum[body_id];
+            if (dof_num != 6)
+            {
+                ROS_WARN("Object %s hast %d DoF, will be ignored...", name, dof_num);
+            }
+
+            int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+            object_states[i].velocity.linear.x = d->qvel[dof_adr];
+            object_states[i].velocity.linear.y = d->qvel[dof_adr + 1];
+            object_states[i].velocity.linear.z = d->qvel[dof_adr + 2];
+            object_states[i].velocity.angular.x = d->qvel[dof_adr + 3];
+            object_states[i].velocity.angular.y = d->qvel[dof_adr + 4];
+            object_states[i].velocity.angular.z = d->qvel[dof_adr + 5];
+            ROS_WARN("destroy: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr + 1], d->qvel[dof_adr + 2], d->qvel[dof_adr + 3], d->qvel[dof_adr + 4], d->qvel[dof_adr + 5]);
+        }
+        else
+        {
+            ROS_WARN("Object %s not found", name);
+            success = success && false;
+        }
+    }
+    res.object_states = object_states;
+
+    success = success && MjSim::remove_body(req.names);
+
+    return success;
 }
 
 void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
@@ -221,18 +315,27 @@ void MjRos::update(double frequency = 60)
     while (ros::ok())
     {
         std::string object_name;
-        for (int body_idx = 1; body_idx < m->nbody; body_idx++)
+        for (int body_id = 1; body_id < m->nbody; body_id++)
         {
-            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx);
+            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
                 if (use_odom_joints && object_name == model_path.stem().string())
                 {
                     continue;
                 }
-                publish_tf(body_idx, object_name);
+                // int dof_num = m->body_dofnum[body_id];
+                // if (dof_num != 6)
+                // {
+                //     ROS_WARN("Object %s hast %d DoF, will be ignored...", object_name, dof_num);
+                // }
 
-                publish_markers(body_idx, object_name);
+                // int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+                // ROS_WARN("destroy: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr+1], d->qvel[dof_adr+2], d->qvel[dof_adr+3], d->qvel[dof_adr+4], d->qvel[dof_adr+5]);
+
+                publish_tf(body_id, object_name);
+
+                publish_markers(body_id, object_name);
             }
         }
 
@@ -241,11 +344,11 @@ void MjRos::update(double frequency = 60)
         {
             base_name = model_path.stem().string();
         }
-        
-        int root_body_idx = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
-        if (root_body_idx != -1)
+
+        int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
+        if (root_body_id != -1)
         {
-            publish_tf(root_body_idx, root_name);
+            publish_tf(root_body_id, root_name);
         }
 
         ros::spinOnce();
@@ -253,9 +356,9 @@ void MjRos::update(double frequency = 60)
     }
 }
 
-void MjRos::publish_markers(int body_idx, std::string object_name)
+void MjRos::publish_markers(int body_id, std::string object_name)
 {
-    int geom_idx = m->body_geomadr[body_idx];
+    int geom_idx = m->body_geomadr[body_id];
     if (geom_idx != -1)
     {
         switch (m->geom_type[geom_idx])
@@ -299,28 +402,28 @@ void MjRos::publish_markers(int body_idx, std::string object_name)
         marker.color.r = m->geom_rgba[4 * geom_idx];
         marker.color.g = m->geom_rgba[4 * geom_idx + 1];
         marker.color.b = m->geom_rgba[4 * geom_idx + 2];
-        marker.pose.position.x = d->xpos[3 * body_idx];
-        marker.pose.position.y = d->xpos[3 * body_idx + 1];
-        marker.pose.position.z = d->xpos[3 * body_idx + 2];
-        marker.pose.orientation.x = d->xquat[4 * body_idx + 1];
-        marker.pose.orientation.y = d->xquat[4 * body_idx + 2];
-        marker.pose.orientation.z = d->xquat[4 * body_idx + 3];
-        marker.pose.orientation.w = d->xquat[4 * body_idx];
+        marker.pose.position.x = d->xpos[3 * body_id];
+        marker.pose.position.y = d->xpos[3 * body_id + 1];
+        marker.pose.position.z = d->xpos[3 * body_id + 2];
+        marker.pose.orientation.x = d->xquat[4 * body_id + 1];
+        marker.pose.orientation.y = d->xquat[4 * body_id + 2];
+        marker.pose.orientation.z = d->xquat[4 * body_id + 3];
+        marker.pose.orientation.w = d->xquat[4 * body_id];
         vis_pub.publish(marker);
     }
 }
 
-void MjRos::publish_tf(int body_idx, std::string object_name)
+void MjRos::publish_tf(int body_id, std::string object_name)
 {
     transform.header.stamp = ros::Time::now();
 
     transform.child_frame_id = object_name;
-    transform.transform.translation.x = d->xpos[3 * body_idx];
-    transform.transform.translation.y = d->xpos[3 * body_idx + 1];
-    transform.transform.translation.z = d->xpos[3 * body_idx + 2];
-    transform.transform.rotation.x = d->xquat[4 * body_idx + 1];
-    transform.transform.rotation.y = d->xquat[4 * body_idx + 2];
-    transform.transform.rotation.z = d->xquat[4 * body_idx + 3];
-    transform.transform.rotation.w = d->xquat[4 * body_idx];
+    transform.transform.translation.x = d->xpos[3 * body_id];
+    transform.transform.translation.y = d->xpos[3 * body_id + 1];
+    transform.transform.translation.z = d->xpos[3 * body_id + 2];
+    transform.transform.rotation.x = d->xquat[4 * body_id + 1];
+    transform.transform.rotation.y = d->xquat[4 * body_id + 2];
+    transform.transform.rotation.z = d->xquat[4 * body_id + 3];
+    transform.transform.rotation.w = d->xquat[4 * body_id];
     br.sendTransform(transform);
 }

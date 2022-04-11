@@ -3,17 +3,15 @@
 import rospy
 from std_msgs.msg import ColorRGBA
 
-from mujoco_msgs.msg import ObjectState
+from mujoco_msgs.msg import ObjectStatus, ObjectInfo, ObjectState
 from mujoco_msgs.srv import SpawnObject, SpawnObjectRequest, DestroyObject, DestroyObjectRequest
 
 from random import random, uniform, randint
 
 from math import pi, sin, cos
 
-object = ObjectState()
-types = [ObjectState.CUBE, ObjectState.SPHERE, ObjectState.CYLINDER]
-
-
+object = ObjectStatus()
+types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER]
 
 color = [
     ColorRGBA(0, 0, 1, 1),
@@ -26,7 +24,12 @@ color = [
 ]
 
 def spawn_object(i):
-    object.name = "object_" + str(i)
+    object.info.name = "object_" + str(i)
+    object.info.type = ObjectInfo.SPHERE
+    object.info.size.x = 0.1
+    object.info.size.y = 0.1
+    object.info.size.z = 0.1
+    object.info.rgba = color[randint(0, len(color) - 1)]
     alpha = uniform(-pi, pi)
     r = uniform(1.5, 2)
     object.pose.position.x = r * sin(alpha)
@@ -37,14 +40,8 @@ def spawn_object(i):
     object.pose.orientation.z = 0.0
     object.pose.orientation.w = 1.0
 
-    object.type = ObjectState.SPHERE
-    object.scale.x = 0.1
-    object.scale.y = 0.1
-    object.scale.z = 0.1
-    object.color = color[randint(0, len(color) - 1)]
-
     objects = SpawnObjectRequest()
-    objects.object_states = [object]
+    objects.objects = [object]
     rospy.wait_for_service("/mujoco/spawn_objects")
     try:
         spawn_objects = rospy.ServiceProxy(
