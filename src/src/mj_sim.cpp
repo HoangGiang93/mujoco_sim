@@ -128,6 +128,12 @@ static void set_joint_names()
 
 static void init_tmp()
 {
+	// Remove directory tmp_model_path if exist
+	if (boost::filesystem::exists(tmp_model_path))
+	{
+		boost::filesystem::remove_all(tmp_model_path);
+	}
+	
 	// Create directory tmp_mesh_path if not exist
 	std::string model_path_tail = model_path.stem().string() + "/meshes/";
 	tmp_mesh_path = tmp_model_path / model_path_tail;
