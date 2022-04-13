@@ -147,6 +147,29 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                         continue;
                     }
 
+                    if (strcmp(copy->Value(), "worldbody") == 0)
+                    {
+                        for (tinyxml2::XMLElement *element = copy->ToElement()->FirstChildElement();
+                             element != nullptr;
+                             element = element->NextSiblingElement())
+                        {
+                            if (strcmp(element->Value(), "body") == 0)
+                            {
+                                element->SetAttribute("name", object.info.name.c_str());
+                                element->SetAttribute("pos", (std::to_string(object.pose.position.x) + " " +
+                                                              std::to_string(object.pose.position.y) + " " +
+                                                              std::to_string(object.pose.position.z))
+                                                                 .c_str());
+                                element->SetAttribute("quat",
+                                                      (std::to_string(object.pose.orientation.w) + " " +
+                                                       std::to_string(object.pose.orientation.x) + " " +
+                                                       std::to_string(object.pose.orientation.y) + " " +
+                                                       std::to_string(object.pose.orientation.z))
+                                                          .c_str());
+                                break;
+                            }
+                        }
+                    }
                     root->InsertEndChild(copy);
                 }
             }
@@ -187,13 +210,13 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                 object.info.inertial.iyz != 0 ||
                 object.info.inertial.izz != 0)
             {
-                inertial_element->SetAttribute("pos", (std::to_string(object.info.inertial.ixx) + " " +
-                                                       std::to_string(object.info.inertial.iyy) + " " +
-                                                       std::to_string(object.info.inertial.izz) + " " +
-                                                       std::to_string(object.info.inertial.ixy) + " " +
-                                                       std::to_string(object.info.inertial.ixz) + " " +
-                                                       std::to_string(object.info.inertial.iyz))
-                                                          .c_str());
+                inertial_element->SetAttribute("fullinertia", (std::to_string(object.info.inertial.ixx) + " " +
+                                                               std::to_string(object.info.inertial.iyy) + " " +
+                                                               std::to_string(object.info.inertial.izz) + " " +
+                                                               std::to_string(object.info.inertial.ixy) + " " +
+                                                               std::to_string(object.info.inertial.ixz) + " " +
+                                                               std::to_string(object.info.inertial.iyz))
+                                                                  .c_str());
             }
 
             body_element->LinkEndChild(inertial_element);
@@ -204,7 +227,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                                     std::to_string(object.info.rgba.g) + " " +
                                     std::to_string(object.info.rgba.b) + " " +
                                     std::to_string(object.info.rgba.a))
-                                       .c_str());        
+                                       .c_str());
 
         body_element->LinkEndChild(geom_element);
         worldbody_element->LinkEndChild(body_element);
