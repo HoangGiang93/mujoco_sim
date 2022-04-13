@@ -259,7 +259,6 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                 d->qvel[dof_adr + 3] = object.velocity.angular.x;
                 d->qvel[dof_adr + 4] = object.velocity.angular.y;
                 d->qvel[dof_adr + 5] = object.velocity.angular.z;
-                ROS_WARN("spawn: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr + 1], d->qvel[dof_adr + 2], d->qvel[dof_adr + 3], d->qvel[dof_adr + 4], d->qvel[dof_adr + 5]);
             }
             else
             {
