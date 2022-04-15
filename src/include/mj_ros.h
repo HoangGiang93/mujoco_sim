@@ -21,11 +21,11 @@
 #pragma once
 
 #include "mj_sim.h"
+#include "mujoco_msgs/DestroyObject.h"
 #include "mujoco_msgs/ObjectInfo.h"
 #include "mujoco_msgs/ObjectState.h"
 #include "mujoco_msgs/ObjectStatus.h"
 #include "mujoco_msgs/SpawnObject.h"
-#include "mujoco_msgs/DestroyObject.h"
 
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
@@ -56,7 +56,7 @@ public:
 private:
     /**
      * @brief Create new object from ROS
-     * 
+     *
      * @param req New object parameters
      * @param res Success or not
      * @return true Success
@@ -66,7 +66,7 @@ private:
 
     /**
      * @brief Destroy object from ROS
-     * 
+     *
      * @param req Array of object names
      * @param res Success or not
      * @return true Success
@@ -90,12 +90,12 @@ private:
     void publish_markers(int body_idx, std::string object_name);
 
     /**
-     * @brief Publish tf of all objects
+     * @brief Set transform of an object
      *
      * @param body_idx Body index of the object
      * @param object_name Name of the object (object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx))
      */
-    void publish_tf(int body_idx, std::string object_name);
+    void set_transform(int body_idx, std::string object_name);
 
 public:
     /**
@@ -113,13 +113,15 @@ private:
 
     ros::ServiceServer destroy_objects_server;
 
-    visualization_msgs::Marker marker;
-
     ros::Publisher vis_pub;
 
-    geometry_msgs::TransformStamped transform;
+    ros::Publisher base_pub;
 
     tf2_ros::TransformBroadcaster br;
+
+    visualization_msgs::Marker marker;
+
+    geometry_msgs::TransformStamped transform;
 };
 
 /**

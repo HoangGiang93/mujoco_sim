@@ -329,13 +329,24 @@ void MjRos::update(double frequency = 60)
 {
     ros::Rate loop_rate(frequency); // Publish with 60 Hz
     vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
+    if (use_odom_joints)
+    {
+        base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
+    }
+    
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
-    marker.header.stamp = ros::Time();
 
     transform.header.frame_id = "map";
     while (ros::ok())
     {
+        // Set header
+        marker.header.stamp = ros::Time::now();
+        marker.header.seq += 1;
+        transform.header.stamp = ros::Time::now();
+        transform.header.seq += 1;
+
+        // Publish tf and marker of objects
         std::string object_name;
         for (int body_id = 1; body_id < m->nbody; body_id++)
         {
@@ -346,31 +357,26 @@ void MjRos::update(double frequency = 60)
                 {
                     continue;
                 }
-                // int dof_num = m->body_dofnum[body_id];
-                // if (dof_num != 6)
-                // {
-                //     ROS_WARN("Object %s hast %d DoF, will be ignored...", object_name, dof_num);
-                // }
 
-                // int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
-                // ROS_WARN("destroy: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr+1], d->qvel[dof_adr+2], d->qvel[dof_adr+3], d->qvel[dof_adr+4], d->qvel[dof_adr+5]);
-
-                publish_tf(body_id, object_name);
+                set_transform(body_id, object_name);
+                br.sendTransform(transform);
 
                 publish_markers(body_id, object_name);
             }
         }
-
+        
+        // Publish tf of root
         std::string base_name = "world";
         if (use_odom_joints)
         {
             base_name = model_path.stem().string();
         }
-
         int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
         if (root_body_id != -1)
         {
-            publish_tf(root_body_id, root_name);
+            set_transform(root_body_id, root_name);
+            br.sendTransform(transform);
+            base_pub.publish(transform);
         }
 
         ros::spinOnce();
@@ -435,10 +441,8 @@ void MjRos::publish_markers(int body_id, std::string object_name)
     }
 }
 
-void MjRos::publish_tf(int body_id, std::string object_name)
+void MjRos::set_transform(int body_id, std::string object_name)
 {
-    transform.header.stamp = ros::Time::now();
-
     transform.child_frame_id = object_name;
     transform.transform.translation.x = d->xpos[3 * body_id];
     transform.transform.translation.y = d->xpos[3 * body_id + 1];
@@ -447,5 +451,4 @@ void MjRos::publish_tf(int body_id, std::string object_name)
     transform.transform.rotation.y = d->xquat[4 * body_id + 2];
     transform.transform.rotation.z = d->xquat[4 * body_id + 3];
     transform.transform.rotation.w = d->xquat[4 * body_id];
-    br.sendTransform(transform);
 }
