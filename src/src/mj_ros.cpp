@@ -34,6 +34,9 @@ MjRos::~MjRos()
 
 void MjRos::init()
 {
+    vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
+    base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
+    
     ros_start = ros::Time::now();
 
     int joint_idx;
@@ -328,11 +331,6 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 void MjRos::update(double frequency = 60)
 {
     ros::Rate loop_rate(frequency); // Publish with 60 Hz
-    vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
-    if (use_odom_joints)
-    {
-        base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
-    }
     
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
