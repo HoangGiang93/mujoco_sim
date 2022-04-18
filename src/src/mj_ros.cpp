@@ -36,7 +36,7 @@ void MjRos::init()
 {
     vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
     base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
-    
+
     ros_start = ros::Time::now();
 
     int joint_idx;
@@ -124,7 +124,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             geom_element->SetAttribute("type", "cylinder");
             geom_element->SetAttribute("size",
                                        (std::to_string(object.info.size.x) + " " +
-                                        std::to_string(object.info.size.y))
+                                        std::to_string(object.info.size.z))
                                            .c_str());
             break;
 
@@ -253,9 +253,11 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                 if (dof_num != 6)
                 {
                     ROS_WARN("Object %s hast %d DoF, will be ignored...", object.info.name.c_str(), dof_num);
+                    continue;
                 }
 
                 int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+
                 d->qvel[dof_adr] = object.velocity.linear.x;
                 d->qvel[dof_adr + 1] = object.velocity.linear.y;
                 d->qvel[dof_adr + 2] = object.velocity.linear.z;
@@ -302,7 +304,6 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
             object_states[i].velocity.angular.x = d->qvel[dof_adr + 3];
             object_states[i].velocity.angular.y = d->qvel[dof_adr + 4];
             object_states[i].velocity.angular.z = d->qvel[dof_adr + 5];
-            ROS_WARN("destroy: qvel: [%f %f %f], [%f, %f, %f]", d->qvel[dof_adr], d->qvel[dof_adr + 1], d->qvel[dof_adr + 2], d->qvel[dof_adr + 3], d->qvel[dof_adr + 4], d->qvel[dof_adr + 5]);
         }
         else
         {
@@ -331,7 +332,7 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 void MjRos::update(double frequency = 60)
 {
     ros::Rate loop_rate(frequency); // Publish with 60 Hz
-    
+
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
 
@@ -362,7 +363,7 @@ void MjRos::update(double frequency = 60)
                 publish_markers(body_id, object_name);
             }
         }
-        
+
         // Publish tf of root
         std::string base_name = "world";
         if (use_odom_joints)
