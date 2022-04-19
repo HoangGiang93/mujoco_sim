@@ -27,6 +27,7 @@
 #include "mujoco_msgs/ObjectStatus.h"
 #include "mujoco_msgs/SpawnObject.h"
 
+#include <std_srvs/Trigger.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -54,6 +55,16 @@ public:
     void update(double frequency);
 
 private:
+    /**
+     * @brief Reset the robot to the initial state service
+     * 
+     * @param req Request
+     * @param res Response
+     * @return true Success
+     * @return false Fail
+     */
+    bool reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
+
     /**
      * @brief Create new object from ROS
      *
@@ -97,6 +108,12 @@ private:
      */
     void set_transform(int body_idx, std::string object_name);
 
+    /**
+     * @brief Reset the robot to the initial state
+     * 
+     */
+    void reset_robot();
+
 public:
     /**
      * @brief Start time of ROS
@@ -108,6 +125,8 @@ private:
     ros::NodeHandle n;
 
     ros::Subscriber cmd_vel_sub;
+
+    ros::ServiceServer reset_robot_server;
 
     ros::ServiceServer spawn_objects_server;
 

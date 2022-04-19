@@ -36,15 +36,15 @@ void MjRos::init()
 {
     vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
     base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
-    
+
     ros_start = ros::Time::now();
 
-    int joint_idx;
+    int joint_id;
     std::string link_name;
     for (const std::string joint_name : MjSim::joint_names)
     {
-        joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-        link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_idx]);
+        joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_id]);
         MjSim::link_names.push_back(link_name);
     }
 
@@ -54,6 +54,9 @@ void MjRos::init()
     {
         cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
     }
+
+    reset_robot_server = n.advertiseService("reset", &MjRos::reset_robot_service, this);
+    ROS_INFO("Started [%s] service.", reset_robot_server.getService().c_str());
 
     spawn_objects_server = n.advertiseService("/mujoco/spawn_objects", &MjRos::spawn_objects_service, this);
     ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
@@ -77,6 +80,61 @@ void MjRos::init()
             }
         }
     }
+    reset_robot();
+}
+
+void MjRos::reset_robot()
+{
+    std::map<std::string, float> joint_inits;
+    if (!ros::param::get("~joint_inits", joint_inits))
+    {
+        ROS_WARN("joint_inits not found, will set to default value (0)");
+    }
+
+    for (const std::string &joint_name : MjSim::joint_names)
+    {
+        int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        if (joint_id != -1)
+        {
+            if (joint_inits.count(joint_name) != 0)
+            {
+                d->qpos[joint_id] = joint_inits[joint_name];
+            }
+            else
+            {
+                d->qpos[joint_id] = 0.f;
+            }
+        }
+    }
+    mj_forward(m, d);
+}
+
+bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
+{
+    mtx.lock();
+    reset_robot();
+    mtx.unlock();
+    ros::Duration(100 * m->opt.timestep).sleep();
+    float vel_sum = 0.f;
+    for (const std::string &joint_name : MjSim::joint_names)
+    {
+        int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        if (joint_id != -1)
+        {
+            vel_sum += mju_abs(d->qvel[joint_id]);
+        }
+    }
+    if (vel_sum < 1)
+    {
+        res.success = true;
+        res.message = "Reset successfully! (vel_sum = " + std::to_string(vel_sum) + " )";
+    }
+    else
+    {
+        res.success = false;
+        res.message = "Failed to reset (vel_sum = " + std::to_string(vel_sum) + " ). Did you stop the controlllers?";
+    }
+    return true;
 }
 
 bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res)
@@ -320,8 +378,8 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
 void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 {
     const std::string odom_z_joint_name = MjSim::odom_joints["odom_z_joint"].first;
-    const int odom_z_joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_z_joint_name.c_str());
-    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_idx];
+    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_z_joint_name.c_str());
+    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
 
     MjSim::odom_joints["odom_x_joint"].second = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
     MjSim::odom_joints["odom_y_joint"].second = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
@@ -384,32 +442,32 @@ void MjRos::update(double frequency = 60)
 
 void MjRos::publish_markers(int body_id, std::string object_name)
 {
-    int geom_idx = m->body_geomadr[body_id];
-    if (geom_idx != -1)
+    int geom_id = m->body_geomadr[body_id];
+    if (geom_id != -1)
     {
-        switch (m->geom_type[geom_idx])
+        switch (m->geom_type[geom_id])
         {
         case mjtGeom::mjGEOM_BOX:
             marker.type = visualization_msgs::Marker::CUBE;
             marker.mesh_resource = "";
-            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.y = m->geom_size[3 * geom_idx + 1] * 2;
-            marker.scale.z = m->geom_size[3 * geom_idx + 2] * 2;
+            marker.scale.x = m->geom_size[3 * geom_id] * 2;
+            marker.scale.y = m->geom_size[3 * geom_id + 1] * 2;
+            marker.scale.z = m->geom_size[3 * geom_id + 2] * 2;
             break;
 
         case mjtGeom::mjGEOM_SPHERE:
             marker.type = visualization_msgs::Marker::SPHERE;
             marker.mesh_resource = "";
-            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.y = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.z = m->geom_size[3 * geom_idx] * 2;
+            marker.scale.x = m->geom_size[3 * geom_id] * 2;
+            marker.scale.y = m->geom_size[3 * geom_id] * 2;
+            marker.scale.z = m->geom_size[3 * geom_id] * 2;
             break;
 
         case mjtGeom::mjGEOM_CYLINDER:
             marker.type = visualization_msgs::Marker::CYLINDER;
-            marker.scale.x = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.y = m->geom_size[3 * geom_idx] * 2;
-            marker.scale.z = m->geom_size[3 * geom_idx + 1] * 2;
+            marker.scale.x = m->geom_size[3 * geom_id] * 2;
+            marker.scale.y = m->geom_size[3 * geom_id] * 2;
+            marker.scale.z = m->geom_size[3 * geom_id + 1] * 2;
             break;
 
         case mjtGeom::mjGEOM_MESH:
@@ -424,10 +482,10 @@ void MjRos::publish_markers(int body_id, std::string object_name)
         }
 
         marker.ns = object_name;
-        marker.color.a = m->geom_rgba[4 * geom_idx + 3];
-        marker.color.r = m->geom_rgba[4 * geom_idx];
-        marker.color.g = m->geom_rgba[4 * geom_idx + 1];
-        marker.color.b = m->geom_rgba[4 * geom_idx + 2];
+        marker.color.a = m->geom_rgba[4 * geom_id + 3];
+        marker.color.r = m->geom_rgba[4 * geom_id];
+        marker.color.g = m->geom_rgba[4 * geom_id + 1];
+        marker.color.b = m->geom_rgba[4 * geom_id + 2];
         marker.pose.position.x = d->xpos[3 * body_id];
         marker.pose.position.y = d->xpos[3 * body_id + 1];
         marker.pose.position.z = d->xpos[3 * body_id + 2];
