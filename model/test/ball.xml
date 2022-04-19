@@ -1,6 +1,6 @@
 <mujoco>
    <worldbody>
-      <body pos="0 0.3 2">
+      <body name ="ball" pos="0 -1 1">
          <joint type="free" />
          <geom type="sphere" size=".1" rgba="0 .9 0 1" />
       </body>

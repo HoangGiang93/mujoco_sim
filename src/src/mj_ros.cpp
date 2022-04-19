@@ -36,7 +36,7 @@ void MjRos::init()
 {
     vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
     base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
-
+    
     ros_start = ros::Time::now();
 
     int joint_idx;
@@ -257,7 +257,6 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                 }
 
                 int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
-
                 d->qvel[dof_adr] = object.velocity.linear.x;
                 d->qvel[dof_adr + 1] = object.velocity.linear.y;
                 d->qvel[dof_adr + 2] = object.velocity.linear.z;
