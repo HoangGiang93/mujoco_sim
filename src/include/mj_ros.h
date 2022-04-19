@@ -141,6 +141,8 @@ private:
     visualization_msgs::Marker marker;
 
     geometry_msgs::TransformStamped transform;
+
+    std::map<std::string, float> joint_inits;
 };
 
 /**

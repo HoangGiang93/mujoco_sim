@@ -80,17 +80,15 @@ void MjRos::init()
             }
         }
     }
+    if (!ros::param::get("~joint_inits", joint_inits))
+    {
+        ROS_WARN("joint_inits not found, will set to default value (0)");
+    }
     reset_robot();
 }
 
 void MjRos::reset_robot()
 {
-    std::map<std::string, float> joint_inits;
-    if (!ros::param::get("~joint_inits", joint_inits))
-    {
-        ROS_WARN("joint_inits not found, will set to default value (0)");
-    }
-
     for (const std::string &joint_name : MjSim::joint_names)
     {
         int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
@@ -106,6 +104,12 @@ void MjRos::reset_robot()
             }
         }
     }
+    if (use_odom_joints)
+    {
+        MjSim::odom_joints["odom_x_joint"].second = 0.f;
+        MjSim::odom_joints["odom_y_joint"].second = 0.f;
+        MjSim::odom_joints["odom_z_joint"].second = 0.f;
+    }
     mj_forward(m, d);
 }
 
@@ -115,24 +119,31 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     reset_robot();
     mtx.unlock();
     ros::Duration(100 * m->opt.timestep).sleep();
-    float vel_sum = 0.f;
+    float error_sum = 0.f;
     for (const std::string &joint_name : MjSim::joint_names)
     {
         int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
         if (joint_id != -1)
         {
-            vel_sum += mju_abs(d->qvel[joint_id]);
+            if (joint_inits.count(joint_name) != 0)
+            {
+                error_sum += mju_abs(d->qpos[joint_id] - joint_inits[joint_name]);
+            }
+            else
+            {
+                error_sum += mju_abs(d->qpos[joint_id]);
+            }
         }
     }
-    if (vel_sum < 1)
+    if (error_sum < MjSim::joint_names.size() * 1E-1)
     {
         res.success = true;
-        res.message = "Reset successfully! (vel_sum = " + std::to_string(vel_sum) + " )";
+        res.message = "Reset successfully! (error_sum = " + std::to_string(error_sum) + ")";
     }
     else
     {
         res.success = false;
-        res.message = "Failed to reset (vel_sum = " + std::to_string(vel_sum) + " ). Did you stop the controlllers?";
+        res.message = "Failed to reset (error_sum = " + std::to_string(error_sum) + "). Did you stop the controlllers?";
     }
     return true;
 }
