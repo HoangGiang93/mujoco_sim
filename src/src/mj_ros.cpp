@@ -91,7 +91,7 @@ void MjRos::reset_robot()
 {
     for (const std::string &joint_name : MjSim::joint_names)
     {
-        int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
         if (joint_id != -1)
         {
             if (joint_inits.count(joint_name) != 0)
@@ -106,9 +106,16 @@ void MjRos::reset_robot()
     }
     if (use_odom_joints)
     {
-        MjSim::odom_joints["odom_x_joint"].second = 0.f;
-        MjSim::odom_joints["odom_y_joint"].second = 0.f;
-        MjSim::odom_joints["odom_z_joint"].second = 0.f;
+        const std::vector<std::string> odom_joints = {"odom_x_joint", "odom_y_joint", "odom_z_joint"};
+        for (const std::string &odom_joint : odom_joints)
+        {
+            MjSim::odom_joints[odom_joint].second = 0.f;
+            const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_joint.c_str());
+            if (joint_id != -1)
+            {
+                d->qpos[joint_id] = 0.f;
+            }
+        }
     }
     mj_forward(m, d);
 }
@@ -122,7 +129,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     float error_sum = 0.f;
     for (const std::string &joint_name : MjSim::joint_names)
     {
-        int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
         if (joint_id != -1)
         {
             if (joint_inits.count(joint_name) != 0)
@@ -135,7 +142,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
             }
         }
     }
-    if (error_sum < MjSim::joint_names.size() * 1E-1)
+    if (error_sum < MjSim::joint_names.size() * 1E-2)
     {
         res.success = true;
         res.message = "Reset successfully! (error_sum = " + std::to_string(error_sum) + ")";
