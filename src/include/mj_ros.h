@@ -52,7 +52,7 @@ public:
      * @brief Update publishers
      *
      */
-    void update(double frequency);
+    void update(const double frequency);
 
 private:
     /**
@@ -93,20 +93,26 @@ private:
     void cmd_vel_callback(const geometry_msgs::Twist &msg);
 
     /**
-     * @brief Publish markers for all objects
+     * @brief Publish marker of an object
      *
-     * @param body_idx Body index of the object
-     * @param object_name Name of the object (object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx))
+     * @param body_id Body index of the object
      */
-    void publish_markers(int body_idx, std::string object_name);
+    void publish_marker(const int body_id);
+
+    /**
+     * @brief Publish state of an object
+     *
+     * @param body_id Body index of the object
+     */
+    void publish_object_state(const int body_id);
 
     /**
      * @brief Set transform of an object
      *
-     * @param body_idx Body index of the object
-     * @param object_name Name of the object (object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_idx))
+     * @param body_id Body index of the object
+     * @param object_name Name of the object
      */
-    void set_transform(int body_idx, std::string object_name);
+    void set_transform(const int body_id, std::string object_name);
 
     /**
      * @brief Reset the robot to the initial state
@@ -132,15 +138,25 @@ private:
 
     ros::ServiceServer destroy_objects_server;
 
-    ros::Publisher vis_pub;
+    ros::Publisher marker_pub;
 
     ros::Publisher base_pub;
+
+    ros::Publisher object_state_pub;
+
+    bool pub_object_marker;
+
+    bool pub_object_tf;
+
+    bool pub_object_state;
 
     tf2_ros::TransformBroadcaster br;
 
     visualization_msgs::Marker marker;
 
     geometry_msgs::TransformStamped transform;
+
+    mujoco_msgs::ObjectState object_state;
 
     std::map<std::string, float> joint_inits;
 };

@@ -376,7 +376,6 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	}
 	for (tinyxml2::XMLNode *&body_to_delete : bodies_to_delete)
 	{
-		ROS_INFO("Delete body %s", body_to_delete->ToElement()->Attribute("name"));
 		worldbody_element->DeleteChild(body_to_delete);
 	}
 	

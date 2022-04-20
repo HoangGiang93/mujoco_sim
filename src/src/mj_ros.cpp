@@ -34,8 +34,22 @@ MjRos::~MjRos()
 
 void MjRos::init()
 {
-    vis_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
-    base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
+    n = ros::NodeHandle();
+
+    if (!ros::param::get("~pub_object_marker", pub_object_marker))
+    {
+        pub_object_marker = true;
+    }
+    if (!ros::param::get("~pub_object_tf", pub_object_tf))
+    {
+        pub_object_tf = true;
+    }
+    if (!ros::param::get("~pub_object_state", pub_object_state))
+    {
+        pub_object_state = true;
+    }
+
+    
 
     ros_start = ros::Time::now();
 
@@ -47,8 +61,6 @@ void MjRos::init()
         link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_id]);
         MjSim::link_names.push_back(link_name);
     }
-
-    n = ros::NodeHandle();
 
     if (use_odom_joints)
     {
@@ -84,6 +96,11 @@ void MjRos::init()
     {
         ROS_WARN("joint_inits not found, will set to default value (0)");
     }
+
+    marker_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
+    base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
+    object_state_pub = n.advertise<mujoco_msgs::ObjectState>("/mujoco/object_states", 0);
+
     reset_robot();
 }
 
@@ -325,10 +342,11 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str());
             if (body_id != -1)
             {
+                ROS_INFO("Add body %s", object.info.name.c_str());
                 int dof_num = m->body_dofnum[body_id];
                 if (dof_num != 6)
                 {
-                    ROS_WARN("Object %s hast %d DoF, will be ignored...", object.info.name.c_str(), dof_num);
+                    ROS_WARN("Object %s has %d DoF, will be ignored...", object.info.name.c_str(), dof_num);
                     continue;
                 }
 
@@ -364,12 +382,14 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
         int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
         if (body_id != -1)
         {
+            ROS_INFO("Remove body %s", name);
             object_states[i].name = name;
             object_states[i].header.stamp = ros::Time::now();
             int dof_num = m->body_dofnum[body_id];
             if (dof_num != 6)
             {
-                ROS_WARN("Object %s hast %d DoF, will be ignored...", name, dof_num);
+                ROS_WARN("Object %s has %d DoF, will be ignored...", name, dof_num);
+                continue;
             }
 
             int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
@@ -404,14 +424,16 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
     MjSim::odom_joints["odom_z_joint"].second = msg.angular.z;
 }
 
-void MjRos::update(double frequency = 60)
+void MjRos::update(const double frequency = 100)
 {
-    ros::Rate loop_rate(frequency); // Publish with 60 Hz
+    ros::Rate loop_rate(frequency); // Publish with 100 Hz
 
     marker.header.frame_id = "map";
     marker.action = visualization_msgs::Marker::MODIFY;
 
     transform.header.frame_id = "map";
+
+    object_state.header.frame_id = "map";
     while (ros::ok())
     {
         // Set header
@@ -419,6 +441,8 @@ void MjRos::update(double frequency = 60)
         marker.header.seq += 1;
         transform.header.stamp = ros::Time::now();
         transform.header.seq += 1;
+        object_state.header.stamp = ros::Time::now();
+        object_state.header.seq += 1;
 
         // Publish tf and marker of objects
         std::string object_name;
@@ -432,10 +456,21 @@ void MjRos::update(double frequency = 60)
                     continue;
                 }
 
-                set_transform(body_id, object_name);
-                br.sendTransform(transform);
+                if (pub_object_tf)
+                {
+                    set_transform(body_id, object_name);
+                    br.sendTransform(transform);
+                }
 
-                publish_markers(body_id, object_name);
+                if (pub_object_marker)
+                {
+                    publish_marker(body_id);
+                }
+
+                if (pub_object_state)
+                {
+                    publish_object_state(body_id);
+                }
             }
         }
 
@@ -445,12 +480,19 @@ void MjRos::update(double frequency = 60)
         {
             base_name = model_path.stem().string();
         }
-        int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
+        const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
         if (root_body_id != -1)
         {
-            set_transform(root_body_id, root_name);
-            br.sendTransform(transform);
-            base_pub.publish(transform);
+            if (pub_object_tf)
+            {
+                set_transform(root_body_id, root_name);
+                br.sendTransform(transform);
+            }
+
+            if (use_odom_joints)
+            {
+                base_pub.publish(transform);
+            }
         }
 
         ros::spinOnce();
@@ -458,9 +500,9 @@ void MjRos::update(double frequency = 60)
     }
 }
 
-void MjRos::publish_markers(int body_id, std::string object_name)
+void MjRos::publish_marker(const int body_id)
 {
-    int geom_id = m->body_geomadr[body_id];
+    const int geom_id = m->body_geomadr[body_id];
     if (geom_id != -1)
     {
         switch (m->geom_type[geom_id])
@@ -490,7 +532,7 @@ void MjRos::publish_markers(int body_id, std::string object_name)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_path.stem().string() + "/meshes/" + object_name + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
@@ -499,7 +541,7 @@ void MjRos::publish_markers(int body_id, std::string object_name)
             break;
         }
 
-        marker.ns = object_name;
+        marker.ns = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
         marker.color.a = m->geom_rgba[4 * geom_id + 3];
         marker.color.r = m->geom_rgba[4 * geom_id];
         marker.color.g = m->geom_rgba[4 * geom_id + 1];
@@ -511,11 +553,39 @@ void MjRos::publish_markers(int body_id, std::string object_name)
         marker.pose.orientation.y = d->xquat[4 * body_id + 2];
         marker.pose.orientation.z = d->xquat[4 * body_id + 3];
         marker.pose.orientation.w = d->xquat[4 * body_id];
-        vis_pub.publish(marker);
+        marker_pub.publish(marker);
     }
 }
 
-void MjRos::set_transform(int body_id, std::string object_name)
+void MjRos::publish_object_state(const int body_id)
+{
+    object_state.name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+    object_state.pose.position.x = d->xpos[3 * body_id];
+    object_state.pose.position.y = d->xpos[3 * body_id + 1];
+    object_state.pose.position.z = d->xpos[3 * body_id + 2];
+    object_state.pose.orientation.x = d->xquat[4 * body_id + 1];
+    object_state.pose.orientation.y = d->xquat[4 * body_id + 2];
+    object_state.pose.orientation.z = d->xquat[4 * body_id + 3];
+    object_state.pose.orientation.w = d->xquat[4 * body_id];
+
+    const int dof_num = m->body_dofnum[body_id];
+    if (dof_num != 6)
+    {
+        ROS_WARN("Object %s has %d DoF, will be ignored...", object_state.name.c_str(), dof_num);
+        return;
+    }
+    const int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+    object_state.velocity.linear.x = d->qvel[dof_adr];
+    object_state.velocity.linear.y = d->qvel[dof_adr + 1];
+    object_state.velocity.linear.z = d->qvel[dof_adr + 2];
+    object_state.velocity.angular.x = d->qvel[dof_adr + 3];
+    object_state.velocity.angular.y = d->qvel[dof_adr + 4];
+    object_state.velocity.angular.z = d->qvel[dof_adr + 5];
+
+    object_state_pub.publish(object_state);
+}
+
+void MjRos::set_transform(const int body_id, std::string object_name)
 {
     transform.child_frame_id = object_name;
     transform.transform.translation.x = d->xpos[3 * body_id];

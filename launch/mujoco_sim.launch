@@ -5,11 +5,17 @@
     <arg name="use_urdf" default="false" />
     <arg name="use_odom_joints" default="false" />
     <arg name="joint_inits" default="$(find mujoco_sim)/src/config/robot.yaml" />
+    <arg name="pub_object_marker" default="true" />
+    <arg name="pub_object_tf" default="true" />
+    <arg name="pub_object_state" default="false" />
 
     <group if="$(arg use_urdf)">
         <node name="mujoco_compile" pkg="mujoco_sim" type="mujoco_compile" output="screen" args="$(arg robot)" />
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" launch-prefix="bash -c 'sleep 0.5; $0 $@' ">
             <rosparam command="load" file="$(arg joint_inits)" />
+            <param name="pub_object_marker" vlue="$(arg pub_object_marker" />
+            <param name="pub_object_tf" vlue="$(arg pub_object_tf" />
+            <param name="pub_object_state" vlue="$(arg pub_object_state" />
             <param name="config" type="str" value="$(arg config)" />
             <param name="use_odom_joints" type="bool" value="$(arg use_odom_joints)" />
         </node>

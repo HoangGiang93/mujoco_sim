@@ -1,3 +1,6 @@
 <mujoco>
-  <worldbody/>
+  <worldbody>
+    <geom pos="0 0 0.002" name="spawn_trigger" size="2 2 .05" type="plane" rgba="0 1 0 1" />
+    <geom pos="0 0 0.001" name="destroy_trigger" size="3 3 .05" type="plane" rgba="1 0 0 1" />
+  </worldbody>
 </mujoco>
