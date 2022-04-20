@@ -26,6 +26,7 @@ color = [
 def spawn_object(i):
     object.info.name = "object_" + str(i)
     object.info.type = ObjectInfo.SPHERE
+    object.info.movable = True
     object.info.size.x = 0.1
     object.info.size.y = 0.1
     object.info.size.z = 0.1

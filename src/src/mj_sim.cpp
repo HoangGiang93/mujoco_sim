@@ -300,16 +300,10 @@ static void add_new_state(mjModel *m_new, mjData *d_new)
 		ROS_WARN("Old model has %d activation states, new model has %d activation states, not supported, will be ignored...", m->na, m_new->na);
 	}
 
-	// Copy mocap bodies
-	if (m->nmocap != 0 || m_new->nmocap != 0)
-	{
-		ROS_WARN("Old model has %d mocap bodies, new model has %d mocap bodies, not supported, will be ignored...", m->nmocap, m_new->nmocap);
-	}
-
 	// Copy sensor data
 	if (m->nsensordata != m_new->nsensordata)
 	{
-		ROS_WARN("Old model has %d sensors, new model has %d sensors, not supported, will be ignored...", m->nmocap, m_new->nmocap);
+		ROS_WARN("Old model has %d sensors, new model has %d sensors, not supported, will be ignored...", m->nsensordata, m_new->nsensordata);
 	}
 	else
 	{

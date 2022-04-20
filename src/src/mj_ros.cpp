@@ -49,8 +49,6 @@ void MjRos::init()
         pub_object_state = true;
     }
 
-    
-
     ros_start = ros::Time::now();
 
     int joint_id;
@@ -179,9 +177,6 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
     object_xml_doc.LinkEndChild(root);
 
-    tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
-    root->LinkEndChild(worldbody_element);
-
     for (const mujoco_msgs::ObjectStatus &object : req.objects)
     {
         if (mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) != -1)
@@ -191,8 +186,16 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
         }
 
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
-        tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
-        body_element->LinkEndChild(joint_element);
+        if (object.info.movable)
+        {
+            tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
+            body_element->LinkEndChild(joint_element);
+        }
+        else
+        {
+            body_element->SetAttribute("mocap", "true");
+        }
+
         tinyxml2::XMLElement *geom_element = object_xml_doc.NewElement("geom");
         tinyxml2::XMLElement *inertial_element = object_xml_doc.NewElement("inertial");
 
@@ -268,12 +271,25 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                     }
                     root->InsertEndChild(copy);
                 }
+                continue;
             }
-            continue;
+            if (object_mesh_path.extension().compare(".stl") == 0)
+            {
+                geom_element->SetAttribute("type", "mesh");
+                geom_element->SetAttribute("size",
+                                           (std::to_string(object.info.size.x) + " " +
+                                            std::to_string(object.info.size.y) + " " +
+                                            std::to_string(object.info.size.z))
+                                               .c_str());
+                geom_element->SetAttribute("mesh", object_mesh_path.stem().c_str());
+            }
 
         default:
             break;
         }
+
+        tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
+        root->LinkEndChild(worldbody_element);
 
         body_element->SetAttribute("name", object.info.name.c_str());
 
@@ -346,7 +362,6 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
                 int dof_num = m->body_dofnum[body_id];
                 if (dof_num != 6)
                 {
-                    ROS_WARN("Object %s has %d DoF, will be ignored...", object.info.name.c_str(), dof_num);
                     continue;
                 }
 
@@ -568,19 +583,16 @@ void MjRos::publish_object_state(const int body_id)
     object_state.pose.orientation.z = d->xquat[4 * body_id + 3];
     object_state.pose.orientation.w = d->xquat[4 * body_id];
 
-    const int dof_num = m->body_dofnum[body_id];
-    if (dof_num != 6)
+    if (m->body_dofnum[body_id] == 6)
     {
-        ROS_WARN("Object %s has %d DoF, will be ignored...", object_state.name.c_str(), dof_num);
-        return;
+        const int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+        object_state.velocity.linear.x = d->qvel[dof_adr];
+        object_state.velocity.linear.y = d->qvel[dof_adr + 1];
+        object_state.velocity.linear.z = d->qvel[dof_adr + 2];
+        object_state.velocity.angular.x = d->qvel[dof_adr + 3];
+        object_state.velocity.angular.y = d->qvel[dof_adr + 4];
+        object_state.velocity.angular.z = d->qvel[dof_adr + 5];
     }
-    const int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
-    object_state.velocity.linear.x = d->qvel[dof_adr];
-    object_state.velocity.linear.y = d->qvel[dof_adr + 1];
-    object_state.velocity.linear.z = d->qvel[dof_adr + 2];
-    object_state.velocity.angular.x = d->qvel[dof_adr + 3];
-    object_state.velocity.angular.y = d->qvel[dof_adr + 4];
-    object_state.velocity.angular.z = d->qvel[dof_adr + 5];
 
     object_state_pub.publish(object_state);
 }
