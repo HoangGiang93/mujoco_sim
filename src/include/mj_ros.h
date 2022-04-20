@@ -130,6 +130,8 @@ public:
 private:
     ros::NodeHandle n;
 
+    std::string root_frame_id;
+
     ros::Subscriber cmd_vel_sub;
 
     ros::ServiceServer reset_robot_server;

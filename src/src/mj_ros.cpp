@@ -48,6 +48,11 @@ void MjRos::init()
     {
         pub_object_state = true;
     }
+    if (!ros::param::get("~root_frame_id", root_frame_id))
+    {
+        root_frame_id = "map";
+    }
+    
 
     ros_start = ros::Time::now();
 
@@ -443,12 +448,12 @@ void MjRos::update(const double frequency = 100)
 {
     ros::Rate loop_rate(frequency); // Publish with 100 Hz
 
-    marker.header.frame_id = "map";
+    marker.header.frame_id = root_frame_id;
     marker.action = visualization_msgs::Marker::MODIFY;
 
-    transform.header.frame_id = "map";
+    transform.header.frame_id = root_frame_id;
 
-    object_state.header.frame_id = "map";
+    object_state.header.frame_id = root_frame_id;
     while (ros::ok())
     {
         // Set header
@@ -490,7 +495,7 @@ void MjRos::update(const double frequency = 100)
         }
 
         // Publish tf of root
-        std::string base_name = "world";
+        std::string base_name = root_frame_id;
         if (use_odom_joints)
         {
             base_name = model_path.stem().string();
