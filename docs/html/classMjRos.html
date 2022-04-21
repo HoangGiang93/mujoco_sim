@@ -83,8 +83,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ae985971c2e79cee58cf59c13d9b58c9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize publishers, subscribers and <a class="el" href="classMjRos.html">MjRos</a> members from rosparam.  <a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">More...</a><br /></td></tr>
 <tr class="separator:ae985971c2e79cee58cf59c13d9b58c9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a559c7ecb955d6969d645b18ea2fe044b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjRos.html#a559c7ecb955d6969d645b18ea2fe044b">update</a> (const double frequency)</td></tr>
-<tr class="memdesc:a559c7ecb955d6969d645b18ea2fe044b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update publishers.  <a href="classMjRos.html#a559c7ecb955d6969d645b18ea2fe044b">More...</a><br /></td></tr>
+<tr class="memdesc:a559c7ecb955d6969d645b18ea2fe044b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update.  <a href="classMjRos.html#a559c7ecb955d6969d645b18ea2fe044b">More...</a><br /></td></tr>
 <tr class="separator:a559c7ecb955d6969d645b18ea2fe044b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2bd94993ed29b21ad9ab7be6d424cc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjRos.html#af2bd94993ed29b21ad9ab7be6d424cc5">spawn_and_destroy_objects</a> (const double frequency)</td></tr>
+<tr class="memdesc:af2bd94993ed29b21ad9ab7be6d424cc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run spawn and destroy objects.  <a href="classMjRos.html#af2bd94993ed29b21ad9ab7be6d424cc5">More...</a><br /></td></tr>
+<tr class="separator:af2bd94993ed29b21ad9ab7be6d424cc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -155,6 +158,32 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="af2bd94993ed29b21ad9ab7be6d424cc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2bd94993ed29b21ad9ab7be6d424cc5">&#9670;&nbsp;</a></span>spawn_and_destroy_objects()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MjRos::spawn_and_destroy_objects </td>
+          <td>(</td>
+          <td class="paramtype">const double&#160;</td>
+          <td class="paramname"><em>frequency</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Run spawn and destroy objects. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frequency</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a559c7ecb955d6969d645b18ea2fe044b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a559c7ecb955d6969d645b18ea2fe044b">&#9670;&nbsp;</a></span>update()</h2>
 
@@ -165,13 +194,13 @@ Static Public Attributes</h2></td></tr>
           <td class="memname">void MjRos::update </td>
           <td>(</td>
           <td class="paramtype">const double&#160;</td>
-          <td class="paramname"><em>frequency</em> = <code>100</code></td><td>)</td>
+          <td class="paramname"><em>frequency</em> = <code>60</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Update publishers. </p>
+<p>Update. </p>
 
 </div>
 </div>

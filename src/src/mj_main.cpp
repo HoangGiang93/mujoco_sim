@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 
     MjRos mj_ros;
     mj_ros.init();
-    
+
 #ifdef VISUAL
     mj_visual.init();
     glfwSetKeyCallback(mj_visual.window, keyboard);
@@ -159,7 +159,8 @@ int main(int argc, char **argv)
 
     mjcb_control = controller;
 
-    std::thread ros_thread(&MjRos::update, mj_ros, 60);
+    std::thread ros_thread1(&MjRos::update, mj_ros, 60);
+    std::thread ros_thread2(&MjRos::spawn_and_destroy_objects, mj_ros, 600);
 
     // start simulation thread
     std::thread sim_thread(simulate);
@@ -184,7 +185,8 @@ int main(int argc, char **argv)
     }
     ros::shutdown();
 
-    ros_thread.join();
+    ros_thread1.join();
+    ros_thread2.join();
     sim_thread.join();
 
     // free MuJoCo model and data, deactivate

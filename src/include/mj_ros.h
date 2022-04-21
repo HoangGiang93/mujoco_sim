@@ -49,10 +49,17 @@ public:
     void init();
 
     /**
-     * @brief Update publishers
+     * @brief Update
      *
      */
     void update(const double frequency);
+
+    /**
+     * @brief Run spawn and destroy objects
+     * 
+     * @param frequency 
+     */
+    void spawn_and_destroy_objects(const double frequency);
 
 private:
     /**

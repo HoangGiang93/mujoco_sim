@@ -222,6 +222,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
     tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
     object_xml_doc.LinkEndChild(root);
 
+    tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
+    root->LinkEndChild(worldbody_element);
+
     for (const mujoco_msgs::ObjectStatus &object : objects)
     {
         if (mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) != -1)
@@ -345,9 +348,6 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             break;
         }
 
-        tinyxml2::XMLElement *worldbody_element = object_xml_doc.NewElement("worldbody");
-        root->LinkEndChild(worldbody_element);
-
         body_element->SetAttribute("name", object.info.name.c_str());
 
         body_element->SetAttribute("pos",
@@ -437,6 +437,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 spawn_success = false;
             }
         }
+        mj_forward(m, d);
         mtx.unlock();
     }
     objects_to_spawn.erase(std::remove_if(objects_to_spawn.begin(), objects_to_spawn.end(), [objects](const mujoco_msgs::ObjectStatus &object)
@@ -498,7 +499,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
 
     destroy_success = false;
     if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [this]
-                         { return destroy_success; }))
+                             { return destroy_success; }))
     {
         res.object_states = object_states;
     }
@@ -528,9 +529,46 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
     MjSim::odom_joints["odom_z_joint"].second = msg.angular.z;
 }
 
-void MjRos::update(const double frequency = 100)
+void MjRos::spawn_and_destroy_objects(const double frequency)
 {
-    ros::Rate loop_rate(frequency); // Update with 100 Hz
+    ros::Rate loop_rate(frequency);
+    while (ros::ok())
+    {
+        // Spawn objects
+        if (objects_to_spawn.size() > 0)
+        {
+            std::unique_lock<std::mutex> lk(spawn_mtx);
+
+            while (objects_to_spawn.size() > 0)
+            {
+                spawn_objects(objects_to_spawn);
+            }
+
+            lk.unlock();
+            condition.notify_all();
+        }
+
+        // Destroy objects
+        if (object_names_to_destroy.size() > 0)
+        {
+            std::unique_lock<std::mutex> lk(destroy_mtx);
+
+            while (object_names_to_destroy.size() > 0)
+            {
+                destroy_objects(object_names_to_destroy);
+            }
+
+            lk.unlock();
+            condition.notify_all();
+        }
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void MjRos::update(const double frequency = 60)
+{
+    ros::Rate loop_rate(frequency); // Update with 60 Hz
 
     marker.header.frame_id = root_frame_id;
     marker.action = visualization_msgs::Marker::MODIFY;
@@ -597,34 +635,6 @@ void MjRos::update(const double frequency = 100)
             {
                 base_pub.publish(transform);
             }
-        }
-
-        // Spawn objects
-        if (objects_to_spawn.size() > 0)
-        {
-            std::unique_lock<std::mutex> lk(spawn_mtx);
-
-            while (objects_to_spawn.size() > 0)
-            {
-                spawn_objects(objects_to_spawn);
-            }
-
-            lk.unlock();
-            condition.notify_all();
-        }
-
-        // Destroy objects
-        if (object_names_to_destroy.size() > 0)
-        {
-            std::unique_lock<std::mutex> lk(destroy_mtx);
-
-            while (object_names_to_destroy.size() > 0)
-            {
-                destroy_objects(object_names_to_destroy);
-            }
-
-            lk.unlock();
-            condition.notify_all();
         }
 
         ros::spinOnce();
