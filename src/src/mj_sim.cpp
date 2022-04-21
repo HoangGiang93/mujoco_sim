@@ -447,6 +447,7 @@ bool MjSim::add_data()
 	current_element->LinkEndChild(include_element);
 	if (current_xml_doc.SaveFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
+		mju_warning_s("Failed to save file \"%s\"\n", tmp_model_path.c_str());
 		return false;
 	}
 

@@ -66,7 +66,7 @@ private:
     bool reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
 
     /**
-     * @brief Create new object from ROS
+     * @brief Spawn objects from ROS
      *
      * @param req New object parameters
      * @param res Success or not
@@ -76,7 +76,14 @@ private:
     bool spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res);
 
     /**
-     * @brief Destroy object from ROS
+     * @brief Spawn objects
+     * 
+     * @param objects Objects to spawn
+     */
+    void spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects);
+
+    /**
+     * @brief Destroy objects from ROS
      *
      * @param req Array of object names
      * @param res Success or not
@@ -84,6 +91,13 @@ private:
      * @return false Fail
      */
     bool destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujoco_msgs::DestroyObjectResponse &res);
+
+    /**
+     * @brief Destroy objects
+     * 
+     * @param object_names Object names to destroy
+     */
+    void destroy_objects(const std::vector<std::string> object_names);
 
     /**
      * @brief Control base velocity from ROS

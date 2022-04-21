@@ -21,12 +21,29 @@
 #include "mj_ros.h"
 
 #include <algorithm>
+#include <condition_variable>
 #include <ros/package.h>
 #include <tinyxml2.h>
+
+using namespace std::chrono_literals;
 
 ros::Time MjRos::ros_start;
 
 std::string root_name;
+
+std::condition_variable condition;
+
+std::mutex spawn_mtx;
+
+std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
+
+bool spawn_success;
+
+std::mutex destroy_mtx;
+
+std::vector<std::string> object_names_to_destroy;
+
+bool destroy_success;
 
 MjRos::~MjRos()
 {
@@ -52,7 +69,6 @@ void MjRos::init()
     {
         root_frame_id = "map";
     }
-    
 
     ros_start = ros::Time::now();
 
@@ -177,12 +193,36 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
 
 bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res)
 {
+    for (const mujoco_msgs::ObjectStatus &object : req.objects)
+    {
+        if (std::find(objects_to_spawn.begin(), objects_to_spawn.end(), object) == objects_to_spawn.end() &&
+            mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) == -1)
+        {
+            objects_to_spawn.push_back(object);
+        }
+    }
+    if (objects_to_spawn.empty())
+    {
+        res.success = false;
+        return true;
+    }
+
+    std::unique_lock<std::mutex> lk(spawn_mtx);
+
+    spawn_success = false;
+    res.success = condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [this]
+                                       { return spawn_success; });
+    return true;
+}
+
+void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
+{
     // Create add.xml
     tinyxml2::XMLDocument object_xml_doc;
     tinyxml2::XMLNode *root = object_xml_doc.NewElement("mujoco");
     object_xml_doc.LinkEndChild(root);
 
-    for (const mujoco_msgs::ObjectStatus &object : req.objects)
+    for (const mujoco_msgs::ObjectStatus &object : objects)
     {
         if (mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) != -1)
         {
@@ -230,6 +270,18 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             break;
 
         case mujoco_msgs::ObjectInfo::MESH:
+            if (!object_mesh_path.has_extension())
+            {
+                if (boost::filesystem::exists(model_path.parent_path() / (object_mesh_path.string() + ".xml")))
+                {
+                    object_mesh_path.replace_extension(".xml");
+                }
+                else if (boost::filesystem::exists(model_path.parent_path() / (model_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
+                {
+                    object_mesh_path.replace_extension(".stl");
+                }
+            }
+
             if (object_mesh_path.extension().compare(".xml") == 0)
             {
                 object_mesh_path = model_path.parent_path() / object_mesh_path;
@@ -352,20 +404,21 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
 
     if (object_xml_doc.SaveFile((tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
     {
-        res.success = false;
+        mju_warning_s("Failed to save file \"%s\"\n", (tmp_model_path.parent_path() / "add.xml").c_str());
+        spawn_success = false;
     }
     else
     {
-        res.success = MjSim::add_data();
+        spawn_success = MjSim::add_data();
         mtx.lock();
-        for (const mujoco_msgs::ObjectStatus &object : req.objects)
+        for (const mujoco_msgs::ObjectStatus &object : objects)
         {
-            int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str());
+            const char *name = object.info.name.c_str();
+            ROS_INFO("Try to spawn body %s", name);
+            int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                ROS_INFO("Add body %s", object.info.name.c_str());
-                int dof_num = m->body_dofnum[body_id];
-                if (dof_num != 6)
+                if (m->body_dofnum[body_id] != 6)
                 {
                     continue;
                 }
@@ -380,57 +433,88 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             }
             else
             {
-                ROS_WARN("Object %s not found", object.info.name.c_str());
-                res.success = res.success && false;
+                ROS_WARN("Object %s not found to spawn", name);
+                spawn_success = false;
             }
         }
         mtx.unlock();
     }
-
-    return res.success;
+    objects_to_spawn.erase(std::remove_if(objects_to_spawn.begin(), objects_to_spawn.end(), [objects](const mujoco_msgs::ObjectStatus &object)
+                                          { return std::find(objects.begin(), objects.end(), object) != objects.end(); }),
+                           objects_to_spawn.end());
 }
 
 bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujoco_msgs::DestroyObjectResponse &res)
 {
-    std::vector<mujoco_msgs::ObjectState> object_states;
-    object_states.assign(req.names.size(), mujoco_msgs::ObjectState());
-
-    bool success = true;
-    for (int i = 0; i < req.names.size(); i++)
+    for (const std::string &object_name : req.names)
     {
-        const char *name = req.names[i].c_str();
-        int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
-        if (body_id != -1)
+        if (std::find(object_names_to_destroy.begin(), object_names_to_destroy.end(), object_name) == object_names_to_destroy.end() &&
+            mj_name2id(m, mjtObj::mjOBJ_BODY, object_name.c_str()) != -1)
         {
-            ROS_INFO("Remove body %s", name);
-            object_states[i].name = name;
-            object_states[i].header.stamp = ros::Time::now();
-            int dof_num = m->body_dofnum[body_id];
-            if (dof_num != 6)
-            {
-                ROS_WARN("Object %s has %d DoF, will be ignored...", name, dof_num);
-                continue;
-            }
-
-            int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
-            object_states[i].velocity.linear.x = d->qvel[dof_adr];
-            object_states[i].velocity.linear.y = d->qvel[dof_adr + 1];
-            object_states[i].velocity.linear.z = d->qvel[dof_adr + 2];
-            object_states[i].velocity.angular.x = d->qvel[dof_adr + 3];
-            object_states[i].velocity.angular.y = d->qvel[dof_adr + 4];
-            object_states[i].velocity.angular.z = d->qvel[dof_adr + 5];
-        }
-        else
-        {
-            ROS_WARN("Object %s not found", name);
-            success = success && false;
+            object_names_to_destroy.push_back(object_name);
         }
     }
-    res.object_states = object_states;
 
-    success = success && MjSim::remove_body(req.names);
+    std::vector<mujoco_msgs::ObjectState> object_states;
+    if (object_names_to_destroy.empty())
+    {
+        res.object_states = object_states;
+        return true;
+    }
+    else
+    {
+        object_states.assign(object_names_to_destroy.size(), mujoco_msgs::ObjectState());
 
-    return success;
+        for (int i = 0; i < object_names_to_destroy.size(); i++)
+        {
+            const char *name = object_names_to_destroy[i].c_str();
+            ROS_INFO("Try to destroy body %s", name);
+            int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
+            if (body_id != -1)
+            {
+                object_states[i].name = name;
+                object_states[i].header.stamp = ros::Time::now();
+                if (m->body_dofnum[body_id] != 6)
+                {
+                    continue;
+                }
+
+                int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
+                object_states[i].velocity.linear.x = d->qvel[dof_adr];
+                object_states[i].velocity.linear.y = d->qvel[dof_adr + 1];
+                object_states[i].velocity.linear.z = d->qvel[dof_adr + 2];
+                object_states[i].velocity.angular.x = d->qvel[dof_adr + 3];
+                object_states[i].velocity.angular.y = d->qvel[dof_adr + 4];
+                object_states[i].velocity.angular.z = d->qvel[dof_adr + 5];
+            }
+            else
+            {
+                ROS_WARN("Object %s not found to destroy", name);
+            }
+        }
+    }
+
+    std::unique_lock<std::mutex> lk(destroy_mtx);
+
+    destroy_success = false;
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [this]
+                         { return destroy_success; }))
+    {
+        res.object_states = object_states;
+    }
+    else
+    {
+        res.object_states = std::vector<mujoco_msgs::ObjectState>();
+    }
+    return true;
+}
+
+void MjRos::destroy_objects(const std::vector<std::string> object_names)
+{
+    MjSim::remove_body(object_names);
+    object_names_to_destroy.erase(std::remove_if(object_names_to_destroy.begin(), object_names_to_destroy.end(), [object_names](const std::string &object_name)
+                                                 { return std::find(object_names.begin(), object_names.end(), object_name) != object_names.end(); }),
+                                  object_names_to_destroy.end());
 }
 
 void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
@@ -446,7 +530,7 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
 
 void MjRos::update(const double frequency = 100)
 {
-    ros::Rate loop_rate(frequency); // Publish with 100 Hz
+    ros::Rate loop_rate(frequency); // Update with 100 Hz
 
     marker.header.frame_id = root_frame_id;
     marker.action = visualization_msgs::Marker::MODIFY;
@@ -513,6 +597,34 @@ void MjRos::update(const double frequency = 100)
             {
                 base_pub.publish(transform);
             }
+        }
+
+        // Spawn objects
+        if (objects_to_spawn.size() > 0)
+        {
+            std::unique_lock<std::mutex> lk(spawn_mtx);
+
+            while (objects_to_spawn.size() > 0)
+            {
+                spawn_objects(objects_to_spawn);
+            }
+
+            lk.unlock();
+            condition.notify_all();
+        }
+
+        // Destroy objects
+        if (object_names_to_destroy.size() > 0)
+        {
+            std::unique_lock<std::mutex> lk(destroy_mtx);
+
+            while (object_names_to_destroy.size() > 0)
+            {
+                destroy_objects(object_names_to_destroy);
+            }
+
+            lk.unlock();
+            condition.notify_all();
         }
 
         ros::spinOnce();
