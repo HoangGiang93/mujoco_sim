@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['tau_144',['tau',['../classMjSim.html#a1b22b4acbcbc8d870ad07f6de414402f',1,'MjSim']]],
-  ['tmp_5fmodel_5fname_145',['tmp_model_name',['../mj__model_8cpp.html#aeecea58d25fb5f1f6169c413ab9faf6e',1,'tmp_model_name():&#160;mj_model.cpp'],['../mj__model_8h.html#aeecea58d25fb5f1f6169c413ab9faf6e',1,'tmp_model_name():&#160;mj_model.cpp']]],
-  ['tmp_5fmodel_5fpath_146',['tmp_model_path',['../mj__model_8cpp.html#aa3242d18959d3232e36d5ed5006cd2d2',1,'tmp_model_path():&#160;mj_model.cpp'],['../mj__model_8h.html#aa3242d18959d3232e36d5ed5006cd2d2',1,'tmp_model_path():&#160;mj_model.cpp']]]
+  ['sim_5fstart_150',['sim_start',['../classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd',1,'MjSim']]],
+  ['spawn_5fmtx_151',['spawn_mtx',['../mj__ros_8cpp.html#aaad11def1728748faf11899862490bb5',1,'mj_ros.cpp']]],
+  ['spawn_5fnr_152',['spawn_nr',['../mj__ros_8cpp.html#a05eb63fbf828446b090d9011f7d6aba8',1,'mj_ros.cpp']]],
+  ['spawn_5fsuccess_153',['spawn_success',['../mj__ros_8cpp.html#a36e198c05e53a5324f02ded3a89d8ecb',1,'mj_ros.cpp']]]
 ];

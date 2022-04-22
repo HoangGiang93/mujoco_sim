@@ -24,6 +24,7 @@
 #include "mujoco_msgs/DestroyObject.h"
 #include "mujoco_msgs/ObjectInfo.h"
 #include "mujoco_msgs/ObjectState.h"
+#include "mujoco_msgs/ObjectStateArray.h"
 #include "mujoco_msgs/ObjectStatus.h"
 #include "mujoco_msgs/SpawnObject.h"
 
@@ -121,11 +122,11 @@ private:
     void publish_marker(const int body_id);
 
     /**
-     * @brief Publish state of an object
+     * @brief Add state of an object
      *
      * @param body_id Body index of the object
      */
-    void publish_object_state(const int body_id);
+    void add_object_state(const int body_id);
 
     /**
      * @brief Set transform of an object
@@ -165,13 +166,7 @@ private:
 
     ros::Publisher base_pub;
 
-    ros::Publisher object_state_pub;
-
-    bool pub_object_marker;
-
-    bool pub_object_tf;
-
-    bool pub_object_state;
+    ros::Publisher object_states_pub;
 
     tf2_ros::TransformBroadcaster br;
 
@@ -179,7 +174,7 @@ private:
 
     geometry_msgs::TransformStamped transform;
 
-    mujoco_msgs::ObjectState object_state;
+    mujoco_msgs::ObjectStateArray object_states;
 
     std::map<std::string, float> joint_inits;
 };

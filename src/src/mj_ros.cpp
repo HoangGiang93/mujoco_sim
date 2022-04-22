@@ -31,18 +31,20 @@ ros::Time MjRos::ros_start;
 
 std::string root_name;
 
+bool pub_object_marker;
+bool pub_object_tf;
+bool pub_object_states;
+
 std::condition_variable condition;
 
+int spawn_nr = 0;
 std::mutex spawn_mtx;
-
 std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
-
 bool spawn_success;
 
+int destroy_nr = 0;
 std::mutex destroy_mtx;
-
 std::vector<std::string> object_names_to_destroy;
-
 bool destroy_success;
 
 MjRos::~MjRos()
@@ -61,9 +63,9 @@ void MjRos::init()
     {
         pub_object_tf = true;
     }
-    if (!ros::param::get("~pub_object_state", pub_object_state))
+    if (!ros::param::get("~pub_object_states", pub_object_states))
     {
-        pub_object_state = true;
+        pub_object_states = true;
     }
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
@@ -118,7 +120,7 @@ void MjRos::init()
 
     marker_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
     base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
-    object_state_pub = n.advertise<mujoco_msgs::ObjectState>("/mujoco/object_states", 0);
+    object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
 
     reset_robot();
 }
@@ -193,25 +195,33 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
 
 bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res)
 {
+    std::vector<std::string> names;
     for (const mujoco_msgs::ObjectStatus &object : req.objects)
     {
         if (std::find(objects_to_spawn.begin(), objects_to_spawn.end(), object) == objects_to_spawn.end() &&
             mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) == -1)
         {
             objects_to_spawn.push_back(object);
+            names.push_back(object.info.name);
         }
     }
     if (objects_to_spawn.empty())
     {
-        res.success = false;
+        res.names = std::vector<std::string>();
         return true;
     }
 
     std::unique_lock<std::mutex> lk(spawn_mtx);
-
     spawn_success = false;
-    res.success = condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [this]
-                                       { return spawn_success; });
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
+                             { return spawn_success; }))
+    {
+        res.names = names;
+    }
+    else
+    {
+        res.names = std::vector<std::string>();
+    }
     return true;
 }
 
@@ -414,7 +424,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         for (const mujoco_msgs::ObjectStatus &object : objects)
         {
             const char *name = object.info.name.c_str();
-            ROS_INFO("Try to spawn body %s", name);
+            ROS_INFO("[Spawn #%d] Try to spawn body %s", spawn_nr, name);
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
@@ -437,6 +447,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 spawn_success = false;
             }
         }
+        spawn_nr++;
         mj_forward(m, d);
         mtx.unlock();
     }
@@ -464,41 +475,45 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     }
     else
     {
-        object_states.assign(object_names_to_destroy.size(), mujoco_msgs::ObjectState());
+        const std::size_t objects_num = object_names_to_destroy.size();
+        object_states.reserve(objects_num);
 
-        for (int i = 0; i < object_names_to_destroy.size(); i++)
+        for (int i = 0; i < objects_num; i++)
         {
             const char *name = object_names_to_destroy[i].c_str();
-            ROS_INFO("Try to destroy body %s", name);
+            ROS_INFO("[Destroy #%d] Try to destroy body %s", destroy_nr, name);
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                object_states[i].name = name;
-                object_states[i].header.stamp = ros::Time::now();
+                mujoco_msgs::ObjectState object_state;
+                object_state.name = name;
                 if (m->body_dofnum[body_id] != 6)
                 {
                     continue;
                 }
 
                 int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
-                object_states[i].velocity.linear.x = d->qvel[dof_adr];
-                object_states[i].velocity.linear.y = d->qvel[dof_adr + 1];
-                object_states[i].velocity.linear.z = d->qvel[dof_adr + 2];
-                object_states[i].velocity.angular.x = d->qvel[dof_adr + 3];
-                object_states[i].velocity.angular.y = d->qvel[dof_adr + 4];
-                object_states[i].velocity.angular.z = d->qvel[dof_adr + 5];
+                object_state.velocity.linear.x = d->qvel[dof_adr];
+                object_state.velocity.linear.y = d->qvel[dof_adr + 1];
+                object_state.velocity.linear.z = d->qvel[dof_adr + 2];
+                object_state.velocity.angular.x = d->qvel[dof_adr + 3];
+                object_state.velocity.angular.y = d->qvel[dof_adr + 4];
+                object_state.velocity.angular.z = d->qvel[dof_adr + 5];
+
+                object_states.push_back(object_state);
             }
             else
             {
                 ROS_WARN("Object %s not found to destroy", name);
             }
         }
+        destroy_nr++;
     }
 
     std::unique_lock<std::mutex> lk(destroy_mtx);
 
     destroy_success = false;
-    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [this]
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
                              { return destroy_success; }))
     {
         res.object_states = object_states;
@@ -575,7 +590,7 @@ void MjRos::update(const double frequency = 60)
 
     transform.header.frame_id = root_frame_id;
 
-    object_state.header.frame_id = root_frame_id;
+    object_states.header.frame_id = root_frame_id;
     while (ros::ok())
     {
         // Set header
@@ -583,8 +598,9 @@ void MjRos::update(const double frequency = 60)
         marker.header.seq += 1;
         transform.header.stamp = ros::Time::now();
         transform.header.seq += 1;
-        object_state.header.stamp = ros::Time::now();
-        object_state.header.seq += 1;
+        object_states.header.stamp = ros::Time::now();
+        object_states.header.seq += 1;
+        object_states.object_states.clear();
 
         // Publish tf and marker of objects
         std::string object_name;
@@ -609,15 +625,21 @@ void MjRos::update(const double frequency = 60)
                     publish_marker(body_id);
                 }
 
-                if (pub_object_state)
+                if (pub_object_states)
                 {
-                    publish_object_state(body_id);
+                    add_object_state(body_id);
                 }
             }
         }
 
+        // Publish object states
+        if (pub_object_states)
+        {
+            object_states_pub.publish(object_states);
+        }
+
         // Publish tf of root
-        std::string base_name = root_frame_id;
+        std::string base_name = "world";
         if (use_odom_joints)
         {
             base_name = model_path.stem().string();
@@ -699,8 +721,9 @@ void MjRos::publish_marker(const int body_id)
     }
 }
 
-void MjRos::publish_object_state(const int body_id)
+void MjRos::add_object_state(const int body_id)
 {
+    mujoco_msgs::ObjectState object_state;
     object_state.name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
     object_state.pose.position.x = d->xpos[3 * body_id];
     object_state.pose.position.y = d->xpos[3 * body_id + 1];
@@ -721,7 +744,7 @@ void MjRos::publish_object_state(const int body_id)
         object_state.velocity.angular.z = d->qvel[dof_adr + 5];
     }
 
-    object_state_pub.publish(object_state);
+    object_states.object_states.push_back(object_state);
 }
 
 void MjRos::set_transform(const int body_id, std::string object_name)

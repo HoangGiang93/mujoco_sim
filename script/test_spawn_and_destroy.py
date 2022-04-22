@@ -3,7 +3,7 @@
 import rospy
 from std_msgs.msg import ColorRGBA
 
-from mujoco_msgs.msg import ObjectStatus, ObjectInfo, ObjectState
+from mujoco_msgs.msg import ObjectStatus, ObjectInfo
 from mujoco_msgs.srv import SpawnObject, SpawnObjectRequest, DestroyObject, DestroyObjectRequest
 
 from random import random, uniform, randint
