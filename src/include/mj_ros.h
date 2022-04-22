@@ -28,9 +28,10 @@
 #include "mujoco_msgs/ObjectStatus.h"
 #include "mujoco_msgs/SpawnObject.h"
 
-#include <std_srvs/Trigger.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
+#include <std_srvs/Trigger.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <urdf/model.h>
 #include <visualization_msgs/Marker.h>
@@ -57,15 +58,15 @@ public:
 
     /**
      * @brief Run spawn and destroy objects
-     * 
-     * @param frequency 
+     *
+     * @param frequency
      */
     void spawn_and_destroy_objects(const double frequency);
 
 private:
     /**
      * @brief Reset the robot to the initial state service
-     * 
+     *
      * @param req Request
      * @param res Response
      * @return true Success
@@ -85,7 +86,7 @@ private:
 
     /**
      * @brief Spawn objects
-     * 
+     *
      * @param objects Objects to spawn
      */
     void spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects);
@@ -102,7 +103,7 @@ private:
 
     /**
      * @brief Destroy objects
-     * 
+     *
      * @param object_names Object names to destroy
      */
     void destroy_objects(const std::vector<std::string> object_names);
@@ -117,28 +118,35 @@ private:
     /**
      * @brief Publish marker of an object
      *
-     * @param body_id Body index of the object
+     * @param body_id Body id of the object
      */
     void publish_marker(const int body_id);
 
     /**
+     * @brief Publish pose of the base
+     *
+     * @param body_id Body id of the base
+     */
+    void publish_base_pose(const int body_id);
+
+    /**
      * @brief Add state of an object
      *
-     * @param body_id Body index of the object
+     * @param body_id Body id of the object
      */
     void add_object_state(const int body_id);
 
     /**
      * @brief Set transform of an object
      *
-     * @param body_id Body index of the object
+     * @param body_id Body id of the object
      * @param object_name Name of the object
      */
-    void set_transform(const int body_id, std::string object_name);
+    void set_transform(const int body_id, const std::string &object_name);
 
     /**
      * @brief Reset the robot to the initial state
-     * 
+     *
      */
     void reset_robot();
 
@@ -164,17 +172,11 @@ private:
 
     ros::Publisher marker_pub;
 
-    ros::Publisher base_pub;
+    ros::Publisher base_pose_pub;
 
     ros::Publisher object_states_pub;
 
     tf2_ros::TransformBroadcaster br;
-
-    visualization_msgs::Marker marker;
-
-    geometry_msgs::TransformStamped transform;
-
-    mujoco_msgs::ObjectStateArray object_states;
 
     std::map<std::string, float> joint_inits;
 };

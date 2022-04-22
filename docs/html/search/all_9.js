@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['pub_5fobject_5fmarker_46',['pub_object_marker',['../mj__ros_8cpp.html#a0c5fead09c8b73754d1411502c7e4f1f',1,'mj_ros.cpp']]],
-  ['pub_5fobject_5fstates_47',['pub_object_states',['../mj__ros_8cpp.html#a45a78a3eeade7d7feb18de525d6a7df1',1,'mj_ros.cpp']]],
-  ['pub_5fobject_5ftf_48',['pub_object_tf',['../mj__ros_8cpp.html#a938094f1fddbd7747042023e8da467ea',1,'mj_ros.cpp']]]
+  ['object_5fnames_5fto_5fdestroy_44',['object_names_to_destroy',['../mj__ros_8cpp.html#a1c26f523373b47230d3f2915e07eeb17',1,'mj_ros.cpp']]],
+  ['object_5fstates_45',['object_states',['../mj__ros_8cpp.html#a78293c260e1de932a97b3c3a5813143e',1,'mj_ros.cpp']]],
+  ['objects_5fto_5fspawn_46',['objects_to_spawn',['../mj__ros_8cpp.html#a9b4a55cd0a3501440cc64a382c41f297',1,'mj_ros.cpp']]],
+  ['odom_5fjoints_47',['odom_joints',['../classMjSim.html#accf1bc7a72f830340aadfdbda78d5a3b',1,'MjSim']]],
+  ['offset_48',['offset',['../structMimicJoint.html#a78f75b44afdc104d972ed55a46accf97',1,'MimicJoint']]]
 ];

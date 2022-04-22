@@ -35,6 +35,11 @@ bool pub_object_marker;
 bool pub_object_tf;
 bool pub_object_states;
 
+visualization_msgs::Marker marker;
+geometry_msgs::TransformStamped transform;
+nav_msgs::Odometry base_pose;
+mujoco_msgs::ObjectStateArray object_states;
+
 std::condition_variable condition;
 
 int spawn_nr = 0;
@@ -119,7 +124,7 @@ void MjRos::init()
     }
 
     marker_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
-    base_pub = n.advertise<geometry_msgs::TransformStamped>(root_name, 0);
+    base_pose_pub = n.advertise<nav_msgs::Odometry>(root_name, 0);
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
 
     reset_robot();
@@ -542,6 +547,8 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
     MjSim::odom_joints["odom_x_joint"].second = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
     MjSim::odom_joints["odom_y_joint"].second = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
     MjSim::odom_joints["odom_z_joint"].second = msg.angular.z;
+
+    base_pose.twist.twist = msg;
 }
 
 void MjRos::spawn_and_destroy_objects(const double frequency)
@@ -585,22 +592,28 @@ void MjRos::update(const double frequency = 60)
 {
     ros::Rate loop_rate(frequency); // Update with 60 Hz
 
-    marker.header.frame_id = root_frame_id;
     marker.action = visualization_msgs::Marker::MODIFY;
 
-    transform.header.frame_id = root_frame_id;
+    std_msgs::Header header;
+    header.frame_id = root_frame_id;
 
-    object_states.header.frame_id = root_frame_id;
+    std::string base_name = "world";
+    if (use_odom_joints)
+    {
+        base_name = model_path.stem().string();
+    }
+    base_pose.child_frame_id = base_name;
+
     while (ros::ok())
     {
         // Set header
-        marker.header.stamp = ros::Time::now();
-        marker.header.seq += 1;
-        transform.header.stamp = ros::Time::now();
-        transform.header.seq += 1;
-        object_states.header.stamp = ros::Time::now();
-        object_states.header.seq += 1;
-        object_states.object_states.clear();
+        header.stamp = ros::Time::now();
+        header.seq += 1;
+
+        marker.header = header;
+        transform.header = header;
+        object_states.header = header;
+        base_pose.header = header;
 
         // Publish tf and marker of objects
         std::string object_name;
@@ -639,11 +652,6 @@ void MjRos::update(const double frequency = 60)
         }
 
         // Publish tf of root
-        std::string base_name = "world";
-        if (use_odom_joints)
-        {
-            base_name = model_path.stem().string();
-        }
         const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
         if (root_body_id != -1)
         {
@@ -655,7 +663,7 @@ void MjRos::update(const double frequency = 60)
 
             if (use_odom_joints)
             {
-                base_pub.publish(transform);
+                publish_base_pose(root_body_id);
             }
         }
 
@@ -747,7 +755,7 @@ void MjRos::add_object_state(const int body_id)
     object_states.object_states.push_back(object_state);
 }
 
-void MjRos::set_transform(const int body_id, std::string object_name)
+void MjRos::set_transform(const int body_id, const std::string &object_name)
 {
     transform.child_frame_id = object_name;
     transform.transform.translation.x = d->xpos[3 * body_id];
@@ -757,4 +765,19 @@ void MjRos::set_transform(const int body_id, std::string object_name)
     transform.transform.rotation.y = d->xquat[4 * body_id + 2];
     transform.transform.rotation.z = d->xquat[4 * body_id + 3];
     transform.transform.rotation.w = d->xquat[4 * body_id];
+}
+
+void MjRos::publish_base_pose(const int body_id)
+{
+    base_pose.pose.pose.position.x = d->xpos[3 * body_id];
+    base_pose.pose.pose.position.y = d->xpos[3 * body_id + 1];
+    base_pose.pose.pose.position.z = d->xpos[3 * body_id + 2];
+    base_pose.pose.pose.orientation.x = d->xquat[4 * body_id + 1];
+    base_pose.pose.pose.orientation.y = d->xquat[4 * body_id + 2];
+    base_pose.pose.pose.orientation.z = d->xquat[4 * body_id + 3];
+    base_pose.pose.pose.orientation.w = d->xquat[4 * body_id];
+    base_pose.pose.covariance.assign(0.0);
+    base_pose.twist.covariance.assign(0.0);
+
+    base_pose_pub.publish(base_pose);
 }
