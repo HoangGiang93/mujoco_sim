@@ -10,9 +10,11 @@ ROS interface for MuJoCo simulator
 - Import and export of **URDF** and **MJCF**
 - Integration of controller interfaces, controller managers and hardware interfaces from http://wiki.ros.org/ros_control
 - Integrate PD computed-torque control to ensure stability
-- Spawn objects in run-time
+- Spawn objects and destroy objects in run-time using rosservice
 - Synchronize simulation time and real time (the simulation time can also be set to speed up or slow down)
 - Visualize everything from MuJoCo to rviz
+- Provide velocity controller for the base
+- Support mimic joints from **URDF**
 
 ## Installation
 1) Create a workspace
