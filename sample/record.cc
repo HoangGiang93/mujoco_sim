@@ -16,7 +16,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "mujoco.h"
+#include <mujoco.h>
 
 // select EGL, OSMESA or GLFW
 #if defined(MJ_EGL)
@@ -26,7 +26,7 @@
   OSMesaContext ctx;
   unsigned char buffer[10000000];
 #else
-  #include "glfw3.h"
+  #include <GLFW/glfw3.h>
 #endif
 
 #include "array_safety.h"

@@ -1,23 +1,23 @@
-MuJoCo version 2.1.1 incorporates the following open-source libraries:
+MuJoCo version 2.1.5 incorporates the following open-source libraries:
 
   - libccd
   - Collisions
   - TinyXML2
   - LodePNG
   - Qhull
-  - GLEW
+  - GLAD
   - GLFW
-
-Their copyright and license information is included below.
-
+  - TinyObjLoader
 
 MuJoCo was built for GNU/Linux using LLVM/Clang 13.
-The compilers may incorporate portions of their standard headers and/or runtime
-libraries in the resulting MuJoCo binary.
+LLVM/Clang incorporates portions of its standard headers and runtime libraries
+in the resulting MuJoCo binary.
+
+Third-party copyright and license information is included below.
 
 
 
-=========================  LIBCCD  ============================================
+=========================  LIBCCD  =============================================
 
 Copyright (c)2010-2012 Daniel Fiser <danfis@danfis.cz>,
 Intelligent and Mobile Robotics Group, Department of Cybernetics,
@@ -63,7 +63,31 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 
-=========================  TINYXML2  ==========================================
+=========================  COLLISIONS  =========================================
+
+Copyright (c) 2015 Svetoslav Kolev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+
+=========================  TINYXML2  ===========================================
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any
@@ -86,7 +110,7 @@ distribution.
 
 
 
-=========================  LODEPNG  ===========================================
+=========================  LODEPNG  ============================================
 
 Copyright (c) 2005-2018 Lode Vandevenne
 
@@ -111,7 +135,7 @@ freely, subject to the following restrictions:
 
 
 
-=========================  QHULL  =============================================
+=========================  QHULL  ==============================================
 
                     Qhull, Copyright (c) 1993-2020
 
@@ -155,64 +179,14 @@ modified, and redistributed under the following conditions:
 
 
 
-=========================  GLEW  ==============================================
+=========================  GLAD  ===============================================
 
-The OpenGL Extension Wrangler Library
-Copyright (C) 2002-2007, Milan Ikits <milan ikits[]ieee org>
-Copyright (C) 2002-2007, Marcelo E. Magallon <mmagallo[]debian org>
-Copyright (C) 2002, Lev Povalahev
-All rights reserved.
+The glad generated code itself is CC0. The source files for the generated code
+are under various licenses from Khronos.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+--------------------------------------------------------------------------------
 
-* Redistributions of source code must retain the above copyright notice,
-  this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-* The name of the author may be used to endorse or promote products
-  derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
-
--------------------------------------
-
-Mesa 3-D graphics library
-Version:  7.0
-
-Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
-AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
--------------------------------------
-
-Copyright (c) 2007 The Khronos Group Inc.
+Copyright 2013-2020 The Khronos Group Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and/or associated documentation files (the
@@ -235,7 +209,7 @@ MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.
 
 
 
-=========================  GLFW  ==============================================
+=========================  GLFW  ===============================================
 
 Copyright (c) 2002-2006 Marcus Geelnard
 
@@ -262,9 +236,35 @@ freely, subject to the following restrictions:
 
 
 
-==============================================================================
+========================= TinyObjLoader ========================================
+
+The MIT License (MIT)
+
+Copyright (c) 2012-2019 Syoyo Fujita and many contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+
+
+================================================================================
 The LLVM Project is under the Apache License v2.0 with LLVM Exceptions:
-==============================================================================
+================================================================================
 
                                  Apache License
                            Version 2.0, January 2004
@@ -485,9 +485,9 @@ prospectively choose to deem waived or otherwise exclude such Section(s) of
 the License, but only in their entirety and only with respect to the Combined
 Software.
 
-==============================================================================
+================================================================================
 Software from third parties included in the LLVM Project:
-==============================================================================
+================================================================================
 The LLVM Project contains third party software which is under different license
 terms. All such code will be identified clearly using at least one of two
 mechanisms:
@@ -497,9 +497,9 @@ mechanisms:
 2) It will contain specific license and restriction terms at the top of every
    file.
 
-==============================================================================
+================================================================================
 Legacy LLVM License (https://llvm.org/docs/DeveloperPolicy.html#legacy):
-==============================================================================
+================================================================================
 University of Illinois/NCSA
 Open Source License
 

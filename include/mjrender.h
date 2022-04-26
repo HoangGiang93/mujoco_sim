@@ -15,7 +15,11 @@
 #ifndef MUJOCO_MJRENDER_H_
 #define MUJOCO_MJRENDER_H_
 
-#include "mjmodel.h"
+#include <mjmodel.h>
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 #define mjNAUX          10        // number of auxiliary buffers
 #define mjMAXTEXTURE    1000      // maximum number of textures
@@ -137,7 +141,7 @@ struct mjrContext_ {              // custom OpenGL context
   int charHeightBig;              // character heights: big
 
   // capabilities
-  int glewInitialized;            // is glew initialized
+  int glInitialized;              // is OpenGL initialized
   int windowAvailable;            // is default/window framebuffer available
   int windowSamples;              // number of samples for default/window framebuffer
   int windowStereo;               // is stereo available for default/window framebuffer
@@ -148,4 +152,7 @@ struct mjrContext_ {              // custom OpenGL context
 };
 typedef struct mjrContext_ mjrContext;
 
+#if defined(__cplusplus)
+}
+#endif
 #endif  // MUJOCO_MJRENDER_H_

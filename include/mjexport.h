@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MUJOCO_MUJOCO_EXPORT_H_
-#define MUJOCO_MUJOCO_EXPORT_H_
+#ifndef MUJOCO_MJEXPORT_H_
+#define MUJOCO_MJEXPORT_H_
 
 #if defined _WIN32 || defined __CYGWIN__
   #define MUJOCO_HELPER_DLL_IMPORT __declspec(dllimport)
@@ -44,4 +44,4 @@
   #define MJLOCAL MUJOCO_HELPER_DLL_LOCAL
 #endif
 
-#endif  // MUJOCO_MUJOCO_EXPORT_H_
+#endif  // MUJOCO_MJEXPORT_H_

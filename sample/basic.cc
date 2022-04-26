@@ -15,8 +15,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include "glfw3.h"
-#include "mujoco.h"
+#include "GLFW/glfw3.h"
+#include <mujoco.h>
 
 // MuJoCo data structures
 mjModel* m = NULL;                  // MuJoCo model
