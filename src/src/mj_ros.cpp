@@ -602,7 +602,7 @@ void MjRos::update(const double frequency = 60)
     {
         base_name = model_path.stem().string();
     }
-    base_pose.child_frame_id = base_name;
+    base_pose.child_frame_id = root_name;
 
     while (ros::ok())
     {
