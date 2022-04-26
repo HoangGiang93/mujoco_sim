@@ -1,5 +1,5 @@
 # mujoco_sim
-ROS interface for Mujoco simulator
+ROS interface for MuJoCo simulator
 
 ## Overview
 
@@ -12,7 +12,7 @@ ROS interface for Mujoco simulator
 - Integrate PD computed-torque control to ensure stability
 - Spawn objects in run-time
 - Synchronize simulation time and real time (the simulation time can also be set to speed up or slow down)
-- Visualize everything from Mujoco to rviz
+- Visualize everything from MuJoCo to rviz
 
 ## Installation
 1) Create a workspace
