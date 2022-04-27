@@ -1,5 +1,5 @@
 build
-model
+model/tmp
 
 # Prerequisites
 *.d
