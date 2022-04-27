@@ -34,7 +34,7 @@
 #include <std_srvs/Trigger.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <urdf/model.h>
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 class MjRos
 {
@@ -114,13 +114,13 @@ private:
      * @param msg cmd_vel message from ROS
      */
     void cmd_vel_callback(const geometry_msgs::Twist &msg);
-
+    
     /**
-     * @brief Publish marker of an object
+     * @brief Add marker of an object
      *
      * @param body_id Body id of the object
      */
-    void publish_marker(const int body_id);
+    void add_marker(const int body_id);
 
     /**
      * @brief Publish pose of the base
@@ -170,7 +170,7 @@ private:
 
     ros::ServiceServer destroy_objects_server;
 
-    ros::Publisher marker_pub;
+    ros::Publisher marker_array_pub;
 
     ros::Publisher base_pose_pub;
 

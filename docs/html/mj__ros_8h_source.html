@@ -106,7 +106,7 @@ $(function() {
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#include &lt;std_srvs/Trigger.h&gt;</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &lt;tf2_ros/transform_broadcaster.h&gt;</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &lt;urdf/model.h&gt;</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &lt;visualization_msgs/Marker.h&gt;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#include &lt;visualization_msgs/MarkerArray.h&gt;</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classMjRos.html">   39</a></span>&#160;<span class="keyword">class </span><a class="code" href="classMjRos.html">MjRos</a></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;{</div>
@@ -134,8 +134,8 @@ $(function() {
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">void</span> destroy_objects(<span class="keyword">const</span> std::vector&lt;std::string&gt; object_names);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> cmd_vel_callback(<span class="keyword">const</span> geometry_msgs::Twist &amp;msg);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">void</span> publish_marker(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">void</span> add_marker(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">void</span> publish_base_pose(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
@@ -161,7 +161,7 @@ $(function() {
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    ros::ServiceServer destroy_objects_server;</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160; </div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    ros::Publisher marker_pub;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    ros::Publisher marker_array_pub;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    ros::Publisher base_pose_pub;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
@@ -187,13 +187,13 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="amj__ros_8h_html_a0c87fc0c5caf99e8363d04b3dc1265dc"><div class="ttname"><a href="mj__ros_8h.html#a0c87fc0c5caf99e8363d04b3dc1265dc">init_urdf</a></div><div class="ttdeci">bool init_urdf(urdf::Model &amp;urdf_model, const ros::NodeHandle &amp;n)</div><div class="ttdoc">This function urdf::Model::initParamWithNodeHandle should be inside the implementation file,...</div><div class="ttdef"><b>Definition:</b> mj_ros.h:194</div></div>
 <div class="ttc" id="amj__sim_8h_html"><div class="ttname"><a href="mj__sim_8h.html">mj_sim.h</a></div></div>
-<div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:55</div></div>
-<div class="ttc" id="aclassMjRos_html_a559c7ecb955d6969d645b18ea2fe044b"><div class="ttname"><a href="classMjRos.html#a559c7ecb955d6969d645b18ea2fe044b">MjRos::update</a></div><div class="ttdeci">void update(const double frequency)</div><div class="ttdoc">Update.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:591</div></div>
+<div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:56</div></div>
+<div class="ttc" id="aclassMjRos_html_a559c7ecb955d6969d645b18ea2fe044b"><div class="ttname"><a href="classMjRos.html#a559c7ecb955d6969d645b18ea2fe044b">MjRos::update</a></div><div class="ttdeci">void update(const double frequency)</div><div class="ttdoc">Update.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:592</div></div>
 <div class="ttc" id="aclassMjRos_html"><div class="ttname"><a href="classMjRos.html">MjRos</a></div><div class="ttdef"><b>Definition:</b> mj_ros.h:39</div></div>
 <div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdoc">Start time of ROS.</div><div class="ttdef"><b>Definition:</b> mj_ros.h:158</div></div>
 <div class="ttc" id="aclassMjRos_html_a07f40261e2c2734408dba24e52e6a397"><div class="ttname"><a href="classMjRos.html#a07f40261e2c2734408dba24e52e6a397">MjRos::MjRos</a></div><div class="ttdeci">MjRos()=default</div></div>
-<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdoc">Initialize publishers, subscribers and MjRos members from rosparam.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:59</div></div>
-<div class="ttc" id="aclassMjRos_html_af2bd94993ed29b21ad9ab7be6d424cc5"><div class="ttname"><a href="classMjRos.html#af2bd94993ed29b21ad9ab7be6d424cc5">MjRos::spawn_and_destroy_objects</a></div><div class="ttdeci">void spawn_and_destroy_objects(const double frequency)</div><div class="ttdoc">Run spawn and destroy objects.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:554</div></div>
+<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdoc">Initialize publishers, subscribers and MjRos members from rosparam.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:60</div></div>
+<div class="ttc" id="aclassMjRos_html_af2bd94993ed29b21ad9ab7be6d424cc5"><div class="ttname"><a href="classMjRos.html#af2bd94993ed29b21ad9ab7be6d424cc5">MjRos::spawn_and_destroy_objects</a></div><div class="ttdeci">void spawn_and_destroy_objects(const double frequency)</div><div class="ttdoc">Run spawn and destroy objects.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:555</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

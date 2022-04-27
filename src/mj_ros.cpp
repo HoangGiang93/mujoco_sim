@@ -36,6 +36,7 @@ bool pub_object_tf;
 bool pub_object_states;
 
 visualization_msgs::Marker marker;
+visualization_msgs::MarkerArray marker_array;
 geometry_msgs::TransformStamped transform;
 nav_msgs::Odometry base_pose;
 mujoco_msgs::ObjectStateArray object_states;
@@ -123,7 +124,7 @@ void MjRos::init()
         ROS_WARN("joint_inits not found, will set to default value (0)");
     }
 
-    marker_pub = n.advertise<visualization_msgs::Marker>("/mujoco/visualization_marker", 0);
+    marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
     base_pose_pub = n.advertise<nav_msgs::Odometry>(root_name, 0);
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
 
@@ -615,6 +616,8 @@ void MjRos::update(const double frequency = 60)
         object_states.header = header;
         base_pose.header = header;
 
+        marker_array.markers.clear();
+
         // Publish tf and marker of objects
         std::string object_name;
         for (int body_id = 1; body_id < m->nbody; body_id++)
@@ -635,7 +638,7 @@ void MjRos::update(const double frequency = 60)
 
                 if (pub_object_marker)
                 {
-                    publish_marker(body_id);
+                    add_marker(body_id);
                 }
 
                 if (pub_object_states)
@@ -643,6 +646,12 @@ void MjRos::update(const double frequency = 60)
                     add_object_state(body_id);
                 }
             }
+        }
+
+        // Publish markers
+        if (pub_object_marker)
+        {
+            marker_array_pub.publish(marker_array);
         }
 
         // Publish object states
@@ -672,7 +681,7 @@ void MjRos::update(const double frequency = 60)
     }
 }
 
-void MjRos::publish_marker(const int body_id)
+void MjRos::add_marker(const int body_id)
 {
     const int geom_id = m->body_geomadr[body_id];
     if (geom_id != -1)
@@ -725,7 +734,8 @@ void MjRos::publish_marker(const int body_id)
         marker.pose.orientation.y = d->xquat[4 * body_id + 2];
         marker.pose.orientation.z = d->xquat[4 * body_id + 3];
         marker.pose.orientation.w = d->xquat[4 * body_id];
-        marker_pub.publish(marker);
+
+        marker_array.markers.push_back(marker);
     }
 }
 
