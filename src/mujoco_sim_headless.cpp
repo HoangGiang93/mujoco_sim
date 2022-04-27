@@ -1,1 +1,1 @@
-#include "src/mj_main.cpp"
+#include "mj_main.cpp"

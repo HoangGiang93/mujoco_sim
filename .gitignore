@@ -1,6 +1,5 @@
-bin
-model/tmp/add.xml
-model/tmp/current.xml
+build
+model
 
 # Prerequisites
 *.d

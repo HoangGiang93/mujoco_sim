@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['base_5fpose_1',['base_pose',['../mj__ros_8cpp.html#a4aeace95546bbfe762c065e4e16c766a',1,'mj_ros.cpp']]]
+  ['visual_2',['VISUAL',['../mujoco__sim_8cpp.html#a5719963d148e344fe549ddff3b70f9b2',1,'mujoco_sim.cpp']]]
 ];
