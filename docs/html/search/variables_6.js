@@ -1,9 +1,4 @@
 var searchData=
 [
-  ['m_139',['m',['../mj__model_8cpp.html#aa95761db16f4e4b06b9a3c0851a83afb',1,'m():&#160;mj_model.cpp'],['../mj__model_8h.html#aa95761db16f4e4b06b9a3c0851a83afb',1,'m():&#160;mj_model.cpp']]],
-  ['marker_140',['marker',['../mj__ros_8cpp.html#af35d683dcc7c4746e4fc1bfa2a550742',1,'mj_ros.cpp']]],
-  ['mimic_5fjoints_141',['mimic_joints',['../classMjSim.html#a9be8392a5a0a54734be5b824fc84b4e2',1,'MjSim']]],
-  ['model_5fpath_142',['model_path',['../mj__model_8cpp.html#ab809d073880cebd47e7223a73bf6ca5e',1,'model_path():&#160;mj_model.cpp'],['../mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e',1,'model_path():&#160;mj_model.cpp']]],
-  ['mtx_143',['mtx',['../mj__model_8cpp.html#ad5e0dbd36f0d71fce9b00b7f991b2f38',1,'mtx():&#160;mj_model.cpp'],['../mj__model_8h.html#ad5e0dbd36f0d71fce9b00b7f991b2f38',1,'mtx():&#160;mj_model.cpp']]],
-  ['multiplier_144',['multiplier',['../structMimicJoint.html#aefe55f75fa5ae2c537aea13618e6bba7',1,'MimicJoint']]]
+  ['joint_5fnames_157',['joint_names',['../classMjSim.html#aedb86ffb5319a6a91b248c715118f214',1,'MjSim']]]
 ];

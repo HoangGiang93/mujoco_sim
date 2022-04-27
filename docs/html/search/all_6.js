@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['joint_5fnames_14',['joint_names',['../classMjSim.html#aedb86ffb5319a6a91b248c715118f214',1,'MjSim']]]
+  ['helpstring_15',['helpstring',['../mujoco__compile_8cpp.html#aefaa2b747a16eb8a497f61ebbde9caac',1,'mujoco_compile.cpp']]]
 ];

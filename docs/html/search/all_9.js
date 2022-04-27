@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['object_5fnames_5fto_5fdestroy_44',['object_names_to_destroy',['../mj__ros_8cpp.html#a1c26f523373b47230d3f2915e07eeb17',1,'mj_ros.cpp']]],
-  ['object_5fstates_45',['object_states',['../mj__ros_8cpp.html#a78293c260e1de932a97b3c3a5813143e',1,'mj_ros.cpp']]],
-  ['objects_5fto_5fspawn_46',['objects_to_spawn',['../mj__ros_8cpp.html#a9b4a55cd0a3501440cc64a382c41f297',1,'mj_ros.cpp']]],
-  ['odom_5fjoints_47',['odom_joints',['../classMjSim.html#accf1bc7a72f830340aadfdbda78d5a3b',1,'MjSim']]],
-  ['offset_48',['offset',['../structMimicJoint.html#a78f75b44afdc104d972ed55a46accf97',1,'MimicJoint']]]
+  ['link_5fnames_20',['link_names',['../classMjSim.html#a293ecea5493f2b4e78ac54e24e48b5c7',1,'MjSim']]],
+  ['load_5ftmp_5fmodel_21',['load_tmp_model',['../mj__sim_8cpp.html#a8b30354afaf6ff725bab3cee3839f33b',1,'load_tmp_model(bool reset):&#160;mj_sim.cpp'],['../mj__sim_8h.html#af8301d50bb5cd4ff96f7d72d92be4a33',1,'load_tmp_model(bool reset=true):&#160;mj_sim.cpp']]],
+  ['load_5furdf_22',['load_urdf',['../mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f',1,'mujoco_compile.cpp']]]
 ];

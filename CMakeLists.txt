@@ -36,7 +36,7 @@ set(MUJOCO mujoco)
 
 add_custom_command(OUTPUT ${MUJOCO}_build
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMAND make mujoco
+  COMMAND $(MAKE) mujoco
   VERBATIM
 )
 
