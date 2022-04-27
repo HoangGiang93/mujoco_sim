@@ -13,7 +13,7 @@
     <group if="$(arg use_urdf)">
         <node name="mujoco_compile" pkg="mujoco_sim" type="mujoco_compile" output="screen" args="$(arg robot)" />
         <param name="robot_description" command="$(find xacro)/xacro '$(arg robot)'" />
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen" launch-prefix="bash -c 'sleep 0.5; $0 $@' ">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" launch-prefix="bash -c 'sleep 0.5; $0 $@' ">
             <rosparam command="load" file="$(arg joint_inits)" />
             <param name="pub_object_marker" value="$(arg pub_object_marker" />
             <param name="pub_object_tf" value="$(arg pub_object_tf" />
@@ -25,7 +25,7 @@
     </group>
 
     <group unless="$(arg use_urdf)">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim" output="screen">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
             <param name="pub_object_marker" value="$(arg pub_object_marker" />
             <param name="pub_object_tf" value="$(arg pub_object_tf" />
             <param name="pub_object_state" value="$(arg pub_object_state" />
