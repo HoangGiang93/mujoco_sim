@@ -47,6 +47,9 @@ MjSim::~MjSim()
 	boost::filesystem::remove(cache_model_path);
 }
 
+/**
+ * @brief Set tmp_model_name, config_path and odom_joints
+ */
 static void set_param()
 {
 	std::string model_path_string;
@@ -75,9 +78,14 @@ static void set_param()
 	}
 }
 
-static void get_joint_names(tinyxml2::XMLElement *parent_body_element)
+/**
+ * @brief Get all joint names of this body element and save it in MjSim::joint_names
+ * 
+ * @param body_element 
+ */
+static void get_joint_names(tinyxml2::XMLElement *body_element)
 {
-	for (tinyxml2::XMLElement *joint_element = parent_body_element->FirstChildElement();
+	for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement();
 			 joint_element != nullptr;
 			 joint_element = joint_element->NextSiblingElement())
 	{
@@ -93,6 +101,11 @@ static void get_joint_names(tinyxml2::XMLElement *parent_body_element)
 	}
 }
 
+/**
+ * @brief Iterate all child body element of this body element
+ * 
+ * @param parent_body_element 
+ */
 static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 {
 	for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement();
@@ -107,6 +120,10 @@ static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 	}
 }
 
+/**
+ * @brief Set all joint names to MjSim::joint_names and MjSim::odom_joints
+ * 
+ */
 static void set_joint_names()
 {
 	tinyxml2::XMLDocument xml_doc;
@@ -126,6 +143,12 @@ static void set_joint_names()
 	}
 }
 
+/**
+ * @brief Create tmp_mesh_path and copy model meshes there,
+ * add config to tmp_model_path,
+ * copy model.xml to cache_model_path and add odom joints if required,
+ * include cache_model_path into tmp_model_path
+ */
 static void init_tmp()
 {
 	// Remove directory tmp_model_path if exist and tmp_model_path doesn't contain model_path
@@ -163,7 +186,7 @@ static void init_tmp()
 		boost::filesystem::copy_file(model_path, cache_model_path);
 	}
 
-	// Add default.xml to tmp_model_path
+	// Add config to tmp_model_path
 	tmp_model_path /= tmp_model_name;
 	tinyxml2::XMLDocument current_xml_doc;
 	if (current_xml_doc.LoadFile(config_path.c_str()) != tinyxml2::XML_SUCCESS)
@@ -230,7 +253,13 @@ static void init_tmp()
 	}
 }
 
-static void add_new_state(mjModel *m_new, mjData *d_new)
+/**
+ * @brief Add the old state to the new state
+ * 
+ * @param m_new New mjModel*
+ * @param d_new New mjData*
+ */
+static void add_old_state(mjModel *m_new, mjData *d_new)
 {
 	d_new->time = d->time;
 
@@ -314,6 +343,9 @@ static void add_new_state(mjModel *m_new, mjData *d_new)
 	m = m_new;
 }
 
+/**
+ * @brief Reset malloc for MjSim::tau
+ */
 static void init_malloc()
 {
 	MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
@@ -378,6 +410,12 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	doc.SaveFile(xml_path);
 }
 
+/**
+ * @brief Load the tmp_model_path
+ * 
+ * @param reset Reset the simulation or not
+ * @return true if succeed
+ */
 bool load_tmp_model(bool reset)
 {
 	char error[1000] = "Could not load binary model";
@@ -409,7 +447,7 @@ bool load_tmp_model(bool reset)
 		mtx.lock();
 		// make data
 		mjData *d_new = mj_makeData(m_new);
-		add_new_state(m_new, d_new);
+		add_old_state(m_new, d_new);
 		init_malloc();
 		mtx.unlock();
 
