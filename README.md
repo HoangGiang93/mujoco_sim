@@ -87,7 +87,9 @@ roslaunch giskardpy giskardpy_panda_arm.launch            # Run giskard
 ```
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
 wstool update -t ~/mujoco_ws/src
+cd ~/mujoco_ws/src
 catkin build
+source ~/mujoco_ws/src/devel/setup.bash
 roslaunch franka_mujoco dual_panda_arm_demo.launch
 ```
 ## Software architecture
