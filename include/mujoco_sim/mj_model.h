@@ -45,4 +45,4 @@ extern boost::filesystem::path tmp_model_path;
 
 extern boost::filesystem::path cache_model_path;
 
-extern boost::filesystem::path config_path;
+extern boost::filesystem::path world_path;

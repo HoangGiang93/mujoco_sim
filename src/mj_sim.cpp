@@ -27,6 +27,8 @@
 
 std::vector<std::string> MjSim::joint_names;
 
+std::vector<std::string> MjSim::joint_ignores;
+
 std::map<std::string, std::pair<std::string, mjtNum>> MjSim::odom_joints = {{"odom_x_joint", {"odom_x_joint", 0.0}}, {"odom_y_joint", {"odom_y_joint", 0.0}}, {"odom_z_joint", {"odom_z_joint", 0.0}}};
 
 std::map<std::string, MimicJoint> MjSim::mimic_joints;
@@ -48,7 +50,7 @@ MjSim::~MjSim()
 }
 
 /**
- * @brief Set tmp_model_name, config_path and odom_joints
+ * @brief Set tmp_model_name, world_path and odom_joints
  */
 static void set_param()
 {
@@ -59,10 +61,11 @@ static void set_param()
 		tmp_model_name = "current_" + model_path.filename().string();
 	}
 
-	std::string config_path_string;
-	if (ros::param::get("~config", config_path_string))
+	std::string world_path_string;
+	if (ros::param::get("~world", world_path_string))
 	{
-		config_path = config_path_string;
+		ROS_INFO("Set world from %s", world_path_string.c_str());
+		world_path = world_path_string;
 	}
 
 	if (ros::param::get("~use_odom_joints", use_odom_joints))
@@ -145,7 +148,7 @@ static void set_joint_names()
 
 /**
  * @brief Create tmp_mesh_path and copy model meshes there,
- * add config to tmp_model_path,
+ * add world to tmp_model_path,
  * copy model.xml to cache_model_path and add odom joints if required,
  * include cache_model_path into tmp_model_path
  */
@@ -186,12 +189,12 @@ static void init_tmp()
 		boost::filesystem::copy_file(model_path, cache_model_path);
 	}
 
-	// Add config to tmp_model_path
+	// Add world to tmp_model_path
 	tmp_model_path /= tmp_model_name;
 	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(config_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (current_xml_doc.LoadFile(world_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", config_path.c_str());
+		mju_warning_s("Failed to load file \"%s\"\n", world_path.c_str());
 		return;
 	}
 	tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();

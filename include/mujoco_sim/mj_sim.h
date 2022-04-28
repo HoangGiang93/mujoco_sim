@@ -85,6 +85,8 @@ public:
 public:
     static std::vector<std::string> joint_names;
 
+    static std::vector<std::string> joint_ignores;
+
     static std::map<std::string, std::pair<std::string, mjtNum>> odom_joints;
 
     static std::map<std::string, MimicJoint> mimic_joints;

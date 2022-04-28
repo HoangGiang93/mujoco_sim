@@ -1,0 +1,9 @@
+use_odom_joints: false
+
+pub_object_marker_array: true
+
+pub_object_tf: true
+
+pub_object_state_array: false
+
+root_frame_id: map

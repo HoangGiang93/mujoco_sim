@@ -31,15 +31,15 @@ ros::Time MjRos::ros_start;
 
 std::string root_name;
 
-bool pub_object_marker;
+bool pub_object_marker_array;
 bool pub_object_tf;
-bool pub_object_states;
+bool pub_object_state_array;
 
 visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
 geometry_msgs::TransformStamped transform;
 nav_msgs::Odometry base_pose;
-mujoco_msgs::ObjectStateArray object_states;
+mujoco_msgs::ObjectStateArray object_state_array;
 
 std::condition_variable condition;
 
@@ -61,17 +61,17 @@ void MjRos::init()
 {
     n = ros::NodeHandle();
 
-    if (!ros::param::get("~pub_object_marker", pub_object_marker))
+    if (!ros::param::get("~pub_object_marker_array", pub_object_marker_array))
     {
-        pub_object_marker = true;
+        pub_object_marker_array = true;
     }
     if (!ros::param::get("~pub_object_tf", pub_object_tf))
     {
         pub_object_tf = true;
     }
-    if (!ros::param::get("~pub_object_states", pub_object_states))
+    if (!ros::param::get("~pub_object_state_array", pub_object_state_array))
     {
-        pub_object_states = true;
+        pub_object_state_array = true;
     }
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
@@ -122,6 +122,13 @@ void MjRos::init()
     if (!ros::param::get("~joint_inits", joint_inits))
     {
         ROS_WARN("joint_inits not found, will set to default value (0)");
+    }
+    if (ros::param::get("~joint_ignores", MjSim::joint_ignores))
+    {
+        for (const std::string &joint_ignore : MjSim::joint_ignores)
+        {
+            ROS_INFO("Ignore joint: %s", joint_ignore.c_str());
+        }
     }
 
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
@@ -613,7 +620,7 @@ void MjRos::update(const double frequency = 60)
 
         marker.header = header;
         transform.header = header;
-        object_states.header = header;
+        object_state_array.header = header;
         base_pose.header = header;
 
         marker_array.markers.clear();
@@ -636,12 +643,12 @@ void MjRos::update(const double frequency = 60)
                     br.sendTransform(transform);
                 }
 
-                if (pub_object_marker)
+                if (pub_object_marker_array)
                 {
                     add_marker(body_id);
                 }
 
-                if (pub_object_states)
+                if (pub_object_state_array)
                 {
                     add_object_state(body_id);
                 }
@@ -649,15 +656,15 @@ void MjRos::update(const double frequency = 60)
         }
 
         // Publish markers
-        if (pub_object_marker)
+        if (pub_object_marker_array)
         {
             marker_array_pub.publish(marker_array);
         }
 
         // Publish object states
-        if (pub_object_states)
+        if (pub_object_state_array)
         {
-            object_states_pub.publish(object_states);
+            object_states_pub.publish(object_state_array);
         }
 
         // Publish tf of root
@@ -762,7 +769,7 @@ void MjRos::add_object_state(const int body_id)
         object_state.velocity.angular.z = d->qvel[dof_adr + 5];
     }
 
-    object_states.object_states.push_back(object_state);
+    object_state_array.object_states.push_back(object_state);
 }
 
 void MjRos::set_transform(const int body_id, const std::string &object_name)

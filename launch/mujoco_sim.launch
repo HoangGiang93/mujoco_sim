@@ -1,38 +1,24 @@
 <launch>
 
     <arg name="robot" />
-    <arg name="config" default="$(find mujoco_sim)/src/config/default.xml" />
     <arg name="use_urdf" default="false" />
-    <arg name="use_odom_joints" default="false" />
-    <arg name="joint_inits" default="$(find mujoco_sim)/src/config/robot.yaml" />
-    <arg name="pub_object_marker" default="true" />
-    <arg name="pub_object_tf" default="true" />
-    <arg name="pub_object_state" default="false" />
-    <arg name="root_frame_id" default="map" />
+    <arg name="world" default="$(find mujoco_sim)/model/world/empty.xml" />
+    <arg name="config" default="$(find mujoco_sim)/src/config/robot.yaml" />
 
     <group if="$(arg use_urdf)">
         <node name="mujoco_compile" pkg="mujoco_sim" type="mujoco_compile_node" output="screen" args="$(arg robot)" />
         <param name="robot_description" command="$(find xacro)/xacro '$(arg robot)'" />
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" launch-prefix="bash -c 'sleep 0.5; $0 $@' ">
-            <rosparam command="load" file="$(arg joint_inits)" />
-            <param name="pub_object_marker" value="$(arg pub_object_marker" />
-            <param name="pub_object_tf" value="$(arg pub_object_tf" />
-            <param name="pub_object_state" value="$(arg pub_object_state" />
-            <param name="root_frame_id" value="$(arg root_frame_id)" />
-            <param name="config" type="str" value="$(arg config)" />
-            <param name="use_odom_joints" type="bool" value="$(arg use_odom_joints)" />
+            <rosparam command="load" file="$(arg config)" />
+            <param name="world" value="$(arg world)" />
         </node>
     </group>
 
     <group unless="$(arg use_urdf)">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
-            <param name="pub_object_marker" value="$(arg pub_object_marker" />
-            <param name="pub_object_tf" value="$(arg pub_object_tf" />
-            <param name="pub_object_state" value="$(arg pub_object_state" />
-            <param name="root_frame_id" value="$(arg root_frame_id)" />
+            <rosparam command="load" file="$(arg config)" />
+            <param name="world" value="$(arg world)" />
             <param name="robot" type="str" value="$(arg robot)" />
-            <param name="config" type="str" value="$(arg config)" />
-            <param name="use_odom_joints" type="bool" value="$(arg use_odom_joints)" />
         </node>
     </group>
 

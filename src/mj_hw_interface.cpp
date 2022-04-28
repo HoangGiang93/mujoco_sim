@@ -72,8 +72,11 @@ void MjHWInterface::write()
     mjtNum u[m->nv] = {0.};
     for (std::size_t i = 0; i < MjSim::joint_names.size(); i++)
     {
-        const int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
-        u[idx] = joint_efforts_command[i];
+        if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), MjSim::joint_names[i]) == MjSim::joint_ignores.end())
+        {
+            const int idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
+            u[idx] = joint_efforts_command[i];
+        }
     }
     mj_mulM(m, d, MjSim::tau, u);
     for (const std::string joint_name : MjSim::joint_names)
