@@ -89,7 +89,7 @@ wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/m
 wstool update -t ~/mujoco_ws/src
 cd ~/mujoco_ws/src
 catkin build
-source ~/mujoco_ws/src/devel/setup.bash
+source ~/mujoco_ws/devel/setup.bash
 roslaunch franka_mujoco dual_panda_arm_demo.launch
 ```
 ## Software architecture
