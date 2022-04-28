@@ -28,7 +28,7 @@ mkdir -p ~/mujoco_ws/src                    # create directory for workspace
 ```
 wstool init ~/mujoco_ws/src                 # initialize .rosinstall
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/noetic.rosinstall
-wstool update -t src                        # pull the repositories
+wstool update -t ~/mujoco_ws/src            # pull the repositories
 ```
 3) Install dependency of all packages in the workspace
 ```
