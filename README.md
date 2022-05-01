@@ -28,7 +28,7 @@ mkdir -p ~/mujoco_ws/src                    # create directory for workspace
 ```
 wstool init ~/mujoco_ws/src                 # initialize .rosinstall
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/noetic.rosinstall
-wstool update -t src                        # pull the repositories
+wstool update -t ~/mujoco_ws/src            # pull the repositories
 ```
 3) Install dependency of all packages in the workspace
 ```
@@ -85,9 +85,11 @@ roslaunch giskardpy giskardpy_panda_arm.launch            # Run giskard
 
 - Run the whole pick-and-place demo (using [giskard](http://giskard.de/wiki:tutorials), please update the following [.rosinstall](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall))
 ```
-cd ~/mujoco_ws/
 wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
+wstool update -t ~/mujoco_ws/src
+cd ~/mujoco_ws/src
 catkin build
+source ~/mujoco_ws/devel/setup.bash
 roslaunch franka_mujoco dual_panda_arm_demo.launch
 ```
 ## Software architecture
