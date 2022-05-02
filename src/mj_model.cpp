@@ -42,3 +42,5 @@ boost::filesystem::path tmp_model_path = ros::package::getPath("mujoco_sim") + "
 boost::filesystem::path cache_model_path = model_path;
 
 boost::filesystem::path world_path = ros::package::getPath("mujoco_sim") + "/model/world/empty.xml";
+
+boost::filesystem::path tmp_world_path = tmp_model_path;

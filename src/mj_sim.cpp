@@ -39,14 +39,18 @@ mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
 
-static boost::filesystem::path tmp_mesh_path;
+static boost::filesystem::path tmp_model_mesh_path;
+
+static boost::filesystem::path tmp_world_mesh_path;
 
 MjSim::~MjSim()
 {
 	mju_free(tau);
-	boost::filesystem::remove_all(tmp_mesh_path.parent_path().parent_path());
+	boost::filesystem::remove_all(tmp_model_mesh_path.parent_path().parent_path());
+	boost::filesystem::remove_all(tmp_world_mesh_path.parent_path().parent_path());
 	boost::filesystem::remove(tmp_model_path);
 	boost::filesystem::remove(cache_model_path);
+	boost::filesystem::remove(tmp_world_mesh_path);
 }
 
 /**
@@ -147,7 +151,7 @@ static void set_joint_names()
 }
 
 /**
- * @brief Create tmp_mesh_path and copy model meshes there,
+ * @brief Create tmp_model_mesh_path and copy model meshes there,
  * add world to tmp_model_path,
  * copy model.xml to cache_model_path and add odom joints if required,
  * include cache_model_path into tmp_model_path
@@ -160,21 +164,43 @@ static void init_tmp()
 		boost::filesystem::remove_all(tmp_model_path);
 	}
 	
-	// Create directory tmp_mesh_path if not exist
+	// Create directory tmp_model_mesh_path if not exist
 	std::string model_path_tail = model_path.stem().string() + "/meshes/";
-	tmp_mesh_path = tmp_model_path / model_path_tail;
+	tmp_model_mesh_path = tmp_model_path / model_path_tail;
 
-	if (!boost::filesystem::exists(tmp_mesh_path))
+	if (!boost::filesystem::exists(tmp_model_mesh_path))
 	{
-		boost::filesystem::create_directories(tmp_mesh_path);
+		boost::filesystem::create_directories(tmp_model_mesh_path);
 	}
 
-	// Copy model meshes to tmp_mesh_path
+	// Create directory tmp_world_mesh_path if not exist
+	std::string world_path_tail = world_path.stem().string() + "/meshes/";
+	tmp_world_mesh_path = tmp_world_path / world_path_tail;
+
+	if (!boost::filesystem::exists(tmp_world_mesh_path))
+	{
+		boost::filesystem::create_directories(tmp_world_mesh_path);
+	}
+
+	// Copy model meshes to tmp_model_mesh_path
 	if (boost::filesystem::exists(model_path.parent_path() / model_path_tail))
 	{
 		for (const boost::filesystem::directory_entry &file : boost::filesystem::directory_iterator(model_path.parent_path() / model_path_tail))
 		{
-			boost::filesystem::path des_file_path = tmp_mesh_path / file.path().filename();
+			boost::filesystem::path des_file_path = tmp_model_mesh_path / file.path().filename();
+			if (!boost::filesystem::exists(des_file_path))
+			{
+				boost::filesystem::copy_file(file.path(), des_file_path);
+			}
+		}
+	}
+
+	// Copy model meshes to tmp_world_mesh_path
+	if (boost::filesystem::exists(world_path.parent_path() / world_path_tail))
+	{
+		for (const boost::filesystem::directory_entry &file : boost::filesystem::directory_iterator(world_path.parent_path() / world_path_tail))
+		{
+			boost::filesystem::path des_file_path = tmp_world_mesh_path / file.path().filename();
 			if (!boost::filesystem::exists(des_file_path))
 			{
 				boost::filesystem::copy_file(file.path(), des_file_path);

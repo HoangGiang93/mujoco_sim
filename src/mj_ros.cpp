@@ -323,7 +323,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                      node = node->NextSibling())
                 {
                     tinyxml2::XMLNode *copy = node->DeepClone(&object_xml_doc);
-                    // Don't copy asset, it should be included in config
+                    // Don't copy asset, it should be included in world
                     if (strcmp(copy->Value(), "asset") == 0)
                     {
                         continue;
@@ -720,7 +720,7 @@ void MjRos::add_marker(const int body_id)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + model_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
