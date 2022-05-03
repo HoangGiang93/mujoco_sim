@@ -20,11 +20,11 @@
 
 #include "mujoco.h"
 
+#include <boost/filesystem.hpp>
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
 #include <cstring>
-#include <boost/filesystem.hpp>
 #include <ros/package.h>
 #include <tinyxml2.h>
 #include <urdf/model.h>
@@ -178,7 +178,6 @@ void fix_inertia(const boost::filesystem::path &model_urdf_path)
     {
         doc.SaveFile(model_urdf_path.c_str());
     }
-    
 }
 
 // modify input file
@@ -203,6 +202,40 @@ void load_urdf(const char *input, const char *output)
     model.getLinks(links);
     for (const urdf::LinkSharedPtr &link : links)
     {
+        for (const urdf::VisualConstSharedPtr &visual : link->visual_array)
+        {
+            if (visual->geometry->type == urdf::Geometry::MESH)
+            {
+                urdf::Mesh &mesh = dynamic_cast<urdf::Mesh &>(*visual->geometry);
+                mesh.filename.erase(0, 9);
+                boost::filesystem::path mesh_path = mesh.filename;
+                if (mesh_path.extension().compare(".dae") != 0)
+                {
+                    ROS_WARN("File [%s] doesn't have .dae format, ignore", mesh_path.c_str());
+                }
+                else 
+                {
+                    std::string file_name = mesh_path.filename().string();
+                    boost::filesystem::path ros_pkg = mesh_path;
+                    while (ros_pkg.has_parent_path() && ros_pkg.parent_path().has_parent_path())
+                    {
+                        ros_pkg = ros_pkg.parent_path();
+                    }
+                    ros_pkg = ros_pkg.relative_path();
+                    boost::filesystem::path ros_pkg_path = ros::package::getPath(ros_pkg.string());
+                    mesh_path = ros_pkg_path.parent_path() / mesh_path.string();
+
+                    if (boost::filesystem::exists(meshes_path / (link->name + ".dae")))
+                    {
+                        ROS_INFO("File [%s] from [%s] already exists in [%s], ignore", (link->name + ".dae").c_str(), mesh_path.c_str(), meshes_path.c_str());
+                    }
+                    else
+                    {
+                        boost::filesystem::copy_file(mesh_path, meshes_path / (link->name + ".dae"));
+                    }
+                }
+            }
+        }
         for (const urdf::CollisionSharedPtr &collision : link->collision_array)
         {
             if (collision->geometry->type == urdf::Geometry::MESH)
@@ -222,7 +255,7 @@ void load_urdf(const char *input, const char *output)
 
                 if (boost::filesystem::exists(meshes_path / file_name))
                 {
-                    ROS_WARN("File [%s] from [%s] already exists in [%s], ignore", file_name.c_str(), mesh_path.c_str(), meshes_path.c_str());
+                    ROS_INFO("File [%s] from [%s] already exists in [%s], ignore", file_name.c_str(), mesh_path.c_str(), meshes_path.c_str());
                 }
                 else
                 {

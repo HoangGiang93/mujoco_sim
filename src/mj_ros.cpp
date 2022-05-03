@@ -693,6 +693,7 @@ void MjRos::add_marker(const int body_id)
     const int geom_id = m->body_geomadr[body_id];
     if (geom_id != -1)
     {
+        std::string mesh_name;
         switch (m->geom_type[geom_id])
         {
         case mjtGeom::mjGEOM_BOX:
@@ -720,10 +721,17 @@ void MjRos::add_marker(const int body_id)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
+            mesh_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+            if (!boost::filesystem::exists(tmp_world_path / (world_path.stem().string() + "/meshes/" + mesh_name + ".dae")))
+            {
+                ROS_WARN("Mesh %s not found in %s", mesh_name.c_str(), (tmp_world_path / (world_path.stem().string() + "/meshes")).c_str());
+                return;
+            }
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mesh_name + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
+            break;
 
         default:
             break;
