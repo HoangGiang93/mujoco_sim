@@ -52,17 +52,40 @@ public:
     void init();
 
     /**
-     * @brief Update
+     * @brief Publish tf
      *
      */
-    void update(const double frequency);
+    void publish_tf();
+
+    /**
+     * @brief Publish markers
+     *
+     */
+    void publish_marker_array();
+
+    /**
+     * @brief Publish object states
+     *
+     */
+    void publish_object_state_array();
+
+    /**
+     * @brief Publish world joint states
+     *
+     */
+    void publish_world_joint_states();
+
+    /**
+     * @brief Publish base pose
+     *
+     */
+    void publish_base_pose();
 
     /**
      * @brief Run spawn and destroy objects
      *
-     * @param frequency
      */
-    void spawn_and_destroy_objects(const double frequency);
+    void spawn_and_destroy_objects();
 
 private:
     /**
@@ -124,11 +147,11 @@ private:
     void add_marker(const int body_id);
 
     /**
-     * @brief Publish pose of the base
+     * @brief Set pose of the base
      *
      * @param body_id Body id of the base
      */
-    void publish_base_pose(const int body_id);
+    void set_base_pose(const int body_id);
     
     /**
      * @brief Add joint state of the world
@@ -147,10 +170,11 @@ private:
     /**
      * @brief Set transform of an object
      *
+     * @param body_id Transform to set
      * @param body_id Body id of the object
      * @param object_name Name of the object
      */
-    void set_transform(const int body_id, const std::string &object_name);
+    void set_transform(geometry_msgs::TransformStamped &transform, const int body_id, const std::string &object_name);
 
     /**
      * @brief Reset the robot to the initial state

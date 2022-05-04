@@ -159,34 +159,43 @@ int main(int argc, char **argv)
 
     mjcb_control = controller;
 
-    std::thread ros_thread1(&MjRos::update, mj_ros, 60);
-    std::thread ros_thread2(&MjRos::spawn_and_destroy_objects, mj_ros, 600);
+    std::thread ros_thread1(&MjRos::publish_tf, mj_ros);
+    std::thread ros_thread2(&MjRos::publish_marker_array, mj_ros);
+    std::thread ros_thread3(&MjRos::publish_object_state_array, mj_ros);
+    std::thread ros_thread4(&MjRos::publish_world_joint_states, mj_ros);
+    std::thread ros_thread5(&MjRos::publish_base_pose, mj_ros);
+    std::thread ros_thread6(&MjRos::spawn_and_destroy_objects, mj_ros);
 
     // start simulation thread
     std::thread sim_thread(simulate);
 
     mjtNum sim_step_start = d->time;
+#ifdef VISUAL
     while (ros::ok())
     {
-#ifdef VISUAL
+
         if (mj_visual.is_window_closed())
         {
             break;
         }
-#endif
 
         if (d->time - sim_step_start > 1.0 / 60.0)
         {
-#ifdef VISUAL
             mj_visual.render(d->time - MjSim::sim_start, (ros::Time::now() - MjRos::ros_start).toSec());
             sim_step_start = d->time;
-#endif
         }
     }
     ros::shutdown();
+#else
+    ros::waitForShutdown();
+#endif
 
     ros_thread1.join();
     ros_thread2.join();
+    ros_thread3.join();
+    ros_thread4.join();
+    ros_thread5.join();
+    ros_thread6.join();
     sim_thread.join();
 
     // free MuJoCo model and data, deactivate

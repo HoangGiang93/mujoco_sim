@@ -31,14 +31,15 @@ ros::Time MjRos::ros_start;
 
 std::string root_name;
 
-bool pub_object_marker_array;
-bool pub_object_tf;
-bool pub_object_state_array;
-bool pub_world_joint_state;
+double pub_object_marker_array_rate;
+double pub_object_tf_rate;
+double pub_object_state_array_rate;
+double pub_world_joint_state_rate;
+double pub_base_pose_rate;
+double spawn_and_destroy_objects_rate;
 
 visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
-geometry_msgs::TransformStamped transform;
 nav_msgs::Odometry base_pose;
 sensor_msgs::JointState world_joint_states;
 mujoco_msgs::ObjectStateArray object_state_array;
@@ -63,22 +64,31 @@ void MjRos::init()
 {
     n = ros::NodeHandle();
 
-    if (!ros::param::get("~pub_object_marker_array", pub_object_marker_array))
+    if (!ros::param::get("~pub_object_marker_array_rate", pub_object_marker_array_rate))
     {
-        pub_object_marker_array = true;
+        pub_object_marker_array_rate = 60.0;
     }
-    if (!ros::param::get("~pub_object_tf", pub_object_tf))
+    if (!ros::param::get("~pub_object_tf_rate", pub_object_tf_rate))
     {
-        pub_object_tf = true;
+        pub_object_tf_rate = 60.0;
     }
-    if (!ros::param::get("~pub_object_state_array", pub_object_state_array))
+    if (!ros::param::get("~pub_object_state_array_rate", pub_object_state_array_rate))
     {
-        pub_object_state_array = true;
+        pub_object_state_array_rate = 60.0;
     }
-    if (!ros::param::get("~pub_world_joint_state", pub_world_joint_state))
+    if (!ros::param::get("~pub_world_joint_state_rate", pub_world_joint_state_rate))
     {
-        pub_world_joint_state = false;
+        pub_world_joint_state_rate = 0.0;
     }
+    if (!ros::param::get("~pub_base_pose_rate", pub_base_pose_rate))
+    {
+        pub_base_pose_rate = 60.0;
+    }
+    if (!ros::param::get("~spawn_and_destroy_objects_rate", spawn_and_destroy_objects_rate))
+    {
+        spawn_and_destroy_objects_rate = 600.0;
+    }
+    
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
         root_frame_id = "map";
@@ -566,9 +576,14 @@ void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
     base_pose.twist.twist = msg;
 }
 
-void MjRos::spawn_and_destroy_objects(const double frequency)
+void MjRos::spawn_and_destroy_objects()
 {
-    ros::Rate loop_rate(frequency);
+    if (spawn_and_destroy_objects_rate < 1E-9)
+    {
+        return;
+    }
+    
+    ros::Rate loop_rate(spawn_and_destroy_objects_rate);
     while (ros::ok())
     {
         // Spawn objects
@@ -603,21 +618,63 @@ void MjRos::spawn_and_destroy_objects(const double frequency)
     }
 }
 
-void MjRos::update(const double frequency = 60)
+void MjRos::publish_tf()
 {
-    ros::Rate loop_rate(frequency); // Update with 60 Hz
+    if (pub_object_tf_rate < 1E-9)
+    {
+        return;
+    }
+
+    geometry_msgs::TransformStamped transform;
+
+    ros::Rate loop_rate(pub_object_tf_rate);
+
+    std_msgs::Header header;
+    header.frame_id = root_frame_id;
+
+    while (ros::ok())
+    {
+        // Set header
+        header.stamp = ros::Time::now();
+        header.seq += 1;
+
+        transform.header = header;
+
+        // Publish tf of objects
+        std::string object_name;
+        for (int body_id = 1; body_id < m->nbody; body_id++)
+        {
+            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+            if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
+            {
+                if (use_odom_joints && object_name == model_path.stem().string())
+                {
+                    continue;
+                }
+
+                set_transform(transform, body_id, object_name);
+                br.sendTransform(transform);
+            }
+        }
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void MjRos::publish_marker_array()
+{
+    if (pub_object_marker_array_rate < 1E-9)
+    {
+        return;
+    }
+
+    ros::Rate loop_rate(pub_object_marker_array_rate);
 
     marker.action = visualization_msgs::Marker::MODIFY;
 
     std_msgs::Header header;
     header.frame_id = root_frame_id;
-
-    std::string base_name = "world";
-    if (use_odom_joints)
-    {
-        base_name = model_path.stem().string();
-    }
-    base_pose.child_frame_id = root_name;
 
     while (ros::ok())
     {
@@ -626,12 +683,96 @@ void MjRos::update(const double frequency = 60)
         header.seq += 1;
 
         marker.header = header;
-        transform.header = header;
+        marker_array.markers.clear();
+
+        // Publish marker of objects
+        std::string object_name;
+        for (int body_id = 1; body_id < m->nbody; body_id++)
+        {
+            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+            if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
+            {
+                if (use_odom_joints && object_name == model_path.stem().string())
+                {
+                    continue;
+                }
+
+                add_marker(body_id);
+            }
+        }
+
+        // Publish markers
+        marker_array_pub.publish(marker_array);
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void MjRos::publish_object_state_array()
+{
+    if (pub_object_state_array_rate < 1E-9)
+    {
+        return;
+    }
+
+    ros::Rate loop_rate(pub_object_state_array_rate);
+
+    std_msgs::Header header;
+    header.frame_id = root_frame_id;
+
+    while (ros::ok())
+    {
+        // Set header
+        header.stamp = ros::Time::now();
+        header.seq += 1;
+
         object_state_array.header = header;
-        base_pose.header = header;
+        object_state_array.object_states.clear();
+
+        // Publish state of objects
+        std::string object_name;
+        for (int body_id = 1; body_id < m->nbody; body_id++)
+        {
+            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+            if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
+            {
+                if (use_odom_joints && object_name == model_path.stem().string())
+                {
+                    continue;
+                }
+
+                add_object_state(body_id);
+            }
+        }
+
+        object_states_pub.publish(object_state_array);
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void MjRos::publish_world_joint_states()
+{
+    if (pub_world_joint_state_rate < 1E-9)
+    {
+        return;
+    }
+
+    ros::Rate loop_rate(pub_world_joint_state_rate);
+
+    std_msgs::Header header;
+    header.frame_id = root_frame_id;
+
+    while (ros::ok())
+    {
+        // Set header
+        header.stamp = ros::Time::now();
+        header.seq += 1;
+
         world_joint_states.header = header;
 
-        marker_array.markers.clear();
         world_joint_states.name.clear();
         world_joint_states.position.clear();
         world_joint_states.velocity.clear();
@@ -649,58 +790,58 @@ void MjRos::update(const double frequency = 60)
                     continue;
                 }
 
-                if (pub_object_tf)
-                {
-                    set_transform(body_id, object_name);
-                    br.sendTransform(transform);
-                }
-
-                if (pub_object_marker_array)
-                {
-                    add_marker(body_id);
-                }
-
-                if (pub_object_state_array)
-                {
-                    add_object_state(body_id);
-                }
-
-                // Publish world joint states
-                if (pub_world_joint_state)
-                {
-                    add_world_joint_states(body_id);
-                }
+                add_world_joint_states(body_id);
             }
         }
 
-        // Publish markers
-        if (pub_object_marker_array)
-        {
-            marker_array_pub.publish(marker_array);
-        }
+        world_joint_states_pub.publish(world_joint_states);
 
-        // Publish object states
-        if (pub_object_state_array)
-        {
-            object_states_pub.publish(object_state_array);
-        }
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
 
-        // Publish world joint states
-        if (pub_world_joint_state)
-        {
-            world_joint_states_pub.publish(world_joint_states);
-        }
+void MjRos::publish_base_pose()
+{
+    if (pub_base_pose_rate < 1E-9)
+    {
+        return;
+    }
+
+    ros::Rate loop_rate(pub_base_pose_rate);
+
+    std_msgs::Header header;
+    header.frame_id = root_frame_id;
+
+    geometry_msgs::TransformStamped transform;
+
+    std::string base_name = "world";
+    if (use_odom_joints)
+    {
+        base_name = model_path.stem().string();
+    }
+    base_pose.child_frame_id = root_name;
+
+    while (ros::ok())
+    {
+        // Set header
+        header.stamp = ros::Time::now();
+        header.seq += 1;
+
+        marker.header = header;
+        transform.header = header;
 
         // Publish tf of root
         const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
         if (root_body_id != -1)
         {
-            set_transform(root_body_id, root_name);
+            set_transform(transform, root_body_id, root_name);
             br.sendTransform(transform);
 
             if (use_odom_joints)
             {
-                publish_base_pose(root_body_id);
+                set_base_pose(root_body_id);
+                base_pose_pub.publish(base_pose);
             }
         }
 
@@ -801,7 +942,7 @@ void MjRos::add_object_state(const int body_id)
     object_state_array.object_states.push_back(object_state);
 }
 
-void MjRos::set_transform(const int body_id, const std::string &object_name)
+void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int body_id, const std::string &object_name)
 {
     transform.child_frame_id = object_name;
     transform.transform.translation.x = d->xpos[3 * body_id];
@@ -813,7 +954,7 @@ void MjRos::set_transform(const int body_id, const std::string &object_name)
     transform.transform.rotation.w = d->xquat[4 * body_id];
 }
 
-void MjRos::publish_base_pose(const int body_id)
+void MjRos::set_base_pose(const int body_id)
 {
     base_pose.pose.pose.position.x = d->xpos[3 * body_id];
     base_pose.pose.pose.position.y = d->xpos[3 * body_id + 1];
@@ -824,8 +965,6 @@ void MjRos::publish_base_pose(const int body_id)
     base_pose.pose.pose.orientation.w = d->xquat[4 * body_id];
     base_pose.pose.covariance.assign(0.0);
     base_pose.twist.covariance.assign(0.0);
-
-    base_pose_pub.publish(base_pose);
 }
 
 void MjRos::add_world_joint_states(const int body_id)
