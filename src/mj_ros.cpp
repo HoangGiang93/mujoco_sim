@@ -671,11 +671,8 @@ void MjRos::update(const double frequency = 60)
         const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
         if (root_body_id != -1)
         {
-            if (pub_object_tf)
-            {
-                set_transform(root_body_id, root_name);
-                br.sendTransform(transform);
-            }
+            set_transform(root_body_id, root_name);
+            br.sendTransform(transform);
 
             if (use_odom_joints)
             {
@@ -693,7 +690,7 @@ void MjRos::add_marker(const int body_id)
     const int geom_id = m->body_geomadr[body_id];
     if (geom_id != -1)
     {
-        std::string mesh_name;
+        boost::filesystem::path mesh_path;
         switch (m->geom_type[geom_id])
         {
         case mjtGeom::mjGEOM_BOX:
@@ -721,13 +718,13 @@ void MjRos::add_marker(const int body_id)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            mesh_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-            if (!boost::filesystem::exists(tmp_world_path / (world_path.stem().string() + "/meshes/" + mesh_name + ".dae")))
+            mesh_path = tmp_world_path.parent_path() / (world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae");
+            if (!boost::filesystem::exists(mesh_path))
             {
-                ROS_WARN("Mesh %s not found in %s", mesh_name.c_str(), (tmp_world_path / (world_path.stem().string() + "/meshes")).c_str());
+                ROS_WARN("Mesh %s not found in %s", mesh_path.filename().c_str(), mesh_path.parent_path().c_str());
                 return;
             }
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mesh_name + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
