@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mujoco_compile.cpp File Reference</title>
+<title>MujocoSim: /home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/src/mujoco_compile.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -86,9 +86,9 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mujoco_compile.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="mujoco__compile_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp" alt=""/></div>
-<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp">
-<area shape="rect" title=" " alt="" coords="403,5,618,61"/>
+<div class="center"><img src="mujoco__compile_8cpp__incl.png" border="0" usemap="#_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp" alt=""/></div>
+<map name="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp" id="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__compile_8cpp">
+<area shape="rect" title=" " alt="" coords="397,5,624,61"/>
 <area shape="rect" title=" " alt="" coords="5,109,88,136"/>
 <area shape="rect" title=" " alt="" coords="113,109,271,136"/>
 <area shape="rect" title=" " alt="" coords="295,109,361,136"/>
@@ -115,12 +115,10 @@ Functions</h2></td></tr>
 <tr class="separator:af09045b062462e21622baf0d1a243d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac97b22fbd2b80e4f04106ee5d837b71b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#ac97b22fbd2b80e4f04106ee5d837b71b">filetype</a> (const char *filename)</td></tr>
 <tr class="separator:ac97b22fbd2b80e4f04106ee5d837b71b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a9a02ed780cc601998e82032252634d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a2a9a02ed780cc601998e82032252634d">fix_inertia</a> (const boost::filesystem::path &amp;model_urdf_path)</td></tr>
-<tr class="separator:a2a9a02ed780cc601998e82032252634d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28cd99084d172f74223f3ae765cc279e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a28cd99084d172f74223f3ae765cc279e">add_mujoco_tags</a> (const boost::filesystem::path &amp;model_urdf_path)</td></tr>
+<tr class="separator:a28cd99084d172f74223f3ae765cc279e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d6c6130b7dcc2d8f37d206726779d2f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f">load_urdf</a> (const char *input, const char *output)</td></tr>
 <tr class="separator:a8d6c6130b7dcc2d8f37d206726779d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7aa859c1b44534c6b1096acfbc8afe9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a7aa859c1b44534c6b1096acfbc8afe9a">modify_xml</a> (const char *output)</td></tr>
-<tr class="separator:a7aa859c1b44534c6b1096acfbc8afe9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -156,6 +154,24 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a28cd99084d172f74223f3ae765cc279e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28cd99084d172f74223f3ae765cc279e">&#9670;&nbsp;</a></span>add_mujoco_tags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void add_mujoco_tags </td>
+          <td>(</td>
+          <td class="paramtype">const boost::filesystem::path &amp;&#160;</td>
+          <td class="paramname"><em>model_urdf_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac97b22fbd2b80e4f04106ee5d837b71b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac97b22fbd2b80e4f04106ee5d837b71b">&#9670;&nbsp;</a></span>filetype()</h2>
 
@@ -185,24 +201,6 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>msg</em> = <code>0</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2a9a02ed780cc601998e82032252634d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a9a02ed780cc601998e82032252634d">&#9670;&nbsp;</a></span>fix_inertia()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void fix_inertia </td>
-          <td>(</td>
-          <td class="paramtype">const boost::filesystem::path &amp;&#160;</td>
-          <td class="paramname"><em>model_urdf_path</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -260,24 +258,6 @@ Variables</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7aa859c1b44534c6b1096acfbc8afe9a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7aa859c1b44534c6b1096acfbc8afe9a">&#9670;&nbsp;</a></span>modify_xml()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void modify_xml </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>output</em></td><td>)</td>
-          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">

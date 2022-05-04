@@ -110,63 +110,54 @@ int filetype(const char *filename)
     }
 }
 
-// fix_inertia
-void fix_inertia(const boost::filesystem::path &model_urdf_path)
+// add_mujoco_tags
+void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
 {
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
         mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
     }
-    bool fix = false;
+    ROS_INFO("path: %s", model_urdf_path.c_str());
+
+    tinyxml2::XMLElement *mujoco = doc.NewElement("mujoco");
+    doc.FirstChildElement()->InsertFirstChild(mujoco);
+    tinyxml2::XMLElement *compiler = doc.NewElement("compiler");
+    mujoco->LinkEndChild(compiler);
+
+    compiler->SetAttribute("meshdir", model_urdf_path.parent_path().c_str());
+    compiler->SetAttribute("strippath", false);
+    compiler->SetAttribute("balanceinertia", true);
+    compiler->SetAttribute("discardvisual", true);
+
     for (tinyxml2::XMLElement *link = doc.FirstChildElement()->FirstChildElement();
          link != nullptr;
          link = link->NextSiblingElement())
     {
         if (strcmp(link->Value(), "link") == 0)
         {
-            for (tinyxml2::XMLElement *inertial = link->FirstChildElement();
-                 inertial != nullptr;
-                 inertial = inertial->NextSiblingElement())
+            for (tinyxml2::XMLElement *collision = link->FirstChildElement();
+                 collision != nullptr;
+                 collision = collision->NextSiblingElement())
             {
-                if (strcmp(inertial->Value(), "inertial") == 0)
+                if (strcmp(collision->Value(), "collision") == 0)
                 {
-                    for (tinyxml2::XMLElement *inertia = inertial->FirstChildElement();
-                         inertia != nullptr;
-                         inertia = inertia->NextSiblingElement())
+                    for (tinyxml2::XMLElement *geometry = collision->FirstChildElement();
+                         geometry != nullptr;
+                         geometry = geometry->NextSiblingElement())
                     {
-                        if (strcmp(inertia->Value(), "inertia") == 0)
+                        if (strcmp(geometry->Value(), "geometry") == 0)
                         {
-                            float ixx = inertia->FloatAttribute("ixx");
-                            float ixy = inertia->FloatAttribute("ixy");
-                            float ixz = inertia->FloatAttribute("ixz");
-                            float iyy = inertia->FloatAttribute("iyy");
-                            float iyz = inertia->FloatAttribute("iyz");
-                            float izz = inertia->FloatAttribute("izz");
-                            mjtNum mat[9] = {ixx, ixy, ixz, ixy, iyy, iyz, ixz, iyz, izz};
-                            mjtNum eigval[3];
-                            mjtNum eigVec[9];
-                            mjtNum quat[4];
-                            mju_eig3(eigval, eigVec, quat, mat);
-                            float i1 = eigval[0];
-                            float i2 = eigval[1];
-                            float i3 = eigval[2];
-                            if ((i1 + i2 < i3) || (i2 + i3 < i1) || (i3 + i1 < i2))
+                            for (tinyxml2::XMLElement *mesh = geometry->FirstChildElement();
+                                 mesh != nullptr;
+                                 mesh = mesh->NextSiblingElement())
                             {
-                                mju_warning_s("Inertia of link %s must satisfy A + B >= C, set to default value", link->Attribute("name"));
-                                ixx = 0.01;
-                                ixy = 0.0;
-                                ixz = 0.0;
-                                iyy = 0.01;
-                                iyz = 0.0;
-                                izz = 0.01;
-                                inertia->SetAttribute("ixx", ixx);
-                                inertia->SetAttribute("ixy", ixy);
-                                inertia->SetAttribute("ixz", ixz);
-                                inertia->SetAttribute("iyy", iyy);
-                                inertia->SetAttribute("iyz", iyz);
-                                inertia->SetAttribute("izz", izz);
-                                fix = true;
+                                if (strcmp(mesh->Value(), "mesh") == 0)
+                                {
+                                    boost::filesystem::path mesh_path = mesh->Attribute("filename");
+
+                                    mesh->SetAttribute("filename", mesh_path.filename().c_str());
+                                }
                             }
                         }
                     }
@@ -174,10 +165,8 @@ void fix_inertia(const boost::filesystem::path &model_urdf_path)
             }
         }
     }
-    if (fix)
-    {
-        doc.SaveFile(model_urdf_path.c_str());
-    }
+
+    doc.SaveFile(model_urdf_path.c_str());
 }
 
 // modify input file
@@ -196,7 +185,14 @@ void load_urdf(const char *input, const char *output)
 
     boost::filesystem::create_directories(output_file_path.parent_path() / meshes_path_string);
     boost::filesystem::path meshes_path = output_file_path.parent_path() / meshes_path_string;
-    boost::filesystem::copy_file(input_file_path, meshes_path / input_file_path.filename());
+
+    boost::filesystem::path model_urdf_path = meshes_path / input_file_path.filename();
+    if (boost::filesystem::exists(model_urdf_path))
+    {
+        ROS_INFO("File [%s] exists, replace...", model_urdf_path.c_str());
+        boost::filesystem::remove(model_urdf_path);
+    }
+    boost::filesystem::copy_file(input_file_path, model_urdf_path);
 
     std::vector<urdf::LinkSharedPtr> links;
     model.getLinks(links);
@@ -209,30 +205,24 @@ void load_urdf(const char *input, const char *output)
                 urdf::Mesh &mesh = dynamic_cast<urdf::Mesh &>(*visual->geometry);
                 mesh.filename.erase(0, 9);
                 boost::filesystem::path mesh_path = mesh.filename;
-                if (mesh_path.extension().compare(".dae") != 0)
-                {
-                    ROS_WARN("File [%s] doesn't have .dae format, ignore", mesh_path.c_str());
-                }
-                else 
-                {
-                    std::string file_name = mesh_path.filename().string();
-                    boost::filesystem::path ros_pkg = mesh_path;
-                    while (ros_pkg.has_parent_path() && ros_pkg.parent_path().has_parent_path())
-                    {
-                        ros_pkg = ros_pkg.parent_path();
-                    }
-                    ros_pkg = ros_pkg.relative_path();
-                    boost::filesystem::path ros_pkg_path = ros::package::getPath(ros_pkg.string());
-                    mesh_path = ros_pkg_path.parent_path() / mesh_path.string();
 
-                    if (boost::filesystem::exists(meshes_path / (link->name + ".dae")))
-                    {
-                        ROS_INFO("File [%s] from [%s] already exists in [%s], ignore", (link->name + ".dae").c_str(), mesh_path.c_str(), meshes_path.c_str());
-                    }
-                    else
-                    {
-                        boost::filesystem::copy_file(mesh_path, meshes_path / (link->name + ".dae"));
-                    }
+                std::string file_name = mesh_path.filename().string();
+                boost::filesystem::path ros_pkg = mesh_path;
+                while (ros_pkg.has_parent_path() && ros_pkg.parent_path().has_parent_path())
+                {
+                    ros_pkg = ros_pkg.parent_path();
+                }
+                ros_pkg = ros_pkg.relative_path();
+                boost::filesystem::path ros_pkg_path = ros::package::getPath(ros_pkg.string());
+                mesh_path = ros_pkg_path.parent_path() / mesh_path.string();
+
+                if (boost::filesystem::exists(meshes_path / file_name))
+                {
+                    ROS_INFO("File [%s] from [%s] already exists in [%s], ignore", file_name.c_str(), mesh_path.c_str(), meshes_path.c_str());
+                }
+                else
+                {
+                    boost::filesystem::copy_file(mesh_path, meshes_path / mesh_path.filename());
                 }
             }
         }
@@ -265,40 +255,10 @@ void load_urdf(const char *input, const char *output)
         }
     }
 
-    boost::filesystem::path model_urdf_path = meshes_path / input_file_path.filename();
-
-    fix_inertia(model_urdf_path);
+    add_mujoco_tags(model_urdf_path);
 
     // load model
     m = mj_loadXML(model_urdf_path.c_str(), 0, error, 1000);
-
-    boost::filesystem::remove(model_urdf_path);
-}
-
-// modify output file
-void modify_xml(const char *output)
-{
-    tinyxml2::XMLDocument doc;
-    if (doc.LoadFile(output) != tinyxml2::XML_SUCCESS)
-    {
-        mju_error_s("Couldn't read file in [%s]\n", output);
-    }
-    tinyxml2::XMLElement *asset_element = doc.FirstChildElement()->FirstChildElement();
-    while (asset_element != nullptr)
-    {
-        if (strcmp(asset_element->Value(), "asset") == 0)
-        {
-            tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement();
-            while (mesh_element != nullptr)
-            {
-                std::string file_name = mesh_element->Attribute("file");
-                mesh_element->SetAttribute("file", (meshes_path_string + "/" + file_name).c_str());
-                mesh_element = mesh_element->NextSiblingElement();
-            }
-        }
-        asset_element = asset_element->NextSiblingElement();
-    }
-    doc.SaveFile(output);
 }
 
 // main function
@@ -352,8 +312,6 @@ int main(int argc, char **argv)
     {
         return finish(error);
     }
-
-    modify_xml(output.c_str());
 
     // finalize
     return finish("Done");
