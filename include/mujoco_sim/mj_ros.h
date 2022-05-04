@@ -31,6 +31,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
+#include <sensor_msgs/JointState.h>
 #include <std_srvs/Trigger.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <urdf/model.h>
@@ -114,7 +115,7 @@ private:
      * @param msg cmd_vel message from ROS
      */
     void cmd_vel_callback(const geometry_msgs::Twist &msg);
-    
+
     /**
      * @brief Add marker of an object
      *
@@ -128,6 +129,13 @@ private:
      * @param body_id Body id of the base
      */
     void publish_base_pose(const int body_id);
+    
+    /**
+     * @brief Add joint state of the world
+     * 
+     * @param body_id Body id of the body
+     */
+    void add_world_joint_states(const int body_id);
 
     /**
      * @brief Add state of an object
@@ -175,6 +183,8 @@ private:
     ros::Publisher base_pose_pub;
 
     ros::Publisher object_states_pub;
+
+    ros::Publisher world_joint_states_pub;
 
     tf2_ros::TransformBroadcaster br;
 

@@ -34,11 +34,13 @@ std::string root_name;
 bool pub_object_marker_array;
 bool pub_object_tf;
 bool pub_object_state_array;
+bool pub_world_joint_state;
 
 visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
 geometry_msgs::TransformStamped transform;
 nav_msgs::Odometry base_pose;
+sensor_msgs::JointState world_joint_states;
 mujoco_msgs::ObjectStateArray object_state_array;
 
 std::condition_variable condition;
@@ -72,6 +74,10 @@ void MjRos::init()
     if (!ros::param::get("~pub_object_state_array", pub_object_state_array))
     {
         pub_object_state_array = true;
+    }
+    if (!ros::param::get("~pub_world_joint_state", pub_world_joint_state))
+    {
+        pub_world_joint_state = false;
     }
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
@@ -134,6 +140,7 @@ void MjRos::init()
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
     base_pose_pub = n.advertise<nav_msgs::Odometry>(root_name, 0);
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
+    world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
 
     reset_robot();
 }
@@ -622,8 +629,13 @@ void MjRos::update(const double frequency = 60)
         transform.header = header;
         object_state_array.header = header;
         base_pose.header = header;
+        world_joint_states.header = header;
 
         marker_array.markers.clear();
+        world_joint_states.name.clear();
+        world_joint_states.position.clear();
+        world_joint_states.velocity.clear();
+        world_joint_states.effort.clear();
 
         // Publish tf and marker of objects
         std::string object_name;
@@ -652,6 +664,12 @@ void MjRos::update(const double frequency = 60)
                 {
                     add_object_state(body_id);
                 }
+
+                // Publish world joint states
+                if (pub_world_joint_state)
+                {
+                    add_world_joint_states(body_id);
+                }
             }
         }
 
@@ -665,6 +683,12 @@ void MjRos::update(const double frequency = 60)
         if (pub_object_state_array)
         {
             object_states_pub.publish(object_state_array);
+        }
+
+        // Publish world joint states
+        if (pub_world_joint_state)
+        {
+            world_joint_states_pub.publish(world_joint_states);
         }
 
         // Publish tf of root
@@ -802,4 +826,18 @@ void MjRos::publish_base_pose(const int body_id)
     base_pose.twist.covariance.assign(0.0);
 
     base_pose_pub.publish(base_pose);
+}
+
+void MjRos::add_world_joint_states(const int body_id)
+{
+    if (m->body_jntnum[body_id] == 1 && (m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_HINGE || m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_SLIDE))
+    {
+        const int joint_id = m->body_jntadr[body_id];
+        const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
+        const int qpos_adr = m->jnt_qposadr[joint_id];
+        const int qvel_adr = m->jnt_dofadr[joint_id];
+        world_joint_states.name.push_back(joint_name);
+        world_joint_states.position.push_back(d->qpos[qpos_adr]);
+        world_joint_states.velocity.push_back(d->qvel[qvel_adr]);
+    }
 }
