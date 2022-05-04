@@ -85,21 +85,17 @@ void MjVisual::mouse_move(GLFWwindow *window, double xpos, double ypos)
     int width, height;
     glfwGetWindowSize(window, &width, &height);
 
-    // get shift key state
-    bool mod_shift = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
-                      glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
-
     // determine action based on mouse button
     mjtMouse action;
-    if (button_right)
-        action = mod_shift ? mjMOUSE_MOVE_H : mjMOUSE_MOVE_V;
+    if (button_middle)
+        action = mjMOUSE_MOVE_H;
     else if (button_left)
-        action = mod_shift ? mjMOUSE_ROTATE_H : mjMOUSE_ROTATE_V;
+        action = mjMOUSE_ROTATE_H;
     else
         action = mjMOUSE_ZOOM;
 
     // move camera
-    mjv_moveCamera(m, action, dx / height, dy / height, &scn, &cam);
+    mjv_moveCamera(m, action, dx / width * 2, dy / height, &scn, &cam);
 }
 
 void MjVisual::mouse_button(GLFWwindow *window, int button, int act, int mods)
