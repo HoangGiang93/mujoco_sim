@@ -2,8 +2,8 @@
     <compiler angle="radian" />
     <size njmax="1000" nconmax="1000" />
     <asset>
-        <mesh name="bowl" file="bowl/meshes/bowl_side.stl" />
-        <mesh name="bowl_bottom" file="bowl/meshes/bowl_bottom.stl" />
+        <mesh name="bowl" file="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/test/bowl/meshes/bowl_side.stl" />
+        <mesh name="bowl_bottom" file="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/test/bowl/meshes/bowl_bottom.stl" />
     </asset>
     <worldbody>
         <body name="bowl" pos="0 0 0">
