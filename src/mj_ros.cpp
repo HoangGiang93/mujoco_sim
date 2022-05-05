@@ -88,7 +88,6 @@ void MjRos::init()
     {
         spawn_and_destroy_objects_rate = 600.0;
     }
-    
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
         root_frame_id = "map";
@@ -315,11 +314,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         case mujoco_msgs::ObjectInfo::MESH:
             if (!object_mesh_path.has_extension())
             {
-                if (boost::filesystem::exists(model_path.parent_path() / (object_mesh_path.string() + ".xml")))
+                if (boost::filesystem::exists(world_path.parent_path() / (object_mesh_path.string() + ".xml")))
                 {
                     object_mesh_path.replace_extension(".xml");
                 }
-                else if (boost::filesystem::exists(model_path.parent_path() / (model_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
+                else if (boost::filesystem::exists(world_path.parent_path() / (world_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
                 {
                     object_mesh_path.replace_extension(".stl");
                 }
@@ -327,7 +326,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
 
             if (object_mesh_path.extension().compare(".xml") == 0)
             {
-                object_mesh_path = model_path.parent_path() / object_mesh_path;
+                object_mesh_path = world_path.parent_path() / object_mesh_path;
                 tinyxml2::XMLDocument mesh_xml_doc;
 
                 if (mesh_xml_doc.LoadFile(object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
@@ -373,7 +372,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 }
                 continue;
             }
-            if (object_mesh_path.extension().compare(".stl") == 0)
+            else if (object_mesh_path.extension().compare(".stl") == 0)
             {
                 geom_element->SetAttribute("type", "mesh");
                 geom_element->SetAttribute("size",
@@ -382,6 +381,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                             std::to_string(object.info.size.z))
                                                .c_str());
                 geom_element->SetAttribute("mesh", object_mesh_path.stem().c_str());
+            }
+            else
+            {
+                ROS_WARN("Object [%s] with extension [%s] not supported", object_mesh_path.c_str(), object_mesh_path.extension().c_str());
+                continue;
             }
 
         default:
@@ -582,7 +586,7 @@ void MjRos::spawn_and_destroy_objects()
     {
         return;
     }
-    
+
     ros::Rate loop_rate(spawn_and_destroy_objects_rate);
     while (ros::ok())
     {
