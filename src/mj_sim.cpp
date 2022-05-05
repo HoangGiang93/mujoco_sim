@@ -42,8 +42,7 @@ mjtNum MjSim::sim_start;
 MjSim::~MjSim()
 {
 	mju_free(tau);
-	boost::filesystem::remove(tmp_model_path);
-	boost::filesystem::remove(cache_model_path);
+	boost::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
 /**
@@ -80,8 +79,8 @@ static void set_param()
 
 /**
  * @brief Get all joint names of this body element and save it in MjSim::joint_names
- * 
- * @param body_element 
+ *
+ * @param body_element
  */
 static void get_joint_names(tinyxml2::XMLElement *body_element)
 {
@@ -103,8 +102,8 @@ static void get_joint_names(tinyxml2::XMLElement *body_element)
 
 /**
  * @brief Iterate all child body element of this body element
- * 
- * @param parent_body_element 
+ *
+ * @param parent_body_element
  */
 static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 {
@@ -122,7 +121,7 @@ static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 
 /**
  * @brief Set all joint names to MjSim::joint_names and MjSim::odom_joints
- * 
+ *
  */
 static void set_joint_names()
 {
@@ -199,26 +198,91 @@ static void init_tmp()
 		mju_warning_s("Failed to load file \"%s\"\n", world_path.c_str());
 		return;
 	}
+	boost::filesystem::path meshdir_abs_path = world_path.parent_path();
+	for (tinyxml2::XMLElement *element = current_xml_doc.FirstChildElement()->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "compiler") == 0)
+		{
+			if (element->Attribute("meshdir") != nullptr)
+			{
+				boost::filesystem::path meshdir_path = element->Attribute("meshdir");
+				if (meshdir_path.is_relative())
+				{
+					meshdir_abs_path /= meshdir_path;
+				}
+				else
+				{
+					meshdir_abs_path = meshdir_path;
+				}
+
+				element->DeleteAttribute("meshdir");
+				break;
+			}
+		}
+	}
+
+	for (tinyxml2::XMLElement *element = current_xml_doc.FirstChildElement()->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "asset") == 0)
+		{
+			for (tinyxml2::XMLElement *asset_element = element->FirstChildElement();
+					 asset_element != nullptr;
+					 asset_element = asset_element->NextSiblingElement())
+			{
+				if (asset_element->Attribute("file") != nullptr)
+				{
+					boost::filesystem::path file_path = asset_element->Attribute("file");
+					if (file_path.is_relative())
+					{
+						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+					}
+				}
+			}
+		}
+	}
+
 	tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", boost::filesystem::relative(cache_model_path, tmp_model_path.parent_path()).c_str());
 	current_element->LinkEndChild(include_element);
 	current_xml_doc.SaveFile(tmp_model_path.c_str());
 
-	// Add odom joints to cache_model_path if required
-	if (use_odom_joints)
+	tinyxml2::XMLDocument cache_model_xml_doc;
+	if (cache_model_xml_doc.LoadFile(cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		tinyxml2::XMLDocument cache_model_xml_doc;
-		if (cache_model_xml_doc.LoadFile(cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+		mju_warning_s("Failed to load file \"%s\"\n", cache_model_path.c_str());
+		return;
+	}
+
+	meshdir_abs_path = model_path.parent_path();
+	for (tinyxml2::XMLElement *element = cache_model_xml_doc.FirstChildElement()->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "compiler") == 0)
 		{
-			mju_warning_s("Failed to load file \"%s\"\n", cache_model_path.c_str());
-			return;
+			if (element->Attribute("meshdir") != nullptr)
+			{
+				boost::filesystem::path meshdir_path = element->Attribute("meshdir");
+				if (meshdir_path.is_relative())
+				{
+					meshdir_abs_path /= meshdir_path;
+				}
+				else
+				{
+					meshdir_abs_path = meshdir_path;
+				}
+				element->DeleteAttribute("meshdir");
+			}
 		}
-		for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement();
-				 worldbody_element != nullptr;
-				 worldbody_element = worldbody_element->NextSiblingElement())
+		// Add odom joints to cache_model_path if required
+		if (use_odom_joints)
 		{
-			if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+			if (strcmp(element->Value(), "worldbody") == 0)
 			{
 				tinyxml2::XMLElement *robot_element = cache_model_xml_doc.NewElement("body");
 
@@ -244,23 +308,45 @@ static void init_tmp()
 				odom_z_joint_element->SetAttribute("type", "hinge");
 				odom_z_joint_element->SetAttribute("axis", "0 0 1");
 
-				while (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement())
+				while (tinyxml2::XMLElement *body_element = element->FirstChildElement())
 				{
 					robot_element->LinkEndChild(body_element);
 				}
-				worldbody_element->LinkEndChild(robot_element);
+				element->LinkEndChild(robot_element);
 
 				break;
 			}
 		}
-
-		cache_model_xml_doc.SaveFile(cache_model_path.c_str());
 	}
+
+	for (tinyxml2::XMLElement *element = cache_model_xml_doc.FirstChildElement()->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "asset") == 0)
+		{
+			for (tinyxml2::XMLElement *asset_element = element->FirstChildElement();
+					 asset_element != nullptr;
+					 asset_element = asset_element->NextSiblingElement())
+			{
+				if (asset_element->Attribute("file") != nullptr)
+				{
+					boost::filesystem::path file_path = asset_element->Attribute("file");
+					if (file_path.is_relative())
+					{
+						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+					}
+				}
+			}
+		}
+	}
+
+	cache_model_xml_doc.SaveFile(cache_model_path.c_str());
 }
 
 /**
  * @brief Add the old state to the new state
- * 
+ *
  * @param m_new New mjModel*
  * @param d_new New mjData*
  */
@@ -271,7 +357,7 @@ static void add_old_state(mjModel *m_new, mjData *d_new)
 	int body_id = 0;
 	while (true)
 	{
-		body_id++;		
+		body_id++;
 		const char *name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
 		if (name == nullptr)
 		{
@@ -289,7 +375,7 @@ static void add_old_state(mjModel *m_new, mjData *d_new)
 		{
 			d_new->xfrc_applied[body_id_new + body_nr] = d->xfrc_applied[body_id + body_nr];
 		}
-		
+
 		// Copy joint states
 		int jnt_num = m->body_jntnum[body_id];
 		int jnt_num_new = m_new->body_jntnum[body_id_new];
@@ -409,7 +495,7 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	{
 		worldbody_element->DeleteChild(body_to_delete);
 	}
-	
+
 	mtx.unlock();
 
 	doc.SaveFile(xml_path);
@@ -417,7 +503,7 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 
 /**
  * @brief Load the tmp_model_path
- * 
+ *
  * @param reset Reset the simulation or not
  * @return true if succeed
  */
@@ -484,6 +570,7 @@ bool MjSim::add_data()
 		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 		return false;
 	}
+
 	tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", "add.xml");
