@@ -39,6 +39,8 @@ mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
 
+bool MjSim::add_odom_joints;
+
 MjSim::~MjSim()
 {
 	mju_free(tau);
@@ -64,7 +66,7 @@ static void set_param()
 		world_path = world_path_string;
 	}
 
-	if (ros::param::get("~use_odom_joints", use_odom_joints))
+	if (ros::param::get("~add_odom_joints", MjSim::add_odom_joints))
 	{
 		std::map<std::string, std::string> odom_joints;
 		if (ros::param::get("~odom_joints", odom_joints))
@@ -279,12 +281,17 @@ static void init_tmp()
 				element->DeleteAttribute("meshdir");
 			}
 		}
+
 		// Add odom joints to cache_model_path if required
-		if (use_odom_joints)
+		if (MjSim::add_odom_joints)
 		{
 			if (strcmp(element->Value(), "worldbody") == 0)
 			{
+				ROS_INFO("Add odom joints for base");
+
 				tinyxml2::XMLElement *robot_element = cache_model_xml_doc.NewElement("body");
+
+				robot_element->SetAttribute("name", model_path.stem().c_str());
 
 				tinyxml2::XMLElement *odom_x_joint_element = cache_model_xml_doc.NewElement("joint");
 				tinyxml2::XMLElement *odom_y_joint_element = cache_model_xml_doc.NewElement("joint");
@@ -293,8 +300,6 @@ static void init_tmp()
 				robot_element->LinkEndChild(odom_x_joint_element);
 				robot_element->LinkEndChild(odom_y_joint_element);
 				robot_element->LinkEndChild(odom_z_joint_element);
-
-				robot_element->SetAttribute("name", model_path.stem().c_str());
 
 				odom_x_joint_element->SetAttribute("name", MjSim::odom_joints["odom_x_joint"].first.c_str());
 				odom_x_joint_element->SetAttribute("type", "slide");
@@ -606,11 +611,16 @@ void MjSim::set_mimic_joints()
 	for (const std::pair<std::string, MimicJoint> &mimic_joint : mimic_joints)
 	{
 		const std::string joint_name = mimic_joint.first;
-		const int joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
 		const std::string from_joint_name = mimic_joint.second.from_joint;
-		const int from_joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, from_joint_name.c_str());
+		const int from_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, from_joint_name.c_str());
 
-		d->qpos[joint_idx] = mimic_joint.second.multiplier * d->qpos[from_joint_idx] + mimic_joint.second.offset;
+		d->qfrc_applied[from_joint_id] += 1 / mimic_joint.second.multiplier * d->qfrc_applied[joint_id];
+
+		d->qpos[joint_id] = mimic_joint.second.multiplier * d->qpos[from_joint_id] + mimic_joint.second.offset;
+		d->qvel[joint_id] = mimic_joint.second.multiplier * d->qvel[from_joint_id];
+		d->qacc[joint_id] = mimic_joint.second.multiplier * d->qacc[from_joint_id];
+		d->qfrc_applied[joint_id] = mimic_joint.second.multiplier * d->qfrc_applied[from_joint_id];
 	}
 }
 
@@ -619,8 +629,8 @@ void MjSim::set_odom_joints()
 	for (const std::pair<std::string, std::pair<std::string, mjtNum>> &odom_joint : odom_joints)
 	{
 		const std::string joint_name = odom_joint.second.first;
-		const int joint_idx = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
 
-		d->qvel[joint_idx] = odom_joint.second.second;
+		d->qvel[joint_id] = odom_joint.second.second;
 	}
 }

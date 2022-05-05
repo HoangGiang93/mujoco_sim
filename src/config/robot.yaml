@@ -6,7 +6,7 @@
 #   - joint1
 #   - joint2
 
-use_odom_joints: false
+add_odom_joints: false
 
 pub_object_marker_array_rate: 0.0
 

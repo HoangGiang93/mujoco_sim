@@ -152,10 +152,10 @@ private:
      * @param body_id Body id of the base
      */
     void set_base_pose(const int body_id);
-    
+
     /**
      * @brief Add joint state of the world
-     * 
+     *
      * @param body_id Body id of the body
      */
     void add_world_joint_states(const int body_id);

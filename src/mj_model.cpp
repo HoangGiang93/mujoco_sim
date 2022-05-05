@@ -31,8 +31,6 @@ double rtf_des = 1.0;
 
 double rtf_actual = 0.0;
 
-bool use_odom_joints = false;
-
 std::string tmp_model_name = "current.xml";
 
 boost::filesystem::path model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";

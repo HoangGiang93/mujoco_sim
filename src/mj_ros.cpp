@@ -104,7 +104,7 @@ void MjRos::init()
         MjSim::link_names.push_back(link_name);
     }
 
-    if (use_odom_joints)
+    if (MjSim::add_odom_joints)
     {
         cmd_vel_sub = n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this);
     }
@@ -171,7 +171,7 @@ void MjRos::reset_robot()
             }
         }
     }
-    if (use_odom_joints)
+    if (MjSim::add_odom_joints)
     {
         const std::vector<std::string> odom_joints = {"odom_x_joint", "odom_y_joint", "odom_z_joint"};
         for (const std::string &odom_joint : odom_joints)
@@ -651,7 +651,7 @@ void MjRos::publish_tf()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (use_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
                 {
                     continue;
                 }
@@ -696,7 +696,7 @@ void MjRos::publish_marker_array()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (use_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
                 {
                     continue;
                 }
@@ -741,7 +741,7 @@ void MjRos::publish_object_state_array()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (use_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
                 {
                     continue;
                 }
@@ -789,7 +789,7 @@ void MjRos::publish_world_joint_states()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (use_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
                 {
                     continue;
                 }
@@ -820,7 +820,7 @@ void MjRos::publish_base_pose()
     geometry_msgs::TransformStamped transform;
 
     std::string base_name = "world";
-    if (use_odom_joints)
+    if (MjSim::add_odom_joints)
     {
         base_name = model_path.stem().string();
     }
@@ -842,7 +842,7 @@ void MjRos::publish_base_pose()
             set_transform(transform, root_body_id, root_name);
             br.sendTransform(transform);
 
-            if (use_odom_joints)
+            if (MjSim::add_odom_joints)
             {
                 set_base_pose(root_body_id);
                 base_pose_pub.publish(base_pose);

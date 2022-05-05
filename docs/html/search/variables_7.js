@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['link_5fnames_170',['link_names',['../classMjSim.html#a293ecea5493f2b4e78ac54e24e48b5c7',1,'MjSim']]]
+  ['joint_5fignores_169',['joint_ignores',['../classMjSim.html#a4ac5e8a3e7450d1f8e33b173365451d3',1,'MjSim']]],
+  ['joint_5fnames_170',['joint_names',['../classMjSim.html#aedb86ffb5319a6a91b248c715118f214',1,'MjSim']]]
 ];

@@ -56,13 +56,13 @@ public:
 
     /**
      * @brief Set the mimic joint positions
-     * 
+     *
      */
     void set_mimic_joints();
 
     /**
      * @brief Set the odom joint velocities
-     * 
+     *
      */
     void set_odom_joints();
 
@@ -71,11 +71,11 @@ public:
      * @brief Spawn new data from file
      *
      */
-    static bool add_data(); 
+    static bool add_data();
 
     /**
      * @brief Remove bodies with name
-     * 
+     *
      * @param body_names Array of body names
      * @return true Successfully removed
      * @return false Fail to remove
@@ -95,5 +95,7 @@ public:
 
     static mjtNum sim_start;
 
-    static mjtNum *tau;    
+    static mjtNum *tau;
+
+    static bool add_odom_joints;
 };

@@ -80,6 +80,7 @@ void simulate()
             ros::Duration sim_period = sim_time - last_sim_time;
 
             mtx.lock();
+            mj_sim.set_mimic_joints();
             mj_step1(m, d);
             // check if we should update the controllers
             if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz
@@ -97,8 +98,7 @@ void simulate()
             mj_hw_interface.write();
 
             mj_step2(m, d);
-            mj_sim.set_mimic_joints();
-            if (use_odom_joints)
+            if (MjSim::add_odom_joints)
             {
                 mj_sim.set_odom_joints();
             }
