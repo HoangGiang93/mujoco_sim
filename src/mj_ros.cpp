@@ -832,7 +832,7 @@ void MjRos::publish_base_pose()
         header.stamp = ros::Time::now();
         header.seq += 1;
 
-        marker.header = header;
+        base_pose.header = header;
         transform.header = header;
 
         // Publish tf of root
