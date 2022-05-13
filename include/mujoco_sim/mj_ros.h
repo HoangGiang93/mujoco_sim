@@ -194,7 +194,7 @@ private:
 
     std::string root_frame_id;
 
-    ros::Subscriber cmd_vel_sub;
+    std::vector<ros::Subscriber> cmd_vel_subs;
 
     ros::ServiceServer reset_robot_server;
 
