@@ -121,7 +121,8 @@ void simulate()
         {
             ros_time = (ros::Time::now() - MjRos::ros_start).toSec();
             diff = ros_time - sim_time / rtf_des;
-        } while (mju_abs(diff) < 1E-3);
+        } while (diff < -1E-6);
+
         last_ros_time.push_front(ros_time);
         last_sim_time.push_front(sim_time);
         if (i == num_step)

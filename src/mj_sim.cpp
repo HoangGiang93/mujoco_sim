@@ -301,8 +301,8 @@ static void init_tmp()
 							tinyxml2::XMLElement *odom_z_joint_element = cache_model_xml_doc.NewElement("joint");
 
 							robot_body->InsertFirstChild(odom_z_joint_element);
-							robot_body->InsertFirstChild(odom_x_joint_element);
 							robot_body->InsertFirstChild(odom_y_joint_element);
+							robot_body->InsertFirstChild(odom_x_joint_element);
 							
 							std::string odom_x_joint_name = robot + "_odom_x_joint";
 							std::string odom_y_joint_name = robot + "_odom_y_joint";
@@ -643,7 +643,6 @@ void MjSim::set_odom_joints()
 			continue;;
 		}
 
-		ROS_INFO("%s - %f", joint_name.c_str(), odom_joint.second);
 		d->qvel[joint_id] = odom_joint.second;
 	}
 }

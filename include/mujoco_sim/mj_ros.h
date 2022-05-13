@@ -37,6 +37,22 @@
 #include <urdf/model.h>
 #include <visualization_msgs/MarkerArray.h>
 
+class CmdVelCallback
+{
+
+public:
+    CmdVelCallback(){}
+
+    CmdVelCallback(const size_t in_id, const std::string &in_robot);
+
+private:
+    size_t id = 0;
+    std::string robot;
+
+public:
+    void callback(const geometry_msgs::Twist &msg);
+};
+
 class MjRos
 {
 public:
@@ -188,6 +204,8 @@ private:
     ros::NodeHandle n;
 
     std::string root_frame_id;
+
+    std::vector<CmdVelCallback*> cmd_vel_callbacks;
 
     std::vector<ros::Subscriber> cmd_vel_subs;
 

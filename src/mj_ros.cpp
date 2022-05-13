@@ -29,7 +29,7 @@ using namespace std::chrono_literals;
 
 ros::Time MjRos::ros_start;
 
-std::vector<std::string> root_names;
+std::vector<std::string> root_names = {"world"};
 
 double pub_object_marker_array_rate;
 double pub_object_tf_rate;
@@ -56,37 +56,30 @@ std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
 
-class CmdVelCallback
+CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
-public:
-    size_t i = 0;
-    std::string robot;
+}
 
-public:
-    void callback(const geometry_msgs::Twist &msg)
+void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
+{
+    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_odom_z_joint").c_str());
+    if (odom_z_joint_id == -1)
     {
-        const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_odom_z_joint").c_str());
-        if (odom_z_joint_id == -1)
-        {
-            ROS_ERROR("Joint %s not found", (robot + "_odom_z_joint").c_str());
-            return;
-        }
-        
-        const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
-        ROS_INFO("odom_z_joint_pos: %f", odom_z_joint_pos);
-
-        MjSim::odom_joints[robot + "_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
-        MjSim::odom_joints[robot + "_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
-        MjSim::odom_joints[robot + "_odom_z_joint"] = msg.angular.z;
-
-        if (pub_base_pose_rate > 1E-9)
-        {
-            base_poses[i].twist.twist = msg;
-        }
+        ROS_ERROR("Joint %s not found", (robot + "_odom_z_joint").c_str());
+        return;
     }
-};
 
-std::vector<CmdVelCallback> cmd_vel_callbacks;
+    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
+
+    MjSim::odom_joints[robot + "_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
+    MjSim::odom_joints[robot + "_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
+    MjSim::odom_joints[robot + "_odom_z_joint"] = msg.angular.z;
+
+    if (pub_base_pose_rate > 1E-9)
+    {
+        base_poses[id].twist.twist = msg;
+    }
+}
 
 MjRos::~MjRos()
 {
@@ -136,35 +129,12 @@ void MjRos::init()
         MjSim::link_names.push_back(link_name);
     }
 
-    if (MjSim::add_odom_joints)
-    {
-        for (size_t i = 0; i < MjSim::robots.size(); i++)
-        {
-            CmdVelCallback cmd_vel_callback;
-            cmd_vel_callback.robot = MjSim::robots[i];
-            cmd_vel_callback.i = i;
-
-            cmd_vel_callbacks.push_back(cmd_vel_callback);
-
-            cmd_vel_subs.push_back(n.subscribe("/" + MjSim::robots[i] + "/cmd_vel", 10, &CmdVelCallback::callback, &cmd_vel_callbacks[i]));
-        }
-    }
-
-    reset_robot_server = n.advertiseService("reset", &MjRos::reset_robot_service, this);
-    ROS_INFO("Started [%s] service.", reset_robot_server.getService().c_str());
-
-    spawn_objects_server = n.advertiseService("/mujoco/spawn_objects", &MjRos::spawn_objects_service, this);
-    ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
-
-    destroy_objects_server = n.advertiseService("/mujoco/destroy_objects", &MjRos::destroy_objects_service, this);
-    ROS_INFO("Started [%s] service.", destroy_objects_server.getService().c_str());
-
     if (MjSim::robots.size() < 2)
     {
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, n)) // this looks so retared...
         {
-            root_names.push_back(urdf_model.getRoot()->name);
+            root_names[0] = urdf_model.getRoot()->name;
             for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
             {
                 if (joint.second->mimic != nullptr)
@@ -199,8 +169,31 @@ void MjRos::init()
                     }
                 }
             }
+            else
+            {
+                root_names.push_back("world");
+            }
         }
     }
+
+    if (MjSim::add_odom_joints)
+    {
+        for (size_t i = 0; i < MjSim::robots.size(); i++)
+        {
+            cmd_vel_callbacks.push_back(new CmdVelCallback(i, MjSim::robots[i]));
+
+            cmd_vel_subs.push_back(n.subscribe("/" + MjSim::robots[i] + "/cmd_vel", 1, &CmdVelCallback::callback, cmd_vel_callbacks[i]));
+        }
+    }
+
+    reset_robot_server = n.advertiseService("reset", &MjRos::reset_robot_service, this);
+    ROS_INFO("Started [%s] service.", reset_robot_server.getService().c_str());
+
+    spawn_objects_server = n.advertiseService("/mujoco/spawn_objects", &MjRos::spawn_objects_service, this);
+    ROS_INFO("Started [%s] service.", spawn_objects_server.getService().c_str());
+
+    destroy_objects_server = n.advertiseService("/mujoco/destroy_objects", &MjRos::destroy_objects_service, this);
+    ROS_INFO("Started [%s] service.", destroy_objects_server.getService().c_str());
 
     if (!ros::param::get("~joint_inits", joint_inits))
     {
