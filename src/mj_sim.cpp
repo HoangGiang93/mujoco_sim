@@ -68,12 +68,14 @@ static void set_param()
 		world_path = world_path_string;
 	}
 
-	if (ros::param::get("~add_odom_joints", MjSim::add_odom_joints))
+	if (!ros::param::get("~add_odom_joints", MjSim::add_odom_joints))
 	{
-		if (ros::param::get("~robots", MjSim::robots))
-		{
-			ROS_INFO("Initialize %zu robots", MjSim::robots.size());
-		}
+		MjSim::add_odom_joints = false;
+	}
+
+	if (!ros::param::get("~robots", MjSim::robots))
+	{
+		MjSim::robots.push_back(model_path.stem().string());
 	}
 }
 
@@ -285,85 +287,43 @@ static void init_tmp()
 		{
 			if (strcmp(element->Value(), "worldbody") == 0)
 			{
-				if (MjSim::robots.size() < 2)
+				for (const std::string &robot : MjSim::robots)
 				{
-					ROS_INFO("Add odom joints for %s", model_path.stem().c_str());
-
-					MjSim::odom_joints = {{"odom_x_joint", 0.0}, {"odom_y_joint", 0.0}, {"odom_z_joint", 0.0}};
-
-					tinyxml2::XMLElement *robot_element = cache_model_xml_doc.NewElement("body");
-
-					robot_element->SetAttribute("name", model_path.stem().c_str());
-
-					tinyxml2::XMLElement *odom_x_joint_element = cache_model_xml_doc.NewElement("joint");
-					tinyxml2::XMLElement *odom_y_joint_element = cache_model_xml_doc.NewElement("joint");
-					tinyxml2::XMLElement *odom_z_joint_element = cache_model_xml_doc.NewElement("joint");
-
-					robot_element->LinkEndChild(odom_x_joint_element);
-					robot_element->LinkEndChild(odom_y_joint_element);
-					robot_element->LinkEndChild(odom_z_joint_element);
-
-					odom_x_joint_element->SetAttribute("name", "odom_x_joint");
-					odom_x_joint_element->SetAttribute("type", "slide");
-					odom_x_joint_element->SetAttribute("axis", "1 0 0");
-
-					odom_y_joint_element->SetAttribute("name", "odom_y_joint");
-					odom_y_joint_element->SetAttribute("type", "slide");
-					odom_y_joint_element->SetAttribute("axis", "0 1 0");
-
-					odom_z_joint_element->SetAttribute("name", "odom_z_joint");
-					odom_z_joint_element->SetAttribute("type", "hinge");
-					odom_z_joint_element->SetAttribute("axis", "0 0 1");
-
-					while (tinyxml2::XMLElement *body_element = element->FirstChildElement())
+					ROS_INFO("Add odom joints for %s", robot.c_str());
+					for (tinyxml2::XMLElement *robot_body = element->FirstChildElement();
+							 robot_body != nullptr;
+							 robot_body = robot_body->NextSiblingElement())
 					{
-						robot_element->LinkEndChild(body_element);
-					}
-					element->LinkEndChild(robot_element);
-
-					break;
-				}
-				else
-				{
-					for (const std::string &robot : MjSim::robots)
-					{
-						ROS_INFO("Add odom joints for %s", robot.c_str());
-						for (tinyxml2::XMLElement *robot_body = element->FirstChildElement();
-								 robot_body != nullptr;
-								 robot_body = robot_body->NextSiblingElement())
+						if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
 						{
-							ROS_INFO("Body %s", robot_body->Value());
-							if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
-							{
-								tinyxml2::XMLElement *odom_x_joint_element = cache_model_xml_doc.NewElement("joint");
-								tinyxml2::XMLElement *odom_y_joint_element = cache_model_xml_doc.NewElement("joint");
-								tinyxml2::XMLElement *odom_z_joint_element = cache_model_xml_doc.NewElement("joint");
+							tinyxml2::XMLElement *odom_x_joint_element = cache_model_xml_doc.NewElement("joint");
+							tinyxml2::XMLElement *odom_y_joint_element = cache_model_xml_doc.NewElement("joint");
+							tinyxml2::XMLElement *odom_z_joint_element = cache_model_xml_doc.NewElement("joint");
 
-								robot_body->LinkEndChild(odom_x_joint_element);
-								robot_body->LinkEndChild(odom_y_joint_element);
-								robot_body->LinkEndChild(odom_z_joint_element);
+							robot_body->InsertFirstChild(odom_z_joint_element);
+							robot_body->InsertFirstChild(odom_x_joint_element);
+							robot_body->InsertFirstChild(odom_y_joint_element);
+							
+							std::string odom_x_joint_name = robot + "_odom_x_joint";
+							std::string odom_y_joint_name = robot + "_odom_y_joint";
+							std::string odom_z_joint_name = robot + "_odom_z_joint";
 
-								std::string odom_x_joint_name = robot + "_odom_x_joint";
-								std::string odom_y_joint_name = robot + "_odom_y_joint";
-								std::string odom_z_joint_name = robot + "_odom_z_joint";
+							MjSim::odom_joints[odom_x_joint_name] = 0.f;
+							MjSim::odom_joints[odom_y_joint_name] = 0.f;
+							MjSim::odom_joints[odom_z_joint_name] = 0.f;
 
-								MjSim::odom_joints[odom_x_joint_name] = 0.f;
-								MjSim::odom_joints[odom_y_joint_name] = 0.f;
-								MjSim::odom_joints[odom_z_joint_name] = 0.f;
+							odom_x_joint_element->SetAttribute("name", odom_x_joint_name.c_str());
+							odom_x_joint_element->SetAttribute("type", "slide");
+							odom_x_joint_element->SetAttribute("axis", "1 0 0");
 
-								odom_x_joint_element->SetAttribute("name", odom_x_joint_name.c_str());
-								odom_x_joint_element->SetAttribute("type", "slide");
-								odom_x_joint_element->SetAttribute("axis", "1 0 0");
+							odom_y_joint_element->SetAttribute("name", odom_y_joint_name.c_str());
+							odom_y_joint_element->SetAttribute("type", "slide");
+							odom_y_joint_element->SetAttribute("axis", "0 1 0");
 
-								odom_y_joint_element->SetAttribute("name", odom_y_joint_name.c_str());
-								odom_y_joint_element->SetAttribute("type", "slide");
-								odom_y_joint_element->SetAttribute("axis", "0 1 0");
-
-								odom_z_joint_element->SetAttribute("name", odom_z_joint_name.c_str());
-								odom_z_joint_element->SetAttribute("type", "hinge");
-								odom_z_joint_element->SetAttribute("axis", "0 0 1");
-								break;
-							}
+							odom_z_joint_element->SetAttribute("name", odom_z_joint_name.c_str());
+							odom_z_joint_element->SetAttribute("type", "hinge");
+							odom_z_joint_element->SetAttribute("axis", "0 0 1");
+							break;
 						}
 					}
 				}
@@ -677,7 +637,13 @@ void MjSim::set_odom_joints()
 	{
 		const std::string joint_name = odom_joint.first;
 		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+		if (joint_id == -1)
+		{
+			ROS_ERROR("Joint %s not found", joint_name.c_str());
+			continue;;
+		}
 
+		ROS_INFO("%s - %f", joint_name.c_str(), odom_joint.second);
 		d->qvel[joint_id] = odom_joint.second;
 	}
 }

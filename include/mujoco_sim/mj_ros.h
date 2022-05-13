@@ -133,13 +133,6 @@ private:
     void destroy_objects(const std::vector<std::string> object_names);
 
     /**
-     * @brief Control base velocity from ROS
-     *
-     * @param msg cmd_vel message from ROS
-     */
-    void cmd_vel_callback(const geometry_msgs::Twist &msg);
-
-    /**
      * @brief Add marker of an object
      *
      * @param body_id Body id of the object
@@ -150,8 +143,10 @@ private:
      * @brief Set pose of the base
      *
      * @param body_id Body id of the base
+     * 
+     * @param robot_id Robot id
      */
-    void set_base_pose(const int body_id);
+    void set_base_pose(const int body_id, const int robot_id = 0);
 
     /**
      * @brief Add joint state of the world
@@ -204,7 +199,7 @@ private:
 
     ros::Publisher marker_array_pub;
 
-    ros::Publisher base_pose_pub;
+    std::vector<ros::Publisher> base_pose_pubs;
 
     ros::Publisher object_states_pub;
 
@@ -222,18 +217,18 @@ private:
  *
  * @param urdf_model The urdf model to be initialized
  * @param n The node handle
- * @return true Successfully initialized
- * @return false Fail to initialize
+ * @param robot_description Robot description
+ * @return True if successfully initialized
  */
-bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n)
+bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
-    if (n.hasParam("robot_description"))
+    if (n.hasParam(robot_description))
     {
-        return urdf_model.initParamWithNodeHandle("robot_description", n);
+        return urdf_model.initParamWithNodeHandle(robot_description, n);
     }
     else
     {
-        ROS_WARN("robot_description not found");
+        ROS_WARN("%s not found", robot_description);
         return false;
     }
 }

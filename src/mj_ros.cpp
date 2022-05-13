@@ -29,7 +29,7 @@ using namespace std::chrono_literals;
 
 ros::Time MjRos::ros_start;
 
-std::string root_name;
+std::vector<std::string> root_names;
 
 double pub_object_marker_array_rate;
 double pub_object_tf_rate;
@@ -40,7 +40,7 @@ double spawn_and_destroy_objects_rate;
 
 visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
-nav_msgs::Odometry base_pose;
+std::vector<nav_msgs::Odometry> base_poses;
 sensor_msgs::JointState world_joint_states;
 mujoco_msgs::ObjectStateArray object_state_array;
 
@@ -55,6 +55,38 @@ int destroy_nr = 0;
 std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
+
+class CmdVelCallback
+{
+public:
+    size_t i = 0;
+    std::string robot;
+
+public:
+    void callback(const geometry_msgs::Twist &msg)
+    {
+        const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_odom_z_joint").c_str());
+        if (odom_z_joint_id == -1)
+        {
+            ROS_ERROR("Joint %s not found", (robot + "_odom_z_joint").c_str());
+            return;
+        }
+        
+        const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
+        ROS_INFO("odom_z_joint_pos: %f", odom_z_joint_pos);
+
+        MjSim::odom_joints[robot + "_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
+        MjSim::odom_joints[robot + "_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
+        MjSim::odom_joints[robot + "_odom_z_joint"] = msg.angular.z;
+
+        if (pub_base_pose_rate > 1E-9)
+        {
+            base_poses[i].twist.twist = msg;
+        }
+    }
+};
+
+std::vector<CmdVelCallback> cmd_vel_callbacks;
 
 MjRos::~MjRos()
 {
@@ -106,9 +138,15 @@ void MjRos::init()
 
     if (MjSim::add_odom_joints)
     {
-        if (MjSim::robots.size() < 2)
+        for (size_t i = 0; i < MjSim::robots.size(); i++)
         {
-            cmd_vel_subs.push_back(n.subscribe("cmd_vel", 10, &MjRos::cmd_vel_callback, this));
+            CmdVelCallback cmd_vel_callback;
+            cmd_vel_callback.robot = MjSim::robots[i];
+            cmd_vel_callback.i = i;
+
+            cmd_vel_callbacks.push_back(cmd_vel_callback);
+
+            cmd_vel_subs.push_back(n.subscribe("/" + MjSim::robots[i] + "/cmd_vel", 10, &CmdVelCallback::callback, &cmd_vel_callbacks[i]));
         }
     }
 
@@ -121,22 +159,49 @@ void MjRos::init()
     destroy_objects_server = n.advertiseService("/mujoco/destroy_objects", &MjRos::destroy_objects_service, this);
     ROS_INFO("Started [%s] service.", destroy_objects_server.getService().c_str());
 
-    urdf::Model urdf_model;
-    if (init_urdf(urdf_model, n)) // this looks so retared...
+    if (MjSim::robots.size() < 2)
     {
-        root_name = urdf_model.getRoot()->name;
-        for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
+        urdf::Model urdf_model;
+        if (init_urdf(urdf_model, n)) // this looks so retared...
         {
-            if (joint.second->mimic != nullptr)
+            root_names.push_back(urdf_model.getRoot()->name);
+            for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
             {
-                MimicJoint mimic_joint;
-                mimic_joint.from_joint = joint.second->mimic->joint_name;
-                mimic_joint.multiplier = joint.second->mimic->multiplier;
-                mimic_joint.offset = joint.second->mimic->offset;
-                MjSim::mimic_joints[joint.first] = mimic_joint;
+                if (joint.second->mimic != nullptr)
+                {
+                    MimicJoint mimic_joint;
+                    mimic_joint.from_joint = joint.second->mimic->joint_name;
+                    mimic_joint.multiplier = joint.second->mimic->multiplier;
+                    mimic_joint.offset = joint.second->mimic->offset;
+                    MjSim::mimic_joints[joint.first] = mimic_joint;
+                }
             }
         }
     }
+    else
+    {
+        root_names.clear();
+        for (const std::string &robot : MjSim::robots)
+        {
+            urdf::Model urdf_model;
+            if (init_urdf(urdf_model, n, ("robot_description_" + robot).c_str())) // this looks so retared...
+            {
+                root_names.push_back(urdf_model.getRoot()->name);
+                for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
+                {
+                    if (joint.second->mimic != nullptr)
+                    {
+                        MimicJoint mimic_joint;
+                        mimic_joint.from_joint = joint.second->mimic->joint_name;
+                        mimic_joint.multiplier = joint.second->mimic->multiplier;
+                        mimic_joint.offset = joint.second->mimic->offset;
+                        MjSim::mimic_joints[joint.first] = mimic_joint;
+                    }
+                }
+            }
+        }
+    }
+
     if (!ros::param::get("~joint_inits", joint_inits))
     {
         ROS_WARN("joint_inits not found, will set to default value (0)");
@@ -150,7 +215,18 @@ void MjRos::init()
     }
 
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
-    base_pose_pub = n.advertise<nav_msgs::Odometry>(root_name, 0);
+    if (MjSim::robots.size() < 2)
+    {
+        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[0], 0));
+    }
+    else
+    {
+        for (size_t i = 0; i < MjSim::robots.size(); i++)
+        {
+            base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[i], 0));
+        }
+    }
+
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
     world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
 
@@ -569,18 +645,6 @@ void MjRos::destroy_objects(const std::vector<std::string> object_names)
                                   object_names_to_destroy.end());
 }
 
-void MjRos::cmd_vel_callback(const geometry_msgs::Twist &msg)
-{
-    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, "odom_z_joint");
-    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
-
-    MjSim::odom_joints["odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
-    MjSim::odom_joints["odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
-    MjSim::odom_joints["odom_z_joint"] = msg.angular.z;
-
-    base_pose.twist.twist = msg;
-}
-
 void MjRos::spawn_and_destroy_objects()
 {
     if (spawn_and_destroy_objects_rate < 1E-9)
@@ -820,12 +884,29 @@ void MjRos::publish_base_pose()
 
     geometry_msgs::TransformStamped transform;
 
-    std::string base_name = "world";
+    std::vector<std::string> base_names = {"world"};
     if (MjSim::add_odom_joints)
     {
-        base_name = model_path.stem().string();
+        if (MjSim::robots.size() < 2)
+        {
+            base_names[0] = model_path.stem().string();
+        }
+        else
+        {
+            base_names.clear();
+            for (const std::string &robot : MjSim::robots)
+            {
+                base_names.push_back(robot);
+            }
+        }
     }
-    base_pose.child_frame_id = root_name;
+
+    for (const std::string &root_name : root_names)
+    {
+        nav_msgs::Odometry base_pose;
+        base_pose.child_frame_id = root_name;
+        base_poses.push_back(base_pose);
+    }
 
     while (ros::ok())
     {
@@ -833,20 +914,27 @@ void MjRos::publish_base_pose()
         header.stamp = ros::Time::now();
         header.seq += 1;
 
-        base_pose.header = header;
+        for (nav_msgs::Odometry &base_pose : base_poses)
+        {
+            base_pose.header = header;
+        }
+
         transform.header = header;
 
         // Publish tf of root
-        const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_name.c_str());
-        if (root_body_id != -1)
+        for (size_t i = 0; i < base_names.size(); i++)
         {
-            set_transform(transform, root_body_id, root_name);
-            br.sendTransform(transform);
-
-            if (MjSim::add_odom_joints)
+            const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_names[i].c_str());
+            if (root_body_id != -1)
             {
-                set_base_pose(root_body_id);
-                base_pose_pub.publish(base_pose);
+                set_transform(transform, root_body_id, root_names[i]);
+                br.sendTransform(transform);
+
+                if (MjSim::add_odom_joints)
+                {
+                    set_base_pose(root_body_id, i);
+                    base_pose_pubs[i].publish(base_poses[i]);
+                }
             }
         }
 
@@ -959,17 +1047,17 @@ void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int 
     transform.transform.rotation.w = d->xquat[4 * body_id];
 }
 
-void MjRos::set_base_pose(const int body_id)
+void MjRos::set_base_pose(const int body_id, const int robot_id)
 {
-    base_pose.pose.pose.position.x = d->xpos[3 * body_id];
-    base_pose.pose.pose.position.y = d->xpos[3 * body_id + 1];
-    base_pose.pose.pose.position.z = d->xpos[3 * body_id + 2];
-    base_pose.pose.pose.orientation.x = d->xquat[4 * body_id + 1];
-    base_pose.pose.pose.orientation.y = d->xquat[4 * body_id + 2];
-    base_pose.pose.pose.orientation.z = d->xquat[4 * body_id + 3];
-    base_pose.pose.pose.orientation.w = d->xquat[4 * body_id];
-    base_pose.pose.covariance.assign(0.0);
-    base_pose.twist.covariance.assign(0.0);
+    base_poses[robot_id].pose.pose.position.x = d->xpos[3 * body_id];
+    base_poses[robot_id].pose.pose.position.y = d->xpos[3 * body_id + 1];
+    base_poses[robot_id].pose.pose.position.z = d->xpos[3 * body_id + 2];
+    base_poses[robot_id].pose.pose.orientation.x = d->xquat[4 * body_id + 1];
+    base_poses[robot_id].pose.pose.orientation.y = d->xquat[4 * body_id + 2];
+    base_poses[robot_id].pose.pose.orientation.z = d->xquat[4 * body_id + 3];
+    base_poses[robot_id].pose.pose.orientation.w = d->xquat[4 * body_id];
+    base_poses[robot_id].pose.covariance.assign(0.0);
+    base_poses[robot_id].twist.covariance.assign(0.0);
 }
 
 void MjRos::add_world_joint_states(const int body_id)
