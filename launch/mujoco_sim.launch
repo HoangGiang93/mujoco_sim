@@ -11,6 +11,7 @@
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" launch-prefix="bash -c 'sleep 0.5; $0 $@' ">
             <rosparam command="load" file="$(arg config)" />
             <param name="world" value="$(arg world)" />
+            <param name="robot" type="str" value="$(arg robot)" />
         </node>
     </group>
 

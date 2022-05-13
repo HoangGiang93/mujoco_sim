@@ -57,8 +57,17 @@ static void set_param()
 	std::string model_path_string;
 	if (ros::param::get("~robot", model_path_string))
 	{
-		model_path = model_path_string;
-		tmp_model_name = "current_" + model_path.filename().string();
+		boost::filesystem::path model_path_path = model_path_string;
+		if (model_path_path.extension() == ".urdf")
+		{
+			model_path = model_path.parent_path() / (model_path_path.stem().string() + ".xml");
+			tmp_model_name = "current_" + model_path.filename().string();
+		}
+		else
+		{
+			model_path = model_path_string;
+			tmp_model_name = "current_" + model_path.filename().string();
+		}
 	}
 
 	std::string world_path_string;
@@ -303,7 +312,7 @@ static void init_tmp()
 							robot_body->InsertFirstChild(odom_z_joint_element);
 							robot_body->InsertFirstChild(odom_y_joint_element);
 							robot_body->InsertFirstChild(odom_x_joint_element);
-							
+
 							std::string odom_x_joint_name = robot + "_odom_x_joint";
 							std::string odom_y_joint_name = robot + "_odom_y_joint";
 							std::string odom_z_joint_name = robot + "_odom_z_joint";
@@ -640,7 +649,8 @@ void MjSim::set_odom_joints()
 		if (joint_id == -1)
 		{
 			ROS_ERROR("Joint %s not found", joint_name.c_str());
-			continue;;
+			continue;
+			;
 		}
 
 		d->qvel[joint_id] = odom_joint.second;

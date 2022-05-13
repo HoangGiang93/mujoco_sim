@@ -154,7 +154,7 @@ void MjRos::init()
         for (const std::string &robot : MjSim::robots)
         {
             urdf::Model urdf_model;
-            if (init_urdf(urdf_model, n, ("robot_description_" + robot).c_str())) // this looks so retared...
+            if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str())) // this looks so retared...
             {
                 root_names.push_back(urdf_model.getRoot()->name);
                 for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
@@ -208,16 +208,9 @@ void MjRos::init()
     }
 
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
-    if (MjSim::robots.size() < 2)
+    for (size_t i = 0; i < MjSim::robots.size(); i++)
     {
-        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[0], 0));
-    }
-    else
-    {
-        for (size_t i = 0; i < MjSim::robots.size(); i++)
-        {
-            base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[i], 0));
-        }
+        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[i], 0));
     }
 
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
@@ -709,7 +702,7 @@ void MjRos::publish_tf()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
                 {
                     continue;
                 }
@@ -799,7 +792,7 @@ void MjRos::publish_object_state_array()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
                 {
                     continue;
                 }
@@ -847,7 +840,7 @@ void MjRos::publish_world_joint_states()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && object_name == model_path.stem().string())
+                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
                 {
                     continue;
                 }
@@ -877,23 +870,6 @@ void MjRos::publish_base_pose()
 
     geometry_msgs::TransformStamped transform;
 
-    std::vector<std::string> base_names = {"world"};
-    if (MjSim::add_odom_joints)
-    {
-        if (MjSim::robots.size() < 2)
-        {
-            base_names[0] = model_path.stem().string();
-        }
-        else
-        {
-            base_names.clear();
-            for (const std::string &robot : MjSim::robots)
-            {
-                base_names.push_back(robot);
-            }
-        }
-    }
-
     for (const std::string &root_name : root_names)
     {
         nav_msgs::Odometry base_pose;
@@ -915,19 +891,31 @@ void MjRos::publish_base_pose()
         transform.header = header;
 
         // Publish tf of root
-        for (size_t i = 0; i < base_names.size(); i++)
+        for (size_t i = 0; i < root_names.size(); i++)
         {
-            const int root_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, base_names[i].c_str());
-            if (root_body_id != -1)
+            const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, MjSim::robots[i].c_str());
+            if (body_id != -1)
             {
-                set_transform(transform, root_body_id, root_names[i]);
+                if (MjSim::robots.size() > 1)
+                {
+                    set_transform(transform, body_id, MjSim::robots[i] + "/" + root_names[i]);
+                }
+                else
+                {
+                    set_transform(transform, body_id, root_names[i]);
+                }
+
                 br.sendTransform(transform);
 
                 if (MjSim::add_odom_joints)
                 {
-                    set_base_pose(root_body_id, i);
+                    set_base_pose(body_id, i);
                     base_pose_pubs[i].publish(base_poses[i]);
                 }
+            }
+            else
+            {
+                ROS_ERROR("Body id of %s not found", MjSim::robots[i].c_str());
             }
         }
 
@@ -1031,6 +1019,7 @@ void MjRos::add_object_state(const int body_id)
 void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int body_id, const std::string &object_name)
 {
     transform.child_frame_id = object_name;
+
     transform.transform.translation.x = d->xpos[3 * body_id];
     transform.transform.translation.y = d->xpos[3 * body_id + 1];
     transform.transform.translation.z = d->xpos[3 * body_id + 2];

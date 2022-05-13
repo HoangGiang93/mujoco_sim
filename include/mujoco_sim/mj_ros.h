@@ -41,7 +41,7 @@ class CmdVelCallback
 {
 
 public:
-    CmdVelCallback(){}
+    CmdVelCallback() {}
 
     CmdVelCallback(const size_t in_id, const std::string &in_robot);
 
@@ -159,7 +159,7 @@ private:
      * @brief Set pose of the base
      *
      * @param body_id Body id of the base
-     * 
+     *
      * @param robot_id Robot id
      */
     void set_base_pose(const int body_id, const int robot_id = 0);
@@ -184,6 +184,7 @@ private:
      * @param body_id Transform to set
      * @param body_id Body id of the object
      * @param object_name Name of the object
+     * @param root_id Body id of the root
      */
     void set_transform(geometry_msgs::TransformStamped &transform, const int body_id, const std::string &object_name);
 
@@ -205,7 +206,7 @@ private:
 
     std::string root_frame_id;
 
-    std::vector<CmdVelCallback*> cmd_vel_callbacks;
+    std::vector<CmdVelCallback *> cmd_vel_callbacks;
 
     std::vector<ros::Subscriber> cmd_vel_subs;
 
@@ -240,7 +241,8 @@ private:
  */
 bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
-    if (n.hasParam(robot_description))
+    std::string robot_description_string;
+    if (ros::param::get(robot_description, robot_description_string))
     {
         return urdf_model.initParamWithNodeHandle(robot_description, n);
     }

@@ -118,7 +118,6 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     {
         mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
     }
-    ROS_INFO("path: %s", model_urdf_path.c_str());
 
     tinyxml2::XMLElement *mujoco = doc.NewElement("mujoco");
     doc.FirstChildElement()->InsertFirstChild(mujoco);
@@ -167,6 +166,37 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     }
 
     doc.SaveFile(model_urdf_path.c_str());
+}
+
+void add_robot_body(const boost::filesystem::path &model_path)
+{
+    tinyxml2::XMLDocument model_xml_doc;
+    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        return;
+    }
+
+    for (tinyxml2::XMLElement *element = model_xml_doc.FirstChildElement()->FirstChildElement();
+         element != nullptr;
+         element = element->NextSiblingElement())
+    {
+        if (strcmp(element->Value(), "worldbody") == 0)
+        {
+            tinyxml2::XMLElement *robot_element = model_xml_doc.NewElement("body");
+
+            robot_element->SetAttribute("name", model_path.stem().c_str());
+            while (tinyxml2::XMLElement *body_element = element->FirstChildElement())
+            {
+                robot_element->LinkEndChild(body_element);
+            }
+            element->LinkEndChild(robot_element);
+
+            break;
+        }
+    }
+
+    model_xml_doc.SaveFile(model_path.c_str());
 }
 
 // modify input file
@@ -279,7 +309,8 @@ int main(int argc, char **argv)
     if (argc == 2)
     {
         type2 = typeXML;
-        output = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
+        boost::filesystem::path input_file_path = argv[1];
+        output = ros::package::getPath("mujoco_sim") + "/model/tmp/" + input_file_path.stem().string() + ".xml";
     }
     else
     {
@@ -312,6 +343,8 @@ int main(int argc, char **argv)
     {
         return finish(error);
     }
+
+    add_robot_body(output);
 
     // finalize
     return finish("Done");
