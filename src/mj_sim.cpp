@@ -39,7 +39,7 @@ mjtNum *MjSim::tau = NULL;
 
 mjtNum MjSim::sim_start;
 
-bool MjSim::add_odom_joints;
+std::map<std::string, bool> MjSim::add_odom_joints;
 
 std::vector<std::string> MjSim::robots;
 
@@ -77,14 +77,36 @@ static void set_param()
 		world_path = world_path_string;
 	}
 
-	if (!ros::param::get("~add_odom_joints", MjSim::add_odom_joints))
-	{
-		MjSim::add_odom_joints = false;
-	}
-
 	if (!ros::param::get("~robots", MjSim::robots))
 	{
 		MjSim::robots.push_back(model_path.stem().string());
+	}
+
+	bool add_odom_joints_bool;
+	if (ros::param::get("~add_odom_joints", add_odom_joints_bool))
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			MjSim::add_odom_joints[robot] = add_odom_joints_bool;
+		}
+	}
+	else
+	{
+		std::vector<std::string> robots;
+		if (ros::param::get("~add_odom_joints", robots))
+		{
+			for (const std::string &robot : robots)
+			{
+				MjSim::add_odom_joints[robot] = true;
+			}
+		}
+		else
+		{
+			for (const std::string &robot : robots)
+			{
+				MjSim::add_odom_joints[robot] = false;
+			}
+		}
 	}
 }
 
@@ -181,7 +203,7 @@ static void init_tmp()
 		boost::filesystem::create_directories(tmp_world_mesh_path);
 	}
 
-	// Copy model meshes to tmp_world_mesh_path
+	// Copy model meshes to tmp_world_mesh_path (to save .dae files)
 	if (boost::filesystem::exists(world_path.parent_path() / world_path_tail))
 	{
 		for (const boost::filesystem::directory_entry &file : boost::filesystem::directory_iterator(world_path.parent_path() / world_path_tail))
@@ -292,11 +314,11 @@ static void init_tmp()
 		}
 
 		// Add odom joints to cache_model_path if required
-		if (MjSim::add_odom_joints)
+		if (strcmp(element->Value(), "worldbody") == 0)
 		{
-			if (strcmp(element->Value(), "worldbody") == 0)
+			for (const std::string &robot : MjSim::robots)
 			{
-				for (const std::string &robot : MjSim::robots)
+				if (MjSim::add_odom_joints[robot])
 				{
 					ROS_INFO("Add odom joints for %s", robot.c_str());
 					for (tinyxml2::XMLElement *robot_body = element->FirstChildElement();

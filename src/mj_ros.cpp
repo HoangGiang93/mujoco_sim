@@ -176,9 +176,9 @@ void MjRos::init()
         }
     }
 
-    if (MjSim::add_odom_joints)
+    for (size_t i = 0; i < MjSim::robots.size(); i++)
     {
-        for (size_t i = 0; i < MjSim::robots.size(); i++)
+        if (MjSim::add_odom_joints[MjSim::robots[i]])
         {
             cmd_vel_callbacks.push_back(new CmdVelCallback(i, MjSim::robots[i]));
 
@@ -236,16 +236,13 @@ void MjRos::reset_robot()
             }
         }
     }
-    if (MjSim::add_odom_joints)
+    for (std::pair<const std::string, mjtNum> &odom_joint : MjSim::odom_joints)
     {
-        for (std::pair<const std::string, mjtNum> &odom_joint : MjSim::odom_joints)
+        odom_joint.second = 0.f;
+        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_joint.first.c_str());
+        if (joint_id != -1)
         {
-            odom_joint.second = 0.f;
-            const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_joint.first.c_str());
-            if (joint_id != -1)
-            {
-                d->qpos[joint_id] = 0.f;
-            }
+            d->qpos[joint_id] = 0.f;
         }
     }
     mj_forward(m, d);
@@ -702,7 +699,7 @@ void MjRos::publish_tf()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
+                if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
                 {
                     continue;
                 }
@@ -747,7 +744,7 @@ void MjRos::publish_marker_array()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
+                if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
                 {
                     continue;
                 }
@@ -792,7 +789,7 @@ void MjRos::publish_object_state_array()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
+                if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
                 {
                     continue;
                 }
@@ -840,7 +837,7 @@ void MjRos::publish_world_joint_states()
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
-                if (MjSim::add_odom_joints && (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end())))
+                if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
                 {
                     continue;
                 }
@@ -907,7 +904,7 @@ void MjRos::publish_base_pose()
 
                 br.sendTransform(transform);
 
-                if (MjSim::add_odom_joints)
+                if (MjSim::add_odom_joints[MjSim::robots[i]])
                 {
                     set_base_pose(body_id, i);
                     base_pose_pubs[i].publish(base_poses[i]);

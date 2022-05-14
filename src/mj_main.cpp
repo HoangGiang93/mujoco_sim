@@ -98,10 +98,9 @@ void simulate()
             mj_hw_interface.write();
 
             mj_step2(m, d);
-            if (MjSim::add_odom_joints)
-            {
-                mj_sim.set_odom_joints();
-            }
+
+            mj_sim.set_odom_joints();
+
             mtx.unlock();
         }
 
