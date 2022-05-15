@@ -29,7 +29,7 @@ using namespace std::chrono_literals;
 
 ros::Time MjRos::ros_start;
 
-std::vector<std::string> root_names = {"world"};
+std::vector<std::string> root_names;
 
 double pub_object_marker_array_rate;
 double pub_object_tf_rate;
@@ -55,6 +55,22 @@ int destroy_nr = 0;
 std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
+
+void init_mimic_joints(const urdf::Model &urdf_model)
+{
+    root_names.push_back(urdf_model.getRoot()->name);
+    for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
+    {
+        if (joint.second->mimic != nullptr)
+        {
+            MimicJoint mimic_joint;
+            mimic_joint.from_joint = joint.second->mimic->joint_name;
+            mimic_joint.multiplier = joint.second->mimic->multiplier;
+            mimic_joint.offset = joint.second->mimic->offset;
+            MjSim::mimic_joints[joint.first] = mimic_joint;
+        }
+    }
+}
 
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
@@ -137,40 +153,21 @@ void MjRos::init()
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, n)) // this looks so retared...
         {
-            root_names[0] = urdf_model.getRoot()->name;
-            for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
-            {
-                if (joint.second->mimic != nullptr)
-                {
-                    MimicJoint mimic_joint;
-                    mimic_joint.from_joint = joint.second->mimic->joint_name;
-                    mimic_joint.multiplier = joint.second->mimic->multiplier;
-                    mimic_joint.offset = joint.second->mimic->offset;
-                    MjSim::mimic_joints[joint.first] = mimic_joint;
-                }
-            }
+            init_mimic_joints(urdf_model);
+        }
+        else
+        {
+            root_names.push_back("world");
         }
     }
     else
     {
-        root_names.clear();
         for (const std::string &robot : MjSim::robots)
         {
             urdf::Model urdf_model;
             if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str())) // this looks so retared...
             {
-                root_names.push_back(urdf_model.getRoot()->name);
-                for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
-                {
-                    if (joint.second->mimic != nullptr)
-                    {
-                        MimicJoint mimic_joint;
-                        mimic_joint.from_joint = joint.second->mimic->joint_name;
-                        mimic_joint.multiplier = joint.second->mimic->multiplier;
-                        mimic_joint.offset = joint.second->mimic->offset;
-                        MjSim::mimic_joints[joint.first] = mimic_joint;
-                    }
-                }
+                init_mimic_joints(urdf_model);
             }
             else
             {
