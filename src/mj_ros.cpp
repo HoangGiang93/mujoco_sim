@@ -210,7 +210,7 @@ void MjRos::init()
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
     for (size_t i = 0; i < MjSim::robots.size(); i++)
     {
-        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>(root_names[i], 0));
+        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>("/" + MjSim::robots[i] + "/" + root_names[i], 0));
     }
 
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);

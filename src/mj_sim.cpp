@@ -515,7 +515,10 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 					{
 						bodies_to_delete.push_back(body_node);
 					}
-					else if (body_name != nullptr && strcmp(body_name, model_path.stem().c_str()) != 0 && std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end())
+					else if (body_name != nullptr &&
+									 strcmp(body_name, model_path.stem().c_str()) != 0 &&
+									 std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end() &&
+									 std::find(MjSim::robots.begin(), MjSim::robots.end(), body_name) == MjSim::robots.end())
 					{
 						int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
 						body_node->ToElement()->SetAttribute("pos",
