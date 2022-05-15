@@ -104,8 +104,8 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:aedb86ffb5319a6a91b248c715118f214"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aedb86ffb5319a6a91b248c715118f214">joint_names</a></td></tr>
-<tr class="separator:aedb86ffb5319a6a91b248c715118f214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4379dd751034d7ba76d7155923f3eb2"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa4379dd751034d7ba76d7155923f3eb2">joint_names</a></td></tr>
+<tr class="separator:aa4379dd751034d7ba76d7155923f3eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a4ac5e8a3e7450d1f8e33b173365451d3">joint_ignores</a></td></tr>
 <tr class="separator:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a8ee0dfa3ec0cb2bf3e356c9e2077b8"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, mjtNum &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a2a8ee0dfa3ec0cb2bf3e356c9e2077b8">odom_joints</a></td></tr>
@@ -116,6 +116,8 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:a293ecea5493f2b4e78ac54e24e48b5c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memItemLeft" align="right" valign="top">static mjtNum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd">sim_start</a></td></tr>
 <tr class="separator:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa810b31343a0c16940cf482e29d504d0"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa810b31343a0c16940cf482e29d504d0">u</a> = NULL</td></tr>
+<tr class="separator:aa810b31343a0c16940cf482e29d504d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b22b4acbcbc8d870ad07f6de414402f"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a1b22b4acbcbc8d870ad07f6de414402f">tau</a> = NULL</td></tr>
 <tr class="separator:a1b22b4acbcbc8d870ad07f6de414402f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8753c262de6576946d589d04c3244890"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a8753c262de6576946d589d04c3244890">add_odom_joints</a></td></tr>
@@ -352,8 +354,8 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="aedb86ffb5319a6a91b248c715118f214"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedb86ffb5319a6a91b248c715118f214">&#9670;&nbsp;</a></span>joint_names</h2>
+<a id="aa4379dd751034d7ba76d7155923f3eb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4379dd751034d7ba76d7155923f3eb2">&#9670;&nbsp;</a></span>joint_names</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -362,7 +364,7 @@ false Fail to remove </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::string &gt; MjSim::joint_names</td>
+          <td class="memname">std::map&lt; std::string, std::vector&lt; std::string &gt; &gt; MjSim::joint_names</td>
         </tr>
       </table>
   </td>
@@ -495,6 +497,28 @@ false Fail to remove </dd></dl>
       <table class="memname">
         <tr>
           <td class="memname">mjtNum * MjSim::tau = NULL</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa810b31343a0c16940cf482e29d504d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa810b31343a0c16940cf482e29d504d0">&#9670;&nbsp;</a></span>u</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">mjtNum * MjSim::u = NULL</td>
         </tr>
       </table>
   </td>

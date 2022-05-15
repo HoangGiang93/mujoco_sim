@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['visual_98',['VISUAL',['../mujoco__sim_8cpp.html#a5719963d148e344fe549ddff3b70f9b2',1,'mujoco_sim.cpp']]]
+  ['u_98',['u',['../classMjSim.html#aa810b31343a0c16940cf482e29d504d0',1,'MjSim']]]
 ];

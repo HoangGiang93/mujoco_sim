@@ -20,9 +20,10 @@
 
 #include "mj_hw_interface.h"
 
-MjHWInterface::MjHWInterface()
+MjHWInterface::MjHWInterface(const std::string &robot)
 {
-    std::size_t num_joints = MjSim::joint_names.size();
+    joint_names = MjSim::joint_names[robot];
+    std::size_t num_joints = joint_names.size();
     joint_positions.resize(num_joints, 0.);
     joint_velocities.resize(num_joints, 0.);
     joint_efforts.resize(num_joints, 0.);
@@ -33,16 +34,16 @@ MjHWInterface::MjHWInterface()
 
     for (std::size_t i = 0; i < num_joints; i++)
     {
-        hardware_interface::JointStateHandle joint_state_handle(MjSim::joint_names[i], &joint_positions[i], &joint_velocities[i], &joint_efforts[i]);
+        hardware_interface::JointStateHandle joint_state_handle(joint_names[i], &joint_positions[i], &joint_velocities[i], &joint_efforts[i]);
         joint_state_interface.registerHandle(joint_state_handle);
 
-        // hardware_interface::JointHandle joint_handle_position(joint_state_interface.getHandle(MjSim::joint_names[i]), &joint_positions_command[i]);
+        // hardware_interface::JointHandle joint_handle_position(joint_state_interface.getHandle(joint_names[i]), &joint_positions_command[i]);
         // position_joint_interface.registerHandle(joint_handle_position);
 
-        // hardware_interface::JointHandle joint_handle_velocity(joint_state_interface.getHandle(MjSim::joint_names[i]), &joint_velocities_command[i]);
+        // hardware_interface::JointHandle joint_handle_velocity(joint_state_interface.getHandle(joint_names[i]), &joint_velocities_command[i]);
         // velocity_joint_interface.registerHandle(joint_handle_velocity);
 
-        hardware_interface::JointHandle joint_handle_effort(joint_state_interface.getHandle(MjSim::joint_names[i]), &joint_efforts_command[i]);
+        hardware_interface::JointHandle joint_handle_effort(joint_state_interface.getHandle(joint_names[i]), &joint_efforts_command[i]);
         effort_joint_interface.registerHandle(joint_handle_effort);
     }
     registerInterface(&joint_state_interface);
@@ -58,9 +59,9 @@ MjHWInterface::~MjHWInterface()
 void MjHWInterface::read()
 {
     mj_inverse(m, d);
-    for (std::size_t i = 0; i < MjSim::joint_names.size(); i++)
+    for (std::size_t i = 0; i < joint_names.size(); i++)
     {
-        const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
+        const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
         joint_positions[i] = d->qpos[id];
         joint_velocities[i] = d->qvel[id];
         joint_efforts[i] = d->qfrc_inverse[id];
@@ -69,22 +70,12 @@ void MjHWInterface::read()
 
 void MjHWInterface::write()
 {
-    mjtNum u[m->nv] = {0.};
-    for (std::size_t i = 0; i < MjSim::joint_names.size(); i++)
+    for (std::size_t i = 0; i < joint_names.size(); i++)
     {
-        if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), MjSim::joint_names[i]) == MjSim::joint_ignores.end())
+        if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_names[i]) == MjSim::joint_ignores.end())
         {
-            const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, MjSim::joint_names[i].c_str());
-            u[id] = joint_efforts_command[i];
-        }
-    }
-    mj_mulM(m, d, MjSim::tau, u);
-    for (const std::string joint_name : MjSim::joint_names)
-    {
-        if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_name) == MjSim::joint_ignores.end())
-        {
-            const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-            MjSim::tau[id] += d->qfrc_bias[id];
+            const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
+            MjSim::u[id] = joint_efforts_command[i];
         }
     }
 }

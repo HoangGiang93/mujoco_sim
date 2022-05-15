@@ -25,7 +25,7 @@
 #include <ros/param.h>
 #include <tinyxml2.h>
 
-std::vector<std::string> MjSim::joint_names;
+std::map<std::string, std::vector<std::string>> MjSim::joint_names;
 
 std::vector<std::string> MjSim::joint_ignores;
 
@@ -34,6 +34,8 @@ std::map<std::string, mjtNum> MjSim::odom_joints;
 std::map<std::string, MimicJoint> MjSim::mimic_joints;
 
 std::vector<std::string> MjSim::link_names;
+
+mjtNum *MjSim::u = NULL;
 
 mjtNum *MjSim::tau = NULL;
 
@@ -117,9 +119,20 @@ static void set_param()
  */
 static void get_joint_names(tinyxml2::XMLElement *body_element)
 {
+	static std::string robot_name;
+	if (std::find(MjSim::robots.begin(), MjSim::robots.end(), body_element->Attribute("name")) != MjSim::robots.end())
+	{
+		robot_name = body_element->Attribute("name");
+	}
+
+	if (robot_name.empty())
+	{
+		return;
+	}
+
 	for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement();
-			 joint_element != nullptr;
-			 joint_element = joint_element->NextSiblingElement())
+		 joint_element != nullptr;
+		 joint_element = joint_element->NextSiblingElement())
 	{
 		if (strcmp(joint_element->Value(), "joint") == 0)
 		{
@@ -128,7 +141,7 @@ static void get_joint_names(tinyxml2::XMLElement *body_element)
 			{
 				continue;
 			}
-			MjSim::joint_names.push_back(joint_name);
+			MjSim::joint_names[robot_name].push_back(joint_name);
 		}
 	}
 }
@@ -141,8 +154,8 @@ static void get_joint_names(tinyxml2::XMLElement *body_element)
 static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 {
 	for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement();
-			 body_element != nullptr;
-			 body_element = body_element->NextSiblingElement())
+		 body_element != nullptr;
+		 body_element = body_element->NextSiblingElement())
 	{
 		if (strcmp(body_element->Value(), "body") == 0)
 		{
@@ -165,8 +178,8 @@ static void set_joint_names()
 		return;
 	}
 	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement())
+		 worldbody_element != nullptr;
+		 worldbody_element = worldbody_element->NextSiblingElement())
 	{
 		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
 		{
@@ -233,8 +246,8 @@ static void init_tmp()
 	}
 	boost::filesystem::path meshdir_abs_path = world_path.parent_path();
 	for (tinyxml2::XMLElement *element = current_xml_doc.FirstChildElement()->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
+		 element != nullptr;
+		 element = element->NextSiblingElement())
 	{
 		if (strcmp(element->Value(), "compiler") == 0)
 		{
@@ -257,14 +270,14 @@ static void init_tmp()
 	}
 
 	for (tinyxml2::XMLElement *element = current_xml_doc.FirstChildElement()->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
+		 element != nullptr;
+		 element = element->NextSiblingElement())
 	{
 		if (strcmp(element->Value(), "asset") == 0)
 		{
 			for (tinyxml2::XMLElement *asset_element = element->FirstChildElement();
-					 asset_element != nullptr;
-					 asset_element = asset_element->NextSiblingElement())
+				 asset_element != nullptr;
+				 asset_element = asset_element->NextSiblingElement())
 			{
 				if (asset_element->Attribute("file") != nullptr)
 				{
@@ -293,8 +306,8 @@ static void init_tmp()
 
 	meshdir_abs_path = model_path.parent_path();
 	for (tinyxml2::XMLElement *element = cache_model_xml_doc.FirstChildElement()->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
+		 element != nullptr;
+		 element = element->NextSiblingElement())
 	{
 		if (strcmp(element->Value(), "compiler") == 0)
 		{
@@ -322,8 +335,8 @@ static void init_tmp()
 				{
 					ROS_INFO("Add odom joints for %s", robot.c_str());
 					for (tinyxml2::XMLElement *robot_body = element->FirstChildElement();
-							 robot_body != nullptr;
-							 robot_body = robot_body->NextSiblingElement())
+						 robot_body != nullptr;
+						 robot_body = robot_body->NextSiblingElement())
 					{
 						if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
 						{
@@ -363,14 +376,14 @@ static void init_tmp()
 	}
 
 	for (tinyxml2::XMLElement *element = cache_model_xml_doc.FirstChildElement()->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
+		 element != nullptr;
+		 element = element->NextSiblingElement())
 	{
 		if (strcmp(element->Value(), "asset") == 0)
 		{
 			for (tinyxml2::XMLElement *asset_element = element->FirstChildElement();
-					 asset_element != nullptr;
-					 asset_element = asset_element->NextSiblingElement())
+				 asset_element != nullptr;
+				 asset_element = asset_element->NextSiblingElement())
 			{
 				if (asset_element->Attribute("file") != nullptr)
 				{
@@ -484,6 +497,8 @@ static void init_malloc()
 {
 	MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
 	mju_zero(MjSim::tau, m->nv);
+	MjSim::u = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
+	mju_zero(MjSim::u, m->nv);
 }
 
 static void modify_xml(const char *xml_path, const std::vector<std::string> &remove_body_names = {""})
@@ -499,14 +514,14 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
 	std::vector<tinyxml2::XMLNode *> bodies_to_delete;
 	for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement())
+		 worldbody_element != nullptr;
+		 worldbody_element = worldbody_element->NextSiblingElement())
 	{
 		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
 		{
 			for (tinyxml2::XMLNode *body_node = worldbody_element->FirstChild();
-					 body_node != nullptr;
-					 body_node = body_node->NextSibling())
+				 body_node != nullptr;
+				 body_node = body_node->NextSibling())
 			{
 				if (strcmp(body_node->Value(), "body") == 0)
 				{
@@ -516,22 +531,22 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 						bodies_to_delete.push_back(body_node);
 					}
 					else if (body_name != nullptr &&
-									 strcmp(body_name, model_path.stem().c_str()) != 0 &&
-									 std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end() &&
-									 std::find(MjSim::robots.begin(), MjSim::robots.end(), body_name) == MjSim::robots.end())
+							 strcmp(body_name, model_path.stem().c_str()) != 0 &&
+							 std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end() &&
+							 std::find(MjSim::robots.begin(), MjSim::robots.end(), body_name) == MjSim::robots.end())
 					{
 						int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
 						body_node->ToElement()->SetAttribute("pos",
-																								 (std::to_string(d->xpos[3 * body_id]) + " " +
-																									std::to_string(d->xpos[3 * body_id + 1]) + " " +
-																									std::to_string(d->xpos[3 * body_id + 2]))
-																										 .c_str());
+															 (std::to_string(d->xpos[3 * body_id]) + " " +
+															  std::to_string(d->xpos[3 * body_id + 1]) + " " +
+															  std::to_string(d->xpos[3 * body_id + 2]))
+																 .c_str());
 						body_node->ToElement()->SetAttribute("quat",
-																								 (std::to_string(d->xquat[4 * body_id]) + " " +
-																									std::to_string(d->xquat[4 * body_id + 1]) + " " +
-																									std::to_string(d->xquat[4 * body_id + 2]) + " " +
-																									std::to_string(d->xquat[4 * body_id + 3]))
-																										 .c_str());
+															 (std::to_string(d->xquat[4 * body_id]) + " " +
+															  std::to_string(d->xquat[4 * body_id + 1]) + " " +
+															  std::to_string(d->xquat[4 * body_id + 2]) + " " +
+															  std::to_string(d->xquat[4 * body_id + 3]))
+																 .c_str());
 					}
 				}
 			}
@@ -644,7 +659,20 @@ bool MjSim::remove_body(const std::vector<std::string> &body_names)
 
 void MjSim::controller()
 {
+	mj_mulM(m, d, tau, u);
+	for (const std::string &robot : MjSim::robots)
+	{
+		for (const std::string joint_name : MjSim::joint_names[robot])
+		{
+			if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_name) == MjSim::joint_ignores.end())
+			{
+				const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+				tau[id] += d->qfrc_bias[id];
+			}
+		}
+	}
 	mju_copy(d->qfrc_applied, tau, m->nv);
+	mju_zero(u, m->nv);
 }
 
 void MjSim::set_mimic_joints()
@@ -675,7 +703,6 @@ void MjSim::set_odom_joints()
 		{
 			ROS_ERROR("Joint %s not found", joint_name.c_str());
 			continue;
-			;
 		}
 
 		d->qvel[joint_id] = odom_joint.second;

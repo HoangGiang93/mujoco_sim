@@ -67,8 +67,20 @@ void controller(const mjModel *m, mjData *d)
 
 void simulate()
 {
-    MjHWInterface mj_hw_interface;
-    controller_manager::ControllerManager controller_manager(&mj_hw_interface);
+    std::vector<MjHWInterface *> mj_hw_interfaces;
+    std::vector<controller_manager::ControllerManager *> controller_managers;
+    for (const std::string &robot : MjSim::robots)
+    {
+        mj_hw_interfaces.push_back(new MjHWInterface(robot));
+        if (MjSim::robots.size() < 2)
+        {
+            controller_managers.push_back(new controller_manager::ControllerManager(mj_hw_interfaces.back()));
+        }
+        else
+        {
+            controller_managers.push_back(new controller_manager::ControllerManager(mj_hw_interfaces.back(), ros::NodeHandle(robot)));
+        }
+    }
 
     ros::AsyncSpinner spinner(3);
     spinner.start();
@@ -89,13 +101,22 @@ void simulate()
                 last_sim_time = sim_time;
 
                 // update the robot simulation with the state of the mujoco model
-                mj_hw_interface.read();
+                for (MjHWInterface *mj_hw_interface : mj_hw_interfaces)
+                {
+                    mj_hw_interface->read();
+                }
 
                 // compute the controller commands
-                controller_manager.update(sim_time, sim_period);
+                for (controller_manager::ControllerManager *controller_manager : controller_managers)
+                {
+                    controller_manager->update(sim_time, sim_period);
+                }
             }
             // update the mujoco model with the result of the controller
-            mj_hw_interface.write();
+            for (MjHWInterface *mj_hw_interface : mj_hw_interfaces)
+            {
+                mj_hw_interface->write();
+            }
 
             mj_step2(m, d);
 

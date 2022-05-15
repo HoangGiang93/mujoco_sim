@@ -122,11 +122,14 @@ void MjRos::init()
 
     int joint_id;
     std::string link_name;
-    for (const std::string joint_name : MjSim::joint_names)
+    for (const std::string &robot : MjSim::robots)
     {
-        joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-        link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_id]);
-        MjSim::link_names.push_back(link_name);
+        for (const std::string joint_name : MjSim::joint_names[robot])
+        {
+            joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+            link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_id]);
+            MjSim::link_names.push_back(link_name);
+        }
     }
 
     if (MjSim::robots.size() < 2)
@@ -221,18 +224,21 @@ void MjRos::init()
 
 void MjRos::reset_robot()
 {
-    for (const std::string &joint_name : MjSim::joint_names)
+    for (const std::string &robot : MjSim::robots)
     {
-        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-        if (joint_id != -1)
+        for (const std::string &joint_name : MjSim::joint_names[robot])
         {
-            if (joint_inits.count(joint_name) != 0)
+            const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+            if (joint_id != -1)
             {
-                d->qpos[joint_id] = joint_inits[joint_name];
-            }
-            else
-            {
-                d->qpos[joint_id] = 0.f;
+                if (joint_inits.count(joint_name) != 0)
+                {
+                    d->qpos[joint_id] = joint_inits[joint_name];
+                }
+                else
+                {
+                    d->qpos[joint_id] = 0.f;
+                }
             }
         }
     }
@@ -255,18 +261,21 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     mtx.unlock();
     ros::Duration(100 * m->opt.timestep).sleep();
     float error_sum = 0.f;
-    for (const std::string &joint_name : MjSim::joint_names)
+    for (const std::string &robot : MjSim::robots)
     {
-        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-        if (joint_id != -1)
+        for (const std::string &joint_name : MjSim::joint_names[robot])
         {
-            if (joint_inits.count(joint_name) != 0)
+            const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+            if (joint_id != -1)
             {
-                error_sum += mju_abs(d->qpos[joint_id] - joint_inits[joint_name]);
-            }
-            else
-            {
-                error_sum += mju_abs(d->qpos[joint_id]);
+                if (joint_inits.count(joint_name) != 0)
+                {
+                    error_sum += mju_abs(d->qpos[joint_id] - joint_inits[joint_name]);
+                }
+                else
+                {
+                    error_sum += mju_abs(d->qpos[joint_id]);
+                }
             }
         }
     }

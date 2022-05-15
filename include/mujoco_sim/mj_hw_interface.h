@@ -30,7 +30,7 @@
 class MjHWInterface : public hardware_interface::RobotHW
 {
 public:
-    MjHWInterface();
+    MjHWInterface(const std::string &robot);
 
     ~MjHWInterface();
 
@@ -49,6 +49,8 @@ private:
     hardware_interface::EffortJointInterface effort_joint_interface;
 
 private:
+    std::vector<std::string> joint_names;
+
     // States
     std::vector<double> joint_positions;
     std::vector<double> joint_velocities;
