@@ -43,6 +43,9 @@ std::string meshes_path_string;
 // model and error
 mjModel *m = 0;
 
+// urdf model
+urdf::Model model;
+
 // deallocate and print message
 int finish(const char *msg = 0)
 {
@@ -199,13 +202,43 @@ void add_robot_body(const boost::filesystem::path &model_path)
     model_xml_doc.SaveFile(model_path.c_str());
 }
 
+void add_mimic_joints(const boost::filesystem::path &model_path)
+{
+    tinyxml2::XMLDocument model_xml_doc;
+    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        return;
+    }
+
+    tinyxml2::XMLElement *equality_element = model_xml_doc.NewElement("equality");
+    model_xml_doc.FirstChildElement()->LinkEndChild(equality_element);
+
+    for (const std::pair<std::string, urdf::JointSharedPtr> &joint : model.joints_)
+    {
+        if (joint.second->mimic != nullptr)
+        {
+            tinyxml2::XMLElement *joint_element = model_xml_doc.NewElement("joint");
+            joint_element->SetAttribute("joint1", joint.first.c_str());
+            joint_element->SetAttribute("joint2", joint.second->mimic->joint_name.c_str());
+            joint_element->SetAttribute("polycoef",
+                                        (std::to_string(joint.second->mimic->offset) + " " +
+                                         std::to_string(joint.second->mimic->multiplier) + " " +
+                                         " 0 0 0")
+                                            .c_str());
+            equality_element->LinkEndChild(joint_element);
+        }
+    }
+
+    model_xml_doc.SaveFile(model_path.c_str());
+}
+
 // modify input file
 void load_urdf(const char *input, const char *output)
 {
     boost::filesystem::path input_file_path = input;
     boost::filesystem::path output_file_path = output;
 
-    urdf::Model model;
     if (!model.initFile(input_file_path.c_str()))
     {
         ROS_ERROR("Couldn't read file in [%s]\n", input);
@@ -345,6 +378,8 @@ int main(int argc, char **argv)
     }
 
     add_robot_body(output);
+
+    add_mimic_joints(output);
 
     // finalize
     return finish("Done");

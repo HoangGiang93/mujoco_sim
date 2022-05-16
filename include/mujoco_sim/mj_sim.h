@@ -27,13 +27,6 @@
 
 bool load_tmp_model(bool reset = true);
 
-struct MimicJoint
-{
-    std::string from_joint;
-    mjtNum multiplier;
-    mjtNum offset;
-};
-
 class MjSim
 {
 public:
@@ -88,8 +81,6 @@ public:
     static std::vector<std::string> joint_ignores;
 
     static std::map<std::string, mjtNum> odom_joints;
-
-    static std::map<std::string, MimicJoint> mimic_joints;
 
     static std::vector<std::string> link_names;
 

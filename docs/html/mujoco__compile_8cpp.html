@@ -119,6 +119,8 @@ Functions</h2></td></tr>
 <tr class="separator:a28cd99084d172f74223f3ae765cc279e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8705c1c4a80eb33063c5860da7e74ac3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a8705c1c4a80eb33063c5860da7e74ac3">add_robot_body</a> (const boost::filesystem::path &amp;<a class="el" href="mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a>)</td></tr>
 <tr class="separator:a8705c1c4a80eb33063c5860da7e74ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3046424ff72b7376513a326886bd7f83"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a3046424ff72b7376513a326886bd7f83">add_mimic_joints</a> (const boost::filesystem::path &amp;<a class="el" href="mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a>)</td></tr>
+<tr class="separator:a3046424ff72b7376513a326886bd7f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d6c6130b7dcc2d8f37d206726779d2f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f">load_urdf</a> (const char *input, const char *output)</td></tr>
 <tr class="separator:a8d6c6130b7dcc2d8f37d206726779d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a> (int argc, char **argv)</td></tr>
@@ -134,6 +136,8 @@ Variables</h2></td></tr>
 <tr class="separator:a002b4466f710d71c57255039bc63e88a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95761db16f4e4b06b9a3c0851a83afb"><td class="memItemLeft" align="right" valign="top">mjModel *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#aa95761db16f4e4b06b9a3c0851a83afb">m</a> = 0</td></tr>
 <tr class="separator:aa95761db16f4e4b06b9a3c0851a83afb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ec70ff62d5e8410a8071003425a6fe3"><td class="memItemLeft" align="right" valign="top">urdf::Model&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a></td></tr>
+<tr class="separator:a2ec70ff62d5e8410a8071003425a6fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a06fc87d81c62e9abb8790b6e5713c55b"></a>
@@ -156,6 +160,24 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a3046424ff72b7376513a326886bd7f83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3046424ff72b7376513a326886bd7f83">&#9670;&nbsp;</a></span>add_mimic_joints()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void add_mimic_joints </td>
+          <td>(</td>
+          <td class="paramtype">const boost::filesystem::path &amp;&#160;</td>
+          <td class="paramname"><em>model_path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a28cd99084d172f74223f3ae765cc279e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a28cd99084d172f74223f3ae765cc279e">&#9670;&nbsp;</a></span>add_mujoco_tags()</h2>
 
@@ -340,6 +362,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::string meshes_path_string</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2ec70ff62d5e8410a8071003425a6fe3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ec70ff62d5e8410a8071003425a6fe3">&#9670;&nbsp;</a></span>model</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">urdf::Model model</td>
         </tr>
       </table>
 </div><div class="memdoc">

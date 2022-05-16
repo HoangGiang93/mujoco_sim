@@ -56,40 +56,25 @@ std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
 
-void init_mimic_joints(const urdf::Model &urdf_model)
-{
-    root_names.push_back(urdf_model.getRoot()->name);
-    for (const std::pair<std::string, urdf::JointSharedPtr> &joint : urdf_model.joints_)
-    {
-        if (joint.second->mimic != nullptr)
-        {
-            MimicJoint mimic_joint;
-            mimic_joint.from_joint = joint.second->mimic->joint_name;
-            mimic_joint.multiplier = joint.second->mimic->multiplier;
-            mimic_joint.offset = joint.second->mimic->offset;
-            MjSim::mimic_joints[joint.first] = mimic_joint;
-        }
-    }
-}
-
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
 }
 
 void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
 {
-    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_odom_z_joint").c_str());
+    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_z_joint").c_str());
     if (odom_z_joint_id == -1)
     {
-        ROS_ERROR("Joint %s not found", (robot + "_odom_z_joint").c_str());
+        ROS_ERROR("Joint %s not found", (robot + "_ang_odom_z_joint").c_str());
         return;
     }
 
     const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
 
-    MjSim::odom_joints[robot + "_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
-    MjSim::odom_joints[robot + "_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
-    MjSim::odom_joints[robot + "_odom_z_joint"] = msg.angular.z;
+    MjSim::odom_joints[robot + "_lin_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
+    MjSim::odom_joints[robot + "_lin_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
+    MjSim::odom_joints[robot + "_lin_odom_z_joint"] = msg.linear.z;
+    MjSim::odom_joints[robot + "_ang_odom_z_joint"] = msg.angular.z;
 
     if (pub_base_pose_rate > 1E-9)
     {
@@ -153,7 +138,7 @@ void MjRos::init()
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, n)) // this looks so retared...
         {
-            init_mimic_joints(urdf_model);
+            root_names.push_back(urdf_model.getRoot()->name);
         }
         else
         {
@@ -167,7 +152,7 @@ void MjRos::init()
             urdf::Model urdf_model;
             if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str())) // this looks so retared...
             {
-                init_mimic_joints(urdf_model);
+                root_names.push_back(urdf_model.getRoot()->name);
             }
             else
             {
@@ -379,16 +364,13 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             break;
 
         case mujoco_msgs::ObjectInfo::MESH:
-            if (!object_mesh_path.has_extension())
+            if (boost::filesystem::exists(world_path.parent_path() / (object_mesh_path.string() + ".xml")))
             {
-                if (boost::filesystem::exists(world_path.parent_path() / (object_mesh_path.string() + ".xml")))
-                {
-                    object_mesh_path.replace_extension(".xml");
-                }
-                else if (boost::filesystem::exists(world_path.parent_path() / (world_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
-                {
-                    object_mesh_path.replace_extension(".stl");
-                }
+                object_mesh_path.replace_extension(".xml");
+            }
+            else if (boost::filesystem::exists(world_path.parent_path() / (world_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
+            {
+                object_mesh_path.replace_extension(".stl");
             }
 
             if (object_mesh_path.extension().compare(".xml") == 0)

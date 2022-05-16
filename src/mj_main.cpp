@@ -92,7 +92,6 @@ void simulate()
             ros::Duration sim_period = sim_time - last_sim_time;
 
             mtx.lock();
-            mj_sim.set_mimic_joints();
             mj_step1(m, d);
             // check if we should update the controllers
             if (sim_period.toSec() >= 1 / 10000.) // Controller with 10kHz
