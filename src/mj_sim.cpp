@@ -432,6 +432,17 @@ static void add_old_state(mjModel *m_new, mjData *d_new)
 			continue;
 		}
 
+		// Copy body position
+		d_new->xpos[body_id_new] = d->xpos[body_id];
+		d_new->xpos[body_id_new + 1] = d->xpos[body_id + 1];
+		d_new->xpos[body_id_new + 2] = d->xpos[body_id + 2];
+
+		// Copy body rotation
+		d_new->xquat[body_id_new] = d->xquat[body_id];
+		d_new->xquat[body_id_new + 1] = d->xquat[body_id + 1];
+		d_new->xquat[body_id_new + 2] = d->xquat[body_id + 2];
+		d_new->xquat[body_id_new + 3] = d->xquat[body_id + 3];
+
 		// Copy body states
 		for (int body_nr = 0; body_nr < 6; body_nr++)
 		{

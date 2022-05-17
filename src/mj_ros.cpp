@@ -37,6 +37,7 @@ double pub_object_state_array_rate;
 double pub_world_joint_state_rate;
 double pub_base_pose_rate;
 double spawn_and_destroy_objects_rate;
+int spawn_object_count_per_cycle;
 
 visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
@@ -117,6 +118,10 @@ void MjRos::init()
     if (!ros::param::get("~root_frame_id", root_frame_id))
     {
         root_frame_id = "map";
+    }
+    if (!ros::param::get("~spawn_object_count_per_cycle", spawn_object_count_per_cycle))
+    {
+        spawn_object_count_per_cycle = -1;
     }
 
     ros_start = ros::Time::now();
@@ -633,7 +638,25 @@ void MjRos::spawn_and_destroy_objects()
 
             while (objects_to_spawn.size() > 0)
             {
-                spawn_objects(objects_to_spawn);
+                if (spawn_object_count_per_cycle == -1)
+                {
+                    spawn_objects(objects_to_spawn);
+                }
+                else
+                {
+                    std::vector<mujoco_msgs::ObjectStatus> objects;
+                    size_t i = 0;
+                    for (const mujoco_msgs::ObjectStatus &object : objects_to_spawn)
+                    {
+                        if (i++ > spawn_object_count_per_cycle)
+                        {
+                            break;
+                        }
+                        objects.push_back(object);
+                    }
+
+                    spawn_objects(objects);
+                }
             }
 
             lk.unlock();
@@ -778,6 +801,11 @@ void MjRos::publish_object_state_array()
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
                 if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
+                {
+                    continue;
+                }
+
+                if (m->body_mocapid[body_id] != -1)
                 {
                     continue;
                 }
