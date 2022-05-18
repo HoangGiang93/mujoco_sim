@@ -634,6 +634,30 @@ void MjRos::spawn_and_destroy_objects()
         // Spawn objects
         if (objects_to_spawn.size() > 0)
         {
+            if (pub_object_tf_rate > 1E-9)
+            {
+                std_msgs::Header header;
+                header.frame_id = root_frame_id;
+                header.stamp = ros::Time::now();
+
+                geometry_msgs::TransformStamped transform;
+                transform.header = header;
+
+                // Publish tf of static objects
+                std::string object_name;
+                for (const mujoco_msgs::ObjectStatus &object : objects_to_spawn)
+                {
+                    const char *name = object.info.name.c_str();
+                    const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
+                    if (m->body_mocapid[body_id] == -1)
+                    {
+                        continue;
+                    }
+                    set_transform(transform, body_id, name);
+                    static_br.sendTransform(transform);
+                }
+            }
+
             std::unique_lock<std::mutex> lk(spawn_mtx);
 
             while (objects_to_spawn.size() > 0)
@@ -694,6 +718,22 @@ void MjRos::publish_tf()
 
     std_msgs::Header header;
     header.frame_id = root_frame_id;
+    header.stamp = ros::Time::now();
+
+    transform.header = header;
+
+    // Publish tf of static objects
+    std::string object_name;
+    for (int body_id = 1; body_id < m->nbody; body_id++)
+    {
+        if (m->body_mocapid[body_id] == -1)
+        {
+            continue;
+        }
+        object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+        set_transform(transform, body_id, object_name);
+        static_br.sendTransform(transform);
+    }
 
     while (ros::ok())
     {
@@ -707,6 +747,10 @@ void MjRos::publish_tf()
         std::string object_name;
         for (int body_id = 1; body_id < m->nbody; body_id++)
         {
+            if (m->body_mocapid[body_id] != -1)
+            {
+                continue;
+            }
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {

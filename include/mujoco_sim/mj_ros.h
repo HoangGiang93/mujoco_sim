@@ -33,6 +33,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/JointState.h>
 #include <std_srvs/Trigger.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <urdf/model.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -225,6 +226,8 @@ private:
     ros::Publisher world_joint_states_pub;
 
     tf2_ros::TransformBroadcaster br;
+
+    tf2_ros::StaticTransformBroadcaster static_br;
 
     std::map<std::string, float> joint_inits;
 };
