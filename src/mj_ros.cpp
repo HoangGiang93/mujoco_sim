@@ -1080,10 +1080,16 @@ void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int 
     transform.transform.translation.x = d->xpos[3 * body_id];
     transform.transform.translation.y = d->xpos[3 * body_id + 1];
     transform.transform.translation.z = d->xpos[3 * body_id + 2];
-    transform.transform.rotation.x = d->xquat[4 * body_id + 1];
-    transform.transform.rotation.y = d->xquat[4 * body_id + 2];
-    transform.transform.rotation.z = d->xquat[4 * body_id + 3];
-    transform.transform.rotation.w = d->xquat[4 * body_id];
+
+    const double sqrt_sum_square = mju_sqrt(d->xquat[4 * body_id] * d->xquat[4 * body_id] +
+                                            d->xquat[4 * body_id + 1] * d->xquat[4 * body_id + 1] +
+                                            d->xquat[4 * body_id + 2] * d->xquat[4 * body_id + 2] +
+                                            d->xquat[4 * body_id + 3] * d->xquat[4 * body_id + 3]);
+
+    transform.transform.rotation.x = d->xquat[4 * body_id + 1] / sqrt_sum_square;
+    transform.transform.rotation.y = d->xquat[4 * body_id + 2] / sqrt_sum_square;
+    transform.transform.rotation.z = d->xquat[4 * body_id + 3] / sqrt_sum_square;
+    transform.transform.rotation.w = d->xquat[4 * body_id] / sqrt_sum_square;
 }
 
 void MjRos::set_base_pose(const int body_id, const int robot_id)
