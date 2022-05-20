@@ -25,6 +25,8 @@
 #include <ros/param.h>
 #include <tinyxml2.h>
 
+double MjSim::max_time_step;
+
 std::map<std::string, std::vector<std::string>> MjSim::joint_names;
 
 std::vector<std::string> MjSim::joint_ignores;
@@ -68,6 +70,15 @@ static void set_param()
 			model_path = model_path_string;
 			tmp_model_name = "current_" + model_path.filename().string();
 		}
+	}
+
+	if (ros::param::get("~max_time_step", MjSim::max_time_step))
+	{
+		ROS_INFO("Set max time step = %f", MjSim::max_time_step);
+	}
+	else
+	{
+		MjSim::max_time_step = 0.02;
 	}
 
 	std::string world_path_string;
@@ -338,6 +349,7 @@ static void init_tmp()
 					{
 						if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
 						{
+
 							tinyxml2::XMLElement *odom_lin_x_joint_element = cache_model_xml_doc.NewElement("joint");
 							tinyxml2::XMLElement *odom_lin_y_joint_element = cache_model_xml_doc.NewElement("joint");
 							tinyxml2::XMLElement *odom_lin_z_joint_element = cache_model_xml_doc.NewElement("joint");
@@ -352,6 +364,7 @@ static void init_tmp()
 							std::string lin_odom_y_joint_name = robot + "_lin_odom_y_joint";
 							std::string lin_odom_z_joint_name = robot + "_lin_odom_z_joint";
 							std::string ang_odom_z_joint_name = robot + "_ang_odom_z_joint";
+							MjSim::joint_ignores.push_back(lin_odom_z_joint_name);
 
 							MjSim::odom_joints[lin_odom_x_joint_name] = 0.f;
 							MjSim::odom_joints[lin_odom_y_joint_name] = 0.f;
@@ -697,6 +710,11 @@ void MjSim::set_odom_joints()
 	for (const std::pair<std::string, mjtNum> &odom_joint : odom_joints)
 	{
 		const std::string joint_name = odom_joint.first;
+		if (joint_name.find("_lin_odom_z_joint") != std::string::npos)
+		{
+			continue;
+		}
+
 		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
 		if (joint_id == -1)
 		{

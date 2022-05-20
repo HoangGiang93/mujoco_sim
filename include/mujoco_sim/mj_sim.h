@@ -76,6 +76,8 @@ public:
     static bool remove_body(const std::vector<std::string> &body_names);
 
 public:
+    static double max_time_step;
+
     static std::map<std::string, std::vector<std::string>> joint_names;
 
     static std::vector<std::string> joint_ignores;

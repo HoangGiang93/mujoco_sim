@@ -85,6 +85,7 @@ void simulate()
     ros::AsyncSpinner spinner(3);
     spinner.start();
     ros::Time last_sim_time = MjRos::ros_start;
+    double time_step = m->opt.timestep;
     while (ros::ok())
     {
         {
@@ -125,7 +126,7 @@ void simulate()
         }
 
         // Calculate real time factor
-        int num_step = mju_ceil(0.1 / m->opt.timestep);
+        int num_step = mju_ceil(1 / m->opt.timestep);
         static std::deque<double> last_sim_time;
         static std::deque<double> last_ros_time;
         double diff;
@@ -158,7 +159,20 @@ void simulate()
         }
 
         // Change timestep when out of sync
-        // m->opt.timestep *= 1 + mju_pow(mju_abs(diff), 2) * mju_sign(diff);
+        if (diff > 1E-3)
+        {
+            if (m->opt.timestep < 0.02)
+            {
+                m->opt.timestep *= 2;
+            }
+        }
+        else
+        {
+            if (m->opt.timestep > time_step)
+            {
+                m->opt.timestep /= 2;
+            }
+        }
     }
 }
 
