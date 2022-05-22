@@ -143,6 +143,7 @@ void simulate()
             diff = ros_time - sim_time / rtf_des;
         } while (diff < -1E-6);
 
+        sim_time = d->time - MjSim::sim_start;
         last_ros_time.push_front(ros_time);
         last_sim_time.push_front(sim_time);
         if (i == num_step)
