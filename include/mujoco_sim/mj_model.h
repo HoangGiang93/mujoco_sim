@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "mujoco.h"
+#include <mujoco/mujoco.h>
 
 #include <boost/filesystem.hpp>
 #include <mutex>
