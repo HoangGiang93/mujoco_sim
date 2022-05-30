@@ -1,25 +1,33 @@
-# joint_inits:
+# robots: # List of robots (for multiple robots)
+#   - robot1
+#   - robot2
+
+# joint_inits: # Initialize the joint positions
 #   joint1: 0
 #   joint2: 1
 
-# joint_ignores:
+# joint_ignores: # Ignore to control the following joints
 #   - joint1
 #   - joint2
 
-add_odom_joints: false
+add_odom_joints: false # true for mobile robots, false for fixed-based robots
+# For multiple robots it can be specified as a list of key-value pair
+# add_odom_joints:
+#   robot1: true
+#   robot2: false
 
-pub_object_marker_array_rate: 0.0
+pub_object_marker_array_rate: 0.0 # The frequency to publish the marker array of simulating objects
 
-pub_object_tf_rate: 60.0
+pub_object_tf_rate: 60.0 # The frequency to publish the tf of simulating objects
 
-pub_object_state_array_rate: 60.0
+pub_object_state_array_rate: 60.0 # The frequency to publish the state array of simulating objects
 
-pub_world_joint_state_rate: 0.0
+pub_world_joint_state_rate: 0.0 # The frequency to publish the joint state of the world (if the world has constraints)
 
-pub_base_pose_rate: 60.0
+pub_base_pose_rate: 60.0 # The frequency to publish the base pose of the robot
 
-spawn_and_destroy_objects_rate: 600.0
+spawn_and_destroy_objects_rate: 600.0 # The frequency to spawn and destroy the objects
 
-spawn_object_count_per_cycle: 20
+spawn_object_count_per_cycle: 20 # The maximal number of objects to spawn per cycle
 
-root_frame_id: map
+root_frame_id: map # The frame id of the world (normally 'map' for fixed-based robots and 'odom' for mobile robots)
