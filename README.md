@@ -42,6 +42,7 @@ source ~/mujoco_ws/devel/setup.bash         # source new overlay
 ```
 
 ## Quick start
+This tutorial shows a quick view of some basic functionalities of this software. To learn more details please checkout this [Wiki](https://github.com/HoangGiang93/mujoco_sim/wiki)
 1) Import robot from **URDF**
 
 [![Watch the video]()](https://user-images.githubusercontent.com/64316740/159138084-c8cad813-6d55-4dab-874d-82870c793484.mp4)
