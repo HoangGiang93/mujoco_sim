@@ -74,7 +74,11 @@ void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
 
     MjSim::odom_joints[robot + "_lin_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
     MjSim::odom_joints[robot + "_lin_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
-    MjSim::odom_joints[robot + "_lin_odom_z_joint"] = msg.linear.z;
+    if (!MjSim::float_base)
+    {
+        MjSim::odom_joints[robot + "_lin_odom_z_joint"] = msg.linear.z;
+    }
+
     MjSim::odom_joints[robot + "_ang_odom_z_joint"] = msg.angular.z;
 
     if (pub_base_pose_rate > 1E-9)

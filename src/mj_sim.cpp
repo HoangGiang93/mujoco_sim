@@ -45,6 +45,8 @@ std::map<std::string, bool> MjSim::add_odom_joints;
 
 std::vector<std::string> MjSim::robots;
 
+bool MjSim::float_base;
+
 MjSim::~MjSim()
 {
 	mju_free(tau);
@@ -118,6 +120,11 @@ static void set_param()
 				MjSim::add_odom_joints[robot] = false;
 			}
 		}
+	}
+
+	if (!ros::param::get("~float_base", MjSim::float_base))
+	{
+		MjSim::float_base = true;
 	}
 }
 
@@ -352,23 +359,21 @@ static void init_tmp()
 
 							tinyxml2::XMLElement *odom_lin_x_joint_element = cache_model_xml_doc.NewElement("joint");
 							tinyxml2::XMLElement *odom_lin_y_joint_element = cache_model_xml_doc.NewElement("joint");
-							tinyxml2::XMLElement *odom_lin_z_joint_element = cache_model_xml_doc.NewElement("joint");
+
 							tinyxml2::XMLElement *odom_ang_z_joint_element = cache_model_xml_doc.NewElement("joint");
 
-							robot_body->InsertFirstChild(odom_lin_z_joint_element);
 							robot_body->InsertFirstChild(odom_ang_z_joint_element);
 							robot_body->InsertFirstChild(odom_lin_y_joint_element);
 							robot_body->InsertFirstChild(odom_lin_x_joint_element);
 
 							std::string lin_odom_x_joint_name = robot + "_lin_odom_x_joint";
 							std::string lin_odom_y_joint_name = robot + "_lin_odom_y_joint";
-							std::string lin_odom_z_joint_name = robot + "_lin_odom_z_joint";
+
 							std::string ang_odom_z_joint_name = robot + "_ang_odom_z_joint";
-							MjSim::joint_ignores.push_back(lin_odom_z_joint_name);
 
 							MjSim::odom_joints[lin_odom_x_joint_name] = 0.f;
 							MjSim::odom_joints[lin_odom_y_joint_name] = 0.f;
-							MjSim::odom_joints[lin_odom_z_joint_name] = 0.f;
+
 							MjSim::odom_joints[ang_odom_z_joint_name] = 0.f;
 
 							odom_lin_x_joint_element->SetAttribute("name", lin_odom_x_joint_name.c_str());
@@ -379,13 +384,21 @@ static void init_tmp()
 							odom_lin_y_joint_element->SetAttribute("type", "slide");
 							odom_lin_y_joint_element->SetAttribute("axis", "0 1 0");
 
-							odom_lin_z_joint_element->SetAttribute("name", lin_odom_z_joint_name.c_str());
-							odom_lin_z_joint_element->SetAttribute("type", "slide");
-							odom_lin_z_joint_element->SetAttribute("axis", "0 0 1");
-
 							odom_ang_z_joint_element->SetAttribute("name", ang_odom_z_joint_name.c_str());
 							odom_ang_z_joint_element->SetAttribute("type", "hinge");
 							odom_ang_z_joint_element->SetAttribute("axis", "0 0 1");
+
+							if (!MjSim::float_base)
+							{
+								tinyxml2::XMLElement *odom_lin_z_joint_element = cache_model_xml_doc.NewElement("joint");
+								robot_body->InsertFirstChild(odom_lin_z_joint_element);
+								std::string lin_odom_z_joint_name = robot + "_lin_odom_z_joint";
+								MjSim::joint_ignores.push_back(lin_odom_z_joint_name);
+								MjSim::odom_joints[lin_odom_z_joint_name] = 0.f;
+								odom_lin_z_joint_element->SetAttribute("name", lin_odom_z_joint_name.c_str());
+								odom_lin_z_joint_element->SetAttribute("type", "slide");
+								odom_lin_z_joint_element->SetAttribute("axis", "0 0 1");
+							}
 							break;
 						}
 					}
