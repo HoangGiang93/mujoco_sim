@@ -231,6 +231,7 @@ void MjRos::reset_robot()
                     d->qpos[joint_id] = 0.f;
                 }
                 d->qvel[joint_id] = 0.f;
+                d->qacc[joint_id] = 0.f;
             }
         }
     }
@@ -242,6 +243,7 @@ void MjRos::reset_robot()
         {
             d->qpos[joint_id] = 0.f;
             d->qvel[joint_id] = 0.f;
+            d->qacc[joint_id] = 0.f;
         }
     }
     mj_forward(m, d);
