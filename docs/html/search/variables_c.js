@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['robots_198',['robots',['../classMjSim.html#a6bf6dfb17e4a82bc9f23e7868c7112cc',1,'MjSim']]],
-  ['root_5fnames_199',['root_names',['../mj__ros_8cpp.html#ac003b7c686b87098702d6fa1135e2e7c',1,'mj_ros.cpp']]],
-  ['ros_5fstart_200',['ros_start',['../classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b',1,'MjRos']]],
-  ['rtf_5factual_201',['rtf_actual',['../mj__model_8cpp.html#a5fdbeed094ed6871ca4007d4b3d3a69b',1,'rtf_actual():&#160;mj_model.cpp'],['../mj__model_8h.html#a5fdbeed094ed6871ca4007d4b3d3a69b',1,'rtf_actual():&#160;mj_model.cpp']]],
-  ['rtf_5fdes_202',['rtf_des',['../mj__model_8cpp.html#a995e5d130dc2d63966290bbf7de6aff1',1,'rtf_des():&#160;mj_model.cpp'],['../mj__model_8h.html#a995e5d130dc2d63966290bbf7de6aff1',1,'rtf_des():&#160;mj_model.cpp']]]
+  ['sim_5fstart_201',['sim_start',['../classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd',1,'MjSim']]],
+  ['spawn_5fand_5fdestroy_5fobjects_5frate_202',['spawn_and_destroy_objects_rate',['../mj__ros_8cpp.html#ad23f3ddbb9579d65216b8b19e4165ec4',1,'mj_ros.cpp']]],
+  ['spawn_5fmtx_203',['spawn_mtx',['../mj__ros_8cpp.html#aaad11def1728748faf11899862490bb5',1,'mj_ros.cpp']]],
+  ['spawn_5fnr_204',['spawn_nr',['../mj__ros_8cpp.html#a05eb63fbf828446b090d9011f7d6aba8',1,'mj_ros.cpp']]],
+  ['spawn_5fobject_5fcount_5fper_5fcycle_205',['spawn_object_count_per_cycle',['../mj__ros_8cpp.html#a3af75d2408bec9cea07519b9892a8171',1,'mj_ros.cpp']]],
+  ['spawn_5fsuccess_206',['spawn_success',['../mj__ros_8cpp.html#a36e198c05e53a5324f02ded3a89d8ecb',1,'mj_ros.cpp']]]
 ];

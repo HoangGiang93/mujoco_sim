@@ -64,22 +64,36 @@ CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) 
 void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
 {
     const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_z_joint").c_str());
-    if (odom_z_joint_id == -1)
+    mjtNum odom_z_joint_pos = 0.f;
+    if (odom_z_joint_id != -1)
     {
-        ROS_ERROR("Joint %s not found", (robot + "_ang_odom_z_joint").c_str());
-        return;
+        odom_z_joint_pos = d->qpos[odom_z_joint_id];
     }
 
-    const mjtNum odom_z_joint_pos = d->qpos[odom_z_joint_id];
-
-    MjSim::odom_joints[robot + "_lin_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
-    MjSim::odom_joints[robot + "_lin_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
-    if (!MjSim::float_base)
+    if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"])
+    {
+        MjSim::odom_joints[robot + "_lin_odom_x_joint"] = msg.linear.x * mju_cos(odom_z_joint_pos) - msg.linear.y * mju_sin(odom_z_joint_pos);
+    }
+    if (MjSim::add_odom_joints[robot]["lin_odom_y_joint"])
+    {
+        MjSim::odom_joints[robot + "_lin_odom_y_joint"] = msg.linear.x * mju_sin(odom_z_joint_pos) + msg.linear.y * mju_cos(odom_z_joint_pos);
+    }
+    if (MjSim::add_odom_joints[robot]["lin_odom_z_joint"])
     {
         MjSim::odom_joints[robot + "_lin_odom_z_joint"] = msg.linear.z;
     }
-
-    MjSim::odom_joints[robot + "_ang_odom_z_joint"] = msg.angular.z;
+    if (MjSim::add_odom_joints[robot]["ang_odom_x_joint"])
+    {
+        // TODO: Implement
+    }
+    if (MjSim::add_odom_joints[robot]["ang_odom_y_joint"])
+    {
+        // TODO: Implement
+    }
+    if (MjSim::add_odom_joints[robot]["ang_odom_z_joint"])
+    {
+        MjSim::odom_joints[robot + "_ang_odom_z_joint"] = msg.angular.z;
+    }
 
     if (pub_base_pose_rate > 1E-9)
     {
@@ -172,7 +186,12 @@ void MjRos::init()
 
     for (size_t i = 0; i < MjSim::robots.size(); i++)
     {
-        if (MjSim::add_odom_joints[MjSim::robots[i]])
+        if (MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_x_joint"] ||
+            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_y_joint"] ||
+            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_z_joint"] ||
+            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_x_joint"] ||
+            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_y_joint"] ||
+            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_z_joint"])
         {
             cmd_vel_callbacks.push_back(new CmdVelCallback(i, MjSim::robots[i]));
 
@@ -972,7 +991,12 @@ void MjRos::publish_base_pose()
 
                 br.sendTransform(transform);
 
-                if (MjSim::add_odom_joints[MjSim::robots[i]])
+                if (MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_x_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_y_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_z_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_x_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_y_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_z_joint"])
                 {
                     set_base_pose(body_id, i);
                     base_pose_pubs[i].publish(base_poses[i]);

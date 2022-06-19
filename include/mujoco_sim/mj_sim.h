@@ -92,9 +92,7 @@ public:
 
     static mjtNum *tau;
 
-    static std::map<std::string, bool> add_odom_joints;
+    static std::map<std::string, std::map<std::string, bool>> add_odom_joints;
 
     static std::vector<std::string> robots;
-
-    static bool float_base;
 };

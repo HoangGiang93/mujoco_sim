@@ -11,10 +11,39 @@
 #   - joint2
 
 add_odom_joints: false # true for mobile robots, false for fixed-based robots
-# For multiple robots it can be specified as a list of key-value pair
+# add_odom_joints can be specified by different ways:
+# 1. by bool: (true mean set default odom joints (lin_x, lin_y, ang_z))
+# 1.1.
+# add_odom_joints: true (set true for all robots)
+# 1.2.
 # add_odom_joints:
 #   robot1: true
 #   robot2: false
+# 2. by dof:
+# 2.1.
+# add_odom_joints: (set for all robots
+#   lin_odom_x_joint: true
+#   lin_odom_y_joint: true
+#   lin_odom_z_joint: true
+#   ang_odom_x_joint: false
+#   ang_odom_y_joint: false
+#   ang_odom_z_joint: true
+# 2.2.
+# add_odom_joints:
+#   robot1: true
+#     lin_odom_x_joint: true
+#     lin_odom_y_joint: true
+#     lin_odom_z_joint: true
+#     ang_odom_x_joint: false
+#     ang_odom_y_joint: false
+#     ang_odom_z_joint: true
+#   robot2: false
+#     lin_odom_x_joint: true
+#     lin_odom_y_joint: false
+#     lin_odom_z_joint: false
+#     ang_odom_x_joint: false
+#     ang_odom_y_joint: false
+#     ang_odom_z_joint: true
 
 max_time_step: 0.005 # Maximal time step (bigger value <=> faster but more unstable)
 
