@@ -16,6 +16,8 @@ add_odom_joints: false # true for mobile robots, false for fixed-based robots
 #   robot1: true
 #   robot2: false
 
+max_time_step: 0.005 # Maximal time step (bigger value <=> faster but more unstable)
+
 pub_object_marker_array_rate: 0.0 # The frequency to publish the marker array of simulating objects
 
 pub_object_tf_rate: 60.0 # The frequency to publish the tf of simulating objects

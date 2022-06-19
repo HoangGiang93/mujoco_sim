@@ -80,7 +80,7 @@ static void set_param()
 	}
 	else
 	{
-		MjSim::max_time_step = 0.02;
+		MjSim::max_time_step = 0.005;
 	}
 
 	std::string world_path_string;

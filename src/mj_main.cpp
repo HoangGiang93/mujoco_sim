@@ -162,7 +162,7 @@ void simulate()
         // Change timestep when out of sync
         if (diff > 1E-3)
         {
-            if (m->opt.timestep < 0.02)
+            if (m->opt.timestep < MjSim::max_time_step)
             {
                 m->opt.timestep *= 2;
             }
