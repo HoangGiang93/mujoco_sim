@@ -48,16 +48,10 @@ public:
     void controller();
 
     /**
-     * @brief Set the mimic joint positions
-     *
-     */
-    void set_mimic_joints();
-
-    /**
      * @brief Set the odom joint velocities
      *
      */
-    void set_odom_joints();
+    void set_odom_vels();
 
 public:
     /**
@@ -82,7 +76,7 @@ public:
 
     static std::vector<std::string> joint_ignores;
 
-    static std::map<std::string, mjtNum> odom_joints;
+    static std::map<std::string, mjtNum> odom_vels;
 
     static std::vector<std::string> link_names;
 

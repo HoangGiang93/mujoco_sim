@@ -31,7 +31,7 @@ std::map<std::string, std::vector<std::string>> MjSim::joint_names;
 
 std::vector<std::string> MjSim::joint_ignores;
 
-std::map<std::string, mjtNum> MjSim::odom_joints;
+std::map<std::string, mjtNum> MjSim::odom_vels;
 
 std::vector<std::string> MjSim::link_names;
 
@@ -177,7 +177,7 @@ static void get_joint_names(tinyxml2::XMLElement *body_element)
 		if (strcmp(joint_element->Value(), "joint") == 0)
 		{
 			std::string joint_name = joint_element->Attribute("name");
-			if (MjSim::odom_joints.count(joint_name))
+			if (MjSim::odom_vels.count(joint_name))
 			{
 				continue;
 			}
@@ -206,7 +206,7 @@ static void get_body_element(tinyxml2::XMLElement *parent_body_element)
 }
 
 /**
- * @brief Set all joint names to MjSim::joint_names and MjSim::odom_joints
+ * @brief Set all joint names to MjSim::joint_names and MjSim::odom_vels
  *
  */
 static void set_joint_names()
@@ -385,7 +385,7 @@ static void init_tmp()
 					{
 						if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
 						{
-							if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"])
+							if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] || (MjSim::add_odom_joints[robot]["lin_odom_y_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]) || (MjSim::add_odom_joints[robot]["lin_odom_y_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]))
 							{
 								tinyxml2::XMLElement *odom_lin_x_joint_element = cache_model_xml_doc.NewElement("joint");
 								robot_body->InsertEndChild(odom_lin_x_joint_element);
@@ -394,7 +394,7 @@ static void init_tmp()
 								odom_lin_x_joint_element->SetAttribute("type", "slide");
 								odom_lin_x_joint_element->SetAttribute("axis", "1 0 0");
 							}
-							if (MjSim::add_odom_joints[robot]["lin_odom_y_joint"])
+							if (MjSim::add_odom_joints[robot]["lin_odom_y_joint"] || (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]) || (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]))
 							{
 								tinyxml2::XMLElement *odom_lin_y_joint_element = cache_model_xml_doc.NewElement("joint");
 								robot_body->InsertEndChild(odom_lin_y_joint_element);
@@ -403,7 +403,7 @@ static void init_tmp()
 								odom_lin_y_joint_element->SetAttribute("type", "slide");
 								odom_lin_y_joint_element->SetAttribute("axis", "0 1 0");
 							}
-							if (MjSim::add_odom_joints[robot]["lin_odom_z_joint"])
+							if (MjSim::add_odom_joints[robot]["lin_odom_z_joint"] || (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] && MjSim::add_odom_joints[robot]["ang_odom_y_joint"]) || (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] && MjSim::add_odom_joints[robot]["ang_odom_y_joint"]))
 							{
 								tinyxml2::XMLElement *odom_lin_z_joint_element = cache_model_xml_doc.NewElement("joint");
 								robot_body->InsertEndChild(odom_lin_z_joint_element);
@@ -758,15 +758,11 @@ void MjSim::controller()
 	mju_zero(u, m->nv);
 }
 
-void MjSim::set_odom_joints()
+void MjSim::set_odom_vels()
 {
-	for (const std::pair<std::string, mjtNum> &odom_joint : odom_joints)
+	for (const std::pair<std::string, mjtNum> &odom_vel : odom_vels)
 	{
-		const std::string joint_name = odom_joint.first;
-		if (joint_name.find("_lin_odom_z_joint") != std::string::npos)
-		{
-			continue;
-		}
+		const std::string joint_name = odom_vel.first;
 
 		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
 		if (joint_id == -1)
@@ -775,6 +771,6 @@ void MjSim::set_odom_joints()
 			continue;
 		}
 
-		d->qvel[joint_id] = odom_joint.second;
+		d->qvel[joint_id] = odom_vel.second;
 	}
 }

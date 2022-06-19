@@ -86,12 +86,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8873b8410c75a0d286298054ee06c328"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a8873b8410c75a0d286298054ee06c328">controller</a> ()</td></tr>
 <tr class="memdesc:a8873b8410c75a0d286298054ee06c328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement the controller.  <a href="classMjSim.html#a8873b8410c75a0d286298054ee06c328">More...</a><br /></td></tr>
 <tr class="separator:a8873b8410c75a0d286298054ee06c328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8459793769505270695d7b7fd5f19385"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a8459793769505270695d7b7fd5f19385">set_mimic_joints</a> ()</td></tr>
-<tr class="memdesc:a8459793769505270695d7b7fd5f19385"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the mimic joint positions.  <a href="classMjSim.html#a8459793769505270695d7b7fd5f19385">More...</a><br /></td></tr>
-<tr class="separator:a8459793769505270695d7b7fd5f19385"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad97cb994f9224e309b5da4c088f65a44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#ad97cb994f9224e309b5da4c088f65a44">set_odom_joints</a> ()</td></tr>
-<tr class="memdesc:ad97cb994f9224e309b5da4c088f65a44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the odom joint velocities.  <a href="classMjSim.html#ad97cb994f9224e309b5da4c088f65a44">More...</a><br /></td></tr>
-<tr class="separator:ad97cb994f9224e309b5da4c088f65a44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6097e3b550ebc38140275ecea5f4598a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a6097e3b550ebc38140275ecea5f4598a">set_odom_vels</a> ()</td></tr>
+<tr class="memdesc:a6097e3b550ebc38140275ecea5f4598a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the odom joint velocities.  <a href="classMjSim.html#a6097e3b550ebc38140275ecea5f4598a">More...</a><br /></td></tr>
+<tr class="separator:a6097e3b550ebc38140275ecea5f4598a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -110,8 +107,8 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:aa4379dd751034d7ba76d7155923f3eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a4ac5e8a3e7450d1f8e33b173365451d3">joint_ignores</a></td></tr>
 <tr class="separator:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a8ee0dfa3ec0cb2bf3e356c9e2077b8"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, mjtNum &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a2a8ee0dfa3ec0cb2bf3e356c9e2077b8">odom_joints</a></td></tr>
-<tr class="separator:a2a8ee0dfa3ec0cb2bf3e356c9e2077b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dfaec832b709cfea62ec80e5fd94bad"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, mjtNum &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a0dfaec832b709cfea62ec80e5fd94bad">odom_vels</a></td></tr>
+<tr class="separator:a0dfaec832b709cfea62ec80e5fd94bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a293ecea5493f2b4e78ac54e24e48b5c7"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a293ecea5493f2b4e78ac54e24e48b5c7">link_names</a></td></tr>
 <tr class="separator:a293ecea5493f2b4e78ac54e24e48b5c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memItemLeft" align="right" valign="top">static mjtNum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd">sim_start</a></td></tr>
@@ -271,33 +268,14 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="a8459793769505270695d7b7fd5f19385"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8459793769505270695d7b7fd5f19385">&#9670;&nbsp;</a></span>set_mimic_joints()</h2>
+<a id="a6097e3b550ebc38140275ecea5f4598a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6097e3b550ebc38140275ecea5f4598a">&#9670;&nbsp;</a></span>set_odom_vels()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void MjSim::set_mimic_joints </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the mimic joint positions. </p>
-
-</div>
-</div>
-<a id="ad97cb994f9224e309b5da4c088f65a44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad97cb994f9224e309b5da4c088f65a44">&#9670;&nbsp;</a></span>set_odom_joints()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void MjSim::set_odom_joints </td>
+          <td class="memname">void MjSim::set_odom_vels </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -420,8 +398,8 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="a2a8ee0dfa3ec0cb2bf3e356c9e2077b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a8ee0dfa3ec0cb2bf3e356c9e2077b8">&#9670;&nbsp;</a></span>odom_joints</h2>
+<a id="a0dfaec832b709cfea62ec80e5fd94bad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0dfaec832b709cfea62ec80e5fd94bad">&#9670;&nbsp;</a></span>odom_vels</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -430,7 +408,7 @@ false Fail to remove </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt; std::string, mjtNum &gt; MjSim::odom_joints</td>
+          <td class="memname">std::map&lt; std::string, mjtNum &gt; MjSim::odom_vels</td>
         </tr>
       </table>
   </td>
