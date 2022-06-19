@@ -129,7 +129,7 @@ void simulate()
         int num_step = mju_ceil(1 / m->opt.timestep);
         static std::deque<double> last_sim_time;
         static std::deque<double> last_ros_time;
-        double diff;
+        double error_time;
         double ros_time;
         double sim_time = d->time - MjSim::sim_start;
         if (i == 0)
@@ -140,8 +140,8 @@ void simulate()
         do
         {
             ros_time = (ros::Time::now() - MjRos::ros_start).toSec();
-            diff = ros_time - sim_time / rtf_des;
-        } while (diff < -1E-6);
+            error_time = ros_time - sim_time / rtf_des;
+        } while (error_time < -1E-6 && i != 0);
 
         sim_time = d->time - MjSim::sim_start;
         last_ros_time.push_front(ros_time);
@@ -160,7 +160,7 @@ void simulate()
         }
 
         // Change timestep when out of sync
-        if (diff > 1E-3)
+        if (error_time > 1E-3)
         {
             if (m->opt.timestep < MjSim::max_time_step)
             {

@@ -21,7 +21,7 @@ add_odom_joints: false # true for mobile robots, false for fixed-based robots
 #   robot2: false
 # 2. by dof:
 # 2.1.
-# add_odom_joints: (set for all robots
+# add_odom_joints: (set for all robots)
 #   lin_odom_x_joint: true
 #   lin_odom_y_joint: true
 #   lin_odom_z_joint: true
