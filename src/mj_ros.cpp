@@ -59,28 +59,34 @@ bool destroy_success;
 
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
+    MjSim::odom_vels[robot + "_lin_odom_x_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_y_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_z_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_x_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_y_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_z_joint"] = 0.0;
 }
 
 void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
 {
-    const int odom_x_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_x_joint").c_str());
-    const int odom_y_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_y_joint").c_str());
-    const int odom_z_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_z_joint").c_str());
-    mjtNum odom_x_joint_pos = odom_x_joint_id != -1 ? d->qpos[odom_x_joint_id] : 0.f;
-    mjtNum odom_y_joint_pos = odom_y_joint_id != -1 ? d->qpos[odom_y_joint_id] : 0.f;
-    mjtNum odom_z_joint_pos = odom_z_joint_id != -1 ? d->qpos[odom_z_joint_id] : 0.f;
+    MjSim::odom_vels[robot + "_lin_odom_x_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_y_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_z_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_x_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_y_joint"] = 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_z_joint"] = 0.0;
 
     if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"])
     {
-        MjSim::odom_vels[robot + "_lin_odom_x_joint"] = msg.linear.x * mju_cos(odom_y_joint_pos) * mju_cos(odom_z_joint_pos) + msg.linear.y * (mju_sin(odom_x_joint_pos) * mju_sin(odom_y_joint_pos) * mju_cos(odom_z_joint_pos) - mju_cos(odom_x_joint_pos) * mju_sin(odom_z_joint_pos)) + msg.linear.z * (mju_cos(odom_x_joint_pos) * mju_sin(odom_y_joint_pos) * mju_cos(odom_z_joint_pos) + mju_sin(odom_x_joint_pos) * mju_sin(odom_z_joint_pos));
+        MjSim::odom_vels[robot + "_lin_odom_x_joint"] = msg.linear.x;
     }
     if (MjSim::add_odom_joints[robot]["lin_odom_y_joint"])
     {
-        MjSim::odom_vels[robot + "_lin_odom_y_joint"] = msg.linear.x * mju_cos(odom_y_joint_pos) * mju_sin(odom_z_joint_pos) + msg.linear.y * (mju_sin(odom_x_joint_pos) * mju_sin(odom_y_joint_pos) * mju_sin(odom_z_joint_pos) + mju_cos(odom_x_joint_pos) * mju_cos(odom_z_joint_pos)) + msg.linear.z * (mju_cos(odom_x_joint_pos) * mju_sin(odom_y_joint_pos) * mju_sin(odom_z_joint_pos) - mju_sin(odom_x_joint_pos) * mju_cos(odom_z_joint_pos));
+        MjSim::odom_vels[robot + "_lin_odom_y_joint"] = msg.linear.y;
     }
     if (MjSim::add_odom_joints[robot]["lin_odom_z_joint"])
     {
-        MjSim::odom_vels[robot + "_lin_odom_z_joint"] = -msg.linear.x * mju_sin(odom_y_joint_pos) + msg.linear.y * mju_sin(odom_x_joint_pos) * mju_cos(odom_y_joint_pos) + msg.linear.z * mju_cos(odom_x_joint_pos) * mju_cos(odom_y_joint_pos);
+        MjSim::odom_vels[robot + "_lin_odom_z_joint"] = msg.linear.z;
     }
     if (MjSim::add_odom_joints[robot]["ang_odom_x_joint"])
     {
