@@ -161,12 +161,12 @@ void MjRos::init()
 
     for (size_t i = 0; i < MjSim::robots.size(); i++)
     {
-        if (MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_x_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_y_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_z_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_x_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_y_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_z_joint"])
+        if (MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_x_joint") ||
+            MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_y_joint") ||
+            MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_z_joint") ||
+            MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_x_joint") ||
+            MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_y_joint") ||
+            MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_z_joint"))
         {
             cmd_vel_callbacks.push_back(new CmdVelCallback(i, MjSim::robots[i]));
 
