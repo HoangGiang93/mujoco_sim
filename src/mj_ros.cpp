@@ -972,12 +972,12 @@ void MjRos::publish_base_pose()
 
                 br.sendTransform(transform);
 
-                if (MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_x_joint") ||
-                    MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_y_joint") ||
-                    MjSim::add_odom_joints[MjSim::robots[i]].count("lin_odom_z_joint") ||
-                    MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_x_joint") ||
-                    MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_y_joint") ||
-                    MjSim::add_odom_joints[MjSim::robots[i]].count("ang_odom_z_joint"))
+                if (MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_x_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_y_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_z_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_x_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_y_joint"] ||
+                    MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_z_joint"])
                 {
                     set_base_pose(body_id, i);
                     base_pose_pubs[i].publish(base_poses[i]);
