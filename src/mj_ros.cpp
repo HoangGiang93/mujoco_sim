@@ -228,12 +228,6 @@ void MjRos::reset_robot()
                 d->qacc[joint_id] = 0.f;
             }
         }
-        MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = 0.f;
-        MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = 0.f;
-        MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = 0.f;
-        MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = 0.f;
-        MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = 0.f;
-        MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = 0.f;
     }
     for (std::pair<const std::string, mjtNum> &odom_joint : MjSim::odom_vels)
     {
