@@ -22,6 +22,9 @@
 
 #include <algorithm>
 #include <condition_variable>
+#include <controller_manager_msgs/ControllerState.h>
+#include <controller_manager_msgs/ListControllers.h>
+#include <controller_manager_msgs/SwitchController.h>
 #include <ros/package.h>
 #include <tinyxml2.h>
 
@@ -245,6 +248,37 @@ void MjRos::reset_robot()
 
 bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
 {
+    ros::ServiceClient list_controllers_client = n.serviceClient<controller_manager_msgs::ListControllers>("controller_manager/list_controllers");
+    controller_manager_msgs::ListControllers list_controllers_srv;
+    ros::ServiceClient switch_controller_client = n.serviceClient<controller_manager_msgs::SwitchController>("controller_manager/switch_controller");
+    controller_manager_msgs::SwitchController switch_controller_srv;
+    switch_controller_srv.request.strictness = controller_manager_msgs::SwitchControllerRequest::STRICT;
+    switch_controller_srv.request.start_asap = true;
+    std::vector<std::string> controller_names;
+    bool should_switch_controller = false;
+    if (list_controllers_client.call(list_controllers_srv))
+    {
+        should_switch_controller = true;
+        
+        for (const controller_manager_msgs::ControllerState &controller_state : list_controllers_srv.response.controller)
+        {
+            if (controller_state.state.compare("running") == 0 && controller_state.type.find("effort_controllers") != std::string::npos)
+            {
+                controller_names.push_back(controller_state.name);
+                ROS_INFO("Reset %s", controller_state.name.c_str());
+            }
+        }
+    }
+    if (should_switch_controller)
+    {
+        switch_controller_srv.request.start_controllers.clear();
+        switch_controller_srv.request.stop_controllers = controller_names;
+        if (!switch_controller_client.call(switch_controller_srv))
+        {
+            ROS_WARN("Failed to call switch_controller");
+        }
+    }
+    
     mtx.lock();
     reset_robot();
     mtx.unlock();
@@ -268,7 +302,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
             }
         }
     }
-    if (error_sum < MjSim::joint_names.size() * 1E-2)
+    if (error_sum < MjSim::joint_names.size() * 0.1)
     {
         res.success = true;
         res.message = "Reset successfully! (error_sum = " + std::to_string(error_sum) + ")";
@@ -277,6 +311,16 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     {
         res.success = false;
         res.message = "Failed to reset (error_sum = " + std::to_string(error_sum) + "). Did you stop the controlllers?";
+    }
+
+    if (should_switch_controller)
+    {
+        switch_controller_srv.request.start_controllers = controller_names;
+        switch_controller_srv.request.stop_controllers.clear();
+        if (!switch_controller_client.call(switch_controller_srv))
+        {
+            ROS_WARN("Failed to call switch_controller");
+        }
     }
     return true;
 }
