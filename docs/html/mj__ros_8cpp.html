@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mj_ros.cpp File Reference</title>
+<title>MujocoSim: /home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/src/mj_ros.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -75,41 +75,47 @@ $(function() {
 <div class="textblock"><code>#include &quot;<a class="el" href="mj__ros_8h_source.html">mj_ros.h</a>&quot;</code><br />
 <code>#include &lt;algorithm&gt;</code><br />
 <code>#include &lt;condition_variable&gt;</code><br />
+<code>#include &lt;controller_manager_msgs/ControllerState.h&gt;</code><br />
+<code>#include &lt;controller_manager_msgs/ListControllers.h&gt;</code><br />
+<code>#include &lt;controller_manager_msgs/SwitchController.h&gt;</code><br />
 <code>#include &lt;ros/package.h&gt;</code><br />
 <code>#include &lt;tinyxml2.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mj_ros.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="mj__ros_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" alt=""/></div>
-<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp">
-<area shape="rect" title=" " alt="" coords="2246,5,2425,61"/>
-<area shape="rect" href="mj__ros_8h.html" title=" " alt="" coords="2051,109,2129,136"/>
-<area shape="rect" title=" " alt="" coords="2154,109,2239,136"/>
-<area shape="rect" title=" " alt="" coords="2264,109,2407,136"/>
-<area shape="rect" title=" " alt="" coords="2431,109,2544,136"/>
-<area shape="rect" title=" " alt="" coords="2568,109,2660,136"/>
-<area shape="rect" href="mj__sim_8h.html" title=" " alt="" coords="301,191,383,218"/>
-<area shape="rect" title=" " alt="" coords="407,191,629,218"/>
-<area shape="rect" title=" " alt="" coords="653,191,847,218"/>
-<area shape="rect" title=" " alt="" coords="872,191,1076,218"/>
-<area shape="rect" title=" " alt="" coords="1101,191,1338,218"/>
-<area shape="rect" title=" " alt="" coords="1362,191,1573,218"/>
-<area shape="rect" title=" " alt="" coords="1597,191,1810,218"/>
-<area shape="rect" title=" " alt="" coords="1834,191,2101,218"/>
-<area shape="rect" title=" " alt="" coords="2125,191,2301,218"/>
-<area shape="rect" title=" " alt="" coords="2325,191,2492,218"/>
-<area shape="rect" title=" " alt="" coords="2517,191,2703,218"/>
-<area shape="rect" title=" " alt="" coords="2728,191,2865,218"/>
-<area shape="rect" title=" " alt="" coords="2890,184,3069,225"/>
-<area shape="rect" title=" " alt="" coords="3093,191,3324,218"/>
-<area shape="rect" title=" " alt="" coords="3348,191,3453,218"/>
-<area shape="rect" title=" " alt="" coords="3478,184,3625,225"/>
-<area shape="rect" href="mj__model_8h.html" title=" " alt="" coords="194,273,293,300"/>
-<area shape="rect" title=" " alt="" coords="317,273,367,300"/>
-<area shape="rect" title=" " alt="" coords="392,273,455,300"/>
-<area shape="rect" title=" " alt="" coords="5,348,140,375"/>
-<area shape="rect" title=" " alt="" coords="164,348,323,375"/>
-<area shape="rect" title=" " alt="" coords="347,348,411,375"/>
+<div class="center"><img src="mj__ros_8cpp__incl.png" border="0" usemap="#_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" alt=""/></div>
+<map name="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" id="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp">
+<area shape="rect" title=" " alt="" coords="2507,5,2734,61"/>
+<area shape="rect" href="mj__ros_8h.html" title=" " alt="" coords="2051,117,2129,143"/>
+<area shape="rect" title=" " alt="" coords="2154,117,2239,143"/>
+<area shape="rect" title=" " alt="" coords="2264,117,2407,143"/>
+<area shape="rect" title=" " alt="" coords="2431,109,2610,151"/>
+<area shape="rect" title=" " alt="" coords="2635,109,2809,151"/>
+<area shape="rect" title=" " alt="" coords="2834,109,3021,151"/>
+<area shape="rect" title=" " alt="" coords="3045,117,3159,143"/>
+<area shape="rect" title=" " alt="" coords="3183,117,3275,143"/>
+<area shape="rect" href="mj__sim_8h.html" title=" " alt="" coords="301,206,383,233"/>
+<area shape="rect" title=" " alt="" coords="407,206,629,233"/>
+<area shape="rect" title=" " alt="" coords="653,206,847,233"/>
+<area shape="rect" title=" " alt="" coords="872,206,1076,233"/>
+<area shape="rect" title=" " alt="" coords="1101,206,1338,233"/>
+<area shape="rect" title=" " alt="" coords="1362,206,1573,233"/>
+<area shape="rect" title=" " alt="" coords="1597,206,1810,233"/>
+<area shape="rect" title=" " alt="" coords="1834,206,2101,233"/>
+<area shape="rect" title=" " alt="" coords="2125,206,2301,233"/>
+<area shape="rect" title=" " alt="" coords="2325,206,2492,233"/>
+<area shape="rect" title=" " alt="" coords="2517,206,2703,233"/>
+<area shape="rect" title=" " alt="" coords="2728,206,2865,233"/>
+<area shape="rect" title=" " alt="" coords="2890,199,3069,240"/>
+<area shape="rect" title=" " alt="" coords="3093,206,3324,233"/>
+<area shape="rect" title=" " alt="" coords="3348,206,3453,233"/>
+<area shape="rect" title=" " alt="" coords="3478,199,3625,240"/>
+<area shape="rect" href="mj__model_8h.html" title=" " alt="" coords="194,288,293,315"/>
+<area shape="rect" title=" " alt="" coords="317,288,367,315"/>
+<area shape="rect" title=" " alt="" coords="392,288,455,315"/>
+<area shape="rect" title=" " alt="" coords="5,363,140,389"/>
+<area shape="rect" title=" " alt="" coords="164,363,323,389"/>
+<area shape="rect" title=" " alt="" coords="347,363,411,389"/>
 </map>
 </div>
 </div><table class="memberdecls">
