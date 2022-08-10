@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['load_5ftmp_5fmodel_137',['load_tmp_model',['../mj__sim_8cpp.html#a8b30354afaf6ff725bab3cee3839f33b',1,'load_tmp_model(bool reset):&#160;mj_sim.cpp'],['../mj__sim_8h.html#af8301d50bb5cd4ff96f7d72d92be4a33',1,'load_tmp_model(bool reset=true):&#160;mj_sim.cpp']]],
-  ['load_5furdf_138',['load_urdf',['../mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f',1,'mujoco_compile.cpp']]]
+  ['init_136',['init',['../classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b',1,'MjRos::init()'],['../classMjSim.html#a0d37111518dcde137b77be9a451e856d',1,'MjSim::init()'],['../classMjVisual.html#ab3172efb82db3cf1bc384e1d100b8cd3',1,'MjVisual::init()']]],
+  ['init_5furdf_137',['init_urdf',['../mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded',1,'mj_ros.h']]],
+  ['is_5fwindow_5fclosed_138',['is_window_closed',['../classMjVisual.html#a25fc0b8a62c11ef384bd30fcab1f5b19',1,'MjVisual']]]
 ];

@@ -1,10 +1,5 @@
 var searchData=
 [
-  ['main_139',['main',['../mj__main_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main(int argc, char **argv):&#160;mj_main.cpp'],['../mujoco__compile_8cpp.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main(int argc, char **argv):&#160;mujoco_compile.cpp']]],
-  ['mjhwinterface_140',['MjHWInterface',['../classMjHWInterface.html#ab1a6f225173cbe8eaada609fc32e6307',1,'MjHWInterface']]],
-  ['mjros_141',['MjRos',['../classMjRos.html#a07f40261e2c2734408dba24e52e6a397',1,'MjRos']]],
-  ['mjsim_142',['MjSim',['../classMjSim.html#a953e30d5df24bfe3bedfcefe81b31546',1,'MjSim']]],
-  ['mjvisual_143',['MjVisual',['../classMjVisual.html#a137f4c0b8b18d8fb85bcffe142adf3b5',1,'MjVisual']]],
-  ['mouse_5fbutton_144',['mouse_button',['../classMjVisual.html#a9f34777dd635466b7e4ddfb0ec5eeb7e',1,'MjVisual']]],
-  ['mouse_5fmove_145',['mouse_move',['../classMjVisual.html#abade44c0dc0a16a4993320314b73fbde',1,'MjVisual']]]
+  ['load_5ftmp_5fmodel_139',['load_tmp_model',['../mj__sim_8cpp.html#a8b30354afaf6ff725bab3cee3839f33b',1,'load_tmp_model(bool reset):&#160;mj_sim.cpp'],['../mj__sim_8h.html#af8301d50bb5cd4ff96f7d72d92be4a33',1,'load_tmp_model(bool reset=true):&#160;mj_sim.cpp']]],
+  ['load_5furdf_140',['load_urdf',['../mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f',1,'mujoco_compile.cpp']]]
 ];

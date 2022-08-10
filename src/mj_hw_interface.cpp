@@ -79,3 +79,26 @@ void MjHWInterface::write()
         }
     }
 }
+
+void MjHWInterface::doSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
+                             const std::list<hardware_interface::ControllerInfo> &stop_list)
+{
+    for (const hardware_interface::ControllerInfo &stop_controller : stop_list)
+    {
+        for (const hardware_interface::InterfaceResources &interface_resource : stop_controller.claimed_resources)
+        {
+            for (const std::string &joint_name : interface_resource.resources)
+            {
+                if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_name) == MjSim::joint_ignores.end())
+                {
+
+                    std::vector<std::string>::iterator it = std::find(joint_names.begin(), joint_names.end(), joint_name);
+                    if (it != joint_names.end())
+                    {
+                        joint_efforts_command[it - joint_names.begin()] = 0.;
+                    }
+                }
+            }
+        }
+    }
+}

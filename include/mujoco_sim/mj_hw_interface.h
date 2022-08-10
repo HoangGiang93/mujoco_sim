@@ -39,6 +39,9 @@ public:
 
     void write();
 
+    void doSwitch(const std::list<hardware_interface::ControllerInfo> &start_list,
+                  const std::list<hardware_interface::ControllerInfo> &stop_list);
+
 private:
     ros::NodeHandle n;
 
