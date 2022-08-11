@@ -93,5 +93,10 @@ catkin build
 source ~/mujoco_ws/devel/setup.bash
 roslaunch franka_mujoco dual_panda_arm_demo.launch
 ```
+
+## Troubleshooting
+1) `ERROR: gladLoadGL error`
+- Solution: `sudo apt install nvidia-driver-515`
+
 ## Software architecture
 ![Picture](docs/html/mj__main_8cpp__incl.png)
