@@ -1,10 +1,10 @@
 all: mujoco
 
-MUJOCO = mujoco-2.2.0-linux-x86_64.tar.gz
+MUJOCO = mujoco-2.2.2-linux-x86_64.tar.gz
 TARBALL = build/$(MUJOCO)
-TARBALL_URL = https://github.com/deepmind/mujoco/releases/download/2.2.0/$(MUJOCO)
-SOURCE_DIR = build/mujoco-2.2.0
-SHA256SUM = b1d1b0f56f34808159d0384c750f60235eb9f5682e4d2f61d117c1be9ade2959
+TARBALL_URL = https://github.com/deepmind/mujoco/releases/download/2.2.2/$(MUJOCO)
+SOURCE_DIR = build/mujoco-2.2.2
+SHA256SUM = c887a4c315201ce47cf654e0115a55c29648567450d44cd8afe8e3a09d34ea1e
 SHA256SUM_ACTUAL = sha256sum $(TARBALL) | cut -d ' ' -f 1
 UNPACK_CMD = tar xzf
 include $(shell rospack find mk)/download_unpack_build.mk
