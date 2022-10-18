@@ -219,16 +219,18 @@ void MjRos::reset_robot()
             const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
             if (joint_id != -1)
             {
+                const int qpos_id = m->jnt_qposadr[joint_id];
                 if (joint_inits.count(joint_name) != 0)
                 {
-                    d->qpos[joint_id] = joint_inits[joint_name];
+                    d->qpos[qpos_id] = joint_inits[joint_name];
                 }
                 else
                 {
-                    d->qpos[joint_id] = 0.f;
+                    d->qpos[qpos_id] = 0.f;
                 }
-                d->qvel[joint_id] = 0.f;
-                d->qacc[joint_id] = 0.f;
+                const int dof_id = m->jnt_dofadr[joint_id];
+                d->qvel[dof_id] = 0.f;
+                d->qacc[dof_id] = 0.f;
             }
         }
     }
@@ -238,9 +240,11 @@ void MjRos::reset_robot()
         const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, odom_joint.first.c_str());
         if (joint_id != -1)
         {
-            d->qpos[joint_id] = 0.f;
-            d->qvel[joint_id] = 0.f;
-            d->qacc[joint_id] = 0.f;
+            const int qpos_id = m->jnt_qposadr[joint_id];
+            const int dof_id = m->jnt_dofadr[joint_id];
+            d->qpos[qpos_id] = 0.f;
+            d->qvel[dof_id] = 0.f;
+            d->qacc[dof_id] = 0.f;
         }
     }
     mj_forward(m, d);
@@ -259,7 +263,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     if (list_controllers_client.call(list_controllers_srv))
     {
         should_switch_controller = true;
-        
+
         for (const controller_manager_msgs::ControllerState &controller_state : list_controllers_srv.response.controller)
         {
             if (controller_state.state.compare("running") == 0 && controller_state.type.find("effort_controllers") != std::string::npos)
@@ -278,7 +282,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
             ROS_WARN("Failed to call switch_controller");
         }
     }
-    
+
     mtx.lock();
     reset_robot();
     mtx.unlock();
@@ -291,13 +295,14 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
             const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
             if (joint_id != -1)
             {
+                const int qpos_id = m->jnt_qposadr[joint_id];
                 if (joint_inits.count(joint_name) != 0)
                 {
-                    error_sum += mju_abs(d->qpos[joint_id] - joint_inits[joint_name]);
+                    error_sum += mju_abs(d->qpos[qpos_id] - joint_inits[joint_name]);
                 }
                 else
                 {
-                    error_sum += mju_abs(d->qpos[joint_id]);
+                    error_sum += mju_abs(d->qpos[qpos_id]);
                 }
             }
         }
@@ -1162,10 +1167,10 @@ void MjRos::add_world_joint_states(const int body_id)
     {
         const int joint_id = m->body_jntadr[body_id];
         const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
-        const int qpos_adr = m->jnt_qposadr[joint_id];
-        const int qvel_adr = m->jnt_dofadr[joint_id];
+        const int qpos_id = m->jnt_qposadr[joint_id];
+        const int dof_id = m->jnt_dofadr[joint_id];
         world_joint_states.name.push_back(joint_name);
-        world_joint_states.position.push_back(d->qpos[qpos_adr]);
-        world_joint_states.velocity.push_back(d->qvel[qvel_adr]);
+        world_joint_states.position.push_back(d->qpos[qpos_id]);
+        world_joint_states.velocity.push_back(d->qvel[dof_id]);
     }
 }
