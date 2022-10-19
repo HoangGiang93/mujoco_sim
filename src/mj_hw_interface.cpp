@@ -61,10 +61,12 @@ void MjHWInterface::read()
     mj_inverse(m, d);
     for (std::size_t i = 0; i < joint_names.size(); i++)
     {
-        const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
-        joint_positions[i] = d->qpos[id];
-        joint_velocities[i] = d->qvel[id];
-        joint_efforts[i] = d->qfrc_inverse[id];
+        const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
+        const int qpos_id = m->jnt_qposadr[joint_id];
+        const int dof_id = m->jnt_dofadr[joint_id];
+        joint_positions[i] = d->qpos[qpos_id];
+        joint_velocities[i] = d->qvel[dof_id];
+        joint_efforts[i] = d->qfrc_inverse[dof_id];
     }
 }
 
@@ -74,8 +76,9 @@ void MjHWInterface::write()
     {
         if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_names[i]) == MjSim::joint_ignores.end())
         {
-            const int id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
-            MjSim::u[id] = joint_efforts_command[i];
+            const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
+            const int dof_id = m->jnt_dofadr[joint_id];
+            MjSim::u[dof_id] = joint_efforts_command[i];
         }
     }
 }
