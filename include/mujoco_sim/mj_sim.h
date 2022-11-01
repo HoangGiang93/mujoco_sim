@@ -42,6 +42,12 @@ public:
     void init();
 
     /**
+     * @brief Initialize the sensors
+     *
+     */
+    void init_sensors();
+
+    /**
      * @brief Implement the controller
      *
      */
@@ -89,4 +95,6 @@ public:
     static std::map<std::string, std::map<std::string, bool>> add_odom_joints;
 
     static std::vector<std::string> robots;
+
+    static std::map<size_t, std::string> sensors;
 };

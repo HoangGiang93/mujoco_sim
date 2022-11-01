@@ -39,6 +39,7 @@ double pub_object_tf_rate;
 double pub_object_state_array_rate;
 double pub_world_joint_state_rate;
 double pub_base_pose_rate;
+double pub_sensor_data_rate;
 double spawn_and_destroy_objects_rate;
 int spawn_object_count_per_cycle;
 
@@ -106,6 +107,10 @@ void MjRos::init()
     if (!ros::param::get("~pub_base_pose_rate", pub_base_pose_rate))
     {
         pub_base_pose_rate = 60.0;
+    }
+    if (!ros::param::get("~pub_sensor_data_rate", pub_sensor_data_rate))
+    {
+        pub_sensor_data_rate = 60.0;
     }
     if (!ros::param::get("~spawn_and_destroy_objects_rate", spawn_and_destroy_objects_rate))
     {
@@ -206,6 +211,7 @@ void MjRos::init()
 
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
     world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
+    sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/sensors", 0);
 
     reset_robot();
 }
@@ -1030,6 +1036,41 @@ void MjRos::publish_base_pose()
             {
                 ROS_ERROR("Body id of %s not found", MjSim::robots[i].c_str());
             }
+        }
+
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+}
+
+void MjRos::publish_sensor_data()
+{
+    if (pub_sensor_data_rate < 1E-9)
+    {
+        return;
+    }
+
+    ros::Rate loop_rate(pub_sensor_data_rate);
+
+    std_msgs::Header header;
+    geometry_msgs::Vector3Stamped sensor_data;
+    while (ros::ok())
+    {
+        // Set header
+        header.stamp = ros::Time::now();
+
+        for (const std::pair<size_t, std::string> &sensor : MjSim::sensors)
+        {
+            header.seq += 1;
+            header.frame_id = sensor.second;
+
+            sensor_data.header = header;
+            const int sensor_adr = m->sensor_adr[sensor.first];
+            sensor_data.vector.x = d->sensordata[sensor_adr];
+            sensor_data.vector.y = d->sensordata[sensor_adr + 1];
+            sensor_data.vector.z = d->sensordata[sensor_adr + 2];
+
+            sensors_pub.publish(sensor_data);
         }
 
         ros::spinOnce();

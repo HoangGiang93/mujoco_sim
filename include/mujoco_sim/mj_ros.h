@@ -30,6 +30,7 @@
 
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/JointState.h>
 #include <std_srvs/Trigger.h>
@@ -97,6 +98,12 @@ public:
      *
      */
     void publish_base_pose();
+
+    /**
+     * @brief Publish sensor data
+     *
+     */
+    void publish_sensor_data();
 
     /**
      * @brief Run spawn and destroy objects
@@ -224,6 +231,8 @@ private:
     ros::Publisher object_states_pub;
 
     ros::Publisher world_joint_states_pub;
+
+    ros::Publisher sensors_pub;
 
     tf2_ros::TransformBroadcaster br;
 

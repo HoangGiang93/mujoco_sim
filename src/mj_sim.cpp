@@ -45,6 +45,8 @@ std::map<std::string, std::map<std::string, bool>> MjSim::add_odom_joints;
 
 std::vector<std::string> MjSim::robots;
 
+std::map<size_t, std::string> MjSim::sensors;
+
 MjSim::~MjSim()
 {
 	mju_free(tau);
@@ -696,7 +698,38 @@ void MjSim::init()
 	init_tmp();
 	load_tmp_model(true);
 	set_joint_names();
+	init_sensors();
 	sim_start = d->time;
+}
+
+void MjSim::init_sensors()
+{
+	for (size_t sensor_id = 0; sensor_id < m->nsensor; sensor_id++)
+	{
+		std::string sensor_name;
+
+		if (m->sensor_type[sensor_id] == mjtSensor::mjSENS_FORCE)
+		{
+			if (mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id) == nullptr)
+			{
+				mju_warning_i("Sensor with id %d doesn't have a name, create one...", sensor_id);
+				sensor_name = "force_sensor_";
+				sensor_name += mj_id2name(m, mjtObj::mjOBJ_SITE, m->sensor_objid[sensor_id]);
+				mju_warning_s("Created sensor %s", sensor_name.c_str());
+			}
+			else
+			{
+				sensor_name = mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id);
+			}
+		}
+		else
+		{
+			mju_warning_i("Sensor with type_id %d not implemented, ignore...", m->sensor_type[sensor_id]);
+			continue;
+		}
+
+		sensors[sensor_id] = sensor_name;
+	}
 }
 
 bool MjSim::add_data()
