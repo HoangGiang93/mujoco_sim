@@ -722,6 +722,20 @@ void MjSim::init_sensors()
 				sensor_name = mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id);
 			}
 		}
+		else if (m->sensor_type[sensor_id] == mjtSensor::mjSENS_TORQUE)
+		{
+			if (mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id) == nullptr)
+			{
+				mju_warning_i("Sensor with id %d doesn't have a name, create one...", sensor_id);
+				sensor_name = "torque_sensor_";
+				sensor_name += mj_id2name(m, mjtObj::mjOBJ_SITE, m->sensor_objid[sensor_id]);
+				mju_warning_s("Created sensor %s", sensor_name.c_str());
+			}
+			else
+			{
+				sensor_name = mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id);
+			}
+		}
 		else
 		{
 			mju_warning_i("Sensor with type_id %d not implemented, ignore...", m->sensor_type[sensor_id]);

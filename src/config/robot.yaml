@@ -57,6 +57,8 @@ pub_world_joint_state_rate: 0.0 # The frequency to publish the joint state of th
 
 pub_base_pose_rate: 60.0 # The frequency to publish the base pose of the robot
 
+pub_sensor_data_rate: 60 # The frequency to publish the sensor data
+
 spawn_and_destroy_objects_rate: 600.0 # The frequency to spawn and destroy the objects
 
 spawn_object_count_per_cycle: 20 # The maximal number of objects to spawn per cycle

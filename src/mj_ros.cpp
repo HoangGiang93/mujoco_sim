@@ -211,7 +211,7 @@ void MjRos::init()
 
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
     world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
-    sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/sensors", 0);
+    sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
 
     reset_robot();
 }
