@@ -1,5 +1,5 @@
 <map id="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_ros.h" name="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_ros.h">
-<area shape="rect" id="node1" title=" " alt="" coords="1977,5,2203,61"/>
+<area shape="rect" id="node1" title=" " alt="" coords="2099,5,2326,61"/>
 <area shape="rect" id="node2" href="$mj__sim_8h.html" title=" " alt="" coords="301,117,383,143"/>
 <area shape="rect" id="node9" title=" " alt="" coords="407,117,629,143"/>
 <area shape="rect" id="node10" title=" " alt="" coords="653,117,847,143"/>
@@ -9,13 +9,14 @@
 <area shape="rect" id="node14" title=" " alt="" coords="1597,117,1810,143"/>
 <area shape="rect" id="node15" title=" " alt="" coords="1834,117,2101,143"/>
 <area shape="rect" id="node16" title=" " alt="" coords="2125,117,2301,143"/>
-<area shape="rect" id="node17" title=" " alt="" coords="2325,117,2492,143"/>
-<area shape="rect" id="node18" title=" " alt="" coords="2517,117,2703,143"/>
-<area shape="rect" id="node19" title=" " alt="" coords="2728,117,2865,143"/>
-<area shape="rect" id="node20" title=" " alt="" coords="2890,109,3069,151"/>
-<area shape="rect" id="node21" title=" " alt="" coords="3093,117,3324,143"/>
-<area shape="rect" id="node22" title=" " alt="" coords="3348,117,3453,143"/>
-<area shape="rect" id="node23" title=" " alt="" coords="3478,109,3625,151"/>
+<area shape="rect" id="node17" title=" " alt="" coords="2325,117,2575,143"/>
+<area shape="rect" id="node18" title=" " alt="" coords="2600,117,2767,143"/>
+<area shape="rect" id="node19" title=" " alt="" coords="2791,117,2978,143"/>
+<area shape="rect" id="node20" title=" " alt="" coords="3003,117,3140,143"/>
+<area shape="rect" id="node21" title=" " alt="" coords="3165,109,3343,151"/>
+<area shape="rect" id="node22" title=" " alt="" coords="3368,117,3599,143"/>
+<area shape="rect" id="node23" title=" " alt="" coords="3623,117,3728,143"/>
+<area shape="rect" id="node24" title=" " alt="" coords="3753,109,3899,151"/>
 <area shape="rect" id="node3" href="$mj__model_8h.html" title=" " alt="" coords="194,199,293,225"/>
 <area shape="rect" id="node7" title=" " alt="" coords="317,199,367,225"/>
 <area shape="rect" id="node8" title=" " alt="" coords="392,199,455,225"/>
