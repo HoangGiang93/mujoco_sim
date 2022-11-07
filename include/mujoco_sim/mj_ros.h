@@ -242,7 +242,7 @@ private:
  * @param robot_description Robot description
  * @return True if successfully initialized
  */
-bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
+bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char* robot_description = "/robot_description")
 {
     std::string robot_description_string;
     if (ros::param::get(robot_description, robot_description_string))
