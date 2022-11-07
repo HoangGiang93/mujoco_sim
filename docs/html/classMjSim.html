@@ -83,6 +83,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0d37111518dcde137b77be9a451e856d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a0d37111518dcde137b77be9a451e856d">init</a> ()</td></tr>
 <tr class="memdesc:a0d37111518dcde137b77be9a451e856d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the simulation.  <a href="classMjSim.html#a0d37111518dcde137b77be9a451e856d">More...</a><br /></td></tr>
 <tr class="separator:a0d37111518dcde137b77be9a451e856d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ba7cffb42cf4ca87dc06d0deb1c54be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a4ba7cffb42cf4ca87dc06d0deb1c54be">init_sensors</a> ()</td></tr>
+<tr class="memdesc:a4ba7cffb42cf4ca87dc06d0deb1c54be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the sensors.  <a href="classMjSim.html#a4ba7cffb42cf4ca87dc06d0deb1c54be">More...</a><br /></td></tr>
+<tr class="separator:a4ba7cffb42cf4ca87dc06d0deb1c54be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8873b8410c75a0d286298054ee06c328"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a8873b8410c75a0d286298054ee06c328">controller</a> ()</td></tr>
 <tr class="memdesc:a8873b8410c75a0d286298054ee06c328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement the controller.  <a href="classMjSim.html#a8873b8410c75a0d286298054ee06c328">More...</a><br /></td></tr>
 <tr class="separator:a8873b8410c75a0d286298054ee06c328"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,6 +124,8 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:aaf4f7195525701e4b57ef967ca75d421"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bf6dfb17e4a82bc9f23e7868c7112cc"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a6bf6dfb17e4a82bc9f23e7868c7112cc">robots</a></td></tr>
 <tr class="separator:a6bf6dfb17e4a82bc9f23e7868c7112cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ef131562c0ed903eeeb09a9eb5ea672"><td class="memItemLeft" align="right" valign="top">static std::map&lt; size_t, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a7ef131562c0ed903eeeb09a9eb5ea672">sensors</a></td></tr>
+<tr class="separator:a7ef131562c0ed903eeeb09a9eb5ea672"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a953e30d5df24bfe3bedfcefe81b31546"></a>
@@ -228,6 +233,25 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Initialize the simulation. </p>
+
+</div>
+</div>
+<a id="a4ba7cffb42cf4ca87dc06d0deb1c54be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ba7cffb42cf4ca87dc06d0deb1c54be">&#9670;&nbsp;</a></span>init_sensors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MjSim::init_sensors </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the sensors. </p>
 
 </div>
 </div>
@@ -431,6 +455,28 @@ false Fail to remove </dd></dl>
       <table class="memname">
         <tr>
           <td class="memname">std::vector&lt; std::string &gt; MjSim::robots</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7ef131562c0ed903eeeb09a9eb5ea672"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ef131562c0ed903eeeb09a9eb5ea672">&#9670;&nbsp;</a></span>sensors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt; size_t, std::string &gt; MjSim::sensors</td>
         </tr>
       </table>
   </td>

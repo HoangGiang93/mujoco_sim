@@ -199,6 +199,7 @@ int main(int argc, char **argv)
     std::thread ros_thread3(&MjRos::publish_object_state_array, mj_ros);
     std::thread ros_thread4(&MjRos::publish_world_joint_states, mj_ros);
     std::thread ros_thread5(&MjRos::publish_base_pose, mj_ros);
+    std::thread ros_thread7(&MjRos::publish_sensor_data, mj_ros);
     std::thread ros_thread6(&MjRos::spawn_and_destroy_objects, mj_ros);
 
     // start simulation thread
@@ -231,6 +232,7 @@ int main(int argc, char **argv)
     ros_thread4.join();
     ros_thread5.join();
     ros_thread6.join();
+    ros_thread7.join();
     sim_thread.join();
 
     // free MuJoCo model and data, deactivate
