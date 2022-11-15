@@ -179,12 +179,16 @@ static void get_joint_names(tinyxml2::XMLElement *body_element)
 		if (strcmp(joint_element->Value(), "joint") == 0)
 		{
 			std::string joint_name = joint_element->Attribute("name");
-			if (MjSim::odom_vels.count(joint_name))
+			for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
 			{
-				continue;
+				if (strcmp(joint_name.c_str(), (robot_name + "_" + odom_joint_name).c_str()) == 0)
+				{
+					goto endloop;
+				}
 			}
 			MjSim::joint_names[robot_name].push_back(joint_name);
 		}
+	endloop:;
 	}
 }
 
