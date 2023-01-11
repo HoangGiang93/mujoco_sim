@@ -910,8 +910,11 @@ void MjRos::publish_object_state_array()
                 {
                     continue;
                 }
-
-                add_object_state(body_id);
+                
+                if (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]]==mjJNT_FREE)
+                {
+                    add_object_state(body_id);
+                }
             }
         }
 
