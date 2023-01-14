@@ -97,4 +97,6 @@ public:
     static std::vector<std::string> robots;
 
     static std::map<size_t, std::string> sensors;
+
+    static std::map<std::string, std::vector<float>> pos_inits;
 };

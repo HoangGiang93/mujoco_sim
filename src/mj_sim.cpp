@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <ros/package.h>
 #include <ros/param.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
 
 double MjSim::max_time_step;
@@ -46,6 +47,8 @@ std::map<std::string, std::map<std::string, bool>> MjSim::add_odom_joints;
 std::vector<std::string> MjSim::robots;
 
 std::map<size_t, std::string> MjSim::sensors;
+
+std::map<std::string, std::vector<float>> MjSim::pos_inits;
 
 MjSim::~MjSim()
 {
@@ -93,6 +96,29 @@ static void set_param()
 	if (!ros::param::get("~robots", MjSim::robots))
 	{
 		MjSim::robots.push_back(model_path.stem().string());
+	}
+
+	std::vector<float> pos_init;
+	if (ros::param::get("~pos_init", pos_init) && pos_init.size() == 6)
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			MjSim::pos_inits[robot] = pos_init;
+		}
+	}
+	else
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			if (ros::param::get("~pos_init/" + robot, pos_init) && pos_init.size() == 6)
+			{
+				MjSim::pos_inits[robot] = pos_init;
+			}
+			else
+			{
+				MjSim::pos_inits[robot] = std::vector<float>(6, 0.0);
+			}
+		}
 	}
 
 	bool add_odom_joints_bool;
@@ -377,6 +403,27 @@ static void init_tmp()
 		{
 			for (const std::string &robot : MjSim::robots)
 			{
+				for (tinyxml2::XMLElement *robot_body = element->FirstChildElement();
+						 robot_body != nullptr;
+						 robot_body = robot_body->NextSiblingElement())
+				{
+					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
+					{
+						robot_body->SetAttribute("pos", (std::to_string(MjSim::pos_inits[robot][0]) + " " +
+																						 std::to_string(MjSim::pos_inits[robot][1]) + " " +
+																						 std::to_string(MjSim::pos_inits[robot][2]))
+																								.c_str());
+						tf2::Quaternion quat;
+						quat.setRPY(MjSim::pos_inits[robot][3], MjSim::pos_inits[robot][4], MjSim::pos_inits[robot][5]);
+						robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
+																							std::to_string(quat.getX()) + " " +
+																							std::to_string(quat.getY()) + " " +
+																							std::to_string(quat.getZ()))
+																									.c_str());
+						break;
+					}
+				}
+
 				if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ||
 						MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
 						MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ||
