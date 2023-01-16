@@ -31,9 +31,7 @@ extern mjData *d;  // MuJoCo data
 
 extern std::mutex mtx;
 
-extern double rtf_des;
-
-extern double rtf_actual;
+extern double rtf;
 
 extern std::string tmp_model_name;
 

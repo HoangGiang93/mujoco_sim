@@ -27,9 +27,7 @@ mjData *d = NULL;
 
 std::mutex mtx;
 
-double rtf_des = 1.0;
-
-double rtf_actual = 0.0;
+double rtf = 0.0;
 
 std::string tmp_model_name = "current.xml";
 

@@ -43,20 +43,6 @@ void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
     {
         MjSim::add_data();
     }
-    if (act == GLFW_PRESS && key == GLFW_KEY_KP_ADD && rtf_des < 4)
-    {
-        rtf_des *= 2;
-        i = 0;
-        MjSim::sim_start = d->time;
-        MjRos::ros_start = ros::Time::now();
-    }
-    if (act == GLFW_PRESS && key == GLFW_KEY_KP_SUBTRACT && rtf_des > 1 / 4)
-    {
-        rtf_des /= 2;
-        i = 0;
-        MjSim::sim_start = d->time;
-        MjRos::ros_start = ros::Time::now();
-    }
 }
 #endif
 
@@ -140,7 +126,7 @@ void simulate()
         do
         {
             ros_time = (ros::Time::now() - MjRos::ros_start).toSec();
-            error_time = ros_time - sim_time / rtf_des;
+            error_time = ros_time - sim_time;
         } while (error_time < -1E-6 && i != 0);
 
         sim_time = d->time - MjSim::sim_start;
@@ -150,7 +136,7 @@ void simulate()
         {
             double ros_time_diff = ros_time - last_ros_time.back();
             double sim_time_diff = sim_time - last_sim_time.back();
-            rtf_actual = sim_time_diff / ros_time_diff;
+            rtf = sim_time_diff / ros_time_diff;
             last_ros_time.pop_back();
             last_sim_time.pop_back();
         }
