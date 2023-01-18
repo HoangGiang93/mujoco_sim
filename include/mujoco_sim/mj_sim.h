@@ -98,5 +98,5 @@ public:
 
     static std::map<size_t, std::string> sensors;
 
-    static std::map<std::string, std::vector<float>> pos_inits;
+    static std::map<std::string, std::vector<float>> pose_inits;
 };

@@ -48,7 +48,7 @@ std::vector<std::string> MjSim::robots;
 
 std::map<size_t, std::string> MjSim::sensors;
 
-std::map<std::string, std::vector<float>> MjSim::pos_inits;
+std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
 MjSim::~MjSim()
 {
@@ -98,25 +98,21 @@ static void set_param()
 		MjSim::robots.push_back(model_path.stem().string());
 	}
 
-	std::vector<float> pos_init;
-	if (ros::param::get("~pos_init", pos_init) && pos_init.size() == 6)
+	std::vector<float> pose_init;
+	if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
 	{
 		for (const std::string &robot : MjSim::robots)
 		{
-			MjSim::pos_inits[robot] = pos_init;
+			MjSim::pose_inits[robot] = pose_init;
 		}
 	}
 	else
 	{
 		for (const std::string &robot : MjSim::robots)
 		{
-			if (ros::param::get("~pos_init/" + robot, pos_init) && pos_init.size() == 6)
+			if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
 			{
-				MjSim::pos_inits[robot] = pos_init;
-			}
-			else
-			{
-				MjSim::pos_inits[robot] = std::vector<float>(6, 0.0);
+				MjSim::pose_inits[robot] = pose_init;
 			}
 		}
 	}
@@ -407,14 +403,14 @@ static void init_tmp()
 						 robot_body != nullptr;
 						 robot_body = robot_body->NextSiblingElement())
 				{
-					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
+					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0 && MjSim::pose_inits.count(robot) == 1 && MjSim::pose_inits.size() == 6)
 					{
-						robot_body->SetAttribute("pos", (std::to_string(MjSim::pos_inits[robot][0]) + " " +
-																						 std::to_string(MjSim::pos_inits[robot][1]) + " " +
-																						 std::to_string(MjSim::pos_inits[robot][2]))
+						robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
+																						 std::to_string(MjSim::pose_inits[robot][1]) + " " +
+																						 std::to_string(MjSim::pose_inits[robot][2]))
 																								.c_str());
 						tf2::Quaternion quat;
-						quat.setRPY(MjSim::pos_inits[robot][3], MjSim::pos_inits[robot][4], MjSim::pos_inits[robot][5]);
+						quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
 						robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
 																							std::to_string(quat.getX()) + " " +
 																							std::to_string(quat.getY()) + " " +

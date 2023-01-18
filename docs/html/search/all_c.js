@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['pos_5finits_62',['pos_inits',['../classMjSim.html#a3379a814e64dfab60c5d8b806f7b1c04',1,'MjSim']]],
+  ['pose_5finits_62',['pose_inits',['../classMjSim.html#a3cac09569d2a8805ee71453d8c2c4336',1,'MjSim']]],
   ['pub_5fbase_5fpose_5frate_63',['pub_base_pose_rate',['../mj__ros_8cpp.html#a02924b670840fa00132c8d92e44b58b0',1,'mj_ros.cpp']]],
   ['pub_5fobject_5fmarker_5farray_5frate_64',['pub_object_marker_array_rate',['../mj__ros_8cpp.html#adf38f2268e11ed2daebb24891eef732b',1,'mj_ros.cpp']]],
   ['pub_5fobject_5fstate_5farray_5frate_65',['pub_object_state_array_rate',['../mj__ros_8cpp.html#a9149d006902df49e007e75833eb7d0e0',1,'mj_ros.cpp']]],
