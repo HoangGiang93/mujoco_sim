@@ -403,7 +403,7 @@ static void init_tmp()
 						 robot_body != nullptr;
 						 robot_body = robot_body->NextSiblingElement())
 				{
-					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0 && MjSim::pose_inits.count(robot) == 1 && MjSim::pose_inits.size() == 6)
+					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0 && MjSim::pose_inits.count(robot) == 1 && MjSim::pose_inits[robot].size() == 6)
 					{
 						robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
 																						 std::to_string(MjSim::pose_inits[robot][1]) + " " +
