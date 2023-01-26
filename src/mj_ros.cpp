@@ -61,6 +61,127 @@ std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
 
+void set_params()
+{
+	std::string model_path_string;
+	if (ros::param::get("~robot", model_path_string))
+	{
+		boost::filesystem::path model_path_path = model_path_string;
+		if (model_path_path.extension() == ".urdf")
+		{
+			model_path = model_path.parent_path() / (model_path_path.stem().string() + ".xml");
+			tmp_model_name = "current_" + model_path.filename().string();
+		}
+		else
+		{
+			model_path = model_path_string;
+			tmp_model_name = "current_" + model_path.filename().string();
+		}
+	}
+
+	if (ros::param::get("~max_time_step", MjSim::max_time_step))
+	{
+		ROS_INFO("Set max time step = %f", MjSim::max_time_step);
+	}
+	else
+	{
+		MjSim::max_time_step = 0.005;
+	}
+
+	std::string world_path_string;
+	if (ros::param::get("~world", world_path_string))
+	{
+		ROS_INFO("Set world from %s", world_path_string.c_str());
+		world_path = world_path_string;
+	}
+
+	if (!ros::param::get("~robots", MjSim::robots))
+	{
+		MjSim::robots.push_back(model_path.stem().string());
+	}
+
+	std::vector<float> pose_init;
+	if (ros::param::get("~pos_init", pose_init) && pose_init.size() == 6)
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			MjSim::pose_inits[robot] = pose_init;
+		}
+	}
+	else
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
+			{
+				MjSim::pose_inits[robot] = pose_init;
+			}
+			else
+			{
+				MjSim::pose_inits[robot] = std::vector<float>(6, 0.0);
+			}
+		}
+	}
+
+	bool add_odom_joints_bool;
+	if (ros::param::get("~add_odom_joints", add_odom_joints_bool))
+	{
+		for (const std::string &robot : MjSim::robots)
+		{
+			MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = add_odom_joints_bool;
+			MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = add_odom_joints_bool;
+			MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
+			MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
+			MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
+			MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = add_odom_joints_bool;
+		}
+	}
+	else
+	{
+		bool odom_joint_bool;
+		for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
+		{
+			if (ros::param::get("~add_odom_joints/" + odom_joint_name, odom_joint_bool))
+			{
+				for (const std::string &robot : MjSim::robots)
+				{
+					MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
+				}
+			}
+			else
+			{
+				for (const std::string &robot : MjSim::robots)
+				{
+					MjSim::add_odom_joints[robot][odom_joint_name] = false;
+				}
+			}
+		}
+
+		for (const std::string &robot : MjSim::robots)
+		{
+			if (ros::param::get("~add_odom_joints/" + robot, odom_joint_bool))
+			{
+				MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = odom_joint_bool;
+				MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = odom_joint_bool;
+				MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
+				MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
+				MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
+				MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = odom_joint_bool;
+			}
+			else
+			{
+				for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
+				{
+					if (ros::param::get("~add_odom_joints/" + robot + "/" + odom_joint_name, odom_joint_bool))
+					{
+						MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
+					}
+				}
+			}
+		}
+	}
+}
+
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
 }

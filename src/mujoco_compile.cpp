@@ -233,6 +233,44 @@ void add_mimic_joints(const boost::filesystem::path &model_path)
     model_xml_doc.SaveFile(model_path.c_str());
 }
 
+void disable_parent_child_collision(const boost::filesystem::path &model_path, const int disable_parent_child_collision_level)
+{
+    tinyxml2::XMLDocument model_xml_doc;
+    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        return;
+    }
+
+    tinyxml2::XMLElement *contact_element = model_xml_doc.NewElement("contact");
+    model_xml_doc.FirstChildElement()->LinkEndChild(contact_element);
+
+    for (int body_id = 0; body_id < m->nbody; body_id++)
+    {
+        int body_id_current = body_id;
+        const std::string &body_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
+        for (int k = 0; k < disable_parent_child_collision_level; k++)
+        {
+            if (body_id_current == 0 || m->body_parentid[body_id_current] < 0)
+            {
+                break;
+            }
+            tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
+            const std::string &parent_name = mj_id2name(m, mjOBJ_BODY, m->body_parentid[body_id_current]);
+            exclude_element->SetAttribute("body1", parent_name.c_str());
+            exclude_element->SetAttribute("body2", body_name.c_str());
+            contact_element->LinkEndChild(exclude_element);
+            body_id_current = m->body_parentid[body_id_current];
+            if (m->body_parentid[body_id_current] == 0)
+            {
+                break;
+            }
+        }
+    }
+
+    model_xml_doc.SaveFile(model_path.c_str());
+}
+
 // modify input file
 void load_urdf(const char *input, const char *output)
 {
@@ -339,6 +377,7 @@ int main(int argc, char **argv)
     int type1 = filetype(argv[1]);
     int type2;
     std::string output;
+    int disable_parent_child_collision_level = 1;
     if (argc == 2)
     {
         type2 = typeXML;
@@ -347,8 +386,22 @@ int main(int argc, char **argv)
     }
     else
     {
-        type2 = filetype(argv[2]);
-        output = argv[2];
+        if (atoi(argv[2]))
+        {
+            type2 = typeXML;
+            boost::filesystem::path input_file_path = argv[1];
+            output = ros::package::getPath("mujoco_sim") + "/model/tmp/" + input_file_path.stem().string() + ".xml";
+            disable_parent_child_collision_level = atoi(argv[2]);
+        }
+        else
+        {
+            type2 = filetype(argv[2]);
+            output = argv[2];
+            if (argc == 4)
+            {
+                disable_parent_child_collision_level = atoi(argv[3]);
+            }
+        }
     }
 
     // check types
@@ -380,6 +433,8 @@ int main(int argc, char **argv)
     add_robot_body(output);
 
     add_mimic_joints(output);
+
+    disable_parent_child_collision(output, disable_parent_child_collision_level);
 
     // finalize
     return finish("Done");

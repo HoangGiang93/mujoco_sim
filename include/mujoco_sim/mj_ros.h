@@ -39,6 +39,11 @@
 #include <urdf/model.h>
 #include <visualization_msgs/MarkerArray.h>
 
+/**
+ * @brief Set tmp_model_name, world_path and odom_joints
+ */
+void set_params();
+
 class CmdVelCallback
 {
 
