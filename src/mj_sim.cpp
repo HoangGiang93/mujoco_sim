@@ -50,6 +50,9 @@ std::map<size_t, std::string> MjSim::sensors;
 
 std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
+// Fix bug from m->geom_quat
+std::map<int, std::vector<mjtNum>> MjSim::geom_quat;
+
 MjSim::~MjSim()
 {
 	mju_free(tau);
@@ -295,7 +298,7 @@ static void init_tmp()
 																							std::to_string(quat.getX()) + " " +
 																							std::to_string(quat.getY()) + " " +
 																							std::to_string(quat.getZ()))
-																									.c_str());
+																								 .c_str());
 						break;
 					}
 				}
@@ -596,7 +599,6 @@ bool load_tmp_model(bool reset)
 		// make data
 		d = mj_makeData(m);
 		init_malloc();
-		return true;
 	}
 	else
 	{
@@ -614,9 +616,70 @@ bool load_tmp_model(bool reset)
 		add_old_state(m_new, d_new);
 		init_malloc();
 		mtx.unlock();
-
-		return true;
 	}
+
+	/***********************************/
+	/* Fix bug for m->geom_quat begins */
+	/***********************************/
+	mtx.lock();
+	tinyxml2::XMLDocument current_xml_doc;
+	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	{
+		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
+		return false;
+	}
+	for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement())
+	{
+		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+		{
+			tinyxml2::XMLElement *parent_body_element = worldbody_element->FirstChildElement();
+		search_loop:;
+			for (tinyxml2::XMLElement *body_element = parent_body_element;
+					 body_element != nullptr;
+					 body_element = body_element->NextSiblingElement())
+			{
+				if (strcmp(body_element->Value(), "body") == 0)
+				{
+					for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement();
+							 child_body_element != nullptr;
+							 child_body_element = child_body_element->NextSiblingElement())
+					{
+						if (strcmp(child_body_element->Value(), "body") == 0)
+						{
+							parent_body_element = child_body_element->FirstChildElement();
+							goto search_loop;
+						}
+						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
+						{
+							std::vector<mjtNum> mesh_quat = {1, 0, 0, 0};
+							if (child_body_element->Attribute("quat") != nullptr)
+							{
+								std::string quat_str = child_body_element->Attribute("quat");
+								std::istringstream iss(quat_str);
+								mesh_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+							}
+							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
+							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
+							{
+								if (m->geom_dataid[geom_id] == mesh_id)
+								{
+									MjSim::geom_quat[geom_id] = mesh_quat;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	mtx.unlock();
+	/*********************************/
+	/* Fix bug for m->geom_quat ends */
+	/*********************************/
+
+	return true;
 }
 
 void MjSim::init()

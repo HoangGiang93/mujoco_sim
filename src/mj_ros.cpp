@@ -61,125 +61,129 @@ std::mutex destroy_mtx;
 std::vector<std::string> object_names_to_destroy;
 bool destroy_success;
 
+bool pub_object_tf_of_free_bodies_only;
+bool pub_object_marker_array_of_free_bodies_only;
+bool pub_object_state_array_of_free_bodies_only;
+
 void set_params()
 {
-	std::string model_path_string;
-	if (ros::param::get("~robot", model_path_string))
-	{
-		boost::filesystem::path model_path_path = model_path_string;
-		if (model_path_path.extension() == ".urdf")
-		{
-			model_path = model_path.parent_path() / (model_path_path.stem().string() + ".xml");
-			tmp_model_name = "current_" + model_path.filename().string();
-		}
-		else
-		{
-			model_path = model_path_string;
-			tmp_model_name = "current_" + model_path.filename().string();
-		}
-	}
+    std::string model_path_string;
+    if (ros::param::get("~robot", model_path_string))
+    {
+        boost::filesystem::path model_path_path = model_path_string;
+        if (model_path_path.extension() == ".urdf")
+        {
+            model_path = model_path.parent_path() / (model_path_path.stem().string() + ".xml");
+            tmp_model_name = "current_" + model_path.filename().string();
+        }
+        else
+        {
+            model_path = model_path_string;
+            tmp_model_name = "current_" + model_path.filename().string();
+        }
+    }
 
-	if (ros::param::get("~max_time_step", MjSim::max_time_step))
-	{
-		ROS_INFO("Set max time step = %f", MjSim::max_time_step);
-	}
-	else
-	{
-		MjSim::max_time_step = 0.005;
-	}
+    if (ros::param::get("~max_time_step", MjSim::max_time_step))
+    {
+        ROS_INFO("Set max time step = %f", MjSim::max_time_step);
+    }
+    else
+    {
+        MjSim::max_time_step = 0.005;
+    }
 
-	std::string world_path_string;
-	if (ros::param::get("~world", world_path_string))
-	{
-		ROS_INFO("Set world from %s", world_path_string.c_str());
-		world_path = world_path_string;
-	}
+    std::string world_path_string;
+    if (ros::param::get("~world", world_path_string))
+    {
+        ROS_INFO("Set world from %s", world_path_string.c_str());
+        world_path = world_path_string;
+    }
 
-	if (!ros::param::get("~robots", MjSim::robots))
-	{
-		MjSim::robots.push_back(model_path.stem().string());
-	}
+    if (!ros::param::get("~robots", MjSim::robots))
+    {
+        MjSim::robots.push_back(model_path.stem().string());
+    }
 
-	std::vector<float> pose_init;
-	if (ros::param::get("~pos_init", pose_init) && pose_init.size() == 6)
-	{
-		for (const std::string &robot : MjSim::robots)
-		{
-			MjSim::pose_inits[robot] = pose_init;
-		}
-	}
-	else
-	{
-		for (const std::string &robot : MjSim::robots)
-		{
-			if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
-			{
-				MjSim::pose_inits[robot] = pose_init;
-			}
-			else
-			{
-				MjSim::pose_inits[robot] = std::vector<float>(6, 0.0);
-			}
-		}
-	}
+    std::vector<float> pose_init;
+    if (ros::param::get("~pos_init", pose_init) && pose_init.size() == 6)
+    {
+        for (const std::string &robot : MjSim::robots)
+        {
+            MjSim::pose_inits[robot] = pose_init;
+        }
+    }
+    else
+    {
+        for (const std::string &robot : MjSim::robots)
+        {
+            if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
+            {
+                MjSim::pose_inits[robot] = pose_init;
+            }
+            else
+            {
+                MjSim::pose_inits[robot] = std::vector<float>(6, 0.0);
+            }
+        }
+    }
 
-	bool add_odom_joints_bool;
-	if (ros::param::get("~add_odom_joints", add_odom_joints_bool))
-	{
-		for (const std::string &robot : MjSim::robots)
-		{
-			MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = add_odom_joints_bool;
-			MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = add_odom_joints_bool;
-			MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
-			MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
-			MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
-			MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = add_odom_joints_bool;
-		}
-	}
-	else
-	{
-		bool odom_joint_bool;
-		for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
-		{
-			if (ros::param::get("~add_odom_joints/" + odom_joint_name, odom_joint_bool))
-			{
-				for (const std::string &robot : MjSim::robots)
-				{
-					MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
-				}
-			}
-			else
-			{
-				for (const std::string &robot : MjSim::robots)
-				{
-					MjSim::add_odom_joints[robot][odom_joint_name] = false;
-				}
-			}
-		}
+    bool add_odom_joints_bool;
+    if (ros::param::get("~add_odom_joints", add_odom_joints_bool))
+    {
+        for (const std::string &robot : MjSim::robots)
+        {
+            MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = add_odom_joints_bool;
+            MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = add_odom_joints_bool;
+            MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
+            MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
+            MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
+            MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = add_odom_joints_bool;
+        }
+    }
+    else
+    {
+        bool odom_joint_bool;
+        for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
+        {
+            if (ros::param::get("~add_odom_joints/" + odom_joint_name, odom_joint_bool))
+            {
+                for (const std::string &robot : MjSim::robots)
+                {
+                    MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
+                }
+            }
+            else
+            {
+                for (const std::string &robot : MjSim::robots)
+                {
+                    MjSim::add_odom_joints[robot][odom_joint_name] = false;
+                }
+            }
+        }
 
-		for (const std::string &robot : MjSim::robots)
-		{
-			if (ros::param::get("~add_odom_joints/" + robot, odom_joint_bool))
-			{
-				MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = odom_joint_bool;
-				MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = odom_joint_bool;
-				MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
-				MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
-				MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
-				MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = odom_joint_bool;
-			}
-			else
-			{
-				for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
-				{
-					if (ros::param::get("~add_odom_joints/" + robot + "/" + odom_joint_name, odom_joint_bool))
-					{
-						MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
-					}
-				}
-			}
-		}
-	}
+        for (const std::string &robot : MjSim::robots)
+        {
+            if (ros::param::get("~add_odom_joints/" + robot, odom_joint_bool))
+            {
+                MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = odom_joint_bool;
+                MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = odom_joint_bool;
+                MjSim::add_odom_joints[robot]["lin_odom_z_joint"] = false;
+                MjSim::add_odom_joints[robot]["ang_odom_x_joint"] = false;
+                MjSim::add_odom_joints[robot]["ang_odom_y_joint"] = false;
+                MjSim::add_odom_joints[robot]["ang_odom_z_joint"] = odom_joint_bool;
+            }
+            else
+            {
+                for (const std::string &odom_joint_name : {"lin_odom_x_joint", "lin_odom_y_joint", "lin_odom_z_joint", "ang_odom_x_joint", "ang_odom_y_joint", "ang_odom_z_joint"})
+                {
+                    if (ros::param::get("~add_odom_joints/" + robot + "/" + odom_joint_name, odom_joint_bool))
+                    {
+                        MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
+                    }
+                }
+            }
+        }
+    }
 }
 
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
@@ -213,13 +217,25 @@ void MjRos::init()
     {
         pub_object_marker_array_rate = 60.0;
     }
+    if (!ros::param::get("~pub_object_marker_array_of_free_bodies_only", pub_object_marker_array_of_free_bodies_only))
+    {
+        pub_object_marker_array_of_free_bodies_only = true;
+    }
     if (!ros::param::get("~pub_object_tf_rate", pub_object_tf_rate))
     {
         pub_object_tf_rate = 60.0;
     }
+    if (!ros::param::get("~pub_object_tf_of_free_bodies_only", pub_object_tf_of_free_bodies_only))
+    {
+        pub_object_tf_of_free_bodies_only = true;
+    }
     if (!ros::param::get("~pub_object_state_array_rate", pub_object_state_array_rate))
     {
         pub_object_state_array_rate = 60.0;
+    }
+    if (!ros::param::get("~pub_object_state_array_of_free_bodies_only", pub_object_state_array_of_free_bodies_only))
+    {
+        pub_object_state_array_of_free_bodies_only = true;
     }
     if (!ros::param::get("~pub_world_joint_state_rate", pub_world_joint_state_rate))
     {
@@ -921,7 +937,7 @@ void MjRos::publish_tf()
 
         transform.header = header;
 
-        // Publish tf of objects
+        // Publish tf of moving objects
         std::string object_name;
         for (int body_id = 1; body_id < m->nbody; body_id++)
         {
@@ -929,16 +945,22 @@ void MjRos::publish_tf()
             {
                 continue;
             }
+
             object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
             if (std::find(MjSim::link_names.begin(), MjSim::link_names.end(), object_name) == MjSim::link_names.end())
             {
+
                 if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
                 {
                     continue;
                 }
 
-                set_transform(transform, body_id, object_name);
-                br.sendTransform(transform);
+                if (!pub_object_tf_of_free_bodies_only ||
+                    (pub_object_tf_of_free_bodies_only && m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
+                {
+                    set_transform(transform, body_id, object_name);
+                    br.sendTransform(transform);
+                }
             }
         }
 
@@ -982,7 +1004,11 @@ void MjRos::publish_marker_array()
                     continue;
                 }
 
-                add_marker(body_id);
+                if (!pub_object_marker_array_of_free_bodies_only ||
+                    (pub_object_marker_array_of_free_bodies_only && m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
+                {
+                    add_marker(body_id);
+                }
             }
         }
 
@@ -1031,8 +1057,9 @@ void MjRos::publish_object_state_array()
                 {
                     continue;
                 }
-                
-                if (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]]==mjJNT_FREE)
+
+                if (!pub_object_state_array_of_free_bodies_only ||
+                    (pub_object_state_array_of_free_bodies_only && m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
                 {
                     add_object_state(body_id);
                 }
@@ -1204,9 +1231,12 @@ void MjRos::publish_sensor_data()
 
 void MjRos::add_marker(const int body_id)
 {
-    const int geom_id = m->body_geomadr[body_id];
-    if (geom_id != -1)
+    for (int geom_id = m->body_geomadr[body_id]; geom_id < m->body_geomadr[body_id] + m->body_geomnum[body_id]; geom_id++)
     {
+        if (geom_id == -1)
+        {
+            continue;
+        }
         boost::filesystem::path mesh_path;
         switch (m->geom_type[geom_id])
         {
@@ -1235,13 +1265,13 @@ void MjRos::add_marker(const int body_id)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            mesh_path = tmp_world_path.parent_path() / (world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae");
+            mesh_path = tmp_world_path.parent_path() / (world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]) + ".stl");
             if (!boost::filesystem::exists(mesh_path))
             {
-                ROS_WARN("Mesh %s not found in %s", mesh_path.filename().c_str(), mesh_path.parent_path().c_str());
-                return;
+                ROS_WARN("Body %s: Mesh %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mesh_path.filename().c_str(), mesh_path.parent_path().c_str());
+                continue;
             }
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_BODY, body_id) + ".dae";
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mesh_path.filename().c_str();
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
@@ -1252,17 +1282,54 @@ void MjRos::add_marker(const int body_id)
         }
 
         marker.ns = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+        marker.id = geom_id;
         marker.color.a = m->geom_rgba[4 * geom_id + 3];
         marker.color.r = m->geom_rgba[4 * geom_id];
         marker.color.g = m->geom_rgba[4 * geom_id + 1];
         marker.color.b = m->geom_rgba[4 * geom_id + 2];
-        marker.pose.position.x = d->xpos[3 * body_id];
-        marker.pose.position.y = d->xpos[3 * body_id + 1];
-        marker.pose.position.z = d->xpos[3 * body_id + 2];
-        marker.pose.orientation.x = d->xquat[4 * body_id + 1];
-        marker.pose.orientation.y = d->xquat[4 * body_id + 2];
-        marker.pose.orientation.z = d->xquat[4 * body_id + 3];
-        marker.pose.orientation.w = d->xquat[4 * body_id];
+        marker.pose.position.x = d->geom_xpos[3 * geom_id];
+        marker.pose.position.y = d->geom_xpos[3 * geom_id + 1];
+        marker.pose.position.z = d->geom_xpos[3 * geom_id + 2];
+
+        if (m->geom_type[geom_id] != mjtGeom::mjGEOM_MESH)
+        {
+            mjtNum quat[4];
+            mjtNum mat[9];
+            for (int i = 0; i < 9; i++)
+            {
+                mat[i] = d->geom_xmat[9 * geom_id + i];
+            }
+            mju_mat2Quat(quat, mat);
+            marker.pose.orientation.x = quat[1];
+            marker.pose.orientation.y = quat[2];
+            marker.pose.orientation.z = quat[3];
+            marker.pose.orientation.w = quat[0];
+        }
+        else
+        {
+            mjtNum body_quat[4];
+            body_quat[0] = d->xquat[4 * body_id];
+            body_quat[1] = d->xquat[4 * body_id + 1];
+            body_quat[2] = d->xquat[4 * body_id + 2];
+            body_quat[3] = d->xquat[4 * body_id + 3];
+
+            mjtNum geom_quat[4] = {1, 0, 0, 0};
+            if (MjSim::geom_quat.count(geom_id) > 0)
+            {
+                geom_quat[0] = MjSim::geom_quat[geom_id][0];
+                geom_quat[1] = MjSim::geom_quat[geom_id][1];
+                geom_quat[2] = MjSim::geom_quat[geom_id][2];
+                geom_quat[3] = MjSim::geom_quat[geom_id][3];
+            }
+
+            mjtNum quat[4];
+            mju_mulQuat(quat, body_quat, geom_quat);
+
+            marker.pose.orientation.x = quat[1];
+            marker.pose.orientation.y = quat[2];
+            marker.pose.orientation.z = quat[3];
+            marker.pose.orientation.w = quat[0];
+        }
 
         marker_array.markers.push_back(marker);
     }
@@ -1307,10 +1374,20 @@ void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int 
                                             d->xquat[4 * body_id + 2] * d->xquat[4 * body_id + 2] +
                                             d->xquat[4 * body_id + 3] * d->xquat[4 * body_id + 3]);
 
-    transform.transform.rotation.x = d->xquat[4 * body_id + 1] / sqrt_sum_square;
-    transform.transform.rotation.y = d->xquat[4 * body_id + 2] / sqrt_sum_square;
-    transform.transform.rotation.z = d->xquat[4 * body_id + 3] / sqrt_sum_square;
-    transform.transform.rotation.w = d->xquat[4 * body_id] / sqrt_sum_square;
+    if (mju_abs(sqrt_sum_square) < mjMINVAL)
+    {
+        transform.transform.rotation.x = 0.0;
+        transform.transform.rotation.y = 0.0;
+        transform.transform.rotation.z = 0.0;
+        transform.transform.rotation.w = 1.0;
+    }
+    else
+    {
+        transform.transform.rotation.x = d->xquat[4 * body_id + 1] / sqrt_sum_square;
+        transform.transform.rotation.y = d->xquat[4 * body_id + 2] / sqrt_sum_square;
+        transform.transform.rotation.z = d->xquat[4 * body_id + 3] / sqrt_sum_square;
+        transform.transform.rotation.w = d->xquat[4 * body_id] / sqrt_sum_square;
+    }
 }
 
 void MjRos::set_base_pose(const int body_id, const int robot_id)

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['link_5fnames_27',['link_names',['../classMjSim.html#a293ecea5493f2b4e78ac54e24e48b5c7',1,'MjSim']]],
-  ['load_5ftmp_5fmodel_28',['load_tmp_model',['../mj__sim_8cpp.html#a8b30354afaf6ff725bab3cee3839f33b',1,'load_tmp_model(bool reset):&#160;mj_sim.cpp'],['../mj__sim_8h.html#af8301d50bb5cd4ff96f7d72d92be4a33',1,'load_tmp_model(bool reset=true):&#160;mj_sim.cpp']]],
-  ['load_5furdf_29',['load_urdf',['../mujoco__compile_8cpp.html#a8d6c6130b7dcc2d8f37d206726779d2f',1,'mujoco_compile.cpp']]]
+  ['joint_5fignores_26',['joint_ignores',['../classMjSim.html#a4ac5e8a3e7450d1f8e33b173365451d3',1,'MjSim']]],
+  ['joint_5fnames_27',['joint_names',['../classMjSim.html#aa4379dd751034d7ba76d7155923f3eb2',1,'MjSim']]]
 ];

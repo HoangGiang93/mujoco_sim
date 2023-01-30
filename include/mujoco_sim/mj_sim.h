@@ -99,4 +99,7 @@ public:
     static std::map<size_t, std::string> sensors;
 
     static std::map<std::string, std::vector<float>> pose_inits;
+
+    // Fix bug from m->geom_quat
+    static std::map<int, std::vector<mjtNum>> geom_quat;
 };
