@@ -26,6 +26,7 @@
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <ros/package.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
 
 using namespace std::chrono_literals;
@@ -496,6 +497,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
                              { return spawn_success; }))
     {
+        MjSim::reload_mesh = true;
         res.names = names;
     }
     else
@@ -563,37 +565,56 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             break;
 
         case mujoco_msgs::ObjectInfo::MESH:
-            if (boost::filesystem::exists(world_path.parent_path() / (object_mesh_path.string() + ".xml")))
-            {
-                object_mesh_path.replace_extension(".xml");
-            }
-            else if (boost::filesystem::exists(world_path.parent_path() / (world_path.stem().string() + "/meshes/" + object_mesh_path.string() + ".stl")))
-            {
-                object_mesh_path.replace_extension(".stl");
-            }
-
             if (object_mesh_path.extension().compare(".xml") == 0)
             {
-                object_mesh_path = world_path.parent_path() / object_mesh_path;
-                tinyxml2::XMLDocument mesh_xml_doc;
+                if (object_mesh_path.is_relative())
+                {
+                    object_mesh_path = world_path.parent_path() / object_mesh_path;
+                }
+                else if (!object_mesh_path.is_absolute())
+                {
+                    ROS_WARN("Mesh path %s is not valid", object_mesh_path.c_str());
+                }
 
+                tinyxml2::XMLDocument mesh_xml_doc;
                 if (mesh_xml_doc.LoadFile(object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
                 {
                     mju_warning_s("Failed to load file \"%s\"\n", object_mesh_path.c_str());
                     continue;
                 }
+
+                boost::filesystem::path mesh_dir = object_mesh_path.parent_path();
                 for (tinyxml2::XMLNode *node = mesh_xml_doc.FirstChild()->FirstChild();
                      node != nullptr;
                      node = node->NextSibling())
                 {
                     tinyxml2::XMLNode *copy = node->DeepClone(&object_xml_doc);
-                    // Don't copy asset, it should be included in world
-                    if (strcmp(copy->Value(), "asset") == 0)
+
+                    // Save path of asset
+                    if (strcmp(copy->Value(), "compiler") == 0 && copy->ToElement()->Attribute("meshdir") != nullptr)
                     {
+                        mesh_dir = mesh_dir / copy->ToElement()->Attribute("meshdir");
                         continue;
                     }
 
-                    if (strcmp(copy->Value(), "worldbody") == 0)
+                    // Change path of asset
+                    if (strcmp(copy->Value(), "asset") == 0)
+                    {
+                        for (tinyxml2::XMLElement *element = copy->ToElement()->FirstChildElement();
+                             element != nullptr;
+                             element = element->NextSiblingElement())
+                        {
+                            if (strcmp(element->Value(), "mesh") == 0 && element->Attribute("file") != nullptr)
+                            {
+                                if (element->Attribute("file")[0] != '/')
+                                {
+                                    element->SetAttribute("file", (mesh_dir / element->Attribute("file")).c_str());
+                                }
+                                mesh_paths[element->Attribute("name")] = element->Attribute("file");
+                            }
+                        }
+                    }
+                    else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
                         for (tinyxml2::XMLElement *element = copy->ToElement()->FirstChildElement();
                              element != nullptr;
@@ -1265,13 +1286,13 @@ void MjRos::add_marker(const int body_id)
 
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-            mesh_path = tmp_world_path.parent_path() / (world_path.stem().string() + "/meshes/" + mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]) + ".stl");
-            if (!boost::filesystem::exists(mesh_path))
+            mesh_path = boost::filesystem::relative(mesh_paths[mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id])], tmp_world_path.parent_path());
+            if (!boost::filesystem::exists(tmp_world_path.parent_path() /mesh_path))
             {
-                ROS_WARN("Body %s: Mesh %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mesh_path.filename().c_str(), mesh_path.parent_path().c_str());
+                ROS_WARN("Body %s: Mesh %s - %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].c_str(), mesh_path.parent_path().c_str());
                 continue;
             }
-            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + world_path.stem().string() + "/meshes/" + mesh_path.filename().c_str();
+            marker.mesh_resource = "package://mujoco_sim/model/tmp/" + mesh_path.string();
             marker.scale.x = 1;
             marker.scale.y = 1;
             marker.scale.z = 1;
@@ -1287,12 +1308,13 @@ void MjRos::add_marker(const int body_id)
         marker.color.r = m->geom_rgba[4 * geom_id];
         marker.color.g = m->geom_rgba[4 * geom_id + 1];
         marker.color.b = m->geom_rgba[4 * geom_id + 2];
-        marker.pose.position.x = d->geom_xpos[3 * geom_id];
-        marker.pose.position.y = d->geom_xpos[3 * geom_id + 1];
-        marker.pose.position.z = d->geom_xpos[3 * geom_id + 2];
 
         if (m->geom_type[geom_id] != mjtGeom::mjGEOM_MESH)
         {
+            marker.pose.position.x = d->geom_xpos[3 * geom_id];
+            marker.pose.position.y = d->geom_xpos[3 * geom_id + 1];
+            marker.pose.position.z = d->geom_xpos[3 * geom_id + 2];
+
             mjtNum quat[4];
             mjtNum mat[9];
             for (int i = 0; i < 9; i++)
@@ -1307,19 +1329,40 @@ void MjRos::add_marker(const int body_id)
         }
         else
         {
+            mjtNum body_pos[3];
+            body_pos[0] = d->xpos[3 * body_id];
+            body_pos[1] = d->xpos[3 * body_id + 1];
+            body_pos[2] = d->xpos[3 * body_id + 2];
+
             mjtNum body_quat[4];
             body_quat[0] = d->xquat[4 * body_id];
             body_quat[1] = d->xquat[4 * body_id + 1];
             body_quat[2] = d->xquat[4 * body_id + 2];
             body_quat[3] = d->xquat[4 * body_id + 3];
 
-            mjtNum geom_quat[4] = {1, 0, 0, 0};
-            if (MjSim::geom_quat.count(geom_id) > 0)
+            mjtNum geom_pos[3] = {0, 0, 0};
+            if (MjSim::geom_pose.count(geom_id) > 0)
             {
-                geom_quat[0] = MjSim::geom_quat[geom_id][0];
-                geom_quat[1] = MjSim::geom_quat[geom_id][1];
-                geom_quat[2] = MjSim::geom_quat[geom_id][2];
-                geom_quat[3] = MjSim::geom_quat[geom_id][3];
+                geom_pos[0] = MjSim::geom_pose[geom_id][0];
+                geom_pos[1] = MjSim::geom_pose[geom_id][1];
+                geom_pos[2] = MjSim::geom_pose[geom_id][2];
+            }
+
+            mjtNum pos[3];
+            mju_rotVecQuat(pos, geom_pos, body_quat);
+            mju_addTo3(pos, body_pos);
+
+            marker.pose.position.x = pos[0];
+            marker.pose.position.y = pos[1];
+            marker.pose.position.z = pos[2];
+
+            mjtNum geom_quat[4] = {1, 0, 0, 0};
+            if (MjSim::geom_pose.count(geom_id) > 0)
+            {
+                geom_quat[0] = MjSim::geom_pose[geom_id][3];
+                geom_quat[1] = MjSim::geom_pose[geom_id][4];
+                geom_quat[2] = MjSim::geom_pose[geom_id][5];
+                geom_quat[3] = MjSim::geom_pose[geom_id][6];
             }
 
             mjtNum quat[4];

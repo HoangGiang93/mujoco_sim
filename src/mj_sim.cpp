@@ -50,8 +50,10 @@ std::map<size_t, std::string> MjSim::sensors;
 
 std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
-// Fix bug from m->geom_quat
-std::map<int, std::vector<mjtNum>> MjSim::geom_quat;
+bool MjSim::reload_mesh = true;
+
+// Fix bug from m->geom_pos and m->geom_quat
+std::map<int, std::vector<mjtNum>> MjSim::geom_pose;
 
 MjSim::~MjSim()
 {
@@ -577,58 +579,19 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	doc.SaveFile(xml_path);
 }
 
-/**
- * @brief Load the tmp_model_path
- *
- * @param reset Reset the simulation or not
- * @return true if succeed
- */
-bool load_tmp_model(bool reset)
+/***********************************/
+/* Fix bug for m->geom_quat begins */
+/***********************************/
+bool save_geom_quat(const char *path)
 {
-	char error[1000] = "Could not load binary model";
-	if (reset)
-	{
-		// load and compile model
-		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
-		if (!m)
-		{
-			mju_warning_s("Could not load model file '%s'", tmp_model_path.c_str());
-			return false;
-		}
-
-		// make data
-		d = mj_makeData(m);
-		init_malloc();
-	}
-	else
-	{
-		// Load current.xml
-		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
-		if (!m_new)
-		{
-			mju_warning_s("Load model error: %s", error);
-			return false;
-		}
-
-		mtx.lock();
-		// make data
-		mjData *d_new = mj_makeData(m_new);
-		add_old_state(m_new, d_new);
-		init_malloc();
-		mtx.unlock();
-	}
-
-	/***********************************/
-	/* Fix bug for m->geom_quat begins */
-	/***********************************/
 	mtx.lock();
-	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	tinyxml2::XMLDocument xml_doc;
+	if (xml_doc.LoadFile(path) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
+		mju_warning_s("Failed to load file \"%s\"\n", path);
 		return false;
 	}
-	for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
+	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement())
 	{
@@ -653,19 +616,39 @@ bool load_tmp_model(bool reset)
 						}
 						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
 						{
-							std::vector<mjtNum> mesh_quat = {1, 0, 0, 0};
+							std::vector<mjtNum> geom_pos = {0, 0, 0};
+							std::vector<mjtNum> geom_quat = {1, 0, 0, 0};
+							if (child_body_element->Attribute("pos") != nullptr)
+							{
+								std::string pos_str = child_body_element->Attribute("pos");
+								std::istringstream iss(pos_str);
+								geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+							}
 							if (child_body_element->Attribute("quat") != nullptr)
 							{
 								std::string quat_str = child_body_element->Attribute("quat");
 								std::istringstream iss(quat_str);
-								mesh_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+								geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 							}
+							else if (child_body_element->Attribute("euler") != nullptr)
+							{
+								std::string euler_str = child_body_element->Attribute("euler");
+								std::istringstream iss(euler_str);
+								std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+								tf2::Quaternion quat;
+								quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
+								geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+							}
+
 							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
 							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
 							{
-								if (m->geom_dataid[geom_id] == mesh_id)
+								if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.count(geom_id) == 0)
 								{
-									MjSim::geom_quat[geom_id] = mesh_quat;
+									MjSim::geom_pose[geom_id].reserve(7);
+									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
+									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
+									break;
 								}
 							}
 						}
@@ -675,11 +658,58 @@ bool load_tmp_model(bool reset)
 		}
 	}
 	mtx.unlock();
-	/*********************************/
-	/* Fix bug for m->geom_quat ends */
-	/*********************************/
-
 	return true;
+}
+/*********************************/
+/* Fix bug for m->geom_quat ends */
+/*********************************/
+
+/**
+ * @brief Load the tmp_model_path
+ *
+ * @param reset Reset the simulation or not
+ * @return true if succeed
+ */
+bool load_tmp_model(bool reset)
+{
+	char error[1000] = "Could not load binary model";
+	if (reset)
+	{
+		// load and compile model
+		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
+		if (!m)
+		{
+			mju_warning_s("Could not load model file '%s'", tmp_model_path.c_str());
+			return false;
+		}
+
+		// make data
+		d = mj_makeData(m);
+		init_malloc();
+
+		MjSim::geom_pose.clear();
+		return save_geom_quat(tmp_model_path.c_str());
+	}
+	else
+	{
+		// Load current.xml
+		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
+		if (!m_new)
+		{
+			mju_warning_s("Load model error: %s", error);
+			return false;
+		}
+
+		mtx.lock();
+		// make data
+		mjData *d_new = mj_makeData(m_new);
+		add_old_state(m_new, d_new);
+		init_malloc();
+		mtx.unlock();
+
+		MjSim::geom_pose.clear();
+		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
+	}
 }
 
 void MjSim::init()

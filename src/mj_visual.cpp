@@ -123,12 +123,22 @@ bool MjVisual::is_window_closed()
 
 void MjVisual::render(double sim_time, double ros_time)
 {
+    if (MjSim::reload_mesh)
+    {
+        for (int mesh_id = 0; mesh_id < m->nmesh; mesh_id++)
+        {
+            mjr_uploadMesh(m, &con, mesh_id);
+        }
+        MjSim::reload_mesh = false;
+    }
+
     // get framebuffer viewport
     mjrRect viewport = {0, 0, 0, 0};
     glfwGetFramebufferSize(window, &viewport.width, &viewport.height);
 
     // update scene and render
     mjv_updateScene(m, d, &opt, NULL, &cam, mjCAT_ALL, &scn);
+
     mjr_render(viewport, &scn, &con);
 
     // print simulation time
