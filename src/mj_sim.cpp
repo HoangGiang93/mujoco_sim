@@ -577,6 +577,86 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	doc.SaveFile(xml_path);
 }
 
+/***********************************/
+/* Fix bug for m->geom_quat begins */
+/***********************************/
+bool save_geom_quat(const char *path)
+{
+	mtx.lock();
+	tinyxml2::XMLDocument xml_doc;
+	if (xml_doc.LoadFile(path) != tinyxml2::XML_SUCCESS)
+	{
+		mju_warning_s("Failed to load file \"%s\"\n", path);
+		return false;
+	}
+	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement())
+	{
+		ROS_WARN("%s", path);
+		ROS_WARN("%s", worldbody_element->Value());
+		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+		{
+			tinyxml2::XMLElement *parent_body_element = worldbody_element->FirstChildElement();
+		search_loop:;
+			for (tinyxml2::XMLElement *body_element = parent_body_element;
+					 body_element != nullptr;
+					 body_element = body_element->NextSiblingElement())
+			{
+				ROS_WARN("%s", body_element->Value());
+				if (strcmp(body_element->Value(), "body") == 0)
+				{
+					for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement();
+							 child_body_element != nullptr;
+							 child_body_element = child_body_element->NextSiblingElement())
+					{
+						ROS_WARN("%s", child_body_element->Value());
+						if (strcmp(child_body_element->Value(), "body") == 0)
+						{
+							parent_body_element = child_body_element->FirstChildElement();
+							goto search_loop;
+						}
+						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
+						{
+							ROS_WARN("%s - %s", child_body_element->Attribute("name"), child_body_element->Attribute("euler"));
+							std::vector<mjtNum> mesh_quat = {1, 0, 0, 0};
+							if (child_body_element->Attribute("quat") != nullptr)
+							{
+								std::string quat_str = child_body_element->Attribute("quat");
+								std::istringstream iss(quat_str);
+								mesh_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+							}
+							if (child_body_element->Attribute("euler") != nullptr)
+							{
+								std::string euler_str = child_body_element->Attribute("euler");
+								std::istringstream iss(euler_str);
+								std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+								tf2::Quaternion quat;
+								quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
+								mesh_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+							}
+							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
+							ROS_WARN("%s - [%f %f %f %f] - %d", child_body_element->Attribute("name"), mesh_quat[0], mesh_quat[1], mesh_quat[2], mesh_quat[3], mesh_id);
+							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
+							{
+								if (m->geom_dataid[geom_id] == mesh_id)
+								{
+									MjSim::geom_quat[geom_id] = mesh_quat;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	mtx.unlock();
+	return true;
+}
+/*********************************/
+/* Fix bug for m->geom_quat ends */
+/*********************************/
+
 /**
  * @brief Load the tmp_model_path
  *
@@ -616,70 +696,14 @@ bool load_tmp_model(bool reset)
 		add_old_state(m_new, d_new);
 		init_malloc();
 		mtx.unlock();
-	}
-
-	/***********************************/
-	/* Fix bug for m->geom_quat begins */
-	/***********************************/
-	mtx.lock();
-	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
-	{
-		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
-		return false;
-	}
-	for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement();
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement())
-	{
-		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+		ROS_WARN("Add.xml");
+		if (!save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()))
 		{
-			tinyxml2::XMLElement *parent_body_element = worldbody_element->FirstChildElement();
-		search_loop:;
-			for (tinyxml2::XMLElement *body_element = parent_body_element;
-					 body_element != nullptr;
-					 body_element = body_element->NextSiblingElement())
-			{
-				if (strcmp(body_element->Value(), "body") == 0)
-				{
-					for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement();
-							 child_body_element != nullptr;
-							 child_body_element = child_body_element->NextSiblingElement())
-					{
-						if (strcmp(child_body_element->Value(), "body") == 0)
-						{
-							parent_body_element = child_body_element->FirstChildElement();
-							goto search_loop;
-						}
-						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
-						{
-							std::vector<mjtNum> mesh_quat = {1, 0, 0, 0};
-							if (child_body_element->Attribute("quat") != nullptr)
-							{
-								std::string quat_str = child_body_element->Attribute("quat");
-								std::istringstream iss(quat_str);
-								mesh_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-							}
-							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
-							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
-							{
-								if (m->geom_dataid[geom_id] == mesh_id)
-								{
-									MjSim::geom_quat[geom_id] = mesh_quat;
-								}
-							}
-						}
-					}
-				}
-			}
+			return false;
 		}
 	}
-	mtx.unlock();
-	/*********************************/
-	/* Fix bug for m->geom_quat ends */
-	/*********************************/
 
-	return true;
+	return save_geom_quat(tmp_model_path.c_str());
 }
 
 void MjSim::init()

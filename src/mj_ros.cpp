@@ -26,6 +26,7 @@
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <ros/package.h>
+#include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
 
 using namespace std::chrono_literals;
