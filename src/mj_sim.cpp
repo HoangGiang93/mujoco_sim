@@ -50,8 +50,10 @@ std::map<size_t, std::string> MjSim::sensors;
 
 std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
-// Fix bug from m->geom_quat
-std::map<int, std::vector<mjtNum>> MjSim::geom_quat;
+bool MjSim::reload_mesh = true;
+
+// Fix bug from m->geom_pos and m->geom_quat
+std::map<int, std::vector<mjtNum>> MjSim::geom_pose;
 
 MjSim::~MjSim()
 {
@@ -593,8 +595,6 @@ bool save_geom_quat(const char *path)
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement())
 	{
-		ROS_WARN("%s", path);
-		ROS_WARN("%s", worldbody_element->Value());
 		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
 		{
 			tinyxml2::XMLElement *parent_body_element = worldbody_element->FirstChildElement();
@@ -603,14 +603,12 @@ bool save_geom_quat(const char *path)
 					 body_element != nullptr;
 					 body_element = body_element->NextSiblingElement())
 			{
-				ROS_WARN("%s", body_element->Value());
 				if (strcmp(body_element->Value(), "body") == 0)
 				{
 					for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement();
 							 child_body_element != nullptr;
 							 child_body_element = child_body_element->NextSiblingElement())
 					{
-						ROS_WARN("%s", child_body_element->Value());
 						if (strcmp(child_body_element->Value(), "body") == 0)
 						{
 							parent_body_element = child_body_element->FirstChildElement();
@@ -618,30 +616,39 @@ bool save_geom_quat(const char *path)
 						}
 						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
 						{
-							ROS_WARN("%s - %s", child_body_element->Attribute("name"), child_body_element->Attribute("euler"));
-							std::vector<mjtNum> mesh_quat = {1, 0, 0, 0};
+							std::vector<mjtNum> geom_pos = {0, 0, 0};
+							std::vector<mjtNum> geom_quat = {1, 0, 0, 0};
+							if (child_body_element->Attribute("pos") != nullptr)
+							{
+								std::string pos_str = child_body_element->Attribute("pos");
+								std::istringstream iss(pos_str);
+								geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+							}
 							if (child_body_element->Attribute("quat") != nullptr)
 							{
 								std::string quat_str = child_body_element->Attribute("quat");
 								std::istringstream iss(quat_str);
-								mesh_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+								geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 							}
-							if (child_body_element->Attribute("euler") != nullptr)
+							else if (child_body_element->Attribute("euler") != nullptr)
 							{
 								std::string euler_str = child_body_element->Attribute("euler");
 								std::istringstream iss(euler_str);
 								std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 								tf2::Quaternion quat;
 								quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
-								mesh_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+								geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
 							}
+
 							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
-							ROS_WARN("%s - [%f %f %f %f] - %d", child_body_element->Attribute("name"), mesh_quat[0], mesh_quat[1], mesh_quat[2], mesh_quat[3], mesh_id);
 							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
 							{
-								if (m->geom_dataid[geom_id] == mesh_id)
+								if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.count(geom_id) == 0)
 								{
-									MjSim::geom_quat[geom_id] = mesh_quat;
+									MjSim::geom_pose[geom_id].reserve(7);
+									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
+									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
+									break;
 								}
 							}
 						}
@@ -679,6 +686,9 @@ bool load_tmp_model(bool reset)
 		// make data
 		d = mj_makeData(m);
 		init_malloc();
+
+		MjSim::geom_pose.clear();
+		return save_geom_quat(tmp_model_path.c_str());
 	}
 	else
 	{
@@ -696,14 +706,10 @@ bool load_tmp_model(bool reset)
 		add_old_state(m_new, d_new);
 		init_malloc();
 		mtx.unlock();
-		ROS_WARN("Add.xml");
-		if (!save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()))
-		{
-			return false;
-		}
-	}
 
-	return save_geom_quat(tmp_model_path.c_str());
+		MjSim::geom_pose.clear();
+		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
+	}
 }
 
 void MjSim::init()

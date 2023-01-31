@@ -24,6 +24,7 @@
 
 #include <map>
 #include <vector>
+#include <functional>
 
 bool load_tmp_model(bool reset = true);
 
@@ -100,6 +101,8 @@ public:
 
     static std::map<std::string, std::vector<float>> pose_inits;
 
-    // Fix bug from m->geom_quat
-    static std::map<int, std::vector<mjtNum>> geom_quat;
+    static bool reload_mesh;
+
+    // Fix bug from m->geom_pos and m->geom_quat
+    static std::map<int, std::vector<mjtNum>> geom_pose;
 };

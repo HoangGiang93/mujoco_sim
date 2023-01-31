@@ -37,7 +37,7 @@ public:
      *
      */
     void init();
-
+    
     /**
      * @brief mouse button callback
      *
