@@ -582,6 +582,60 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 /***********************************/
 /* Fix bug for m->geom_quat begins */
 /***********************************/
+void get_geom_element(tinyxml2::XMLElement *parent_element)
+{
+	for (tinyxml2::XMLElement *element = parent_element->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "body") == 0)
+		{
+			get_geom_element(element);
+		}
+		else if (strcmp(element->Value(), "geom") == 0 && element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
+		{
+			std::vector<mjtNum> geom_pos = {0, 0, 0};
+			std::vector<mjtNum> geom_quat = {1, 0, 0, 0};
+			if (element->Attribute("pos") != nullptr)
+			{
+				std::string pos_str = element->Attribute("pos");
+				std::istringstream iss(pos_str);
+				geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+			}
+			if (element->Attribute("quat") != nullptr)
+			{
+				std::string quat_str = element->Attribute("quat");
+				std::istringstream iss(quat_str);
+				geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+			}
+			else if (element->Attribute("euler") != nullptr)
+			{
+				std::string euler_str = element->Attribute("euler");
+				std::istringstream iss(euler_str);
+				std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+				tf2::Quaternion quat;
+				quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
+				geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+			}
+
+			const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
+			for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
+			{
+				if (m->geom_dataid[geom_id] == mesh_id)
+				{
+					if (MjSim::geom_pose.count(geom_id) == 0)
+					{
+						MjSim::geom_pose[geom_id].reserve(7);
+						MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
+						MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
 bool save_geom_quat(const char *path)
 {
 	mtx.lock();
@@ -591,70 +645,14 @@ bool save_geom_quat(const char *path)
 		mju_warning_s("Failed to load file \"%s\"\n", path);
 		return false;
 	}
+	
 	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement())
 	{
 		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
 		{
-			tinyxml2::XMLElement *parent_body_element = worldbody_element->FirstChildElement();
-		search_loop:;
-			for (tinyxml2::XMLElement *body_element = parent_body_element;
-					 body_element != nullptr;
-					 body_element = body_element->NextSiblingElement())
-			{
-				if (strcmp(body_element->Value(), "body") == 0)
-				{
-					for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement();
-							 child_body_element != nullptr;
-							 child_body_element = child_body_element->NextSiblingElement())
-					{
-						if (strcmp(child_body_element->Value(), "body") == 0)
-						{
-							parent_body_element = child_body_element->FirstChildElement();
-							goto search_loop;
-						}
-						else if (strcmp(child_body_element->Value(), "geom") == 0 && child_body_element->Attribute("type") != nullptr && strcmp(child_body_element->Attribute("type"), "mesh") == 0)
-						{
-							std::vector<mjtNum> geom_pos = {0, 0, 0};
-							std::vector<mjtNum> geom_quat = {1, 0, 0, 0};
-							if (child_body_element->Attribute("pos") != nullptr)
-							{
-								std::string pos_str = child_body_element->Attribute("pos");
-								std::istringstream iss(pos_str);
-								geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-							}
-							if (child_body_element->Attribute("quat") != nullptr)
-							{
-								std::string quat_str = child_body_element->Attribute("quat");
-								std::istringstream iss(quat_str);
-								geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-							}
-							else if (child_body_element->Attribute("euler") != nullptr)
-							{
-								std::string euler_str = child_body_element->Attribute("euler");
-								std::istringstream iss(euler_str);
-								std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-								tf2::Quaternion quat;
-								quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
-								geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
-							}
-
-							const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, child_body_element->Attribute("mesh"));
-							for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
-							{
-								if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.count(geom_id) == 0)
-								{
-									MjSim::geom_pose[geom_id].reserve(7);
-									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
-									MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
+			get_geom_element(worldbody_element);
 		}
 	}
 	mtx.unlock();
@@ -708,6 +706,7 @@ bool load_tmp_model(bool reset)
 		mtx.unlock();
 
 		MjSim::geom_pose.clear();
+
 		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 }

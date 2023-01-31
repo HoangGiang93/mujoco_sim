@@ -112,5 +112,6 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   glfw
   tinyxml2
+  GL
 )
 

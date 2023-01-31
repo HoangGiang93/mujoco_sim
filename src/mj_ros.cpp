@@ -600,18 +600,31 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     // Change path of asset
                     if (strcmp(copy->Value(), "asset") == 0)
                     {
+                        std::vector<tinyxml2::XMLElement *> elements_to_remove;
                         for (tinyxml2::XMLElement *element = copy->ToElement()->FirstChildElement();
                              element != nullptr;
                              element = element->NextSiblingElement())
                         {
                             if (strcmp(element->Value(), "mesh") == 0 && element->Attribute("file") != nullptr)
                             {
-                                if (element->Attribute("file")[0] != '/')
+                                if (mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("name")) != -1)
                                 {
-                                    element->SetAttribute("file", (mesh_dir / element->Attribute("file")).c_str());
+                                    elements_to_remove.push_back(element);
                                 }
-                                mesh_paths[element->Attribute("name")] = element->Attribute("file");
+                                else
+                                {
+                                    if (element->Attribute("file")[0] != '/')
+                                    {
+                                        element->SetAttribute("file", (mesh_dir / element->Attribute("file")).c_str());
+                                    }
+                                    mesh_paths[element->Attribute("name")] = element->Attribute("file");
+                                }
                             }
+                        }
+
+                        for (tinyxml2::XMLElement *element : elements_to_remove)
+                        {
+                            copy->DeleteChild(element);
                         }
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
@@ -784,7 +797,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
         for (int i = 0; i < objects_num; i++)
         {
             const char *name = object_names_to_destroy[i].c_str();
-            ROS_INFO("[Destroy #%d] Try to destroy body %s", destroy_nr, name);
+            ROS_INFO("[Destroy #%d] Try to detroy body %s", destroy_nr, name);
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
@@ -794,6 +807,15 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
                 {
                     continue;
                 }
+
+                object_state.pose.position.x = d->xpos[3 * body_id];
+                object_state.pose.position.y = d->xpos[3 * body_id + 1];
+                object_state.pose.position.z = d->xpos[3 * body_id + 2];
+
+                object_state.pose.orientation.x = d->xquat[4 * body_id + 1];
+                object_state.pose.orientation.x = d->xquat[4 * body_id + 2];
+                object_state.pose.orientation.z = d->xquat[4 * body_id + 3];
+                object_state.pose.orientation.w = d->xquat[4 * body_id];
 
                 int dof_adr = m->jnt_dofadr[m->body_jntadr[body_id]];
                 object_state.velocity.linear.x = d->qvel[dof_adr];
@@ -830,7 +852,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
 
 void MjRos::destroy_objects(const std::vector<std::string> object_names)
 {
-    MjSim::remove_body(object_names);
+    destroy_success = MjSim::remove_body(object_names);
     object_names_to_destroy.erase(std::remove_if(object_names_to_destroy.begin(), object_names_to_destroy.end(), [object_names](const std::string &object_name)
                                                  { return std::find(object_names.begin(), object_names.end(), object_name) != object_names.end(); }),
                                   object_names_to_destroy.end());
@@ -903,6 +925,34 @@ void MjRos::spawn_and_destroy_objects()
         }
 
         // Destroy objects
+        visualization_msgs::Marker destroy_marker;
+        visualization_msgs::MarkerArray destroy_marker_array;
+
+        destroy_marker.action = visualization_msgs::Marker::DELETE;
+
+        std_msgs::Header header;
+        header.frame_id = root_frame_id;
+
+        // Set header
+        header.stamp = ros::Time::now();
+
+        destroy_marker.header = header;
+
+        for (const std::string &object_name : object_names_to_destroy)
+        {
+            const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, object_name.c_str());
+            destroy_marker.ns = object_name;
+            for (int geom_id = m->body_geomadr[body_id]; geom_id < m->body_geomadr[body_id] + m->body_geomnum[body_id]; geom_id++)
+            {
+                if (geom_id == -1)
+                {
+                    continue;
+                }
+                destroy_marker.id = geom_id;
+                destroy_marker_array.markers.push_back(destroy_marker);
+            }
+        }
+
         if (object_names_to_destroy.size() > 0)
         {
             std::unique_lock<std::mutex> lk(destroy_mtx);
@@ -915,6 +965,11 @@ void MjRos::spawn_and_destroy_objects()
             lk.unlock();
             condition.notify_all();
         }
+
+        // Publish destroy markers
+
+        marker_array_pub.publish(destroy_marker_array);
+
         ros::spinOnce();
         loop_rate.sleep();
     }
@@ -1287,7 +1342,7 @@ void MjRos::add_marker(const int body_id)
         case mjtGeom::mjGEOM_MESH:
             marker.type = visualization_msgs::Marker::MESH_RESOURCE;
             mesh_path = boost::filesystem::relative(mesh_paths[mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id])], tmp_world_path.parent_path());
-            if (!boost::filesystem::exists(tmp_world_path.parent_path() /mesh_path))
+            if (!boost::filesystem::exists(tmp_world_path.parent_path() / mesh_path))
             {
                 ROS_WARN("Body %s: Mesh %s - %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].c_str(), mesh_path.parent_path().c_str());
                 continue;

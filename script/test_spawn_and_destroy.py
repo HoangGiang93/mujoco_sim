@@ -11,9 +11,10 @@ from random import random, uniform, randint
 from math import pi, sin, cos
 
 object = ObjectStatus()
-types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER]
+types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER, ObjectInfo.MESH, ObjectInfo.MESH]
+meshes = ["../test/cup.xml", "../test/bowl_small.xml"]
 
-color = [
+colors = [
     ColorRGBA(0, 0, 1, 1),
     ColorRGBA(0, 1, 1, 1),
     ColorRGBA(0, 1, 0, 1),
@@ -25,14 +26,20 @@ color = [
 
 def spawn_object(i):
     object.info.name = "object_" + str(i)
-    object.info.type = ObjectInfo.SPHERE
+    object.info.type = types[randint(0, len(types) - 1)]
     object.info.movable = True
-    object.info.size.x = 0.1
-    object.info.size.y = 0.1
-    object.info.size.z = 0.1
-    object.info.rgba = color[randint(0, len(color) - 1)]
+    if object.info.type != ObjectInfo.MESH:
+        object.info.size.x = 0.05
+        object.info.size.y = 0.05
+        object.info.size.z = 0.05
+    else:
+        object.info.size.x = 1
+        object.info.size.y = 1
+        object.info.size.z = 1
+    object.info.rgba = colors[randint(0, len(colors) - 1)]
     alpha = uniform(-pi, pi)
     r = uniform(1.5, 2)
+    object.info.mesh = meshes[randint(0, len(meshes) - 1)]
     object.pose.position.x = r * sin(alpha)
     object.pose.position.y = r * cos(alpha)
     object.pose.position.z = 2
@@ -48,7 +55,8 @@ def spawn_object(i):
         spawn_objects = rospy.ServiceProxy(
             "/mujoco/spawn_objects", SpawnObject
         )
-        spawn_objects(objects)
+        spawn_resp = spawn_objects(objects)
+        rospy.loginfo("Spawn response: " + str(spawn_resp))
     except rospy.ServiceException as e:
         print("Service call failed: %s" % e)
 
@@ -60,7 +68,8 @@ def destroy_object(i):
         destroy_objects = rospy.ServiceProxy(
             "/mujoco/destroy_objects", DestroyObject
         )
-        destroy_objects(objects)
+        destroy_resp = destroy_objects(objects)
+        rospy.loginfo("Destroy response: " + str(destroy_resp))
     except rospy.ServiceException as e:
         print("Service call failed: %s" % e)
 
@@ -69,7 +78,11 @@ if __name__ == "__main__":
     i = 0
     while not rospy.is_shutdown():
         spawn_object(i)
-        if i > 20:
+        if i > 10:
+            rospy.sleep(0.2)
             destroy_object(i-20)
+            rospy.sleep(0.2)
+        else:
+            rospy.sleep(0.4)
         i+=1
-        rospy.sleep(0.1)
+        

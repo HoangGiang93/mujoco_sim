@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 #include "mj_visual.h"
+#include "GL/gl.h"
 
 mjvCamera MjVisual::cam;  // abstract camera
 mjvOption MjVisual::opt;  // visualization options
@@ -30,6 +31,21 @@ bool MjVisual::button_middle = false;
 bool MjVisual::button_right = false;
 double MjVisual::lastx = 0;
 double MjVisual::lasty = 0;
+
+// allocate lists from https://github.com/deepmind/mujoco/blob/main/src/render/render_context.c
+static void listAllocate(GLuint *base, GLsizei *range, GLsizei newrange)
+{
+    // allocate lists
+    *range = newrange;
+    if (newrange)
+    {
+        *base = glGenLists(*range);
+        if (*base <= 0)
+        {
+            mju_error("Could not allocate display lists");
+        }
+    }
+}
 
 MjVisual::~MjVisual()
 {
@@ -125,10 +141,15 @@ void MjVisual::render(double sim_time, double ros_time)
 {
     if (MjSim::reload_mesh)
     {
-        for (int mesh_id = 0; mesh_id < m->nmesh; mesh_id++)
+        // allocate list
+        listAllocate(&con.baseMesh, &con.rangeMesh, 2 * m->nmesh);
+
+        // process meshes
+        for (int i = 0; i < m->nmesh; i++)
         {
-            mjr_uploadMesh(m, &con, mesh_id);
+            mjr_uploadMesh(m, &con, i);
         }
+
         MjSim::reload_mesh = false;
     }
 
