@@ -477,8 +477,19 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
 bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res)
 {
     std::vector<std::string> names;
-    for (const mujoco_msgs::ObjectStatus &object : req.objects)
+    int i = 0;
+    for (mujoco_msgs::ObjectStatus &object : req.objects)
     {
+        if (object.info.name.empty())
+        {
+            object.info.name = "Object_" + std::to_string(spawn_nr);
+            if (i++ > 0)
+            {
+                object.info.name += "_" + std::to_string(i);
+            }
+            
+            ROS_WARN("[Spawn #%d] Empty name found, replace to %s", spawn_nr, object.info.name.c_str());
+        }
         if (std::find(objects_to_spawn.begin(), objects_to_spawn.end(), object) == objects_to_spawn.end() &&
             mj_name2id(m, mjtObj::mjOBJ_BODY, object.info.name.c_str()) == -1)
         {
@@ -489,6 +500,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     if (objects_to_spawn.empty())
     {
         res.names = std::vector<std::string>();
+        ROS_WARN("[Spawn #%d] Can't find any spawnable object, either the object exists already or there is no object to spawn", spawn_nr);
         return true;
     }
 
@@ -499,10 +511,12 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     {
         MjSim::reload_mesh = true;
         res.names = names;
+        ROS_INFO("[Spawn #%d] Spawned successfully", spawn_nr);
     }
     else
     {
         res.names = std::vector<std::string>();
+        ROS_WARN("[Spawn #%d] Spawned unsuccessfully", spawn_nr);
     }
     return true;
 }
@@ -787,6 +801,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     if (object_names_to_destroy.empty())
     {
         res.object_states = object_states;
+        ROS_WARN("[Destry #%d] Can't find any destroyable object, either the object doesn't exist or there is no object to destroy", spawn_nr);
         return true;
     }
     else
@@ -842,10 +857,12 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
                              { return destroy_success; }))
     {
         res.object_states = object_states;
+        ROS_INFO("[Destroy #%d] Destroyed successfully", destroy_nr);
     }
     else
     {
         res.object_states = std::vector<mujoco_msgs::ObjectState>();
+        ROS_WARN("[Destroy #%d] Destroyed unsuccessfully", destroy_nr);
     }
     return true;
 }
