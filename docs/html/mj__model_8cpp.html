@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mj_model.cpp File Reference</title>
+<title>MujocoSim: /home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/src/mj_model.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,9 +77,9 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mj_model.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="mj__model_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" alt=""/></div>
-<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp">
-<area shape="rect" title=" " alt="" coords="219,5,398,61"/>
+<div class="center"><img src="mj__model_8cpp__incl.png" border="0" usemap="#_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" alt=""/></div>
+<map name="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" id="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp">
+<area shape="rect" title=" " alt="" coords="195,5,422,61"/>
 <area shape="rect" href="mj__model_8h.html" title=" " alt="" coords="194,109,293,136"/>
 <area shape="rect" title=" " alt="" coords="317,109,431,136"/>
 <area shape="rect" title=" " alt="" coords="5,184,140,211"/>
@@ -100,10 +100,14 @@ Variables</h2></td></tr>
 <tr class="separator:a2197996e6b57e659623d3d56f5f9fd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeecea58d25fb5f1f6169c413ab9faf6e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aeecea58d25fb5f1f6169c413ab9faf6e">tmp_model_name</a> = &quot;current.xml&quot;</td></tr>
 <tr class="separator:aeecea58d25fb5f1f6169c413ab9faf6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa161aecad7baa53d6917fb9919b21cb7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa161aecad7baa53d6917fb9919b21cb7">add_model_name</a> = &quot;add.xml&quot;</td></tr>
+<tr class="separator:aa161aecad7baa53d6917fb9919b21cb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab809d073880cebd47e7223a73bf6ca5e"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/robot.xml&quot;</td></tr>
 <tr class="separator:ab809d073880cebd47e7223a73bf6ca5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa3242d18959d3232e36d5ed5006cd2d2">tmp_model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/&quot;</td></tr>
 <tr class="separator:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9613b9469cd24177cc77eb0f1fd94cdf"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#a9613b9469cd24177cc77eb0f1fd94cdf">add_model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/&quot; + add_model_name</td></tr>
+<tr class="separator:a9613b9469cd24177cc77eb0f1fd94cdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb5dac2d5dd70de1f16f5189f18a8624"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#adb5dac2d5dd70de1f16f5189f18a8624">cache_model_path</a> = <a class="el" href="mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a></td></tr>
 <tr class="separator:adb5dac2d5dd70de1f16f5189f18a8624"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae517df665d331ea2030329312ed2c84b"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ae517df665d331ea2030329312ed2c84b">world_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/world/empty.xml&quot;</td></tr>
@@ -114,6 +118,34 @@ Variables</h2></td></tr>
 <tr class="separator:a0f39d08c52417c40f6a48ff60800dc7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="aa161aecad7baa53d6917fb9919b21cb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa161aecad7baa53d6917fb9919b21cb7">&#9670;&nbsp;</a></span>add_model_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string add_model_name = &quot;add.xml&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9613b9469cd24177cc77eb0f1fd94cdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9613b9469cd24177cc77eb0f1fd94cdf">&#9670;&nbsp;</a></span>add_model_path</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::filesystem::path add_model_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/&quot; + add_model_name</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="adb5dac2d5dd70de1f16f5189f18a8624"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb5dac2d5dd70de1f16f5189f18a8624">&#9670;&nbsp;</a></span>cache_model_path</h2>
 

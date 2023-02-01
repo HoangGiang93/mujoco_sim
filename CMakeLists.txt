@@ -96,6 +96,7 @@ target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   tinyxml2
+  
 )
 
 set(MUJOCO_SIM_NODE mujoco_sim_node)

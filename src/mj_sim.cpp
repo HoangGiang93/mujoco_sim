@@ -127,7 +127,7 @@ static void set_joint_names()
 	tinyxml2::XMLDocument xml_doc;
 	if (xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+		ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
 		return;
 	}
 	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
@@ -194,7 +194,7 @@ static void init_tmp()
 	tinyxml2::XMLDocument current_xml_doc;
 	if (current_xml_doc.LoadFile(world_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", world_path.c_str());
+		ROS_WARN("Failed to load file \"%s\"\n", world_path.c_str());
 		return;
 	}
 	boost::filesystem::path meshdir_abs_path = world_path.parent_path();
@@ -253,7 +253,7 @@ static void init_tmp()
 	tinyxml2::XMLDocument cache_model_xml_doc;
 	if (cache_model_xml_doc.LoadFile(cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", cache_model_path.c_str());
+		ROS_WARN("Failed to load file \"%s\"\n", cache_model_path.c_str());
 		return;
 	}
 
@@ -523,7 +523,7 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(xml_path) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", xml_path);
+		ROS_WARN("Failed to load file \"%s\"\n", xml_path);
 		return;
 	}
 
@@ -642,7 +642,7 @@ bool save_geom_quat(const char *path)
 	tinyxml2::XMLDocument xml_doc;
 	if (xml_doc.LoadFile(path) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", path);
+		ROS_WARN("Failed to load file \"%s\"\n", path);
 		return false;
 	}
 	
@@ -677,7 +677,7 @@ bool load_tmp_model(bool reset)
 		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
 		if (!m)
 		{
-			mju_warning_s("Could not load model file '%s'", tmp_model_path.c_str());
+			ROS_WARN("Could not load model file '%s'", tmp_model_path.c_str());
 			return false;
 		}
 
@@ -694,7 +694,7 @@ bool load_tmp_model(bool reset)
 		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
 		if (!m_new)
 		{
-			mju_warning_s("Load model error: %s", error);
+			ROS_WARN("Load model error: %s", error);
 			return false;
 		}
 
@@ -707,7 +707,7 @@ bool load_tmp_model(bool reset)
 
 		MjSim::geom_pose.clear();
 
-		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
+		return save_geom_quat(add_model_path.c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 }
 
@@ -722,7 +722,7 @@ void MjSim::init()
 
 void MjSim::init_sensors()
 {
-	for (size_t sensor_id = 0; sensor_id < m->nsensor; sensor_id++)
+	for (int sensor_id = 0; sensor_id < m->nsensor; sensor_id++)
 	{
 		std::string sensor_name;
 
@@ -730,10 +730,10 @@ void MjSim::init_sensors()
 		{
 			if (mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id) == nullptr)
 			{
-				mju_warning_i("Sensor with id %d doesn't have a name, create one...", sensor_id);
+				ROS_WARN("Sensor with id %d doesn't have a name, create one...", sensor_id);
 				sensor_name = "force_sensor_";
 				sensor_name += mj_id2name(m, mjtObj::mjOBJ_SITE, m->sensor_objid[sensor_id]);
-				mju_warning_s("Created sensor %s", sensor_name.c_str());
+				ROS_WARN("Created sensor %s", sensor_name.c_str());
 			}
 			else
 			{
@@ -744,10 +744,10 @@ void MjSim::init_sensors()
 		{
 			if (mj_id2name(m, mjtObj::mjOBJ_SENSOR, sensor_id) == nullptr)
 			{
-				mju_warning_i("Sensor with id %d doesn't have a name, create one...", sensor_id);
+				ROS_WARN("Sensor with id %d doesn't have a name, create one...", sensor_id);
 				sensor_name = "torque_sensor_";
 				sensor_name += mj_id2name(m, mjtObj::mjOBJ_SITE, m->sensor_objid[sensor_id]);
-				mju_warning_s("Created sensor %s", sensor_name.c_str());
+				ROS_WARN("Created sensor %s", sensor_name.c_str());
 			}
 			else
 			{
@@ -756,7 +756,7 @@ void MjSim::init_sensors()
 		}
 		else
 		{
-			mju_warning_i("Sensor with type_id %d not implemented, ignore...", m->sensor_type[sensor_id]);
+			ROS_WARN("Sensor with type_id %d not implemented, ignore...", m->sensor_type[sensor_id]);
 			continue;
 		}
 
@@ -776,17 +776,17 @@ bool MjSim::add_data()
 	tinyxml2::XMLDocument current_xml_doc;
 	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to load file \"%s\"\n", tmp_model_path.c_str());
+		ROS_WARN("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 		return false;
 	}
 
 	tinyxml2::XMLElement *current_element = current_xml_doc.FirstChildElement();
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
-	include_element->SetAttribute("file", "add.xml");
+	include_element->SetAttribute("file", add_model_name.c_str());
 	current_element->LinkEndChild(include_element);
 	if (current_xml_doc.SaveFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
-		mju_warning_s("Failed to save file \"%s\"\n", tmp_model_path.c_str());
+		ROS_WARN("Failed to save file \"%s\"\n", tmp_model_path.c_str());
 		return false;
 	}
 

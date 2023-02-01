@@ -66,6 +66,8 @@ bool pub_object_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
+tinyxml2::XMLDocument spawn_objects_urdf_doc;
+
 void set_params()
 {
     std::string model_path_string;
@@ -280,7 +282,7 @@ void MjRos::init()
     if (MjSim::robots.size() < 2)
     {
         urdf::Model urdf_model;
-        if (init_urdf(urdf_model, n)) // this looks so retared...
+        if (init_urdf(urdf_model, n))
         {
             root_names.push_back(urdf_model.getRoot()->name);
         }
@@ -294,7 +296,7 @@ void MjRos::init()
         for (const std::string &robot : MjSim::robots)
         {
             urdf::Model urdf_model;
-            if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str())) // this looks so retared...
+            if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str()))
             {
                 root_names.push_back(urdf_model.getRoot()->name);
             }
@@ -593,7 +595,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 tinyxml2::XMLDocument mesh_xml_doc;
                 if (mesh_xml_doc.LoadFile(object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
                 {
-                    mju_warning_s("Failed to load file \"%s\"\n", object_mesh_path.c_str());
+                    ROS_WARN("Failed to load file \"%s\"\n", object_mesh_path.c_str());
                     continue;
                 }
 
@@ -742,9 +744,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         worldbody_element->LinkEndChild(body_element);
     }
 
-    if (object_xml_doc.SaveFile((tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
+    if (object_xml_doc.SaveFile(add_model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to save file \"%s\"\n", (tmp_model_path.parent_path() / "add.xml").c_str());
+        ROS_WARN("Failed to save file \"%s\"\n", add_model_path.c_str());
         spawn_success = false;
     }
     else
@@ -1530,4 +1532,81 @@ void MjRos::add_world_joint_states(const int body_id)
         world_joint_states.position.push_back(d->qpos[qpos_id]);
         world_joint_states.velocity.push_back(d->qvel[dof_id]);
     }
+}
+
+tinyxml2::XMLElement *set_body_description(const std::string &meshes_path, tinyxml2::XMLElement *parent_body_element)
+{
+    for (tinyxml2::XMLElement *element = parent_body_element->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+        if (strcmp(element->Value(), "body") == 0)
+        {
+            tinyxml2::XMLElement *link_element = spawn_objects_urdf_doc.NewElement("link");
+            if (element->Attribute("name") != nullptr)
+            {
+                link_element->SetAttribute("name", element->Attribute("name"));
+            }
+            tinyxml2::XMLElement *collision_element = set_body_description(meshes_path, element);
+        }
+        else if (strcmp(element->Value(), "geom") == 0)
+        {
+            tinyxml2::XMLElement *collision_element = spawn_objects_urdf_doc.NewElement("collision");
+            
+            tinyxml2::XMLElement *collision_element = set_body_description(meshes_path, element);
+        }
+    }
+    return nullptr;
+}
+
+void MjRos::set_objects_description()
+{
+    tinyxml2::XMLDocument xml_doc;
+	if (xml_doc.LoadFile(add_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	{
+		ROS_WARN("Failed to load file \"%s\"\n", add_model_path.c_str());
+		return;
+	}
+
+    boost::filesystem::path spawn_objects_urdf_path = add_model_path.parent_path() / "spawn_objects.urdf";
+    if (!boost::filesystem::exists(spawn_objects_urdf_path))
+    {
+        tinyxml2::XMLNode *root = spawn_objects_urdf_doc.NewElement("robot");
+        root->ToElement()->SetAttribute("name", "spawn_objects");
+        spawn_objects_urdf_doc.LinkEndChild(root);
+    }
+    
+    boost::filesystem::path meshdir_abs_path = world_path.parent_path();
+    for (tinyxml2::XMLElement *element = xml_doc.FirstChildElement()->FirstChildElement();
+			 element != nullptr;
+			 element = element->NextSiblingElement())
+	{
+		if (strcmp(element->Value(), "compiler") == 0)
+		{
+			if (element->Attribute("meshdir") != nullptr)
+			{
+				boost::filesystem::path meshdir_path = element->Attribute("meshdir");
+				if (meshdir_path.is_relative())
+				{
+					meshdir_abs_path /= meshdir_path;
+				}
+				else
+				{
+					meshdir_abs_path = meshdir_path;
+				}
+                break;
+			}
+		}
+	}
+    const std::string meshes_path = "package://mujoco_sim/model/tmp/" + boost::filesystem::relative(meshdir_abs_path, tmp_world_path.parent_path()).string();
+
+    for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement())
+	{
+		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+		{
+			set_body_description(meshes_path, worldbody_element);
+		}
+	}
 }

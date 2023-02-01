@@ -119,7 +119,7 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
+        ROS_ERROR("Couldn't read file in [%s]\n", model_urdf_path.c_str());
     }
 
     tinyxml2::XMLElement *mujoco = doc.NewElement("mujoco");
@@ -176,7 +176,7 @@ void add_robot_body(const boost::filesystem::path &model_path)
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -207,7 +207,7 @@ void add_mimic_joints(const boost::filesystem::path &model_path)
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -238,7 +238,7 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 

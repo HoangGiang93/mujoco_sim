@@ -116,6 +116,10 @@ public:
      */
     void spawn_and_destroy_objects();
 
+    void set_objects_description();
+
+    void remove_objects_description();
+
 private:
     /**
      * @brief Reset the robot to the initial state service

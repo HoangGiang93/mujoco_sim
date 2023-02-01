@@ -31,9 +31,13 @@ double rtf = 0.0;
 
 std::string tmp_model_name = "current.xml";
 
+std::string add_model_name = "add.xml";
+
 boost::filesystem::path model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/robot.xml";
 
 boost::filesystem::path tmp_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/";
+
+boost::filesystem::path add_model_path = ros::package::getPath("mujoco_sim") + "/model/tmp/" + add_model_name;
 
 boost::filesystem::path cache_model_path = model_path;
 

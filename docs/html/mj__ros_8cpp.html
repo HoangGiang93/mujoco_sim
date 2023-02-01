@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mj_ros.cpp File Reference</title>
+<title>MujocoSim: /home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/src/mj_ros.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -85,9 +85,9 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mj_ros.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="mj__ros_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" alt=""/></div>
-<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp">
-<area shape="rect" title=" " alt="" coords="2795,5,2974,61"/>
+<div class="center"><img src="mj__ros_8cpp__incl.png" border="0" usemap="#_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" alt=""/></div>
+<map name="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp" id="_2home_2giangnguyen_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__ros_8cpp">
+<area shape="rect" title=" " alt="" coords="2771,5,2998,61"/>
 <area shape="rect" href="mj__ros_8h.html" title=" " alt="" coords="2213,117,2292,143"/>
 <area shape="rect" title=" " alt="" coords="2317,117,2402,143"/>
 <area shape="rect" title=" " alt="" coords="2427,117,2569,143"/>
@@ -129,6 +129,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a43ddbc6ba0014ceee874705cdc2e33c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a43ddbc6ba0014ceee874705cdc2e33c2">set_params</a> ()</td></tr>
 <tr class="memdesc:a43ddbc6ba0014ceee874705cdc2e33c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set tmp_model_name, world_path and odom_joints.  <a href="mj__ros_8cpp.html#a43ddbc6ba0014ceee874705cdc2e33c2">More...</a><br /></td></tr>
 <tr class="separator:a43ddbc6ba0014ceee874705cdc2e33c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3085a1114de55d3935475cc3fc29f6f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#ab3085a1114de55d3935475cc3fc29f6f">set_body_description</a> (tinyxml2::XMLElement *parent_body_element)</td></tr>
+<tr class="separator:ab3085a1114de55d3935475cc3fc29f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -184,8 +186,28 @@ Variables</h2></td></tr>
 <tr class="separator:ad6314a2439ba1900a5e82f2dab81d7a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dc4774c1bed068f9f2183f3632e5c4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a8dc4774c1bed068f9f2183f3632e5c4a">pub_object_state_array_of_free_bodies_only</a></td></tr>
 <tr class="separator:a8dc4774c1bed068f9f2183f3632e5c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d869fb8a067f7b48848c6ef4c925278"><td class="memItemLeft" align="right" valign="top">tinyxml2::XMLDocument&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a2d869fb8a067f7b48848c6ef4c925278">spawn_objects_urdf_doc</a></td></tr>
+<tr class="separator:a2d869fb8a067f7b48848c6ef4c925278"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ab3085a1114de55d3935475cc3fc29f6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3085a1114de55d3935475cc3fc29f6f">&#9670;&nbsp;</a></span>set_body_description()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void set_body_description </td>
+          <td>(</td>
+          <td class="paramtype">tinyxml2::XMLElement *&#160;</td>
+          <td class="paramname"><em>parent_body_element</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a43ddbc6ba0014ceee874705cdc2e33c2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a43ddbc6ba0014ceee874705cdc2e33c2">&#9670;&nbsp;</a></span>set_params()</h2>
 
@@ -536,6 +558,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int spawn_object_count_per_cycle</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d869fb8a067f7b48848c6ef4c925278"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d869fb8a067f7b48848c6ef4c925278">&#9670;&nbsp;</a></span>spawn_objects_urdf_doc</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tinyxml2::XMLDocument spawn_objects_urdf_doc</td>
         </tr>
       </table>
 </div><div class="memdoc">

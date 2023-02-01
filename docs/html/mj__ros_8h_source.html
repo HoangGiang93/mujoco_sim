@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_ros.h Source File</title>
+<title>MujocoSim: /home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_ros.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -153,95 +153,101 @@ $(function() {
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#ada54adbe85c78521f7b078133607fd13">spawn_and_destroy_objects</a>();</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">bool</span> reset_robot_service(std_srvs::TriggerRequest &amp;req, std_srvs::TriggerResponse &amp;res);</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordtype">bool</span> spawn_objects_service(mujoco_msgs::SpawnObjectRequest &amp;req, mujoco_msgs::SpawnObjectResponse &amp;res);</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordtype">void</span> spawn_objects(<span class="keyword">const</span> std::vector&lt;mujoco_msgs::ObjectStatus&gt; objects);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160; </div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordtype">bool</span> destroy_objects_service(mujoco_msgs::DestroyObjectRequest &amp;req, mujoco_msgs::DestroyObjectResponse &amp;res);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordtype">void</span> destroy_objects(<span class="keyword">const</span> std::vector&lt;std::string&gt; object_names);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">void</span> add_marker(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordtype">void</span> set_base_pose(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id, <span class="keyword">const</span> <span class="keywordtype">int</span> robot_id = 0);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160; </div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">void</span> add_world_joint_states(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160; </div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="keywordtype">void</span> add_object_state(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordtype">void</span> set_transform(geometry_msgs::TransformStamped &amp;transform, <span class="keyword">const</span> <span class="keywordtype">int</span> body_id, <span class="keyword">const</span> std::string &amp;object_name);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordtype">void</span> reset_robot();</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00215"></a><span class="lineno"><a class="line" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">  215</a></span>&#160;    <span class="keyword">static</span> ros::Time <a class="code" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">ros_start</a>;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    ros::NodeHandle n;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    std::string root_frame_id;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160; </div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    std::vector&lt;CmdVelCallback *&gt; cmd_vel_callbacks;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#a48df63e0863718008a8830b69ccf6f4d">set_objects_description</a>();</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classMjRos.html#ae66a82b12f69e6066fa00c47aa876354">remove_objects_description</a>();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">bool</span> reset_robot_service(std_srvs::TriggerRequest &amp;req, std_srvs::TriggerResponse &amp;res);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordtype">bool</span> spawn_objects_service(mujoco_msgs::SpawnObjectRequest &amp;req, mujoco_msgs::SpawnObjectResponse &amp;res);</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordtype">void</span> spawn_objects(<span class="keyword">const</span> std::vector&lt;mujoco_msgs::ObjectStatus&gt; objects);</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordtype">bool</span> destroy_objects_service(mujoco_msgs::DestroyObjectRequest &amp;req, mujoco_msgs::DestroyObjectResponse &amp;res);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordtype">void</span> destroy_objects(<span class="keyword">const</span> std::vector&lt;std::string&gt; object_names);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordtype">void</span> add_marker(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordtype">void</span> set_base_pose(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id, <span class="keyword">const</span> <span class="keywordtype">int</span> robot_id = 0);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordtype">void</span> add_world_joint_states(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordtype">void</span> add_object_state(<span class="keyword">const</span> <span class="keywordtype">int</span> body_id);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordtype">void</span> set_transform(geometry_msgs::TransformStamped &amp;transform, <span class="keyword">const</span> <span class="keywordtype">int</span> body_id, <span class="keyword">const</span> std::string &amp;object_name);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordtype">void</span> reset_robot();</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">  219</a></span>&#160;    <span class="keyword">static</span> ros::Time <a class="code" href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">ros_start</a>;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    ros::NodeHandle n;</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    std::vector&lt;ros::Subscriber&gt; cmd_vel_subs;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    std::string root_frame_id;</div>
 <div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    ros::ServiceServer reset_robot_server;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    std::vector&lt;CmdVelCallback *&gt; cmd_vel_callbacks;</div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    ros::ServiceServer spawn_objects_server;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    std::vector&lt;ros::Subscriber&gt; cmd_vel_subs;</div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160; </div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    ros::ServiceServer destroy_objects_server;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    ros::ServiceServer reset_robot_server;</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    ros::Publisher marker_array_pub;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    ros::ServiceServer spawn_objects_server;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    std::vector&lt;ros::Publisher&gt; base_pose_pubs;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    ros::ServiceServer destroy_objects_server;</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ros::Publisher object_states_pub;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ros::Publisher marker_array_pub;</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    ros::Publisher world_joint_states_pub;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    std::vector&lt;ros::Publisher&gt; base_pose_pubs;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    ros::Publisher sensors_pub;</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    ros::Publisher object_states_pub;</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    tf2_ros::TransformBroadcaster br;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    ros::Publisher world_joint_states_pub;</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    tf2_ros::StaticTransformBroadcaster static_br;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    ros::Publisher sensors_pub;</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    std::map&lt;std::string, float&gt; joint_inits;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;};</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00259"></a><span class="lineno"><a class="line" href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">  259</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">init_urdf</a>(urdf::Model &amp;urdf_model, <span class="keyword">const</span> ros::NodeHandle &amp;n, <span class="keyword">const</span> <span class="keywordtype">char</span> *robot_description = <span class="stringliteral">&quot;robot_description&quot;</span>)</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;{</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    std::string robot_description_string;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordflow">if</span> (ros::param::get(robot_description, robot_description_string))</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    {</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="keywordflow">return</span> urdf_model.initParamWithNodeHandle(robot_description, n);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    tf2_ros::TransformBroadcaster br;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160; </div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    tf2_ros::StaticTransformBroadcaster static_br;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    std::map&lt;std::string, float&gt; joint_inits;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;};</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160; </div>
+<div class="line"><a name="l00263"></a><span class="lineno"><a class="line" href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">  263</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">init_urdf</a>(urdf::Model &amp;urdf_model, <span class="keyword">const</span> ros::NodeHandle &amp;n, <span class="keyword">const</span> <span class="keywordtype">char</span> *robot_description = <span class="stringliteral">&quot;robot_description&quot;</span>)</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;{</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    std::string robot_description_string;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keywordflow">if</span> (ros::param::get(robot_description, robot_description_string))</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    {</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        ROS_WARN(<span class="stringliteral">&quot;%s not found&quot;</span>, robot_description);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    }</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;}</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        <span class="keywordflow">return</span> urdf_model.initParamWithNodeHandle(robot_description, n);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    }</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    {</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;        ROS_WARN(<span class="stringliteral">&quot;%s not found&quot;</span>, robot_description);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    }</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassMjRos_html_aa1d4cd5751884b5b8655705b76d20d91"><div class="ttname"><a href="classMjRos.html#aa1d4cd5751884b5b8655705b76d20d91">MjRos::publish_world_joint_states</a></div><div class="ttdeci">void publish_world_joint_states()</div><div class="ttdoc">Publish world joint states.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1152</div></div>
+<div class="ttc" id="aclassMjRos_html_aa1d4cd5751884b5b8655705b76d20d91"><div class="ttname"><a href="classMjRos.html#aa1d4cd5751884b5b8655705b76d20d91">MjRos::publish_world_joint_states</a></div><div class="ttdeci">void publish_world_joint_states()</div><div class="ttdoc">Publish world joint states.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1171</div></div>
+<div class="ttc" id="aclassMjRos_html_a48df63e0863718008a8830b69ccf6f4d"><div class="ttname"><a href="classMjRos.html#a48df63e0863718008a8830b69ccf6f4d">MjRos::set_objects_description</a></div><div class="ttdeci">void set_objects_description()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1554</div></div>
 <div class="ttc" id="amj__sim_8h_html"><div class="ttname"><a href="mj__sim_8h.html">mj_sim.h</a></div></div>
-<div class="ttc" id="aclassMjRos_html_a0b43e5e970e4f38b9064f8d86f823744"><div class="ttname"><a href="classMjRos.html#a0b43e5e970e4f38b9064f8d86f823744">MjRos::publish_object_state_array</a></div><div class="ttdeci">void publish_object_state_array()</div><div class="ttdoc">Publish object states.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1099</div></div>
-<div class="ttc" id="aclassMjRos_html_a1ee3ddb85ce5dd2364dcc0f5776a1685"><div class="ttname"><a href="classMjRos.html#a1ee3ddb85ce5dd2364dcc0f5776a1685">MjRos::publish_base_pose</a></div><div class="ttdeci">void publish_base_pose()</div><div class="ttdoc">Publish base pose.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1200</div></div>
-<div class="ttc" id="aclassMjRos_html_ada54adbe85c78521f7b078133607fd13"><div class="ttname"><a href="classMjRos.html#ada54adbe85c78521f7b078133607fd13">MjRos::spawn_and_destroy_objects</a></div><div class="ttdeci">void spawn_and_destroy_objects()</div><div class="ttdoc">Run spawn and destroy objects.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:861</div></div>
-<div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:209</div></div>
-<div class="ttc" id="aclassMjRos_html_a4aff23e80dea0767613b54c4df6949c9"><div class="ttname"><a href="classMjRos.html#a4aff23e80dea0767613b54c4df6949c9">MjRos::publish_tf</a></div><div class="ttdeci">void publish_tf()</div><div class="ttdoc">Publish tf.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:978</div></div>
+<div class="ttc" id="aclassMjRos_html_a0b43e5e970e4f38b9064f8d86f823744"><div class="ttname"><a href="classMjRos.html#a0b43e5e970e4f38b9064f8d86f823744">MjRos::publish_object_state_array</a></div><div class="ttdeci">void publish_object_state_array()</div><div class="ttdoc">Publish object states.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1118</div></div>
+<div class="ttc" id="aclassMjRos_html_a1ee3ddb85ce5dd2364dcc0f5776a1685"><div class="ttname"><a href="classMjRos.html#a1ee3ddb85ce5dd2364dcc0f5776a1685">MjRos::publish_base_pose</a></div><div class="ttdeci">void publish_base_pose()</div><div class="ttdoc">Publish base pose.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1219</div></div>
+<div class="ttc" id="aclassMjRos_html_ada54adbe85c78521f7b078133607fd13"><div class="ttname"><a href="classMjRos.html#ada54adbe85c78521f7b078133607fd13">MjRos::spawn_and_destroy_objects</a></div><div class="ttdeci">void spawn_and_destroy_objects()</div><div class="ttdoc">Run spawn and destroy objects.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:880</div></div>
+<div class="ttc" id="aclassMjRos_html_a6ac18666bf03ec3810874f87a5533091"><div class="ttname"><a href="classMjRos.html#a6ac18666bf03ec3810874f87a5533091">MjRos::~MjRos</a></div><div class="ttdeci">~MjRos()</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:211</div></div>
+<div class="ttc" id="aclassMjRos_html_a4aff23e80dea0767613b54c4df6949c9"><div class="ttname"><a href="classMjRos.html#a4aff23e80dea0767613b54c4df6949c9">MjRos::publish_tf</a></div><div class="ttdeci">void publish_tf()</div><div class="ttdoc">Publish tf.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:997</div></div>
+<div class="ttc" id="aclassMjRos_html_ae66a82b12f69e6066fa00c47aa876354"><div class="ttname"><a href="classMjRos.html#ae66a82b12f69e6066fa00c47aa876354">MjRos::remove_objects_description</a></div><div class="ttdeci">void remove_objects_description()</div></div>
 <div class="ttc" id="aclassCmdVelCallback_html"><div class="ttname"><a href="classCmdVelCallback.html">CmdVelCallback</a></div><div class="ttdef"><b>Definition:</b> mj_ros.h:47</div></div>
-<div class="ttc" id="aclassMjRos_html_a537a8e13f34c5f3015f73a57fd33e852"><div class="ttname"><a href="classMjRos.html#a537a8e13f34c5f3015f73a57fd33e852">MjRos::publish_sensor_data</a></div><div class="ttdeci">void publish_sensor_data()</div><div class="ttdoc">Publish sensor data.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1273</div></div>
-<div class="ttc" id="aclassCmdVelCallback_html_a9064bd955326a3888310ca288a1acd33"><div class="ttname"><a href="classCmdVelCallback.html#a9064bd955326a3888310ca288a1acd33">CmdVelCallback::callback</a></div><div class="ttdeci">void callback(const geometry_msgs::Twist &amp;msg)</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:194</div></div>
-<div class="ttc" id="amj__ros_8h_html_a43ddbc6ba0014ceee874705cdc2e33c2"><div class="ttname"><a href="mj__ros_8h.html#a43ddbc6ba0014ceee874705cdc2e33c2">set_params</a></div><div class="ttdeci">void set_params()</div><div class="ttdoc">Set tmp_model_name, world_path and odom_joints.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:69</div></div>
-<div class="ttc" id="amj__ros_8h_html_aa0ae0ee5690d359ef439332c25675ded"><div class="ttname"><a href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">init_urdf</a></div><div class="ttdeci">bool init_urdf(urdf::Model &amp;urdf_model, const ros::NodeHandle &amp;n, const char *robot_description=&quot;robot_description&quot;)</div><div class="ttdoc">This function urdf::Model::initParamWithNodeHandle should be inside the implementation file,...</div><div class="ttdef"><b>Definition:</b> mj_ros.h:259</div></div>
+<div class="ttc" id="aclassMjRos_html_a537a8e13f34c5f3015f73a57fd33e852"><div class="ttname"><a href="classMjRos.html#a537a8e13f34c5f3015f73a57fd33e852">MjRos::publish_sensor_data</a></div><div class="ttdeci">void publish_sensor_data()</div><div class="ttdoc">Publish sensor data.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1292</div></div>
+<div class="ttc" id="aclassCmdVelCallback_html_a9064bd955326a3888310ca288a1acd33"><div class="ttname"><a href="classCmdVelCallback.html#a9064bd955326a3888310ca288a1acd33">CmdVelCallback::callback</a></div><div class="ttdeci">void callback(const geometry_msgs::Twist &amp;msg)</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:196</div></div>
+<div class="ttc" id="amj__ros_8h_html_a43ddbc6ba0014ceee874705cdc2e33c2"><div class="ttname"><a href="mj__ros_8h.html#a43ddbc6ba0014ceee874705cdc2e33c2">set_params</a></div><div class="ttdeci">void set_params()</div><div class="ttdoc">Set tmp_model_name, world_path and odom_joints.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:71</div></div>
+<div class="ttc" id="amj__ros_8h_html_aa0ae0ee5690d359ef439332c25675ded"><div class="ttname"><a href="mj__ros_8h.html#aa0ae0ee5690d359ef439332c25675ded">init_urdf</a></div><div class="ttdeci">bool init_urdf(urdf::Model &amp;urdf_model, const ros::NodeHandle &amp;n, const char *robot_description=&quot;robot_description&quot;)</div><div class="ttdoc">This function urdf::Model::initParamWithNodeHandle should be inside the implementation file,...</div><div class="ttdef"><b>Definition:</b> mj_ros.h:263</div></div>
 <div class="ttc" id="aclassMjRos_html"><div class="ttname"><a href="classMjRos.html">MjRos</a></div><div class="ttdef"><b>Definition:</b> mj_ros.h:63</div></div>
-<div class="ttc" id="aclassMjRos_html_ab3f8f431ed393f177e5bf60db3f0cbe9"><div class="ttname"><a href="classMjRos.html#ab3f8f431ed393f177e5bf60db3f0cbe9">MjRos::publish_marker_array</a></div><div class="ttdeci">void publish_marker_array()</div><div class="ttdoc">Publish markers.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1048</div></div>
-<div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdoc">Start time of ROS.</div><div class="ttdef"><b>Definition:</b> mj_ros.h:215</div></div>
+<div class="ttc" id="aclassMjRos_html_ab3f8f431ed393f177e5bf60db3f0cbe9"><div class="ttname"><a href="classMjRos.html#ab3f8f431ed393f177e5bf60db3f0cbe9">MjRos::publish_marker_array</a></div><div class="ttdeci">void publish_marker_array()</div><div class="ttdoc">Publish markers.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:1067</div></div>
+<div class="ttc" id="aclassMjRos_html_ac4fdfcf53d7e46c55046a43ba554e31b"><div class="ttname"><a href="classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b">MjRos::ros_start</a></div><div class="ttdeci">static ros::Time ros_start</div><div class="ttdoc">Start time of ROS.</div><div class="ttdef"><b>Definition:</b> mj_ros.h:219</div></div>
 <div class="ttc" id="aclassMjRos_html_a07f40261e2c2734408dba24e52e6a397"><div class="ttname"><a href="classMjRos.html#a07f40261e2c2734408dba24e52e6a397">MjRos::MjRos</a></div><div class="ttdeci">MjRos()=default</div></div>
-<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdoc">Initialize publishers, subscribers and MjRos members from rosparam.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:213</div></div>
+<div class="ttc" id="aclassMjRos_html_ae985971c2e79cee58cf59c13d9b58c9b"><div class="ttname"><a href="classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b">MjRos::init</a></div><div class="ttdeci">void init()</div><div class="ttdoc">Initialize publishers, subscribers and MjRos members from rosparam.</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:215</div></div>
 <div class="ttc" id="aclassCmdVelCallback_html_a470d83c85def1474b3948e93b28c84f6"><div class="ttname"><a href="classCmdVelCallback.html#a470d83c85def1474b3948e93b28c84f6">CmdVelCallback::CmdVelCallback</a></div><div class="ttdeci">CmdVelCallback()</div><div class="ttdef"><b>Definition:</b> mj_ros.h:51</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
