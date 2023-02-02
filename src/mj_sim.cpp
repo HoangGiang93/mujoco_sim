@@ -47,7 +47,7 @@ mjtNum MjSim::sim_start;
 
 std::map<std::string, std::map<std::string, bool>> MjSim::add_odom_joints;
 
-std::vector<std::string> MjSim::robots;
+std::set<std::string> MjSim::robots;
 
 std::map<size_t, std::string> MjSim::sensors;
 
@@ -72,7 +72,7 @@ MjSim::~MjSim()
 static void get_joint_names(tinyxml2::XMLElement *body_element)
 {
 	static std::string robot_name;
-	if (std::find(MjSim::robots.begin(), MjSim::robots.end(), body_element->Attribute("name")) != MjSim::robots.end())
+	if (MjSim::robots.find(body_element->Attribute("name")) != MjSim::robots.end())
 	{
 		robot_name = body_element->Attribute("name");
 	}
@@ -558,7 +558,7 @@ static void init_malloc()
 	mju_zero(MjSim::u, m->nv);
 }
 
-static void modify_xml(const char *xml_path, const std::vector<std::string> &remove_body_names = {""})
+static void modify_xml(const char *xml_path, const std::set<std::string> &remove_body_names = {""})
 {
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(xml_path) != tinyxml2::XML_SUCCESS)
@@ -583,14 +583,14 @@ static void modify_xml(const char *xml_path, const std::vector<std::string> &rem
 				if (strcmp(body_node->Value(), "body") == 0)
 				{
 					const char *body_name = body_node->ToElement()->Attribute("name");
-					if (body_name != nullptr && std::find(remove_body_names.begin(), remove_body_names.end(), body_name) != remove_body_names.end())
+					if (body_name != nullptr && remove_body_names.find(body_name) != remove_body_names.end())
 					{
 						bodies_to_delete.push_back(body_node);
 					}
 					else if (body_name != nullptr &&
 									 strcmp(body_name, model_path.stem().c_str()) != 0 &&
-									 std::find(MjSim::link_names.begin(), MjSim::link_names.end(), body_name) == MjSim::link_names.end() &&
-									 std::find(MjSim::robots.begin(), MjSim::robots.end(), body_name) == MjSim::robots.end())
+									 MjSim::link_names.find(body_name) == MjSim::link_names.end() &&
+									 MjSim::robots.find(body_name) == MjSim::robots.end())
 					{
 						const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
 						body_node->ToElement()->SetAttribute("pos",
@@ -664,7 +664,7 @@ void get_geom_element(tinyxml2::XMLElement *parent_element)
 			}
 			for (size_t i = 0; i < euler.size(); i++)
 			{
-				if (mesh_paths[element->Attribute("mesh")].second[i + 3] < 0)
+				if (mesh_paths[element->Attribute("mesh")].second[i] < 0)
 				{
 					euler[i] += M_PI;
 				}
@@ -848,7 +848,7 @@ bool MjSim::add_data()
 	return load_tmp_model(false);
 }
 
-bool MjSim::remove_body(const std::vector<std::string> &body_names)
+bool MjSim::remove_body(const std::set<std::string> &body_names)
 {
 	// Save current.xml
 	char error[1000] = "Could not save binary model";

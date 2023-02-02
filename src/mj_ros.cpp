@@ -52,7 +52,7 @@ std::map<EObjectType, visualization_msgs::MarkerArray> marker_array;
 std::map<EObjectType, sensor_msgs::JointState> joint_states;
 std::map<EObjectType, mujoco_msgs::ObjectStateArray> object_state_array;
 
-std::vector<nav_msgs::Odometry> base_poses;
+std::map<std::string, nav_msgs::Odometry> base_poses;
 
 std::condition_variable condition;
 
@@ -63,7 +63,7 @@ bool spawn_success;
 
 int destroy_nr = 0;
 std::mutex destroy_mtx;
-std::vector<std::string> object_names_to_destroy;
+std::set<std::string> object_names_to_destroy;
 bool destroy_success;
 
 bool pub_tf_of_free_bodies_only;
@@ -104,10 +104,12 @@ void set_params()
         world_path = world_path_string;
     }
 
-    if (!ros::param::get("~robots", MjSim::robots))
+    std::vector<std::string> robots;
+    if (!ros::param::get("~robots", robots))
     {
-        MjSim::robots.push_back(model_path.stem().string());
+        robots.push_back(model_path.stem().string());
     }
+    MjSim::robots = std::set<std::string>(robots.begin(), robots.end());
 
     std::vector<float> pose_init;
     if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
@@ -205,7 +207,7 @@ bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *ro
     }
 }
 
-CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
+CmdVelCallback::CmdVelCallback(const std::string &in_robot) : robot(in_robot)
 {
 }
 
@@ -220,7 +222,7 @@ void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
 
     if (pub_base_pose_rate > 1E-9)
     {
-        base_poses[id].twist.twist = msg;
+        base_poses[robot].twist.twist = msg;
     }
 }
 
@@ -344,11 +346,11 @@ void MjRos::init()
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, n))
         {
-            root_names[MjSim::robots[0]] = urdf_model.getRoot()->name;
+            root_names[*MjSim::robots.begin()] = urdf_model.getRoot()->name;
         }
         else
         {
-            root_names[MjSim::robots[0]] = "world";
+            root_names[*MjSim::robots.begin()] = "world";
         }
     }
     else
@@ -362,23 +364,23 @@ void MjRos::init()
             }
             else
             {
-                root_names[robot]= "world";
+                root_names[robot] = "world";
             }
         }
     }
 
-    for (size_t i = 0; i < MjSim::robots.size(); i++)
+    for (const std::string &robot : MjSim::robots)
     {
-        if (MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_x_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_y_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["lin_odom_z_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_x_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_y_joint"] ||
-            MjSim::add_odom_joints[MjSim::robots[i]]["ang_odom_z_joint"])
+        if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ||
+            MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
+            MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ||
+            MjSim::add_odom_joints[robot]["ang_odom_x_joint"] ||
+            MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ||
+            MjSim::add_odom_joints[robot]["ang_odom_z_joint"])
         {
-            cmd_vel_callbacks.push_back(new CmdVelCallback(i, MjSim::robots[i]));
+            cmd_vel_callbacks[robot] = new CmdVelCallback(robot);
 
-            cmd_vel_subs.push_back(n.subscribe("/" + MjSim::robots[i] + "/cmd_vel", 1, &CmdVelCallback::callback, cmd_vel_callbacks[i]));
+            cmd_vel_subs[robot] = n.subscribe("/" + robot + "/cmd_vel", 1, &CmdVelCallback::callback, cmd_vel_callbacks[robot]);
         }
     }
 
@@ -409,7 +411,7 @@ void MjRos::init()
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
     for (const std::string &robot : MjSim::robots)
     {
-        base_pose_pubs.push_back(n.advertise<nav_msgs::Odometry>("/" + robot + "/" + root_names[robot], 0));
+        base_pose_pubs[robot] = n.advertise<nav_msgs::Odometry>("/" + robot + "/" + root_names[robot], 0);
     }
 
     object_state_array_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
@@ -703,8 +705,8 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                         scale_str = element->Attribute("scale");
                                     }
                                     std::istringstream iss(scale_str);
-				                    std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-                                    
+                                    std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+
                                     mesh_paths[element->Attribute("name")] = {element->Attribute("file"), scale};
                                 }
                             }
@@ -873,10 +875,9 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
 {
     for (const std::string &object_name : req.names)
     {
-        if (std::find(object_names_to_destroy.begin(), object_names_to_destroy.end(), object_name) == object_names_to_destroy.end() &&
-            mj_name2id(m, mjtObj::mjOBJ_BODY, object_name.c_str()) != -1)
+        if (mj_name2id(m, mjtObj::mjOBJ_BODY, object_name.c_str()) != -1)
         {
-            object_names_to_destroy.push_back(object_name);
+            object_names_to_destroy.insert(object_name);
         }
     }
 
@@ -884,7 +885,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     if (object_names_to_destroy.empty())
     {
         res.object_states = object_states;
-        ROS_WARN("[Destry #%d] Can't find any destroyable object, either the object doesn't exist or there is no object to destroy", spawn_nr);
+        ROS_WARN("[Destroy #%d] Can't find any destroyable object, either the object doesn't exist or there is no object to destroy", destroy_nr);
         return true;
     }
     else
@@ -892,15 +893,14 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
         const std::size_t objects_num = object_names_to_destroy.size();
         object_states.reserve(objects_num);
 
-        for (int i = 0; i < objects_num; i++)
+        for (const std::string &object_name_to_destroy : object_names_to_destroy)
         {
-            const char *name = object_names_to_destroy[i].c_str();
+            const char *name = object_name_to_destroy.c_str();
             ROS_INFO("[Destroy #%d] Try to detroy body %s", destroy_nr, name);
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
                 MjSim::spawned_object_names.erase(name);
-
                 for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
                 {
                     if (m->body_parentid[child_body_id] == body_id)
@@ -908,7 +908,6 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
                         MjSim::spawned_object_names.erase(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
                     }
                 }
-
                 mujoco_msgs::ObjectState object_state;
                 object_state.name = name;
                 if (m->body_dofnum[body_id] != 6)
@@ -960,12 +959,13 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     return true;
 }
 
-void MjRos::destroy_objects(const std::vector<std::string> object_names)
+void MjRos::destroy_objects(const std::set<std::string> object_names)
 {
     destroy_success = MjSim::remove_body(object_names);
-    object_names_to_destroy.erase(std::remove_if(object_names_to_destroy.begin(), object_names_to_destroy.end(), [object_names](const std::string &object_name)
-                                                 { return std::find(object_names.begin(), object_names.end(), object_name) != object_names.end(); }),
-                                  object_names_to_destroy.end());
+    for (const std::string &object_name : object_names)
+    {
+        object_names_to_destroy.erase(object_name);
+    }
 }
 
 void MjRos::spawn_and_destroy_objects()
@@ -1328,7 +1328,7 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
             switch (object_type)
             {
             case EObjectType::Robot:
-                if (MjSim::link_names.find(object_name) != MjSim::link_names.end())
+                if (MjSim::link_names.find(object_name) != MjSim::link_names.end() || object_name == model_path.stem().string() || MjSim::robots.find(object_name) != MjSim::robots.end())
                 {
                     add_object_state(body_id, object_type);
                 }
@@ -1474,7 +1474,7 @@ void MjRos::publish_base_pose()
     {
         nav_msgs::Odometry base_pose;
         base_pose.child_frame_id = root_names[robot];
-        base_poses.push_back(base_pose);
+        base_poses[robot] = base_pose;
     }
 
     while (ros::ok())
@@ -1483,9 +1483,9 @@ void MjRos::publish_base_pose()
         header.stamp = ros::Time::now();
         header.seq += 1;
 
-        for (nav_msgs::Odometry &base_pose : base_poses)
+        for (const std::string &robot : MjSim::robots)
         {
-            base_pose.header = header;
+            base_poses[robot].header = header;
         }
 
         transform.header = header;
@@ -1515,8 +1515,8 @@ void MjRos::publish_base_pose()
                     MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ||
                     MjSim::add_odom_joints[robot]["ang_odom_z_joint"])
                 {
-                    set_base_pose(body_id, i);
-                    base_pose_pubs[i].publish(base_poses[i]);
+                    set_base_pose(body_id, robot);
+                    base_pose_pubs[robot].publish(base_poses[robot]);
                 }
             }
             else
@@ -1749,17 +1749,17 @@ void MjRos::set_transform(geometry_msgs::TransformStamped &transform, const int 
     }
 }
 
-void MjRos::set_base_pose(const int body_id, const int robot_id)
+void MjRos::set_base_pose(const int body_id, const std::string &robot)
 {
-    base_poses[robot_id].pose.pose.position.x = d->xpos[3 * body_id];
-    base_poses[robot_id].pose.pose.position.y = d->xpos[3 * body_id + 1];
-    base_poses[robot_id].pose.pose.position.z = d->xpos[3 * body_id + 2];
-    base_poses[robot_id].pose.pose.orientation.x = d->xquat[4 * body_id + 1];
-    base_poses[robot_id].pose.pose.orientation.y = d->xquat[4 * body_id + 2];
-    base_poses[robot_id].pose.pose.orientation.z = d->xquat[4 * body_id + 3];
-    base_poses[robot_id].pose.pose.orientation.w = d->xquat[4 * body_id];
-    base_poses[robot_id].pose.covariance.assign(0.0);
-    base_poses[robot_id].twist.covariance.assign(0.0);
+    base_poses[robot].pose.pose.position.x = d->xpos[3 * body_id];
+    base_poses[robot].pose.pose.position.y = d->xpos[3 * body_id + 1];
+    base_poses[robot].pose.pose.position.z = d->xpos[3 * body_id + 2];
+    base_poses[robot].pose.pose.orientation.x = d->xquat[4 * body_id + 1];
+    base_poses[robot].pose.pose.orientation.y = d->xquat[4 * body_id + 2];
+    base_poses[robot].pose.pose.orientation.z = d->xquat[4 * body_id + 3];
+    base_poses[robot].pose.pose.orientation.w = d->xquat[4 * body_id];
+    base_poses[robot].pose.covariance.assign(0.0);
+    base_poses[robot].twist.covariance.assign(0.0);
 }
 
 void MjRos::add_joint_states(const int body_id, const EObjectType object_type)

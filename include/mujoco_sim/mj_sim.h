@@ -75,7 +75,7 @@ public:
      * @return true Successfully removed
      * @return false Fail to remove
      */
-    static bool remove_body(const std::vector<std::string> &body_names);
+    static bool remove_body(const std::set<std::string> &body_names);
 
 public:
     static double max_time_step;
@@ -98,7 +98,7 @@ public:
 
     static std::map<std::string, std::map<std::string, bool>> add_odom_joints;
 
-    static std::vector<std::string> robots;
+    static std::set<std::string> robots;
 
     static std::map<size_t, std::string> sensors;
 

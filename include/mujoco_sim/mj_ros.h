@@ -49,10 +49,9 @@ class CmdVelCallback
 public:
     CmdVelCallback() {}
 
-    CmdVelCallback(const size_t in_id, const std::string &in_robot);
+    CmdVelCallback(const std::string &in_robot);
 
 private:
-    size_t id = 0;
     std::string robot;
 
 public:
@@ -166,7 +165,7 @@ private:
      *
      * @param object_names Object names to destroy
      */
-    void destroy_objects(const std::vector<std::string> object_names);
+    void destroy_objects(const std::set<std::string> object_names);
 
     /**
      * @brief Add marker of an object
@@ -182,7 +181,7 @@ private:
      *
      * @param robot_id Robot id
      */
-    void set_base_pose(const int body_id, const int robot_id = 0);
+    void set_base_pose(const int body_id, const std::string &robot_id = "");
 
     /**
      * @brief Add joint state of the world
@@ -226,9 +225,9 @@ private:
 
     std::string root_frame_id;
 
-    std::vector<CmdVelCallback *> cmd_vel_callbacks;
+    std::map<std::string, CmdVelCallback *> cmd_vel_callbacks;
 
-    std::vector<ros::Subscriber> cmd_vel_subs;
+    std::map<std::string, ros::Subscriber> cmd_vel_subs;
 
     ros::ServiceServer reset_robot_server;
 
@@ -236,7 +235,7 @@ private:
 
     ros::ServiceServer destroy_objects_server;
 
-    std::vector<ros::Publisher> base_pose_pubs;
+    std::map<std::string, ros::Publisher> base_pose_pubs;
 
     ros::Publisher marker_array_pub;
 
