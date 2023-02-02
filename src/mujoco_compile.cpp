@@ -188,7 +188,7 @@ void add_robot_body(const boost::filesystem::path &model_path)
         {
             tinyxml2::XMLElement *robot_element = model_xml_doc.NewElement("body");
 
-            robot_element->SetAttribute("name", model_path.stem().c_str());
+            robot_element->SetAttribute("name", model.getName().c_str());
             while (tinyxml2::XMLElement *body_element = element->FirstChildElement())
             {
                 robot_element->LinkEndChild(body_element);

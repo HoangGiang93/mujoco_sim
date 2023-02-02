@@ -726,11 +726,11 @@ bool save_geom_quat(const char *path)
  */
 bool load_tmp_model(bool reset)
 {
-	char error[1000] = "Could not load binary model";
+	char error[100] = "Could not load binary model";
 	if (reset)
 	{
 		// load and compile model
-		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
+		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 100);
 		if (!m)
 		{
 			mju_warning_s("Could not load model file '%s'", tmp_model_path.c_str());
@@ -747,7 +747,7 @@ bool load_tmp_model(bool reset)
 	else
 	{
 		// Load current.xml
-		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 1000);
+		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 100);
 		if (!m_new)
 		{
 			mju_warning_s("Load model error: %s", error);
@@ -822,8 +822,8 @@ void MjSim::init_sensors()
 bool MjSim::add_data()
 {
 	// Save current.xml
-	char error[1000] = "Could not save binary model";
-	mj_saveLastXML(tmp_model_path.c_str(), m, error, 1000);
+	char error[100] = "Could not save binary model";
+	mj_saveLastXML(tmp_model_path.c_str(), m, error, 100);
 
 	modify_xml(tmp_model_path.c_str());
 
@@ -851,8 +851,8 @@ bool MjSim::add_data()
 bool MjSim::remove_body(const std::set<std::string> &body_names)
 {
 	// Save current.xml
-	char error[1000] = "Could not save binary model";
-	mj_saveLastXML(tmp_model_path.c_str(), m, error, 1000);
+	char error[100] = "Could not save binary model";
+	mj_saveLastXML(tmp_model_path.c_str(), m, error, 100);
 
 	// Modify current.xml
 	modify_xml(tmp_model_path.c_str(), body_names);

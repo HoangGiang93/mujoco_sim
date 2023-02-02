@@ -70,6 +70,20 @@ bool pub_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
+bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
+{
+    std::string robot_description_string;
+    if (ros::param::get(robot_description, robot_description_string))
+    {
+        return urdf_model.initParamWithNodeHandle(robot_description, n);
+    }
+    else
+    {
+        ROS_WARN("%s not found", robot_description);
+        return false;
+    }
+}
+
 void set_params()
 {
     std::string model_path_string;
@@ -107,7 +121,37 @@ void set_params()
     std::vector<std::string> robots;
     if (!ros::param::get("~robots", robots))
     {
-        robots.push_back(model_path.stem().string());
+        urdf::Model urdf_model;
+        if (init_urdf(urdf_model, ros::NodeHandle()))
+        {
+            robots.push_back(urdf_model.getName());
+        }
+        else
+        {
+            tinyxml2::XMLDocument current_xml_doc;
+            if (current_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+            {
+                mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+                robots.push_back("robot");
+            }
+            for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
+                 worldbody_element = worldbody_element->NextSiblingElement();
+                 worldbody_element != nullptr)
+            {
+                if (strcmp(worldbody_element->FirstChildElement()->Value(), "body") == 0)
+                {
+                    for (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement();
+                         body_element = body_element->NextSiblingElement();
+                         body_element != nullptr)
+                    {
+                        if (body_element->Attribute("name") != nullptr)
+                        {
+                            robots.push_back(body_element->Attribute("name"));
+                        }
+                    }
+                }
+            }
+        }
     }
     MjSim::robots = std::set<std::string>(robots.begin(), robots.end());
 
@@ -190,20 +234,6 @@ void set_params()
                 }
             }
         }
-    }
-}
-
-bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
-{
-    std::string robot_description_string;
-    if (ros::param::get(robot_description, robot_description_string))
-    {
-        return urdf_model.initParamWithNodeHandle(robot_description, n);
-    }
-    else
-    {
-        ROS_WARN("%s not found", robot_description);
-        return false;
     }
 }
 
@@ -1337,7 +1367,7 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
             case EObjectType::World:
                 if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
+                    if (object_name == model_path.stem().string() || (MjSim::robots.find(object_name) != MjSim::robots.end()))
                     {
                         continue;
                     }
@@ -1428,7 +1458,7 @@ void MjRos::publish_joint_states(const EObjectType object_type)
             case EObjectType::World:
                 if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
+                    if (object_name == model_path.stem().string() || (MjSim::robots.find(object_name) != MjSim::robots.end()))
                     {
                         continue;
                     }
