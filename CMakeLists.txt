@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   tf2_ros
   urdf
+  robot_state_publisher
 )
 
 find_package(Doxygen)
@@ -95,8 +96,8 @@ target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
   ${catkin_LIBRARIES}
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
+  /opt/ros/noetic/lib/libjoint_state_listener.so
   tinyxml2
-  
 )
 
 set(MUJOCO_SIM_NODE mujoco_sim_node)
@@ -111,6 +112,7 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SIM_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
+  /opt/ros/noetic/lib/libjoint_state_listener.so
   glfw
   tinyxml2
   GL

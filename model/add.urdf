@@ -1,3 +1,67 @@
 <robot name="spawn_objects">
-  <link name="worldbody"/>
+  <link name="odom"/>
+  <joint name="Object_0_joint" type="fixed">
+      <parent link="odom"/>
+      <child link="Object_0"/>
+  </joint>
+  <joint name="box_top_layer_bottom_joint" type="continuous">
+      <origin xyz="0.17 0 0.166" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <parent link="Object_0"/>
+      <child link="box_top_layer_bottom"/>
+  </joint>
+  <link name="box_top_layer_bottom">
+      <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+              <mesh filename="package://mujoco_sim/model/tmp/../../../mujoco_world/mujoco_world/model/box/box/box/meshes/BoxTopLayerBottom.stl"/>
+          </geometry>
+      </collision>
+  </link>
+  <joint name="box_top_layer_top_joint" type="continuous">
+      <origin xyz="-0.17 0 0.168" rpy="0 0 0"/>
+      <axis xyz="0 -1 0"/>
+      <parent link="Object_0"/>
+      <child link="box_top_layer_top"/>
+  </joint>
+  <link name="box_top_layer_top">
+      <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+              <mesh filename="package://mujoco_sim/model/tmp/../../../mujoco_world/mujoco_world/model/box/box/box/meshes/BoxTopLayerTop.stl"/>
+          </geometry>
+      </collision>
+  </link>
+  <link name="Object_0">
+      <collision>
+          <origin xyz="0 0 -0.1675" rpy="0 0 0"/>
+          <geometry>
+              <box size="0.340000 0.320000 0.005000"/>
+          </geometry>
+      </collision>
+      <collision>
+          <origin xyz="0.167578 0 -0.0025" rpy="0 0 0"/>
+          <geometry>
+              <box size="0.005156 0.320000 0.335000"/>
+          </geometry>
+      </collision>
+      <collision>
+          <origin xyz="-0.167578 0 -0.0025" rpy="0 0 0"/>
+          <geometry>
+              <box size="0.005156 0.320000 0.335000"/>
+          </geometry>
+      </collision>
+      <collision>
+          <origin xyz="0 0.1575 -0.0025" rpy="0 0 0"/>
+          <geometry>
+              <box size="0.340312 0.005000 0.335000"/>
+          </geometry>
+      </collision>
+      <collision>
+          <origin xyz="0 -0.1575 -0.0025" rpy="0 0 0"/>
+          <geometry>
+              <box size="0.340312 0.005000 0.335000"/>
+          </geometry>
+      </collision>
+  </link>
 </robot>

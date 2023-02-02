@@ -1698,7 +1698,7 @@ tinyxml2::XMLElement *set_body_description(tinyxml2::XMLElement *parent_body_ele
             joint_element->SetAttribute("name", (std::string(parent_body_element->Attribute("name")) + "_joint").c_str());
             if (strcmp(element->Value(), "freejoint") == 0)
             {
-                joint_element->SetAttribute("type", "floating");
+                joint_element->SetAttribute("type", "fixed");
             }
             else if (strcmp(element->Value(), "joint") == 0)
             {

@@ -25,7 +25,7 @@
     </group>
 
     <param name="spawned_objects_description" command="$(find xacro)/xacro '$(find mujoco_sim)/model/add.urdf'" />
-    <node name="spawned_objects_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+    <node name="dynamic_robot_state_publisher" pkg="dynamic_robot_state_publisher" type="dynamic_robot_state_publisher" output="screen">
         <remap from="robot_description" to="spawned_objects_description" />
         <remap from="joint_states" to="/mujoco/joint_states" />
     </node>
