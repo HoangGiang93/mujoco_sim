@@ -59,6 +59,14 @@ public:
     void callback(const geometry_msgs::Twist &msg);
 };
 
+enum EObjectType : std::int8_t
+{
+    None = 0,
+    Robot = 1,
+    World = 2,
+    SpawnedObject = 3
+};
+
 class MjRos
 {
 public:
@@ -77,25 +85,25 @@ public:
      * @brief Publish tf
      *
      */
-    void publish_tf();
+    void publish_tf(const EObjectType object_type = EObjectType::None);
 
     /**
      * @brief Publish markers
      *
      */
-    void publish_marker_array();
+    void publish_marker_array(const EObjectType object_type = EObjectType::None);
 
     /**
      * @brief Publish object states
      *
      */
-    void publish_object_state_array();
+    void publish_object_state_array(const EObjectType object_type = EObjectType::None);
 
     /**
      * @brief Publish world joint states
      *
      */
-    void publish_world_joint_states();
+    void publish_joint_states(const EObjectType object_type = EObjectType::None);
 
     /**
      * @brief Publish base pose
@@ -165,7 +173,7 @@ private:
      *
      * @param body_id Body id of the object
      */
-    void add_marker(const int body_id);
+    void add_marker(const int body_id, const EObjectType object_type);
 
     /**
      * @brief Set pose of the base
@@ -181,14 +189,14 @@ private:
      *
      * @param body_id Body id of the body
      */
-    void add_world_joint_states(const int body_id);
+    void add_joint_states(const int body_id, const EObjectType object_type);
 
     /**
      * @brief Add state of an object
      *
      * @param body_id Body id of the object
      */
-    void add_object_state(const int body_id);
+    void add_object_state(const int body_id, const EObjectType object_type);
 
     /**
      * @brief Set transform of an object
@@ -228,15 +236,13 @@ private:
 
     ros::ServiceServer destroy_objects_server;
 
-    ros::Publisher marker_array_pub;
-
     std::vector<ros::Publisher> base_pose_pubs;
 
-    ros::Publisher object_states_pub;
+    ros::Publisher marker_array_pub;
 
-    ros::Publisher world_joint_states_pub;
+    ros::Publisher object_state_array_pub;
 
-    ros::Publisher spawned_object_joint_states_pub;
+    std::map<EObjectType, ros::Publisher> joint_states_pub;
 
     ros::Publisher sensors_pub;
 

@@ -181,10 +181,10 @@ int main(int argc, char **argv)
 
     mjcb_control = controller;
 
-    std::thread ros_thread1(&MjRos::publish_tf, mj_ros);
-    std::thread ros_thread2(&MjRos::publish_marker_array, mj_ros);
-    std::thread ros_thread3(&MjRos::publish_object_state_array, mj_ros);
-    std::thread ros_thread4(&MjRos::publish_world_joint_states, mj_ros);
+    std::thread ros_thread1(&MjRos::publish_tf, mj_ros, EObjectType::None);
+    std::thread ros_thread2(&MjRos::publish_marker_array, mj_ros, EObjectType::None);
+    std::thread ros_thread3(&MjRos::publish_object_state_array, mj_ros, EObjectType::None);
+    std::thread ros_thread4(&MjRos::publish_joint_states, mj_ros, EObjectType::None);
     std::thread ros_thread5(&MjRos::publish_base_pose, mj_ros);
     std::thread ros_thread6(&MjRos::publish_sensor_data, mj_ros);
     std::thread ros_thread7(&MjRos::spawn_and_destroy_objects, mj_ros);

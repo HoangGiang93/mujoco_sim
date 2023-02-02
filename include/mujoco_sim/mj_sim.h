@@ -22,9 +22,10 @@
 
 #include "mj_model.h"
 
-#include <map>
-#include <vector>
 #include <functional>
+#include <map>
+#include <set>
+#include <vector>
 
 bool load_tmp_model(bool reset = true);
 
@@ -81,11 +82,13 @@ public:
 
     static std::map<std::string, std::vector<std::string>> joint_names;
 
-    static std::vector<std::string> joint_ignores;
+    static std::set<std::string> joint_ignores;
 
     static std::map<std::string, mjtNum> odom_vels;
 
-    static std::vector<std::string> link_names;
+    static std::set<std::string> link_names;
+
+    static std::set<std::string> spawned_object_names;
 
     static mjtNum sim_start;
 

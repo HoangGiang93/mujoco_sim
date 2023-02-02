@@ -108,12 +108,14 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:aca804da71c36848ed0121b8cfb55ce08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4379dd751034d7ba76d7155923f3eb2"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, std::vector&lt; std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa4379dd751034d7ba76d7155923f3eb2">joint_names</a></td></tr>
 <tr class="separator:aa4379dd751034d7ba76d7155923f3eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a4ac5e8a3e7450d1f8e33b173365451d3">joint_ignores</a></td></tr>
-<tr class="separator:a4ac5e8a3e7450d1f8e33b173365451d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dc314bfc332a1e99e052f41193b3eff"><td class="memItemLeft" align="right" valign="top">static std::set&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a2dc314bfc332a1e99e052f41193b3eff">joint_ignores</a></td></tr>
+<tr class="separator:a2dc314bfc332a1e99e052f41193b3eff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0dfaec832b709cfea62ec80e5fd94bad"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, mjtNum &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a0dfaec832b709cfea62ec80e5fd94bad">odom_vels</a></td></tr>
 <tr class="separator:a0dfaec832b709cfea62ec80e5fd94bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a293ecea5493f2b4e78ac54e24e48b5c7"><td class="memItemLeft" align="right" valign="top">static std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a293ecea5493f2b4e78ac54e24e48b5c7">link_names</a></td></tr>
-<tr class="separator:a293ecea5493f2b4e78ac54e24e48b5c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9539a80dbc6c2a30e001735821aaffad"><td class="memItemLeft" align="right" valign="top">static std::set&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a9539a80dbc6c2a30e001735821aaffad">link_names</a></td></tr>
+<tr class="separator:a9539a80dbc6c2a30e001735821aaffad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a893cc5a9f597dca52cb85768db696487"><td class="memItemLeft" align="right" valign="top">static std::set&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a893cc5a9f597dca52cb85768db696487">spawned_object_names</a></td></tr>
+<tr class="separator:a893cc5a9f597dca52cb85768db696487"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memItemLeft" align="right" valign="top">static mjtNum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd">sim_start</a></td></tr>
 <tr class="separator:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa810b31343a0c16940cf482e29d504d0"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa810b31343a0c16940cf482e29d504d0">u</a> = NULL</td></tr>
@@ -362,8 +364,8 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="a4ac5e8a3e7450d1f8e33b173365451d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ac5e8a3e7450d1f8e33b173365451d3">&#9670;&nbsp;</a></span>joint_ignores</h2>
+<a id="a2dc314bfc332a1e99e052f41193b3eff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2dc314bfc332a1e99e052f41193b3eff">&#9670;&nbsp;</a></span>joint_ignores</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -372,7 +374,7 @@ false Fail to remove </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::string &gt; MjSim::joint_ignores</td>
+          <td class="memname">std::set&lt; std::string &gt; MjSim::joint_ignores</td>
         </tr>
       </table>
   </td>
@@ -406,8 +408,8 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="a293ecea5493f2b4e78ac54e24e48b5c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a293ecea5493f2b4e78ac54e24e48b5c7">&#9670;&nbsp;</a></span>link_names</h2>
+<a id="a9539a80dbc6c2a30e001735821aaffad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9539a80dbc6c2a30e001735821aaffad">&#9670;&nbsp;</a></span>link_names</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -416,7 +418,7 @@ false Fail to remove </dd></dl>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::string &gt; MjSim::link_names</td>
+          <td class="memname">std::set&lt; std::string &gt; MjSim::link_names</td>
         </tr>
       </table>
   </td>
@@ -582,6 +584,28 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
+<a id="a893cc5a9f597dca52cb85768db696487"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a893cc5a9f597dca52cb85768db696487">&#9670;&nbsp;</a></span>spawned_object_names</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::set&lt; std::string &gt; MjSim::spawned_object_names</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a1b22b4acbcbc8d870ad07f6de414402f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1b22b4acbcbc8d870ad07f6de414402f">&#9670;&nbsp;</a></span>tau</h2>
 
@@ -627,8 +651,8 @@ false Fail to remove </dd></dl>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/<a class="el" href="mj__sim_8h_source.html">mj_sim.h</a></li>
-<li>/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/<a class="el" href="mj__sim_8cpp.html">mj_sim.cpp</a></li>
+<li>/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/<a class="el" href="mj__sim_8h_source.html">mj_sim.h</a></li>
+<li>/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/src/<a class="el" href="mj__sim_8cpp.html">mj_sim.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

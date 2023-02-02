@@ -30,11 +30,13 @@ double MjSim::max_time_step;
 
 std::map<std::string, std::vector<std::string>> MjSim::joint_names;
 
-std::vector<std::string> MjSim::joint_ignores;
+std::set<std::string> MjSim::joint_ignores;
 
 std::map<std::string, mjtNum> MjSim::odom_vels;
 
-std::vector<std::string> MjSim::link_names;
+std::set<std::string> MjSim::link_names;
+
+std::set<std::string> MjSim::spawned_object_names;
 
 mjtNum *MjSim::u = NULL;
 
@@ -239,6 +241,7 @@ static void init_tmp()
 					{
 						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
 					}
+					mesh_paths[asset_element->Attribute("name")] = asset_element->Attribute("file");
 				}
 			}
 		}
@@ -275,7 +278,26 @@ static void init_tmp()
 				{
 					meshdir_abs_path = meshdir_path;
 				}
+				
 				element->DeleteAttribute("meshdir");
+			}
+		}
+
+		if (strcmp(element->Value(), "asset") == 0)
+		{
+			for (tinyxml2::XMLElement *asset_element = element->FirstChildElement();
+					 asset_element != nullptr;
+					 asset_element = asset_element->NextSiblingElement())
+			{
+				if (asset_element->Attribute("file") != nullptr)
+				{
+					boost::filesystem::path file_path = asset_element->Attribute("file");
+					if (file_path.is_relative())
+					{
+						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+					}
+					mesh_paths[asset_element->Attribute("name")] = asset_element->Attribute("file");
+				}
 			}
 		}
 
@@ -706,7 +728,6 @@ bool load_tmp_model(bool reset)
 		mtx.unlock();
 
 		MjSim::geom_pose.clear();
-
 		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 }

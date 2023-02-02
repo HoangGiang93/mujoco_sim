@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['typeunknown_243',['typeUNKNOWN',['../mujoco__compile_8cpp.html#a06fc87d81c62e9abb8790b6e5713c55baea63e638bd81a685a3fbf2c9c06ab06a',1,'mujoco_compile.cpp']]],
-  ['typeurdf_244',['typeURDF',['../mujoco__compile_8cpp.html#a06fc87d81c62e9abb8790b6e5713c55ba6b79d64c8aeb57f85441b0e64bc62420',1,'mujoco_compile.cpp']]],
-  ['typexml_245',['typeXML',['../mujoco__compile_8cpp.html#a06fc87d81c62e9abb8790b6e5713c55ba5963e7775c914cf9a1b85864c87ebe8c',1,'mujoco_compile.cpp']]]
+  ['none_251',['None',['../mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670ac9d3e887722f2bc482bcca9d41c512af',1,'mj_ros.h']]]
 ];
