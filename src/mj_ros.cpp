@@ -697,7 +697,15 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                     {
                                         element->SetAttribute("file", (mesh_dir / element->Attribute("file")).c_str());
                                     }
-                                    mesh_paths[element->Attribute("name")] = element->Attribute("file");
+                                    std::string scale_str = "1 1 1";
+                                    if (element->Attribute("scale") != nullptr)
+                                    {
+                                        scale_str = element->Attribute("scale");
+                                    }
+                                    std::istringstream iss(scale_str);
+				                    std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    
+                                    mesh_paths[element->Attribute("name")] = {element->Attribute("file"), scale};
                                 }
                             }
                         }
@@ -1594,10 +1602,10 @@ void MjRos::add_marker(const int body_id, const EObjectType object_type)
 
         case mjtGeom::mjGEOM_MESH:
             marker[object_type].type = visualization_msgs::Marker::MESH_RESOURCE;
-            mesh_path = boost::filesystem::relative(mesh_paths[mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id])], tmp_world_path.parent_path());
+            mesh_path = boost::filesystem::relative(mesh_paths[mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id])].first, tmp_world_path.parent_path());
             if (!boost::filesystem::exists(tmp_world_path.parent_path() / mesh_path) || !mesh_path.has_extension())
             {
-                ROS_WARN("Body %s: Mesh %s - %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].c_str(), mesh_path.parent_path().c_str());
+                ROS_WARN("Body %s: Mesh %s - %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].first.c_str(), mesh_path.parent_path().c_str());
                 continue;
             }
             marker[object_type].mesh_resource = "package://mujoco_sim/model/tmp/" + mesh_path.string();

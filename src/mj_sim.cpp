@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <ros/package.h>
 #include <ros/param.h>
+#include <tf/tf.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
 
@@ -241,7 +242,15 @@ static void init_tmp()
 					{
 						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
 					}
-					mesh_paths[asset_element->Attribute("name")] = asset_element->Attribute("file");
+					std::string scale_str = "1 1 1";
+					if (asset_element->Attribute("scale") != nullptr)
+					{
+						scale_str = asset_element->Attribute("scale");
+					}
+					std::istringstream iss(scale_str);
+					std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+
+					mesh_paths[asset_element->Attribute("name")] = {asset_element->Attribute("file"), scale};
 				}
 			}
 		}
@@ -278,7 +287,7 @@ static void init_tmp()
 				{
 					meshdir_abs_path = meshdir_path;
 				}
-				
+
 				element->DeleteAttribute("meshdir");
 			}
 		}
@@ -296,7 +305,16 @@ static void init_tmp()
 					{
 						asset_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
 					}
-					mesh_paths[asset_element->Attribute("name")] = asset_element->Attribute("file");
+
+					std::string scale_str = "1 1 1";
+					if (asset_element->Attribute("scale") != nullptr)
+					{
+						scale_str = asset_element->Attribute("scale");
+					}
+					std::istringstream iss(scale_str);
+					std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+
+					mesh_paths[asset_element->Attribute("name")] = {asset_element->Attribute("file"), scale};
 				}
 			}
 		}
@@ -617,28 +635,44 @@ void get_geom_element(tinyxml2::XMLElement *parent_element)
 		else if (strcmp(element->Value(), "geom") == 0 && element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
 		{
 			std::vector<mjtNum> geom_pos = {0, 0, 0};
-			std::vector<mjtNum> geom_quat = {1, 0, 0, 0};
 			if (element->Attribute("pos") != nullptr)
 			{
 				std::string pos_str = element->Attribute("pos");
 				std::istringstream iss(pos_str);
 				geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 			}
+			for (size_t i = 0; i < geom_pos.size(); i++)
+			{
+				geom_pos[i] *= mesh_paths[element->Attribute("mesh")].second[i];
+			}
+
+			std::vector<mjtNum> euler = {0, 0, 0};
 			if (element->Attribute("quat") != nullptr)
 			{
 				std::string quat_str = element->Attribute("quat");
 				std::istringstream iss(quat_str);
-				geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+				std::vector<mjtNum> geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+				tf::Quaternion quat(geom_quat[1], geom_quat[2], geom_quat[3], geom_quat[0]);
+				tf::Matrix3x3 rot_mat(quat);
+				rot_mat.getRPY(euler[0], euler[1], euler[2]);
 			}
 			else if (element->Attribute("euler") != nullptr)
 			{
 				std::string euler_str = element->Attribute("euler");
 				std::istringstream iss(euler_str);
-				std::vector<mjtNum> mesh_euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-				tf2::Quaternion quat;
-				quat.setRPY(mesh_euler[0], mesh_euler[1], mesh_euler[2]);
-				geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+				euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 			}
+			for (size_t i = 0; i < euler.size(); i++)
+			{
+				if (mesh_paths[element->Attribute("mesh")].second[i + 3] < 0)
+				{
+					euler[i] += M_PI;
+				}
+			}
+
+			tf2::Quaternion quat;
+			quat.setRPY(euler[0], euler[1], euler[2]);
+			std::vector<mjtNum> geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
 
 			const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
 			for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
@@ -667,7 +701,7 @@ bool save_geom_quat(const char *path)
 		mju_warning_s("Failed to load file \"%s\"\n", path);
 		return false;
 	}
-	
+
 	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement())
@@ -708,7 +742,7 @@ bool load_tmp_model(bool reset)
 		init_malloc();
 
 		MjSim::geom_pose.clear();
-		return save_geom_quat(tmp_model_path.c_str());
+		return save_geom_quat(cache_model_path.c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 	else
 	{

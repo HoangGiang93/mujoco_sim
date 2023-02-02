@@ -45,4 +45,4 @@ extern boost::filesystem::path world_path;
 
 extern boost::filesystem::path tmp_world_path;
 
-extern std::map<std::string, boost::filesystem::path> mesh_paths;
+extern std::map<std::string, std::pair<boost::filesystem::path, std::vector<mjtNum>>> mesh_paths;
