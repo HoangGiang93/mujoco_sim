@@ -36,7 +36,6 @@
 #include <std_srvs/Trigger.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <urdf/model.h>
 #include <visualization_msgs/MarkerArray.h>
 
 /**
@@ -237,6 +236,8 @@ private:
 
     ros::Publisher world_joint_states_pub;
 
+    ros::Publisher spawned_object_joint_states_pub;
+
     ros::Publisher sensors_pub;
 
     tf2_ros::TransformBroadcaster br;
@@ -245,27 +246,3 @@ private:
 
     std::map<std::string, float> joint_inits;
 };
-
-/**
- * @brief This function `urdf::Model::initParamWithNodeHandle` should be inside the implementation file, but c++ doesn't want to compile...
- * It makes no sense to put it here, I know...
- * If anyone know how to fix this, please kindly tell me, you will earn a lot of respect from me and my friends :) May your name be honoured!
- *
- * @param urdf_model The urdf model to be initialized
- * @param n The node handle
- * @param robot_description Robot description
- * @return True if successfully initialized
- */
-bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
-{
-    std::string robot_description_string;
-    if (ros::param::get(robot_description, robot_description_string))
-    {
-        return urdf_model.initParamWithNodeHandle(robot_description, n);
-    }
-    else
-    {
-        ROS_WARN("%s not found", robot_description);
-        return false;
-    }
-}

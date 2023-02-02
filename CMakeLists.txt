@@ -95,6 +95,7 @@ target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
   ${catkin_LIBRARIES}
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
+  $ENV{ROS_ROOT}/../../lib/liburdf.so
   tinyxml2
 )
 
@@ -110,6 +111,7 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SIM_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
+  $ENV{ROS_ROOT}/../../lib/liburdf.so
   glfw
   tinyxml2
   GL

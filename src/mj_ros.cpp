@@ -28,6 +28,7 @@
 #include <ros/package.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
+#include <urdf/model.h>
 
 using namespace std::chrono_literals;
 
@@ -38,7 +39,7 @@ std::vector<std::string> root_names;
 double pub_object_marker_array_rate;
 double pub_object_tf_rate;
 double pub_object_state_array_rate;
-double pub_world_joint_state_rate;
+double pub_world_joint_states_rate;
 double pub_base_pose_rate;
 double pub_sensor_data_rate;
 double spawn_and_destroy_objects_rate;
@@ -48,6 +49,7 @@ visualization_msgs::Marker marker;
 visualization_msgs::MarkerArray marker_array;
 std::vector<nav_msgs::Odometry> base_poses;
 sensor_msgs::JointState world_joint_states;
+sensor_msgs::JointState spawned_object_joint_states;
 mujoco_msgs::ObjectStateArray object_state_array;
 
 std::condition_variable condition;
@@ -187,6 +189,20 @@ void set_params()
     }
 }
 
+bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
+{
+    std::string robot_description_string;
+    if (ros::param::get(robot_description, robot_description_string))
+    {
+        return urdf_model.initParamWithNodeHandle(robot_description, n);
+    }
+    else
+    {
+        ROS_WARN("%s not found", robot_description);
+        return false;
+    }
+}
+
 CmdVelCallback::CmdVelCallback(const size_t in_id, const std::string &in_robot) : id(in_id), robot(in_robot)
 {
 }
@@ -238,9 +254,9 @@ void MjRos::init()
     {
         pub_object_state_array_of_free_bodies_only = true;
     }
-    if (!ros::param::get("~pub_world_joint_state_rate", pub_world_joint_state_rate))
+    if (!ros::param::get("~pub_world_joint_states_rate", pub_world_joint_states_rate))
     {
-        pub_world_joint_state_rate = 0.0;
+        pub_world_joint_states_rate = 0.0;
     }
     if (!ros::param::get("~pub_base_pose_rate", pub_base_pose_rate))
     {
@@ -280,7 +296,7 @@ void MjRos::init()
     if (MjSim::robots.size() < 2)
     {
         urdf::Model urdf_model;
-        if (init_urdf(urdf_model, n)) // this looks so retared...
+        if (init_urdf(urdf_model, n))
         {
             root_names.push_back(urdf_model.getRoot()->name);
         }
@@ -294,7 +310,7 @@ void MjRos::init()
         for (const std::string &robot : MjSim::robots)
         {
             urdf::Model urdf_model;
-            if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str())) // this looks so retared...
+            if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str()))
             {
                 root_names.push_back(urdf_model.getRoot()->name);
             }
@@ -349,6 +365,7 @@ void MjRos::init()
 
     object_states_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
     world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
+    spawned_object_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/object_joint_states", 0);
     sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
 
     reset_robot();
@@ -487,7 +504,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             {
                 object.info.name += "_" + std::to_string(i);
             }
-            
+
             ROS_WARN("[Spawn #%d] Empty name found, replace to %s", spawn_nr, object.info.name.c_str());
         }
         if (std::find(objects_to_spawn.begin(), objects_to_spawn.end(), object) == objects_to_spawn.end() &&
@@ -1168,12 +1185,12 @@ void MjRos::publish_object_state_array()
 
 void MjRos::publish_world_joint_states()
 {
-    if (pub_world_joint_state_rate < 1E-9)
+    if (pub_world_joint_states_rate < 1E-9)
     {
         return;
     }
 
-    ros::Rate loop_rate(pub_world_joint_state_rate);
+    ros::Rate loop_rate(pub_world_joint_states_rate);
 
     std_msgs::Header header;
     header.frame_id = root_frame_id;
@@ -1190,6 +1207,8 @@ void MjRos::publish_world_joint_states()
         world_joint_states.position.clear();
         world_joint_states.velocity.clear();
         world_joint_states.effort.clear();
+
+        spawned_object_joint_states = world_joint_states;
 
         // Publish tf and marker of objects
         std::string object_name;
@@ -1208,6 +1227,7 @@ void MjRos::publish_world_joint_states()
         }
 
         world_joint_states_pub.publish(world_joint_states);
+        spawned_object_joint_states_pub.publish(spawned_object_joint_states);
 
         ros::spinOnce();
         loop_rate.sleep();
