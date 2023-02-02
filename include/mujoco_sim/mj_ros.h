@@ -221,8 +221,6 @@ public:
 private:
     ros::NodeHandle n;
 
-    std::string root_frame_id;
-
     std::vector<CmdVelCallback *> cmd_vel_callbacks;
 
     std::vector<ros::Subscriber> cmd_vel_subs;

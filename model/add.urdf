@@ -1,0 +1,3 @@
+<robot name="spawn_objects">
+  <link name="worldbody"/>
+</robot>

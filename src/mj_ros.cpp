@@ -26,6 +26,7 @@
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
 #include <ros/package.h>
+#include <tf/tf.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tinyxml2.h>
 
@@ -34,6 +35,8 @@ using namespace std::chrono_literals;
 ros::Time MjRos::ros_start;
 
 std::vector<std::string> root_names;
+
+std::string root_frame_id;
 
 double pub_object_marker_array_rate;
 double pub_object_tf_rate;
@@ -66,7 +69,7 @@ bool pub_object_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
-tinyxml2::XMLDocument spawn_objects_urdf_doc;
+tinyxml2::XMLDocument spawned_objects_urdf_doc;
 
 void set_params()
 {
@@ -353,6 +356,24 @@ void MjRos::init()
     world_joint_states_pub = n.advertise<sensor_msgs::JointState>("/mujoco/joint_states", 0);
     sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
 
+    boost::filesystem::path add_model_urdf_path = add_model_path.parent_path() / "add.urdf";
+    if (!boost::filesystem::exists(add_model_urdf_path))
+    {
+        tinyxml2::XMLNode *root = spawned_objects_urdf_doc.NewElement("robot");
+        root->ToElement()->SetAttribute("name", "spawn_objects");
+        spawned_objects_urdf_doc.LinkEndChild(root);
+
+        tinyxml2::XMLElement *worldbody_element = spawned_objects_urdf_doc.NewElement("link");
+        root->LinkEndChild(worldbody_element);
+        worldbody_element->SetAttribute("name", root_frame_id.c_str());
+
+        if (spawned_objects_urdf_doc.SaveFile(add_model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
+        {
+            ROS_WARN("Failed to save file \"%s\"\n", add_model_urdf_path.c_str());
+            return;
+        }
+    }
+
     reset_robot();
 }
 
@@ -489,7 +510,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
             {
                 object.info.name += "_" + std::to_string(i);
             }
-            
+
             ROS_WARN("[Spawn #%d] Empty name found, replace to %s", spawn_nr, object.info.name.c_str());
         }
         if (std::find(objects_to_spawn.begin(), objects_to_spawn.end(), object) == objects_to_spawn.end() &&
@@ -514,6 +535,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
         MjSim::reload_mesh = true;
         res.names = names;
         ROS_INFO("[Spawn #%d] Spawned successfully", spawn_nr);
+        set_objects_description();
     }
     else
     {
@@ -803,7 +825,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     if (object_names_to_destroy.empty())
     {
         res.object_states = object_states;
-        ROS_WARN("[Destry #%d] Can't find any destroyable object, either the object doesn't exist or there is no object to destroy", spawn_nr);
+        ROS_WARN("[Destroy #%d] Can't find any destroyable object, either the object doesn't exist or there is no object to destroy", spawn_nr);
         return true;
     }
     else
@@ -1534,79 +1556,319 @@ void MjRos::add_world_joint_states(const int body_id)
     }
 }
 
-tinyxml2::XMLElement *set_body_description(const std::string &meshes_path, tinyxml2::XMLElement *parent_body_element)
+tinyxml2::XMLElement *set_body_description(tinyxml2::XMLElement *parent_body_element)
 {
+    tinyxml2::XMLElement *link_element_out = spawned_objects_urdf_doc.NewElement("link");
     for (tinyxml2::XMLElement *element = parent_body_element->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
-	{
+         element != nullptr;
+         element = element->NextSiblingElement())
+    {
         if (strcmp(element->Value(), "body") == 0)
         {
-            tinyxml2::XMLElement *link_element = spawn_objects_urdf_doc.NewElement("link");
+            tinyxml2::XMLElement *link_element = set_body_description(element);
             if (element->Attribute("name") != nullptr)
             {
                 link_element->SetAttribute("name", element->Attribute("name"));
+                spawned_objects_urdf_doc.FirstChildElement()->LinkEndChild(link_element);
             }
-            tinyxml2::XMLElement *collision_element = set_body_description(meshes_path, element);
+            else
+            {
+                ROS_WARN("Body of %s has no name", parent_body_element->Value());
+            }
         }
         else if (strcmp(element->Value(), "geom") == 0)
         {
-            tinyxml2::XMLElement *collision_element = spawn_objects_urdf_doc.NewElement("collision");
-            
-            tinyxml2::XMLElement *collision_element = set_body_description(meshes_path, element);
+            tinyxml2::XMLElement *collision_element = spawned_objects_urdf_doc.NewElement("collision");
+            link_element_out->LinkEndChild(collision_element);
+            tinyxml2::XMLElement *origin_element = spawned_objects_urdf_doc.NewElement("origin");
+            collision_element->LinkEndChild(origin_element);
+
+            if (element->Attribute("pos") != nullptr)
+            {
+                origin_element->SetAttribute("xyz", element->Attribute("pos"));
+            }
+            else
+            {
+                origin_element->SetAttribute("xyz", "0 0 0");
+            }
+
+            if (element->Attribute("euler") != nullptr)
+            {
+                origin_element->SetAttribute("rpy", element->Attribute("euler"));
+            }
+            else if (element->Attribute("quat") != nullptr)
+            {
+                std::string quat_str = element->Attribute("quat");
+                std::istringstream iss(quat_str);
+                std::vector<mjtNum> quat_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                tf::Quaternion quat(quat_vec[1], quat_vec[2], quat_vec[3], quat_vec[0]);
+                tf::Matrix3x3 rot_mat(quat);
+                double roll, pitch, yaw;
+                rot_mat.getRPY(roll, pitch, yaw);
+                origin_element->SetAttribute("rpy", (std::to_string(roll) + " " + std::to_string(pitch) + " " + std::to_string(yaw)).c_str());
+            }
+            else
+            {
+                origin_element->SetAttribute("rpy", "0 0 0");
+            }
+
+            if (element->Attribute("type") != nullptr)
+            {
+                tinyxml2::XMLElement *geometry_element = spawned_objects_urdf_doc.NewElement("geometry");
+                collision_element->LinkEndChild(geometry_element);
+
+                if (strcmp(element->Attribute("type"), "box") == 0)
+                {
+                    tinyxml2::XMLElement *mesh_element = spawned_objects_urdf_doc.NewElement("box");
+                    geometry_element->LinkEndChild(mesh_element);
+                    if (element->Attribute("size") != nullptr)
+                    {
+                        std::string size_str = element->Attribute("size");
+                        std::istringstream iss(size_str);
+                        std::vector<mjtNum> size_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                        mesh_element->SetAttribute("size", (std::to_string(size_vec[0] * 2) + " " + std::to_string(size_vec[1] * 2) + " " + std::to_string(size_vec[2] * 2)).c_str());
+                    }
+                    else
+                    {
+                        mesh_element->SetAttribute("size", "2 2 2");
+                    }
+                }
+                else if (strcmp(element->Attribute("type"), "sphere") == 0)
+                {
+                    tinyxml2::XMLElement *mesh_element = spawned_objects_urdf_doc.NewElement("sphere");
+                    geometry_element->LinkEndChild(mesh_element);
+                    if (element->Attribute("size") != nullptr)
+                    {
+                        std::string size_str = element->Attribute("size");
+                        std::istringstream iss(size_str);
+                        std::vector<mjtNum> size_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                        mesh_element->SetAttribute("radius", std::to_string(size_vec[0]).c_str());
+                    }
+                    else
+                    {
+                        mesh_element->SetAttribute("radius", "1");
+                    }
+                }
+                else if (strcmp(element->Attribute("type"), "sphere") == 0)
+                {
+                    tinyxml2::XMLElement *mesh_element = spawned_objects_urdf_doc.NewElement("cylinder");
+                    geometry_element->LinkEndChild(mesh_element);
+                    if (element->Attribute("size") != nullptr)
+                    {
+                        std::string size_str = element->Attribute("size");
+                        std::istringstream iss(size_str);
+                        std::vector<mjtNum> size_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                        mesh_element->SetAttribute("radius", std::to_string(size_vec[0]).c_str());
+                        mesh_element->SetAttribute("length", std::to_string(size_vec[0] * 2).c_str());
+                    }
+                    else
+                    {
+                        mesh_element->SetAttribute("radius", "1");
+                    }
+                }
+                else if (strcmp(element->Attribute("type"), "mesh") == 0)
+                {
+                    tinyxml2::XMLElement *mesh_element = spawned_objects_urdf_doc.NewElement("mesh");
+                    geometry_element->LinkEndChild(mesh_element);
+                    if (element->Attribute("mesh") != nullptr)
+                    {
+                        const std::string mesh_path = "package://mujoco_sim/model/tmp/" + boost::filesystem::relative(mesh_paths[element->Attribute("mesh")], tmp_world_path.parent_path()).string();
+                        mesh_element->SetAttribute("filename", mesh_path.c_str());
+                    }
+                    else
+                    {
+                        ROS_WARN("Mesh path of geom from %s not found", parent_body_element->Attribute("name"));
+                    }
+                }
+                else
+                {
+                    ROS_WARN("Unrecognize type %s of %s", element->Attribute("type"), parent_body_element->Attribute("name"));
+                }
+            }
+            else
+            {
+                ROS_WARN("Body %s has no type", parent_body_element->Attribute("name"));
+            }
+        }
+        else if (strcmp(element->Value(), "freejoint") == 0 || (strcmp(element->Value(), "joint")) == 0)
+        {
+            tinyxml2::XMLElement *joint_element = spawned_objects_urdf_doc.NewElement("joint");
+            spawned_objects_urdf_doc.FirstChildElement()->LinkEndChild(joint_element);
+
+            joint_element->SetAttribute("name", (std::string(parent_body_element->Attribute("name")) + "_joint").c_str());
+            if (strcmp(element->Value(), "freejoint") == 0)
+            {
+                joint_element->SetAttribute("type", "floating");
+            }
+            else if (strcmp(element->Value(), "joint") == 0)
+            {
+                tinyxml2::XMLElement *origin_element = spawned_objects_urdf_doc.NewElement("origin");
+                joint_element->LinkEndChild(origin_element);
+
+                if (element->Attribute("pos") != nullptr)
+                {
+                    origin_element->SetAttribute("xyz", element->Attribute("pos"));
+                }
+                else
+                {
+                    origin_element->SetAttribute("xyz", "0 0 0");
+                }
+
+                if (element->Attribute("euler") != nullptr)
+                {
+                    origin_element->SetAttribute("rpy", element->Attribute("euler"));
+                }
+                else if (element->Attribute("quat") != nullptr)
+                {
+                    std::string quat_str = element->Attribute("quat");
+                    std::istringstream iss(quat_str);
+                    std::vector<mjtNum> quat_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                    tf::Quaternion quat(quat_vec[1], quat_vec[2], quat_vec[3], quat_vec[0]);
+                    tf::Matrix3x3 rot_mat(quat);
+                    double roll, pitch, yaw;
+                    rot_mat.getRPY(roll, pitch, yaw);
+                    origin_element->SetAttribute("rpy", (std::to_string(roll) + " " + std::to_string(pitch) + " " + std::to_string(yaw)).c_str());
+                }
+                else
+                {
+                    origin_element->SetAttribute("rpy", "0 0 0");
+                }
+
+                if (element->Attribute("type") == nullptr || strcmp(element->Attribute("type"), "hinge"))
+                {
+                    if (element->Attribute("range") != nullptr || (element->Attribute("limited") != nullptr && strcmp(element->Attribute("limited"), "true")))
+                    {
+                        joint_element->SetAttribute("type", "revolute");
+
+                        tinyxml2::XMLElement *limit_element = spawned_objects_urdf_doc.NewElement("limit");
+                        joint_element->LinkEndChild(limit_element);
+
+                        limit_element->SetAttribute("effort", "1000");
+                        limit_element->SetAttribute("velocity", "1000");
+                        if (element->Attribute("range") != nullptr)
+                        {
+                            std::string range_str = element->Attribute("range");
+                            std::istringstream iss(range_str);
+                            std::vector<mjtNum> range_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                            limit_element->SetAttribute("lower", range_vec[0]);
+                            limit_element->SetAttribute("upper", range_vec[1]);
+                        }
+                        else
+                        {
+                            limit_element->SetAttribute("lower", "0");
+                            limit_element->SetAttribute("upper", "0");
+                        }
+
+                        tinyxml2::XMLElement *axis_element = spawned_objects_urdf_doc.NewElement("axis");
+                        joint_element->LinkEndChild(axis_element);
+
+                        if (element->Attribute("axis") != nullptr)
+                        {
+                            axis_element->SetAttribute("xyz", element->Attribute("axis"));
+                        }
+                    }
+                    else if (element->Attribute("limited") == nullptr || strcmp(element->Attribute("limited"), "false"))
+                    {
+                        joint_element->SetAttribute("type", "continuous");
+
+                        tinyxml2::XMLElement *axis_element = spawned_objects_urdf_doc.NewElement("axis");
+                        joint_element->LinkEndChild(axis_element);
+                        if (element->Attribute("axis") != nullptr)
+                        {
+                            axis_element->SetAttribute("xyz", element->Attribute("axis"));
+                        }
+                    }
+                }
+                else if (element->Attribute("type") != nullptr || strcmp(element->Attribute("type"), "slide"))
+                {
+                    joint_element->SetAttribute("type", "prismatic");
+
+                    tinyxml2::XMLElement *limit_element = spawned_objects_urdf_doc.NewElement("limit");
+                    joint_element->LinkEndChild(limit_element);
+
+                    limit_element->SetAttribute("effort", "1000");
+                    limit_element->SetAttribute("velocity", "1000");
+                    if (element->Attribute("range") != nullptr)
+                    {
+                        std::string range_str = element->Attribute("range");
+                        std::istringstream iss(range_str);
+                        std::vector<mjtNum> range_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                        limit_element->SetAttribute("lower", range_vec[0]);
+                        limit_element->SetAttribute("upper", range_vec[1]);
+                    }
+                    else
+                    {
+                        limit_element->SetAttribute("lower", "0");
+                        limit_element->SetAttribute("upper", "0");
+                    }
+
+                    tinyxml2::XMLElement *axis_element = spawned_objects_urdf_doc.NewElement("axis");
+                    joint_element->LinkEndChild(axis_element);
+                    if (element->Attribute("axis") != nullptr)
+                    {
+                        axis_element->SetAttribute("xyz", element->Attribute("axis"));
+                    }
+                }
+            }
+
+            tinyxml2::XMLElement *parent_element = spawned_objects_urdf_doc.NewElement("parent");
+            joint_element->LinkEndChild(parent_element);
+            if (strcmp(parent_body_element->Parent()->Value(), "worldbody") == 0)
+            {
+                parent_element->SetAttribute("link", root_frame_id.c_str());
+            }
+            else if (strcmp(parent_body_element->Parent()->Value(), "body") == 0)
+            {
+                if (parent_body_element->Parent()->ToElement()->Attribute("name") != nullptr)
+                {
+                    parent_element->SetAttribute("link", parent_body_element->Parent()->ToElement()->Attribute("name"));
+                }
+                else
+                {
+                    ROS_WARN("%s has no name", parent_body_element->Parent()->Value());
+                }
+            }
+            else
+            {
+                ROS_WARN("Unrecognize parent of %s, should be either body or worldbody", parent_body_element->Value());
+            }
+
+            tinyxml2::XMLElement *child_element = spawned_objects_urdf_doc.NewElement("child");
+            joint_element->LinkEndChild(child_element);
+            child_element->SetAttribute("link", parent_body_element->Attribute("name"));
         }
     }
-    return nullptr;
+    return link_element_out;
 }
 
 void MjRos::set_objects_description()
 {
     tinyxml2::XMLDocument xml_doc;
-	if (xml_doc.LoadFile(add_model_path.c_str()) != tinyxml2::XML_SUCCESS)
-	{
-		ROS_WARN("Failed to load file \"%s\"\n", add_model_path.c_str());
-		return;
-	}
-
-    boost::filesystem::path spawn_objects_urdf_path = add_model_path.parent_path() / "spawn_objects.urdf";
-    if (!boost::filesystem::exists(spawn_objects_urdf_path))
+    if (xml_doc.LoadFile(add_model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        tinyxml2::XMLNode *root = spawn_objects_urdf_doc.NewElement("robot");
-        root->ToElement()->SetAttribute("name", "spawn_objects");
-        spawn_objects_urdf_doc.LinkEndChild(root);
+        ROS_WARN("Failed to load file \"%s\"\n", add_model_path.c_str());
+        return;
     }
-    
-    boost::filesystem::path meshdir_abs_path = world_path.parent_path();
-    for (tinyxml2::XMLElement *element = xml_doc.FirstChildElement()->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
-	{
-		if (strcmp(element->Value(), "compiler") == 0)
-		{
-			if (element->Attribute("meshdir") != nullptr)
-			{
-				boost::filesystem::path meshdir_path = element->Attribute("meshdir");
-				if (meshdir_path.is_relative())
-				{
-					meshdir_abs_path /= meshdir_path;
-				}
-				else
-				{
-					meshdir_abs_path = meshdir_path;
-				}
-                break;
-			}
-		}
-	}
-    const std::string meshes_path = "package://mujoco_sim/model/tmp/" + boost::filesystem::relative(meshdir_abs_path, tmp_world_path.parent_path()).string();
 
     for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement();
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement())
-	{
-		if (strcmp(worldbody_element->Value(), "worldbody") == 0)
-		{
-			set_body_description(meshes_path, worldbody_element);
-		}
-	}
+         worldbody_element != nullptr;
+         worldbody_element = worldbody_element->NextSiblingElement())
+    {
+        if (strcmp(worldbody_element->Value(), "worldbody") == 0)
+        {
+            set_body_description(worldbody_element);
+        }
+    }
+
+    boost::filesystem::path add_model_urdf_path = add_model_path.parent_path() / "add.urdf";
+    if (spawned_objects_urdf_doc.SaveFile(add_model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        ROS_WARN("Failed to save file \"%s\"\n", add_model_urdf_path.c_str());
+        return;
+    }
+
+    tinyxml2::XMLPrinter printer;
+    spawned_objects_urdf_doc.Print(&printer);
+
+    n.setParam("spawned_objects_description", printer.CStr());
 }

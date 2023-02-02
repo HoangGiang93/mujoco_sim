@@ -1,0 +1,9 @@
+<launch>
+
+  <param name="spawned_objects_description" command="$(find xacro)/xacro '$(find mujoco_sim)/model/tmp/add.urdf'" />
+  <node name="spawned_objects_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+      <remap from="robot_description" to="spawned_objects_description" />
+      <remap from="joint_states" to="/mujoco/joint_states" />
+  </node>
+
+</launch>
