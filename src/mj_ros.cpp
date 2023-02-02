@@ -110,7 +110,7 @@ void set_params()
     }
 
     std::vector<float> pose_init;
-    if (ros::param::get("~pos_init", pose_init) && pose_init.size() == 6)
+    if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
     {
         for (const std::string &robot : MjSim::robots)
         {
