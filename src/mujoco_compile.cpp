@@ -122,8 +122,17 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
         mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
     }
 
-    tinyxml2::XMLElement *mujoco = doc.NewElement("mujoco");
-    doc.FirstChildElement()->InsertFirstChild(mujoco);
+    tinyxml2::XMLElement *mujoco;
+    if (doc.FirstChildElement("robot") != nullptr && doc.FirstChildElement("robot")->FirstChildElement("mujoco") != nullptr)
+    {
+        mujoco = doc.FirstChildElement("robot")->FirstChildElement("mujoco");
+    }
+    else
+    {
+        mujoco = doc.NewElement("mujoco");
+    }
+
+    doc.FirstChildElement("robot")->InsertFirstChild(mujoco);
     tinyxml2::XMLElement *compiler = doc.NewElement("compiler");
     mujoco->LinkEndChild(compiler);
 
@@ -245,25 +254,82 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
     tinyxml2::XMLElement *contact_element = model_xml_doc.NewElement("contact");
     model_xml_doc.FirstChildElement()->LinkEndChild(contact_element);
 
-    for (int body_id = 0; body_id < m->nbody; body_id++)
+    if (disable_parent_child_collision_level >= 0)
     {
-        int body_id_current = body_id;
-        const std::string &body_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
-        for (int k = 0; k < disable_parent_child_collision_level; k++)
+        for (int body_id = 0; body_id < m->nbody; body_id++)
         {
-            if (body_id_current == 0 || m->body_parentid[body_id_current] < 0)
+            int body_id_current = body_id;
+            const std::string body_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
+            for (int k = 0; k < disable_parent_child_collision_level; k++)
             {
-                break;
+                if (body_id_current == 0 || m->body_parentid[body_id_current] < 0)
+                {
+                    break;
+                }
+
+                body_id_current = m->body_parentid[body_id_current];
+                tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
+                if (body_id_current == 0)
+                {
+                    exclude_element->SetAttribute("body1", model.getName().c_str());
+                }
+                else
+                {
+                    const std::string parent_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
+                    exclude_element->SetAttribute("body1", parent_name.c_str());
+                }
+                exclude_element->SetAttribute("body2", body_name.c_str());
+                contact_element->LinkEndChild(exclude_element);
+
+                for (int body_2_id = 1; body_2_id < m->nbody; body_2_id++)
+                {
+                    if (body_id == body_2_id)
+                    {
+                        continue;
+                    }
+
+                    int body_2_id_current = m->body_parentid[body_2_id];
+                    for (int i = 0; i < k; i++)
+                    {
+                        if (body_2_id_current != m->body_parentid[body_2_id_current])
+                        {
+                            body_2_id_current = m->body_parentid[body_2_id_current];
+                        }
+                    }
+                    if (body_id_current == body_2_id_current)
+                    {
+                        tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
+                        exclude_element->SetAttribute("body1", mj_id2name(m, mjOBJ_BODY, body_2_id));
+                        exclude_element->SetAttribute("body2", body_name.c_str());
+                        contact_element->LinkEndChild(exclude_element);
+                    }
+                }
+
+                if (m->body_parentid[body_id_current] == 0)
+                {
+                    break;
+                }
             }
-            tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
-            const std::string &parent_name = mj_id2name(m, mjOBJ_BODY, m->body_parentid[body_id_current]);
-            exclude_element->SetAttribute("body1", parent_name.c_str());
-            exclude_element->SetAttribute("body2", body_name.c_str());
-            contact_element->LinkEndChild(exclude_element);
-            body_id_current = m->body_parentid[body_id_current];
-            if (m->body_parentid[body_id_current] == 0)
+        }
+    }
+    else if (disable_parent_child_collision_level < m->nbody)
+    {
+        mju_warning_s("Disable self collision of %s", model.getName().c_str());
+        for (int body_1_id = 0; body_1_id < m->nbody; body_1_id++)
+        {
+            for (int body_2_id = body_1_id + 1; body_2_id < m->nbody; body_2_id++)
             {
-                break;
+                tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
+                if (body_1_id == 0)
+                {
+                    exclude_element->SetAttribute("body1", model.getName().c_str());
+                }
+                else
+                {
+                    exclude_element->SetAttribute("body1", mj_id2name(m, mjOBJ_BODY, body_1_id));
+                }
+                exclude_element->SetAttribute("body2", mj_id2name(m, mjOBJ_BODY, body_2_id));
+                contact_element->LinkEndChild(exclude_element);
             }
         }
     }
@@ -386,7 +452,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        if (atoi(argv[2]))
+        if (atoi(argv[2]) != 0 || strcmp(argv[2], "0") == 0)
         {
             type2 = typeXML;
             boost::filesystem::path input_file_path = argv[1];
