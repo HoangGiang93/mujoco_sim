@@ -38,11 +38,6 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 
-/**
- * @brief Set tmp_model_name, world_path and odom_joints
- */
-void set_params();
-
 class CmdVelCallback
 {
 
@@ -75,152 +70,76 @@ public:
 
 public:
     /**
+     * @brief Set tmp_model_name, world_path and odom_joints
+     *
+     */
+    static void set_params();
+
+public:
+    /**
      * @brief Initialize publishers, subscribers and MjRos members from rosparam
      *
      */
     void init();
 
     /**
-     * @brief Publish tf
-     *
+     * @brief Setup publish threads
+     * 
      */
+    void setup_publishers();
+
+    /**
+     * @brief Setup service server threads
+     * 
+     */
+    void setup_service_servers();
+
+private:
+
     void publish_tf(const EObjectType object_type = EObjectType::None);
 
-    /**
-     * @brief Publish markers
-     *
-     */
     void publish_marker_array(const EObjectType object_type = EObjectType::None);
 
-    /**
-     * @brief Publish object states
-     *
-     */
     void publish_object_state_array(const EObjectType object_type = EObjectType::None);
 
-    /**
-     * @brief Publish world joint states
-     *
-     */
     void publish_joint_states(const EObjectType object_type = EObjectType::None);
 
-    /**
-     * @brief Publish base pose
-     *
-     */
     void publish_base_pose();
 
-    /**
-     * @brief Publish sensor data
-     *
-     */
     void publish_sensor_data();
 
-    /**
-     * @brief Run spawn and destroy objects
-     *
-     */
     void spawn_and_destroy_objects();
 
 private:
-    /**
-     * @brief Reset the robot to the initial state service
-     *
-     * @param req Request
-     * @param res Response
-     * @return true Success
-     * @return false Fail
-     */
+
     bool reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
 
-    /**
-     * @brief Spawn objects from ROS
-     *
-     * @param req New object parameters
-     * @param res Success or not
-     * @return true Success
-     * @return false Fail
-     */
     bool spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res);
 
-    /**
-     * @brief Spawn objects
-     *
-     * @param objects Objects to spawn
-     */
     void spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects);
 
-    /**
-     * @brief Destroy objects from ROS
-     *
-     * @param req Array of object names
-     * @param res Success or not
-     * @return true Success
-     * @return false Fail
-     */
     bool destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujoco_msgs::DestroyObjectResponse &res);
 
-    /**
-     * @brief Destroy objects
-     *
-     * @param object_names Object names to destroy
-     */
     void destroy_objects(const std::set<std::string> object_names);
 
-    /**
-     * @brief Add marker of an object
-     *
-     * @param body_id Body id of the object
-     */
     void add_marker(const int body_id, const EObjectType object_type);
 
-    /**
-     * @brief Set pose of the base
-     *
-     * @param body_id Body id of the base
-     *
-     * @param robot_id Robot id
-     */
     void set_base_pose(const int body_id, const std::string &robot_id = "");
 
-    /**
-     * @brief Add joint state of the world
-     *
-     * @param body_id Body id of the body
-     */
     void add_joint_states(const int body_id, const EObjectType object_type);
 
-    /**
-     * @brief Add state of an object
-     *
-     * @param body_id Body id of the object
-     */
     void add_object_state(const int body_id, const EObjectType object_type);
 
-    /**
-     * @brief Set transform of an object
-     *
-     * @param body_id Transform to set
-     * @param body_id Body id of the object
-     * @param object_name Name of the object
-     * @param root_id Body id of the root
-     */
     void set_transform(geometry_msgs::TransformStamped &transform, const int body_id, const std::string &object_name);
 
-    /**
-     * @brief Reset the robot to the initial state
-     *
-     */
     void reset_robot();
 
 public:
-    /**
-     * @brief Start time of ROS
-     *
-     */
+
     static ros::Time ros_start;
 
 private:
+
     ros::NodeHandle n;
 
     std::string root_frame_id;

@@ -27,8 +27,6 @@
 #include <set>
 #include <vector>
 
-bool load_tmp_model(bool reset = true);
-
 class MjSim
 {
 public:
@@ -71,7 +69,7 @@ public:
     /**
      * @brief Remove bodies with name
      *
-     * @param body_names Array of body names
+     * @param body_names Set of body names
      * @return true Successfully removed
      * @return false Fail to remove
      */

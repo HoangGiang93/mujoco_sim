@@ -84,7 +84,30 @@ bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *ro
     }
 }
 
-void set_params()
+CmdVelCallback::CmdVelCallback(const std::string &in_robot) : robot(in_robot)
+{
+}
+
+void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
+{
+    MjSim::odom_vels[robot + "_lin_odom_x_joint"] = MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ? msg.linear.x : 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_y_joint"] = MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ? msg.linear.y : 0.0;
+    MjSim::odom_vels[robot + "_lin_odom_z_joint"] = MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ? msg.linear.z : 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_x_joint"] = MjSim::add_odom_joints[robot]["ang_odom_x_joint"] ? msg.angular.x : 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_y_joint"] = MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ? msg.angular.y : 0.0;
+    MjSim::odom_vels[robot + "_ang_odom_z_joint"] = MjSim::add_odom_joints[robot]["ang_odom_z_joint"] ? msg.angular.z : 0.0;
+
+    if (pub_base_pose_rate > 1E-9)
+    {
+        base_poses[robot].twist.twist = msg;
+    }
+}
+
+MjRos::~MjRos()
+{
+}
+
+void MjRos::set_params()
 {
     std::string model_path_string;
     if (ros::param::get("~robot", model_path_string))
@@ -128,13 +151,13 @@ void set_params()
         }
         else
         {
-            tinyxml2::XMLDocument current_xml_doc;
-            if (current_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+            tinyxml2::XMLDocument cache_model_xml_doc;
+            if (cache_model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
             {
                 mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
                 robots.push_back("robot");
             }
-            for (tinyxml2::XMLElement *worldbody_element = current_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
+            for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
                  worldbody_element = worldbody_element->NextSiblingElement();
                  worldbody_element != nullptr)
             {
@@ -154,6 +177,17 @@ void set_params()
         }
     }
     MjSim::robots = std::set<std::string>(robots.begin(), robots.end());
+    if (MjSim::robots.size() == 0)
+    {
+        ROS_WARN("No robot found in %s", model_path.c_str());
+        return;
+    }
+    std::string log = "Found " + std::to_string(MjSim::robots.size()) + " robots:";
+    for (const std::string &robot : MjSim::robots)
+    {
+        log += " [" + robot + "]";
+    }
+    ROS_INFO("%s", log.c_str());
 
     std::vector<float> pose_init;
     if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
@@ -235,29 +269,6 @@ void set_params()
             }
         }
     }
-}
-
-CmdVelCallback::CmdVelCallback(const std::string &in_robot) : robot(in_robot)
-{
-}
-
-void CmdVelCallback::callback(const geometry_msgs::Twist &msg)
-{
-    MjSim::odom_vels[robot + "_lin_odom_x_joint"] = MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ? msg.linear.x : 0.0;
-    MjSim::odom_vels[robot + "_lin_odom_y_joint"] = MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ? msg.linear.y : 0.0;
-    MjSim::odom_vels[robot + "_lin_odom_z_joint"] = MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ? msg.linear.z : 0.0;
-    MjSim::odom_vels[robot + "_ang_odom_x_joint"] = MjSim::add_odom_joints[robot]["ang_odom_x_joint"] ? msg.angular.x : 0.0;
-    MjSim::odom_vels[robot + "_ang_odom_y_joint"] = MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ? msg.angular.y : 0.0;
-    MjSim::odom_vels[robot + "_ang_odom_z_joint"] = MjSim::add_odom_joints[robot]["ang_odom_z_joint"] ? msg.angular.z : 0.0;
-
-    if (pub_base_pose_rate > 1E-9)
-    {
-        base_poses[robot].twist.twist = msg;
-    }
-}
-
-MjRos::~MjRos()
-{
 }
 
 void MjRos::init()
@@ -490,6 +501,29 @@ void MjRos::reset_robot()
         }
     }
     mj_forward(m, d);
+}
+
+void MjRos::setup_publishers()
+{
+    std::thread ros_thread1(&MjRos::publish_tf, this, EObjectType::None);
+    std::thread ros_thread2(&MjRos::publish_marker_array, this, EObjectType::None);
+    std::thread ros_thread3(&MjRos::publish_object_state_array, this, EObjectType::None);
+    std::thread ros_thread4(&MjRos::publish_joint_states, this, EObjectType::None);
+    std::thread ros_thread5(&MjRos::publish_base_pose, this);
+    std::thread ros_thread6(&MjRos::publish_sensor_data, this);
+
+    ros_thread1.join();
+    ros_thread2.join();
+    ros_thread3.join();
+    ros_thread4.join();
+    ros_thread5.join();
+    ros_thread6.join();
+}
+
+void MjRos::setup_service_servers()
+{
+    std::thread ros_thread(&MjRos::spawn_and_destroy_objects, this);
+    ros_thread.join();
 }
 
 bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
@@ -1189,13 +1223,8 @@ void MjRos::publish_tf(const EObjectType object_type)
                 break;
 
             case EObjectType::World:
-                if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
+                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
-                    {
-                        continue;
-                    }
-
                     if (!pub_tf_of_free_bodies_only ||
                         (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
                     {
@@ -1278,13 +1307,8 @@ void MjRos::publish_marker_array(const EObjectType object_type)
                 break;
 
             case EObjectType::World:
-                if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
+                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (std::find(MjSim::robots.begin(), MjSim::robots.end(), object_name) != MjSim::robots.end()))
-                    {
-                        continue;
-                    }
-
                     if (!pub_tf_of_free_bodies_only ||
                         (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
                     {
@@ -1358,20 +1382,15 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
             switch (object_type)
             {
             case EObjectType::Robot:
-                if (MjSim::link_names.find(object_name) != MjSim::link_names.end() || object_name == model_path.stem().string() || MjSim::robots.find(object_name) != MjSim::robots.end())
+                if (MjSim::link_names.find(object_name) != MjSim::link_names.end())
                 {
                     add_object_state(body_id, object_type);
                 }
                 break;
 
             case EObjectType::World:
-                if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
+                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (MjSim::robots.find(object_name) != MjSim::robots.end()))
-                    {
-                        continue;
-                    }
-
                     if (m->body_mocapid[body_id] != -1)
                     {
                         continue;
@@ -1456,13 +1475,8 @@ void MjRos::publish_joint_states(const EObjectType object_type)
             switch (object_type)
             {
             case EObjectType::World:
-                if (MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
+                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
                 {
-                    if (object_name == model_path.stem().string() || (MjSim::robots.find(object_name) != MjSim::robots.end()))
-                    {
-                        continue;
-                    }
-
                     add_joint_states(body_id, object_type);
                 }
                 break;
@@ -1548,10 +1562,6 @@ void MjRos::publish_base_pose()
                     set_base_pose(body_id, robot);
                     base_pose_pubs[robot].publish(base_poses[robot]);
                 }
-            }
-            else
-            {
-                ROS_ERROR("Body id of %s not found", robot.c_str());
             }
             i++;
         }

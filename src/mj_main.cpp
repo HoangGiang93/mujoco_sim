@@ -168,26 +168,29 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mujoco_sim");
     ros::NodeHandle n;
 
-    set_params();
-    mj_sim.init();
+    ROS_INFO("Get ROS parameters from server");
+    MjRos::set_params();
 
+    ROS_INFO("Initializing MuJoCo simulator...");
+    mj_sim.init();
+    ROS_INFO("Initialize MuJoCo simulator successfully");
+
+    ROS_INFO("Initializing ROS interface...");
     MjRos mj_ros;
     mj_ros.init();
+    ROS_INFO("Initialize ROS interface successfully");
 
 #ifdef VISUAL
+    ROS_INFO("Initializing OpenGL...");
     mj_visual.init();
     glfwSetKeyCallback(mj_visual.window, keyboard);
+    ROS_INFO("Initialize OpenGL successfully...");
 #endif
 
     mjcb_control = controller;
 
-    std::thread ros_thread1(&MjRos::publish_tf, mj_ros, EObjectType::None);
-    std::thread ros_thread2(&MjRos::publish_marker_array, mj_ros, EObjectType::None);
-    std::thread ros_thread3(&MjRos::publish_object_state_array, mj_ros, EObjectType::None);
-    std::thread ros_thread4(&MjRos::publish_joint_states, mj_ros, EObjectType::None);
-    std::thread ros_thread5(&MjRos::publish_base_pose, mj_ros);
-    std::thread ros_thread6(&MjRos::publish_sensor_data, mj_ros);
-    std::thread ros_thread7(&MjRos::spawn_and_destroy_objects, mj_ros);
+    std::thread ros_thread1(&MjRos::setup_publishers, mj_ros);
+    std::thread ros_thread2(&MjRos::setup_service_servers, mj_ros);
 
     // start simulation thread
     std::thread sim_thread(simulate);
@@ -215,11 +218,6 @@ int main(int argc, char **argv)
 
     ros_thread1.join();
     ros_thread2.join();
-    ros_thread3.join();
-    ros_thread4.join();
-    ros_thread5.join();
-    ros_thread6.join();
-    ros_thread7.join();
     sim_thread.join();
 
     // free MuJoCo model and data, deactivate
