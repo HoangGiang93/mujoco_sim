@@ -764,6 +764,15 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                         element->SetAttribute("file", (mesh_dir / element->Attribute("file")).c_str());
                                     }
                                     std::string scale_str = "1 1 1";
+
+                                    if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
+                                    {
+                                        element->SetAttribute("scale",
+                                                              (std::to_string(object.info.size.x) + " " +
+                                                               std::to_string(object.info.size.y) + " " +
+                                                               std::to_string(object.info.size.z))
+                                                                  .c_str());
+                                    }
                                     if (element->Attribute("scale") != nullptr)
                                     {
                                         scale_str = element->Attribute("scale");
@@ -783,24 +792,105 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
-                        for (tinyxml2::XMLElement *element = copy->ToElement()->FirstChildElement();
-                             element != nullptr;
-                             element = element->NextSiblingElement())
+                        tinyxml2::XMLElement *copy_body_element = copy->ToElement()->FirstChildElement("body");
+                        if (copy_body_element != nullptr)
                         {
-                            if (strcmp(element->Value(), "body") == 0)
+                            copy_body_element->SetAttribute("name", object.info.name.c_str());
+                            copy_body_element->SetAttribute("pos", (std::to_string(object.pose.position.x) + " " +
+                                                                    std::to_string(object.pose.position.y) + " " +
+                                                                    std::to_string(object.pose.position.z))
+                                                                       .c_str());
+                            copy_body_element->SetAttribute("quat",
+                                                            (std::to_string(object.pose.orientation.w) + " " +
+                                                             std::to_string(object.pose.orientation.x) + " " +
+                                                             std::to_string(object.pose.orientation.y) + " " +
+                                                             std::to_string(object.pose.orientation.z))
+                                                                .c_str());
+
+                            if (mju_abs(object.info.rgba.r) > mjMINVAL || mju_abs(object.info.rgba.g) > mjMINVAL || mju_abs(object.info.rgba.b) > mjMINVAL || mju_abs(object.info.rgba.a) > mjMINVAL)
                             {
-                                element->SetAttribute("name", object.info.name.c_str());
-                                element->SetAttribute("pos", (std::to_string(object.pose.position.x) + " " +
-                                                              std::to_string(object.pose.position.y) + " " +
-                                                              std::to_string(object.pose.position.z))
-                                                                 .c_str());
-                                element->SetAttribute("quat",
-                                                      (std::to_string(object.pose.orientation.w) + " " +
-                                                       std::to_string(object.pose.orientation.x) + " " +
-                                                       std::to_string(object.pose.orientation.y) + " " +
-                                                       std::to_string(object.pose.orientation.z))
-                                                          .c_str());
-                                break;
+                                for (tinyxml2::XMLElement *copy_geom_element = copy_body_element->FirstChildElement("geom");
+                                     copy_geom_element != nullptr;
+                                     copy_geom_element = copy_geom_element->NextSiblingElement())
+                                {
+                                    copy_geom_element->SetAttribute("rgba", (std::to_string(object.info.rgba.r) + " " +
+                                                                             std::to_string(object.info.rgba.g) + " " +
+                                                                             std::to_string(object.info.rgba.b) + " " +
+                                                                             std::to_string(object.info.rgba.a))
+                                                                                .c_str());
+                                }
+                            }
+
+                            if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
+                            {
+                                for (tinyxml2::XMLElement *copy_geom_element = copy_body_element->FirstChildElement("geom");
+                                     copy_geom_element != nullptr;
+                                     copy_geom_element = copy_geom_element->NextSiblingElement())
+                                {
+                                    std::vector<mjtNum> size = {object.info.size.x, object.info.size.y, object.info.size.z};
+
+                                    std::vector<mjtNum> geom_pos = {0, 0, 0};
+                                    std::vector<mjtNum> geom_size = {1, 1, 1};
+
+                                    if (copy_geom_element->Attribute("type") == nullptr)
+                                    {
+                                        copy_geom_element->SetAttribute("type", "sphere");
+                                    }
+                                   
+                                    if (strcmp(copy_geom_element->Attribute("type"), "sphere") == 0)
+                                    {
+                                        geom_size = {1};
+                                    }
+                                    else if (strcmp(copy_geom_element->Attribute("type"), "cylinder") == 0)
+                                    {
+                                        geom_size = {1, 1};
+                                    }
+
+                                    if (copy_geom_element->Attribute("size") != nullptr)
+                                    {
+                                        std::string geom_size_str = copy_geom_element->Attribute("size");
+                                        std::istringstream iss(geom_size_str);
+                                        geom_size = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    }
+
+                                    std::string size_str = std::to_string(size[0] * geom_size[0]);
+
+                                    for (int i = 1; i < geom_size.size(); i++)
+                                    {
+                                        size_str += " " + std::to_string(size[i] * geom_size[i]);
+                                    }
+
+                                    if (copy_geom_element->Attribute("pos") != nullptr)
+                                    {
+                                        const std::string pos_str = copy_geom_element->Attribute("pos");
+                                        std::istringstream iss(pos_str);
+                                        geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    }
+                                    if (strcmp(copy_geom_element->Attribute("type"), "box") == 0 || strcmp(copy_geom_element->Attribute("type"), "mesh"))
+                                    {
+                                        for (int i = 0; i < geom_pos.size(); i++)
+                                        {
+                                            geom_pos[i] *= size[i];
+                                        }
+                                    }
+                                    else if (strcmp(copy_geom_element->Attribute("type"), "sphere") == 0)
+                                    {
+                                        geom_pos[0] *= size[0];
+                                        geom_pos[1] *= size[0];
+                                        geom_pos[2] *= size[0];
+                                    }
+                                    else if (strcmp(copy_geom_element->Attribute("type"), "cylinder") == 0)
+                                    {
+                                        geom_pos[0] *= size[0];
+                                        geom_pos[1] *= size[0];
+                                        geom_pos[2] *= size[1];
+                                    }
+                                    copy_geom_element->SetAttribute("pos", (std::to_string(geom_pos[0]) + " " +
+                                                                            std::to_string(geom_pos[1]) + " " +
+                                                                            std::to_string(geom_pos[2]))
+                                                                               .c_str());
+                                    copy_geom_element->SetAttribute("size", size_str.c_str());
+                                }
                             }
                         }
                     }

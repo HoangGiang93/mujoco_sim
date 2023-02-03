@@ -28,21 +28,22 @@ def spawn_object(i):
     object.info.name = "object_" + str(i)
     object.info.type = types[randint(0, len(types) - 1)]
     object.info.movable = True
+    scale = randint(200, 500) / 100.0
     if object.info.type != ObjectInfo.MESH:
-        object.info.size.x = 0.05
-        object.info.size.y = 0.05
-        object.info.size.z = 0.05
+        object.info.size.x = 0.05 * scale
+        object.info.size.y = 0.05 * scale
+        object.info.size.z = 0.05 * scale
     else:
-        object.info.size.x = 1
-        object.info.size.y = 1
-        object.info.size.z = 1
+        object.info.size.x = scale 
+        object.info.size.y = scale
+        object.info.size.z = scale
     object.info.rgba = colors[randint(0, len(colors) - 1)]
     alpha = uniform(-pi, pi)
     r = uniform(1.5, 2)
     object.info.mesh = meshes[randint(0, len(meshes) - 1)]
     object.pose.position.x = r * sin(alpha)
     object.pose.position.y = r * cos(alpha)
-    object.pose.position.z = 2
+    object.pose.position.z = 5
     object.pose.orientation.x = 0.0
     object.pose.orientation.y = 0.0
     object.pose.orientation.z = 0.0
@@ -78,11 +79,11 @@ if __name__ == "__main__":
     i = 0
     while not rospy.is_shutdown():
         spawn_object(i)
-        if i >= 10:
-            rospy.sleep(0.2)
-            destroy_object(i-10)
-            rospy.sleep(0.2)
+        if i >= 20:
+            rospy.sleep(0.15)
+            destroy_object(i-20)
+            rospy.sleep(0.15)
         else:
-            rospy.sleep(0.4)
+            rospy.sleep(0.3)
         i+=1
         

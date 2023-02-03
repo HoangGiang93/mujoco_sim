@@ -6,7 +6,6 @@
     </asset>
     <worldbody>
         <body name="bowl" pos="0 0 0">
-            <freejoint />
             <geom name="bowl_bottom" type="mesh" mesh="bowl_bottom" rgba="1 1 1 1" />
             <geom name="bowl_side_1" type="mesh" euler="0 0 0.1745" mesh="bowl" rgba="1 1 1 1" />
             <geom name="bowl_side_2" type="mesh" euler="0 0 0.3491" mesh="bowl" rgba="1 1 1 1" />
