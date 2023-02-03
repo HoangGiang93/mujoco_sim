@@ -70,6 +70,8 @@ bool pub_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
+std::map<std::string, std::string> name_map;
+
 static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
     std::string robot_description_string;
@@ -87,12 +89,14 @@ static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const c
 static void check_index(tinyxml2::XMLElement *element, mjtObj type)
 {
     std::string name = element->Attribute("name");
+    
     while (mj_name2id(m, type, name.c_str()) != -1)
     {
         size_t last_index = name.find_last_not_of("0123456789");
         const int index = atoi(name.substr(last_index + 1).c_str());
         name.replace(last_index + 1, index / 10 + 1, std::to_string(index + 1));
     }
+    name_map[element->Attribute("name")] = name;
     element->SetAttribute("name", name.c_str());
 }
 
@@ -853,6 +857,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         tinyxml2::XMLElement *inertial_element = object_xml_doc.NewElement("inertial");
 
         boost::filesystem::path object_mesh_path = object.info.mesh;
+
+        body_element->SetAttribute("name", object.info.name.c_str());
+
         switch (object.info.type)
         {
         case mujoco_msgs::ObjectInfo::CUBE:
@@ -914,7 +921,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     if (strcmp(copy->Value(), "asset") == 0)
                     {
                         std::vector<tinyxml2::XMLElement *> elements_to_remove;
-                        for (tinyxml2::XMLElement *mesh_element = copy->ToElement()->FirstChildElement("mesh");
+                        for (tinyxml2::XMLElement *mesh_element = copy->FirstChildElement("mesh");
                              mesh_element != nullptr;
                              mesh_element = mesh_element->NextSiblingElement("mesh"))
                         {
@@ -959,9 +966,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
-                        tinyxml2::XMLElement *copy_body_element = copy->ToElement()->FirstChildElement("body");
+                        tinyxml2::XMLElement *copy_body_element = copy->FirstChildElement("body");
 
                         check_name(copy_body_element);
+
+                        name_map[copy_body_element->Attribute("name")] = object.info.name;
 
                         copy_body_element->SetAttribute("name", object.info.name.c_str());
 
@@ -977,6 +986,30 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                             .c_str());
 
                         scale_body(copy_body_element, object.info);
+                    }
+                    else if (strcmp(copy->Value(), "contact") == 0)
+                    {
+                        for (tinyxml2::XMLElement *exclude_element = copy->FirstChildElement("exclude");
+                             exclude_element != nullptr;
+                             exclude_element = exclude_element->NextSiblingElement("exclude"))
+                        {
+                            const std::string body1 = exclude_element->Attribute("body1");
+                            const std::string body2 = exclude_element->Attribute("body2");
+                            exclude_element->SetAttribute("body1", name_map[body1].c_str());
+                            exclude_element->SetAttribute("body2", name_map[body2].c_str());
+                        }
+                    }
+                    else if (strcmp(copy->Value(), "equality") == 0)
+                    {
+                        for (tinyxml2::XMLElement *joint_element = copy->FirstChildElement("joint");
+                             joint_element != nullptr;
+                             joint_element = joint_element->NextSiblingElement("joint"))
+                        {
+                            const std::string joint1 = joint_element->Attribute("joint1");
+                            const std::string joint2 = joint_element->Attribute("joint2");
+                            joint_element->SetAttribute("joint1", name_map[joint1].c_str());
+                            joint_element->SetAttribute("joint2", name_map[joint2].c_str());
+                        }
                     }
                     root->InsertEndChild(copy);
                 }
@@ -1001,9 +1034,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         default:
             break;
         }
-
+        
         body_element->SetAttribute("name", object.info.name.c_str());
-
+        
         body_element->SetAttribute("pos",
                                    (std::to_string(object.pose.position.x) + " " +
                                     std::to_string(object.pose.position.y) + " " +

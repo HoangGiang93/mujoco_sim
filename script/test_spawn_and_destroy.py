@@ -11,7 +11,7 @@ from random import random, uniform, randint
 from math import pi, sin, cos
 
 object = ObjectStatus()
-types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER, ObjectInfo.MESH, ObjectInfo.MESH]
+types = [ObjectInfo.MESH, ObjectInfo.MESH]
 meshes = ["../test/cup.xml", "../test/bowl_small.xml", "../test/box.xml"]
 
 colors = [
@@ -32,7 +32,7 @@ def spawn_object(i):
     object.info.rgba = colors[randint(0, len(colors) - 1)]
     alpha = uniform(-pi, pi)
     r = uniform(1.5, 2)
-    object.info.mesh = meshes[randint(0, len(meshes) - 1)]
+    object.info.mesh = "../test/box.xml"
     object.info.size.x = 1 
     object.info.size.y = 1
     object.info.size.z = 1

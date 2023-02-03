@@ -94,11 +94,6 @@ static void get_joint_names(const std::string &robot_name, tinyxml2::XMLElement 
 	}
 }
 
-/**
- * @brief Iterate all child body element of this body element
- *
- * @param parent_body_element
- */
 static void get_body_element(const std::string &robot_name, tinyxml2::XMLElement *parent_body_element)
 {
 	for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement("body");
@@ -597,6 +592,17 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 			worldbody_element->DeleteChild(body_element_to_delete);
 		}
 	}
+
+	for (tinyxml2::XMLElement *body_element_to_delete : body_elements_to_delete)
+	{
+		for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");
+				 worldbody_element != nullptr;
+				 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+		{
+			worldbody_element->DeleteChild(body_element_to_delete);
+		}
+	}
+
 	mtx.unlock();
 
 	doc.SaveFile(xml_path);
