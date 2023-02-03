@@ -5,7 +5,7 @@ ROS interface for MuJoCo simulator
 
 [![Watch the video]()](https://user-images.githubusercontent.com/64316740/159088750-e9e4d239-81d0-4d99-bae5-8b5e348bfe07.mp4)
 
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/165394434-81d07b3c-af3e-48f4-b483-2a72927c6ef8.mp4)
+[![Watch the video]()](https://user-images.githubusercontent.com/64316740/216664645-063ea29a-9718-4ec8-8c6d-f43febf7dd13.mp4)
 
 ## Features
 - Advanced physics engine from https://mujoco.org/
