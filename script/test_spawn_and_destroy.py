@@ -11,7 +11,7 @@ from random import random, uniform, randint
 from math import pi, sin, cos
 
 object = ObjectStatus()
-types = [ObjectInfo.MESH, ObjectInfo.MESH]
+types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER, ObjectInfo.MESH, ObjectInfo.MESH]
 meshes = ["../test/cup.xml", "../test/bowl_small.xml", "../test/box.xml"]
 
 colors = [
@@ -30,9 +30,7 @@ def spawn_object(i):
     object.info.movable = True
     scale = randint(200, 500) / 100.0
     object.info.rgba = colors[randint(0, len(colors) - 1)]
-    alpha = uniform(-pi, pi)
-    r = uniform(1.5, 2)
-    object.info.mesh = "../test/box.xml"
+    object.info.mesh = meshes[randint(0, len(meshes) - 1)]
     object.info.size.x = 1 
     object.info.size.y = 1
     object.info.size.z = 1
@@ -44,6 +42,8 @@ def spawn_object(i):
         object.info.size.x = scale 
         object.info.size.y = scale
         object.info.size.z = scale
+    alpha = uniform(-pi, pi)
+    r = uniform(1.5, 2)
     object.pose.position.x = r * sin(alpha)
     object.pose.position.y = r * cos(alpha)
     object.pose.position.z = 5
