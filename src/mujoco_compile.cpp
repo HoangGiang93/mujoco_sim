@@ -256,56 +256,27 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
 
     if (disable_parent_child_collision_level >= 0)
     {
-        for (int body_id = 0; body_id < m->nbody; body_id++)
+        for (int body_id = 1; body_id < m->nbody; body_id++)
         {
-            int body_id_current = body_id;
-            const std::string body_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
+            int body_parent_id = body_id;
+            const std::string body_name = mj_id2name(m, mjOBJ_BODY, body_id);
             for (int k = 0; k < disable_parent_child_collision_level; k++)
             {
-                if (body_id_current == 0 || m->body_parentid[body_id_current] < 0)
-                {
-                    break;
-                }
-
-                body_id_current = m->body_parentid[body_id_current];
+                body_parent_id = m->body_parentid[body_parent_id];
+                
                 tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
-                if (body_id_current == 0)
+                if (body_parent_id == 0)
                 {
                     exclude_element->SetAttribute("body1", model.getName().c_str());
                 }
                 else
                 {
-                    const std::string parent_name = mj_id2name(m, mjOBJ_BODY, body_id_current);
+                    const std::string parent_name = mj_id2name(m, mjOBJ_BODY, body_parent_id);
                     exclude_element->SetAttribute("body1", parent_name.c_str());
                 }
                 exclude_element->SetAttribute("body2", body_name.c_str());
                 contact_element->LinkEndChild(exclude_element);
-
-                for (int body_2_id = 1; body_2_id < m->nbody; body_2_id++)
-                {
-                    if (body_id == body_2_id)
-                    {
-                        continue;
-                    }
-
-                    int body_2_id_current = m->body_parentid[body_2_id];
-                    for (int i = 0; i < k; i++)
-                    {
-                        if (body_2_id_current != m->body_parentid[body_2_id_current])
-                        {
-                            body_2_id_current = m->body_parentid[body_2_id_current];
-                        }
-                    }
-                    if (body_id_current == body_2_id_current)
-                    {
-                        tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
-                        exclude_element->SetAttribute("body1", mj_id2name(m, mjOBJ_BODY, body_2_id));
-                        exclude_element->SetAttribute("body2", body_name.c_str());
-                        contact_element->LinkEndChild(exclude_element);
-                    }
-                }
-
-                if (m->body_parentid[body_id_current] == 0)
+                if (body_parent_id == 0)
                 {
                     break;
                 }

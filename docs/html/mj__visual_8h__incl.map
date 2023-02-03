@@ -1,13 +1,13 @@
-<map id="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_visual.h" name="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_visual.h">
-<area shape="rect" id="node1" title=" " alt="" coords="421,5,607,76"/>
-<area shape="rect" id="node2" href="$mj__sim_8h.html" title=" " alt="" coords="413,124,495,151"/>
-<area shape="rect" id="node11" title=" " alt="" coords="519,124,631,151"/>
-<area shape="rect" id="node3" href="$mj__model_8h.html" title=" " alt="" coords="194,199,293,225"/>
-<area shape="rect" id="node7" title=" " alt="" coords="317,199,404,225"/>
-<area shape="rect" id="node8" title=" " alt="" coords="429,199,479,225"/>
-<area shape="rect" id="node9" title=" " alt="" coords="503,199,546,225"/>
-<area shape="rect" id="node10" title=" " alt="" coords="571,199,633,225"/>
-<area shape="rect" id="node4" title=" " alt="" coords="5,273,140,300"/>
-<area shape="rect" id="node5" title=" " alt="" coords="164,273,323,300"/>
-<area shape="rect" id="node6" title=" " alt="" coords="347,273,411,300"/>
+<map id="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_visual.h" name="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_visual.h">
+<area shape="rect" id="node1" title=" " alt="" coords="397,5,631,61"/>
+<area shape="rect" id="node2" href="$mj__sim_8h.html" title=" " alt="" coords="413,109,495,136"/>
+<area shape="rect" id="node11" title=" " alt="" coords="519,109,631,136"/>
+<area shape="rect" id="node3" href="$mj__model_8h.html" title=" " alt="" coords="194,184,293,211"/>
+<area shape="rect" id="node7" title=" " alt="" coords="317,184,404,211"/>
+<area shape="rect" id="node8" title=" " alt="" coords="429,184,479,211"/>
+<area shape="rect" id="node9" title=" " alt="" coords="503,184,546,211"/>
+<area shape="rect" id="node10" title=" " alt="" coords="571,184,633,211"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,259,140,285"/>
+<area shape="rect" id="node5" title=" " alt="" coords="164,259,323,285"/>
+<area shape="rect" id="node6" title=" " alt="" coords="347,259,411,285"/>
 </map>
