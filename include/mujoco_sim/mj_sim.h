@@ -22,7 +22,6 @@
 
 #include "mj_model.h"
 
-#include <functional>
 #include <map>
 #include <set>
 #include <vector>
