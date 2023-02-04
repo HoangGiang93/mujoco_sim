@@ -69,8 +69,6 @@ bool pub_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
-std::map<std::string, std::string> name_map;
-
 static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
     std::string robot_description_string;
@@ -1004,6 +1002,8 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
+                        name_map[copy->FirstChildElement()->Attribute("name")] = object.info.name;
+
                         check_name(copy->ToElement());
 
                         do_each_child_element(copy->ToElement(), "body", object.info, adjust_body);

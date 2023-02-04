@@ -43,3 +43,5 @@ boost::filesystem::path world_path = ros::package::getPath("mujoco_sim") + "/mod
 boost::filesystem::path tmp_world_path = tmp_model_path;
 
 std::map<std::string, std::pair<boost::filesystem::path, std::vector<mjtNum>>> mesh_paths;
+
+std::map<std::string, std::string> name_map;
