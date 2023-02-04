@@ -66,14 +66,14 @@ MjSim::~MjSim()
 static void set_joint_names()
 {
 	tinyxml2::XMLDocument cache_model_xml_doc;
-	if (cache_model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
 		return;
 	}
 	for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-		 worldbody_element != nullptr;
-		 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		if (worldbody_element->FirstChildElement("body") != nullptr && worldbody_element->FirstChildElement("body")->Attribute("name") != nullptr)
 		{
@@ -87,16 +87,16 @@ static void set_joint_names()
 			std::function<void(tinyxml2::XMLElement *, const std::string &)> func = [](tinyxml2::XMLElement *body_element, const std::string &robot_name)
 			{
 				const std::set<std::string> odom_joint_names = {
-					robot_name + "_lin_odom_x_joint",
-					robot_name + "_lin_odom_y_joint",
-					robot_name + "_lin_odom_z_joint",
-					robot_name + "_ang_odom_x_joint",
-					robot_name + "_ang_odom_y_joint",
-					robot_name + "_ang_odom_z_joint",
+						robot_name + "_lin_odom_x_joint",
+						robot_name + "_lin_odom_y_joint",
+						robot_name + "_lin_odom_z_joint",
+						robot_name + "_ang_odom_x_joint",
+						robot_name + "_ang_odom_y_joint",
+						robot_name + "_ang_odom_z_joint",
 				};
 				for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
-					 joint_element != nullptr;
-					 joint_element = joint_element->NextSiblingElement("joint"))
+						 joint_element != nullptr;
+						 joint_element = joint_element->NextSiblingElement("joint"))
 				{
 					if (joint_element->Attribute("name") != nullptr)
 					{
@@ -125,12 +125,12 @@ static void set_joint_names()
 static void save_mesh_paths(tinyxml2::XMLDocument &doc, const boost::filesystem::path &meshdir_abs_path)
 {
 	for (tinyxml2::XMLElement *asset_element = doc.FirstChildElement()->FirstChildElement("asset");
-		 asset_element != nullptr;
-		 asset_element = asset_element->NextSiblingElement("asset"))
+			 asset_element != nullptr;
+			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
-			 mesh_element != nullptr;
-			 mesh_element = mesh_element->NextSiblingElement("mesh"))
+				 mesh_element != nullptr;
+				 mesh_element = mesh_element->NextSiblingElement("mesh"))
 		{
 			if (mesh_element->Attribute("file") != nullptr)
 			{
@@ -205,15 +205,15 @@ static void init_tmp()
 	// Add world to tmp_model_path
 	tmp_model_path /= tmp_model_name;
 	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(world_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (load_XML(current_xml_doc, world_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", world_path.c_str());
 		return;
 	}
 	boost::filesystem::path meshdir_abs_path = world_path.parent_path();
 	for (tinyxml2::XMLElement *compiler_element = current_xml_doc.FirstChildElement()->FirstChildElement("compiler");
-		 compiler_element != nullptr;
-		 compiler_element = compiler_element->NextSiblingElement("compiler"))
+			 compiler_element != nullptr;
+			 compiler_element = compiler_element->NextSiblingElement("compiler"))
 	{
 		if (compiler_element->Attribute("meshdir") != nullptr)
 		{
@@ -239,10 +239,10 @@ static void init_tmp()
 
 	include_element->SetAttribute("file", boost::filesystem::relative(cache_model_path, tmp_model_path.parent_path()).c_str());
 
-	current_xml_doc.SaveFile(tmp_model_path.c_str());
+	save_XML(current_xml_doc, tmp_model_path.c_str());
 
 	tinyxml2::XMLDocument cache_model_xml_doc;
-	if (cache_model_xml_doc.LoadFile(cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (load_XML(cache_model_xml_doc, cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", cache_model_path.c_str());
 		return;
@@ -250,8 +250,8 @@ static void init_tmp()
 
 	meshdir_abs_path = model_path.parent_path();
 	for (tinyxml2::XMLElement *compiler_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("compiler");
-		 compiler_element != nullptr;
-		 compiler_element = compiler_element->NextSiblingElement("compiler"))
+			 compiler_element != nullptr;
+			 compiler_element = compiler_element->NextSiblingElement("compiler"))
 	{
 		if (compiler_element->Attribute("meshdir") != nullptr)
 		{
@@ -272,45 +272,45 @@ static void init_tmp()
 	save_mesh_paths(cache_model_xml_doc, meshdir_abs_path);
 
 	for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-		 worldbody_element != nullptr;
-		 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		// Add odom joints to cache_model_path if required
 		for (const std::string &robot : MjSim::robots)
 		{
 			for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
-				 robot_body != nullptr;
-				 robot_body = robot_body->NextSiblingElement("body"))
+					 robot_body != nullptr;
+					 robot_body = robot_body->NextSiblingElement("body"))
 			{
 				if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0 && MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
 				{
 					robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
-													 std::to_string(MjSim::pose_inits[robot][1]) + " " +
-													 std::to_string(MjSim::pose_inits[robot][2]))
-														.c_str());
+																					 std::to_string(MjSim::pose_inits[robot][1]) + " " +
+																					 std::to_string(MjSim::pose_inits[robot][2]))
+																							.c_str());
 					tf2::Quaternion quat;
 					quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
 					robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
-													  std::to_string(quat.getX()) + " " +
-													  std::to_string(quat.getY()) + " " +
-													  std::to_string(quat.getZ()))
-														 .c_str());
+																						std::to_string(quat.getX()) + " " +
+																						std::to_string(quat.getY()) + " " +
+																						std::to_string(quat.getZ()))
+																							 .c_str());
 					break;
 				}
 			}
 
 			if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ||
-				MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
-				MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ||
-				MjSim::add_odom_joints[robot]["ang_odom_x_joint"] ||
-				MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ||
-				MjSim::add_odom_joints[robot]["ang_odom_z_joint"])
+					MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
+					MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ||
+					MjSim::add_odom_joints[robot]["ang_odom_x_joint"] ||
+					MjSim::add_odom_joints[robot]["ang_odom_y_joint"] ||
+					MjSim::add_odom_joints[robot]["ang_odom_z_joint"])
 			{
 				ROS_INFO("Adding odom joints for model %s...", robot.c_str());
 				int odom_joint_count = 0;
 				for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
-					 robot_body != nullptr;
-					 robot_body = robot_body->NextSiblingElement("body"))
+						 robot_body != nullptr;
+						 robot_body = robot_body->NextSiblingElement("body"))
 				{
 					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
 					{
@@ -383,12 +383,12 @@ static void init_tmp()
 	}
 
 	for (tinyxml2::XMLElement *asset_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("asset");
-		 asset_element != nullptr;
-		 asset_element = asset_element->NextSiblingElement("asset"))
+			 asset_element != nullptr;
+			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
-			 mesh_element != nullptr;
-			 mesh_element = mesh_element->NextSiblingElement("mesh"))
+				 mesh_element != nullptr;
+				 mesh_element = mesh_element->NextSiblingElement("mesh"))
 		{
 			if (mesh_element->Attribute("file") != nullptr)
 			{
@@ -401,7 +401,7 @@ static void init_tmp()
 		}
 	}
 
-	cache_model_xml_doc.SaveFile(cache_model_path.c_str());
+	save_XML(cache_model_xml_doc, cache_model_path.c_str());
 	ROS_INFO("Save models in %s successfully", tmp_model_path.parent_path().c_str());
 }
 
@@ -520,7 +520,7 @@ static void init_malloc()
 static void modify_xml(const char *xml_path, const std::set<std::string> &remove_body_names = {""})
 {
 	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile(xml_path) != tinyxml2::XML_SUCCESS)
+	if (load_XML(doc, xml_path) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", xml_path);
 		return;
@@ -530,12 +530,12 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
 	std::set<tinyxml2::XMLElement *> body_elements_to_delete;
 	for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");
-		 worldbody_element != nullptr;
-		 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		for (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement("body");
-			 body_element != nullptr;
-			 body_element = body_element->NextSiblingElement("body"))
+				 body_element != nullptr;
+				 body_element = body_element->NextSiblingElement("body"))
 		{
 			const char *body_name = body_element->Attribute("name");
 			if (body_name != nullptr && remove_body_names.find(body_name) != remove_body_names.end())
@@ -543,22 +543,22 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 				body_elements_to_delete.insert(body_element);
 			}
 			else if (body_name != nullptr &&
-					 strcmp(body_name, model_path.stem().c_str()) != 0 &&
-					 MjSim::link_names.find(body_name) == MjSim::link_names.end() &&
-					 MjSim::robots.find(body_name) == MjSim::robots.end())
+							 strcmp(body_name, model_path.stem().c_str()) != 0 &&
+							 MjSim::link_names.find(body_name) == MjSim::link_names.end() &&
+							 MjSim::robots.find(body_name) == MjSim::robots.end())
 			{
 				const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
 				body_element->SetAttribute("pos",
-										   (std::to_string(d->xpos[3 * body_id]) + " " +
-											std::to_string(d->xpos[3 * body_id + 1]) + " " +
-											std::to_string(d->xpos[3 * body_id + 2]))
-											   .c_str());
+																	 (std::to_string(d->xpos[3 * body_id]) + " " +
+																		std::to_string(d->xpos[3 * body_id + 1]) + " " +
+																		std::to_string(d->xpos[3 * body_id + 2]))
+																			 .c_str());
 				body_element->SetAttribute("quat",
-										   (std::to_string(d->xquat[4 * body_id]) + " " +
-											std::to_string(d->xquat[4 * body_id + 1]) + " " +
-											std::to_string(d->xquat[4 * body_id + 2]) + " " +
-											std::to_string(d->xquat[4 * body_id + 3]))
-											   .c_str());
+																	 (std::to_string(d->xquat[4 * body_id]) + " " +
+																		std::to_string(d->xquat[4 * body_id + 1]) + " " +
+																		std::to_string(d->xquat[4 * body_id + 2]) + " " +
+																		std::to_string(d->xquat[4 * body_id + 3]))
+																			 .c_str());
 			}
 		}
 	}
@@ -573,7 +573,7 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 			body_names_to_delete.insert(body_name);
 
 			do_each_child_element(body_element_to_delete, "body", [&](tinyxml2::XMLElement *body_element)
-								  {
+														{
 									if (body_element->Attribute("name") != nullptr)
 									{
 										std::string body_name = body_element->Attribute("name");
@@ -592,8 +592,8 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 		}
 
 		for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+				 worldbody_element != nullptr;
+				 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 		{
 			for (tinyxml2::XMLElement *body_element_to_delete : body_elements_to_delete)
 			{
@@ -603,12 +603,12 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 
 		std::set<tinyxml2::XMLElement *> exclude_elements_to_delete;
 		for (tinyxml2::XMLElement *contact_element = doc.FirstChildElement()->FirstChildElement("contact");
-			 contact_element != nullptr;
-			 contact_element = contact_element->NextSiblingElement("contact"))
+				 contact_element != nullptr;
+				 contact_element = contact_element->NextSiblingElement("contact"))
 		{
 			for (tinyxml2::XMLElement *exclude_element = contact_element->FirstChildElement("exclude");
-				 exclude_element != nullptr;
-				 exclude_element = exclude_element->NextSiblingElement("exclude"))
+					 exclude_element != nullptr;
+					 exclude_element = exclude_element->NextSiblingElement("exclude"))
 			{
 				if (body_names_to_delete.find(exclude_element->Attribute("body1")) != body_names_to_delete.end() || body_names_to_delete.find(exclude_element->Attribute("body2")) != body_names_to_delete.end())
 				{
@@ -620,15 +620,15 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 				contact_element->DeleteChild(exclude_element);
 			}
 		}
-		
+
 		std::set<tinyxml2::XMLElement *> joint_elements_to_delete;
 		for (tinyxml2::XMLElement *equality_element = doc.FirstChildElement()->FirstChildElement("equality");
-			 equality_element != nullptr;
-			 equality_element = equality_element->NextSiblingElement("equality"))
+				 equality_element != nullptr;
+				 equality_element = equality_element->NextSiblingElement("equality"))
 		{
 			for (tinyxml2::XMLElement *joint_element = equality_element->FirstChildElement("joint");
-				 joint_element != nullptr;
-				 joint_element = joint_element->NextSiblingElement("joint"))
+					 joint_element != nullptr;
+					 joint_element = joint_element->NextSiblingElement("joint"))
 			{
 				if (joint_names_to_delete.find(joint_element->Attribute("joint1")) != joint_names_to_delete.end() || joint_names_to_delete.find(joint_element->Attribute("joint2")) != joint_names_to_delete.end())
 				{
@@ -642,7 +642,7 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 		}
 	}
 
-	doc.SaveFile(xml_path);
+	save_XML(doc, xml_path);
 
 	mtx.unlock();
 }
@@ -654,20 +654,20 @@ bool save_geom_quat(const char *path)
 {
 	mtx.lock();
 	tinyxml2::XMLDocument xml_doc;
-	if (xml_doc.LoadFile(path) != tinyxml2::XML_SUCCESS)
+	if (load_XML(xml_doc, path) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", path);
 		return false;
 	}
 
 	for (tinyxml2::XMLElement *worldbody_element = xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-		 worldbody_element != nullptr;
-		 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+			 worldbody_element != nullptr;
+			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		std::function<void(tinyxml2::XMLElement *, const char *)> func = [](tinyxml2::XMLElement *parent_element, const char *element_type)
 		{
 			do_each_child_element(parent_element, element_type, [](tinyxml2::XMLElement *element)
-								  {
+														{
 															if (element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
 															{
 																std::vector<mjtNum> geom_pos = {0, 0, 0};
@@ -741,12 +741,10 @@ bool save_geom_quat(const char *path)
  */
 bool load_tmp_model(bool reset)
 {
-	char error[100] = "Could not load binary model";
 	if (reset)
 	{
 		// load and compile model
-		m = mj_loadXML(tmp_model_path.c_str(), 0, error, 100);
-		if (!m)
+		if (!load_XML(m, tmp_model_path.c_str()))
 		{
 			ROS_WARN("Could not load model file '%s'", tmp_model_path.c_str());
 			return false;
@@ -761,22 +759,25 @@ bool load_tmp_model(bool reset)
 	}
 	else
 	{
+		mtx.lock();
 		// Load current.xml
-		mjModel *m_new = mj_loadXML(tmp_model_path.c_str(), 0, error, 100);
-		if (!m_new)
+		mjModel *m_new;
+		if (!load_XML(m_new, tmp_model_path.c_str()))
 		{
-			ROS_WARN("Load model error: %s", error);
+			ROS_WARN("Could not load model file '%s'", tmp_model_path.c_str());
+			mtx.unlock();
 			return false;
 		}
 
-		mtx.lock();
 		// make data
 		mjData *d_new = mj_makeData(m_new);
 		add_old_state(m_new, d_new);
 		init_malloc();
+
 		mtx.unlock();
 
 		MjSim::geom_pose.clear();
+		
 		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 }
@@ -837,14 +838,13 @@ void MjSim::init_sensors()
 bool MjSim::add_data()
 {
 	// Save current.xml
-	char error[100] = "Could not save binary model";
-	mj_saveLastXML(tmp_model_path.c_str(), m, error, 100);
+	save_XML(m, tmp_model_path.c_str());
 
 	modify_xml(tmp_model_path.c_str());
 
 	// Add add.xml to current.xml
 	tinyxml2::XMLDocument current_xml_doc;
-	if (current_xml_doc.LoadFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (load_XML(current_xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 		return false;
@@ -854,7 +854,7 @@ bool MjSim::add_data()
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", "add.xml");
 	current_element->LinkEndChild(include_element);
-	if (current_xml_doc.SaveFile(tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (save_XML(current_xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
 	{
 		ROS_WARN("Failed to save file \"%s\"\n", tmp_model_path.c_str());
 		return false;
@@ -866,8 +866,7 @@ bool MjSim::add_data()
 bool MjSim::remove_body(const std::set<std::string> &body_names)
 {
 	// Save current.xml
-	char error[100] = "Could not save binary model";
-	mj_saveLastXML(tmp_model_path.c_str(), m, error, 100);
+	save_XML(m, tmp_model_path.c_str());
 
 	// Modify current.xml
 	modify_xml(tmp_model_path.c_str(), body_names);

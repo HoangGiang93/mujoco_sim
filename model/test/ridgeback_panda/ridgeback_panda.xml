@@ -1,0 +1,112 @@
+<mujoco model="ridgeback">
+    <compiler angle="radian" meshdir="ridgeback_panda/meshes/"/>
+    <default/>
+    <asset>
+        <mesh name="body-collision" file="body-collision.stl"/>
+        <mesh name="top" file="top.stl"/>
+        <mesh name="hand" file="hand.stl"/>
+        <mesh name="finger" file="finger.stl"/>
+    </asset>
+    <worldbody>
+        <body name="ridgeback_panda">
+            <freejoint />
+            <geom type="mesh" rgba="0.15 0.15 0.15 1" mesh="body-collision"/>
+            <geom type="mesh" rgba="0.15 0.15 0.15 1" mesh="top"/>
+            <geom size="0.025 0.025 0.035" pos="0.3932 0 0.2208" type="box" rgba="0.2 0.2 0.2 1"/>
+            <geom size="0.025 0.025 0.035" pos="-0.3932 0 0.2208" quat="0 0 0 1" type="box" rgba="0.2 0.2 0.2 1"/>
+            <geom pos="0 0 0.30635" type="mesh" rgba="0.15 0.15 0.15 1" mesh="top"/>
+            <geom size="0.02 0.02 0.15" pos="0.4 0.155 0.43" quat="0.994522 0 0 0.104528" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="0.4 -0.155 0.43" quat="0.994522 0 0 -0.104528" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="0.28 0.365 0.43" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="0.28 -0.365 0.43" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="0 0.365 0.43" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="0 -0.365 0.43" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="-0.38 0.3 0.43" quat="0.991445 0 0 -0.130526" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.02 0.02 0.15" pos="-0.38 -0.3 0.43" quat="0.991445 0 0 0.130526" type="box" rgba="0.4 0.4 0.4 1"/>
+            <geom size="0.06 0.015" pos="0.255 0 0.646499" quat="0.707107 0 0.707107 0" type="cylinder"/>
+            <geom size="0.06" pos="0.27 0 0.646499"/>
+            <geom size="0.06" pos="0.24 0 0.646499"/>
+            <body name="front_rocker_link" pos="0.319 0 0.05">
+                <inertial pos="0 0 0" quat="-0.523509 0.523528 0.475312 0.475327" mass="10.267" diaginertia="0.432583 0.412817 0.0288"/>
+                <joint name="front_rocker" pos="0 0 0" axis="1 0 0" limited="true" range="-0.08726 0.08726"/>
+                <body name="front_left_wheel_link" pos="0 0.2755 0">
+                    <inertial pos="0 0 0" quat="0.707107 0 0 0.707107" mass="2.3" diaginertia="0.0066424 0.0033212 0.0033212"/>
+                    <joint name="front_left_wheel" pos="0 0 0" axis="0 1 0"/>
+                    <geom size="0.0759 0.0395" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.15 0.15 0.15 1"/>
+                </body>
+                <body name="front_right_wheel_link" pos="0 -0.2755 0">
+                    <inertial pos="0 0 0" quat="0.707107 0 0 0.707107" mass="2.3" diaginertia="0.0066424 0.0033212 0.0033212"/>
+                    <joint name="front_right_wheel" pos="0 0 0" axis="0 1 0"/>
+                    <geom size="0.0759 0.0395" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.15 0.15 0.15 1"/>
+                </body>
+            </body>
+            <body name="rear_left_wheel_link" pos="-0.319 0.2755 0.05">
+                <inertial pos="0 0 0" quat="0.707107 0 0 0.707107" mass="2.3" diaginertia="0.0066424 0.0033212 0.0033212"/>
+                <joint name="rear_left_wheel" pos="0 0 0" axis="0 1 0"/>
+                <geom size="0.0759 0.0395" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.15 0.15 0.15 1"/>
+            </body>
+            <body name="rear_right_wheel_link" pos="-0.319 -0.2755 0.05">
+                <inertial pos="0 0 0" quat="0.707107 0 0 0.707107" mass="2.3" diaginertia="0.0066424 0.0033212 0.0033212"/>
+                <joint name="rear_right_wheel" pos="0 0 0" axis="0 1 0"/>
+                <geom size="0.0759 0.0395" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.15 0.15 0.15 1"/>
+            </body>
+            <body name="panda_link1" pos="0.33 0 0.919499">
+                <joint name="panda_joint1" pos="0 0 0" axis="0 0 1" limited="true" range="-2.8973 2.8973"/>
+                <geom size="0.06 0.1415" pos="0 0 -0.1915" type="cylinder"/>
+                <geom size="0.06" pos="0 0 -0.333"/>
+                <geom size="0.06" pos="0 0 -0.05"/>
+                <body name="panda_link2" pos="0 0 0" quat="0.707107 -0.707107 0 0">
+                    <joint name="panda_joint2" pos="0 0 0" axis="0 0 1" limited="true" range="-1.7628 1.7628"/>
+                    <geom size="0.06 0.06" type="cylinder"/>
+                    <geom size="0.06" pos="0 0 -0.06"/>
+                    <geom size="0.06" pos="0 0 0.06"/>
+                    <body name="panda_link3" pos="0 -0.316 0" quat="0.707107 0.707107 0 0">
+                        <joint name="panda_joint3" pos="0 0 0" axis="0 0 1" limited="true" range="-2.8973 2.8973"/>
+                        <geom size="0.06 0.075" pos="0 0 -0.145" type="cylinder"/>
+                        <geom size="0.06" pos="0 0 -0.22"/>
+                        <geom size="0.06" pos="0 0 -0.07"/>
+                        <body name="panda_link4" pos="0.0825 0 0" quat="0.707107 0.707107 0 0">
+                            <joint name="panda_joint4" pos="0 0 0" axis="0 0 1" limited="true" range="-3.0718 -0.0698"/>
+                            <geom size="0.06 0.06" type="cylinder"/>
+                            <geom size="0.06" pos="0 0 0.06"/>
+                            <geom size="0.06" pos="0 0 -0.06"/>
+                            <body name="panda_link5" pos="-0.0825 0.384 0" quat="0.707107 -0.707107 0 0">
+                                <joint name="panda_joint5" pos="0 0 0" axis="0 0 1" limited="true" range="-2.8973 2.8973"/>
+                                <geom size="0.06 0.05" pos="0 0 -0.26" type="cylinder"/>
+                                <geom size="0.06" pos="0 0 -0.31"/>
+                                <geom size="0.06" pos="0 0 -0.21"/>
+                                <geom size="0.025 0.07" pos="0 0.08 -0.13" type="cylinder"/>
+                                <geom size="0.025" pos="0 0.08 -0.06"/>
+                                <geom size="0.025" pos="0 0.08 -0.2"/>
+                                <body name="panda_link6" pos="0 0 0" quat="0.707107 0.707107 0 0">
+                                    <joint name="panda_joint6" pos="0 0 0" axis="0 0 1" limited="true" range="-0.0175 3.7525"/>
+                                    <geom size="0.05 0.04" pos="0 0 -0.03" type="cylinder"/>
+                                    <geom size="0.05" pos="0 0 0.01"/>
+                                    <geom size="0.05" pos="0 0 -0.07"/>
+                                    <body name="panda_link7" pos="0.088 0 0" quat="0.707107 0.707107 0 0">
+                                        <joint name="panda_joint7" pos="0 0 0" axis="0 0 1" limited="true" range="-2.8973 2.8973"/>
+                                        <geom size="0.04 0.07" pos="0 0 0.01" type="cylinder"/>
+                                        <geom size="0.04" pos="0 0 0.08"/>
+                                        <geom size="0.04" pos="0 0 -0.06"/>
+                                        <geom size="0.03 0.005" pos="0.0424 0.0424 0.082" quat="0.5 0.5 0.5 -0.5" type="cylinder"/>
+                                        <geom size="0.03" pos="0.0424 0.0424 0.087"/>
+                                        <geom size="0.03" pos="0.0424 0.0424 0.077"/>
+                                        <geom pos="0 0 0.107" quat="0.92388 0 0 -0.382683" type="mesh" mesh="hand"/>
+                                        <body name="panda_leftfinger" pos="0 0 0.1654" quat="0.92388 0 0 -0.382683">
+                                            <joint name="panda_finger_joint1" pos="0 0 0" axis="0 1 0" type="slide" limited="true" range="0 0.04"/>
+                                            <geom type="mesh" mesh="finger"/>
+                                        </body>
+                                        <body name="panda_rightfinger" pos="0 0 0.1654" quat="0.92388 0 0 -0.382683">
+                                            <joint name="panda_finger_joint2" pos="0 0 0" axis="0 -1 0" type="slide" limited="true" range="0 0.04"/>
+                                            <geom quat="0 0 0 1" type="mesh" mesh="finger"/>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+</mujoco>

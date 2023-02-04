@@ -71,11 +71,11 @@ if __name__ == "__main__":
     i = 0
     while not rospy.is_shutdown():
         spawn_object(i)
-        if i >= 5:
-            rospy.sleep(0.5)
-            destroy_object(i-2)
-            rospy.sleep(0.5)
+        if i >= 10:
+            rospy.sleep(0.1)
+            destroy_object(i-10)
+            rospy.sleep(0.1)
         else:
-            rospy.sleep(1)
+            rospy.sleep(0.2)
         i+=1
         

@@ -11,8 +11,8 @@ from random import random, uniform, randint
 from math import pi, sin, cos
 
 object = ObjectStatus()
-types = [ObjectInfo.CUBE, ObjectInfo.SPHERE, ObjectInfo.CYLINDER, ObjectInfo.MESH, ObjectInfo.MESH]
-meshes = ["../test/cup.xml", "../test/bowl_small.xml", "../test/box.xml"]
+types = [ObjectInfo.MESH]
+meshes = ["../test/box.xml"]
 
 colors = [
     ColorRGBA(0, 0, 1, 1),
@@ -82,9 +82,9 @@ if __name__ == "__main__":
     i = 0
     while not rospy.is_shutdown():
         spawn_object(i)
-        if i >= 10:
+        if i >= 20:
             rospy.sleep(0.15)
-            destroy_object(i-10)
+            destroy_object(i-20)
             rospy.sleep(0.15)
         else:
             rospy.sleep(0.3)

@@ -69,6 +69,8 @@ bool pub_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
+std::map<std::string, std::string> name_map;
+
 static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
     std::string robot_description_string;
@@ -89,13 +91,22 @@ std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyx
     {
         return;
     }
-    
+
     std::string name = element->Attribute("name");
     while (mj_name2id(m, type, name.c_str()) != -1)
     {
-        size_t last_index = name.find_last_not_of("0123456789");
-        const int index = atoi(name.substr(last_index + 1).c_str());
-        name.replace(last_index + 1, index / 10 + 1, std::to_string(index + 1));
+        const size_t last_underscore_index = name.find_last_of("_");
+        const std::string string_after_underscore = name.substr(last_underscore_index + 1);
+        if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
+        {
+            name += "_0";
+        }
+        else
+        {
+            size_t last_index = name.find_last_not_of("0123456789");
+            const int index = atoi(name.substr(last_index + 1).c_str());
+            name.replace(last_index + 1, index / 10 + 1, std::to_string(index + 1));
+        }
     }
     name_map[element->Attribute("name")] = name;
     element->SetAttribute("name", name.c_str());
@@ -354,7 +365,7 @@ void MjRos::set_params()
         else
         {
             tinyxml2::XMLDocument cache_model_xml_doc;
-            if (cache_model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+            if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
             {
                 ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
                 robots.push_back("robot");
@@ -933,7 +944,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 }
 
                 tinyxml2::XMLDocument mesh_xml_doc;
-                if (mesh_xml_doc.LoadFile(object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
+                if (load_XML(mesh_xml_doc, object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
                 {
                     ROS_WARN("Failed to load file \"%s\"\n", object_mesh_path.c_str());
                     continue;
@@ -973,16 +984,8 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                     {
                                         mesh_element->SetAttribute("file", (mesh_dir / mesh_element->Attribute("file")).c_str());
                                     }
-                                    std::string scale_str = "1 1 1";
 
-                                    if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
-                                    {
-                                        mesh_element->SetAttribute("scale",
-                                                                   (std::to_string(object.info.size.x) + " " +
-                                                                    std::to_string(object.info.size.y) + " " +
-                                                                    std::to_string(object.info.size.z))
-                                                                       .c_str());
-                                    }
+                                    std::string scale_str = "1 1 1";
                                     if (mesh_element->Attribute("scale") != nullptr)
                                     {
                                         scale_str = mesh_element->Attribute("scale");
@@ -990,6 +993,18 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                     std::istringstream iss(scale_str);
                                     std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
 
+                                    if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
+                                    {
+                                        scale[0] *= object.info.size.x;
+                                        scale[1] *= object.info.size.y;
+                                        scale[2] *= object.info.size.z;
+                                        mesh_element->SetAttribute("scale",
+                                                                   (std::to_string(scale[0]) + " " +
+                                                                    std::to_string(scale[1]) + " " +
+                                                                    std::to_string(scale[2]))
+                                                                       .c_str());
+                                    }
+                                    
                                     mesh_paths[mesh_element->Attribute("name")] = {mesh_element->Attribute("file"), scale};
                                 }
                             }
@@ -1126,7 +1141,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         worldbody_element->LinkEndChild(body_element);
     }
 
-    if (object_xml_doc.SaveFile((tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
+    if (save_XML(object_xml_doc, (tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
     {
         ROS_WARN("Failed to save file \"%s\"\n", (tmp_model_path.parent_path() / "add.xml").c_str());
         spawn_success = false;
@@ -1134,6 +1149,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
     else
     {
         spawn_success = MjSim::add_data();
+
         mtx.lock();
         for (const mujoco_msgs::ObjectStatus &object : objects)
         {
@@ -1904,7 +1920,7 @@ void MjRos::add_joint_states(const int body_id, const EObjectType object_type)
         const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
         const int qpos_id = m->jnt_qposadr[joint_id];
         const int dof_id = m->jnt_dofadr[joint_id];
-        
+
         joint_states[object_type].name.push_back(joint_name);
         joint_states[object_type].position.push_back(d->qpos[qpos_id]);
         joint_states[object_type].velocity.push_back(d->qvel[dof_id]);
