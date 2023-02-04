@@ -19,13 +19,12 @@
 // SOFTWARE.
 
 #include "mj_sim.h"
+#include "mj_util.h"
 
-#include <algorithm>
 #include <ros/package.h>
 #include <ros/param.h>
 #include <tf/tf.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tinyxml2.h>
 
 double MjSim::max_time_step;
 
@@ -64,51 +63,6 @@ MjSim::~MjSim()
 	boost::filesystem::remove_all(tmp_model_path.parent_path());
 }
 
-/**
- * @brief Get all joint names of this body element and save it in MjSim::joint_names
- *
- * @param body_element
- */
-static void get_joint_names(const std::string &robot_name, tinyxml2::XMLElement *body_element)
-{
-	const std::set<std::string> odom_joint_names = {
-			robot_name + "_lin_odom_x_joint",
-			robot_name + "_lin_odom_y_joint",
-			robot_name + "_lin_odom_z_joint",
-			robot_name + "_ang_odom_x_joint",
-			robot_name + "_ang_odom_y_joint",
-			robot_name + "_ang_odom_z_joint",
-	};
-	for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
-			 joint_element != nullptr;
-			 joint_element = joint_element->NextSiblingElement("joint"))
-	{
-		if (joint_element->Attribute("name") != nullptr)
-		{
-			const std::string joint_name = joint_element->Attribute("name");
-			if (odom_joint_names.find(joint_name) == odom_joint_names.end())
-			{
-				MjSim::joint_names[robot_name].push_back(joint_name);
-			}
-		}
-	}
-}
-
-static void get_body_element(const std::string &robot_name, tinyxml2::XMLElement *parent_body_element)
-{
-	for (tinyxml2::XMLElement *body_element = parent_body_element->FirstChildElement("body");
-			 body_element != nullptr;
-			 body_element = body_element->NextSiblingElement("body"))
-	{
-		get_joint_names(robot_name, body_element);
-		get_body_element(robot_name, body_element);
-	}
-}
-
-/**
- * @brief Set all joint names to MjSim::joint_names and MjSim::odom_vels
- *
- */
 static void set_joint_names()
 {
 	tinyxml2::XMLDocument cache_model_xml_doc;
@@ -128,8 +82,34 @@ static void set_joint_names()
 			{
 				continue;
 			}
+
 			ROS_INFO("Getting joints of model %s...", robot_name.c_str());
-			get_body_element(robot_name, worldbody_element);
+			std::function<void(tinyxml2::XMLElement *, const std::string &)> func = [](tinyxml2::XMLElement *body_element, const std::string &robot_name)
+			{
+				const std::set<std::string> odom_joint_names = {
+						robot_name + "_lin_odom_x_joint",
+						robot_name + "_lin_odom_y_joint",
+						robot_name + "_lin_odom_z_joint",
+						robot_name + "_ang_odom_x_joint",
+						robot_name + "_ang_odom_y_joint",
+						robot_name + "_ang_odom_z_joint",
+				};
+				for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
+						 joint_element != nullptr;
+						 joint_element = joint_element->NextSiblingElement("joint"))
+				{
+					if (joint_element->Attribute("name") != nullptr)
+					{
+						const std::string joint_name = joint_element->Attribute("name");
+						if (odom_joint_names.find(joint_name) == odom_joint_names.end())
+						{
+							MjSim::joint_names[robot_name].push_back(joint_name);
+						}
+					}
+				}
+			};
+
+			do_each_child_element(worldbody_element, "body", robot_name, func);
 		}
 	}
 	if (MjSim::joint_names.size() == 0)
@@ -601,73 +581,6 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 /***********************************/
 /* Fix bug for m->geom_quat begins */
 /***********************************/
-void get_geom_element(tinyxml2::XMLElement *parent_element)
-{
-	for (tinyxml2::XMLElement *element = parent_element->FirstChildElement();
-			 element != nullptr;
-			 element = element->NextSiblingElement())
-	{
-		if (strcmp(element->Value(), "body") == 0)
-		{
-			get_geom_element(element);
-		}
-		else if (strcmp(element->Value(), "geom") == 0 && element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
-		{
-			std::vector<mjtNum> geom_pos = {0, 0, 0};
-			if (element->Attribute("pos") != nullptr)
-			{
-				std::string pos_str = element->Attribute("pos");
-				std::istringstream iss(pos_str);
-				geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-			}
-			for (size_t i = 0; i < geom_pos.size(); i++)
-			{
-				geom_pos[i] *= mesh_paths[element->Attribute("mesh")].second[i];
-			}
-
-			std::vector<mjtNum> euler = {0, 0, 0};
-			if (element->Attribute("quat") != nullptr)
-			{
-				std::string quat_str = element->Attribute("quat");
-				std::istringstream iss(quat_str);
-				std::vector<mjtNum> geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-				tf::Quaternion quat(geom_quat[1], geom_quat[2], geom_quat[3], geom_quat[0]);
-				tf::Matrix3x3 rot_mat(quat);
-				rot_mat.getRPY(euler[0], euler[1], euler[2]);
-			}
-			else if (element->Attribute("euler") != nullptr)
-			{
-				std::string euler_str = element->Attribute("euler");
-				std::istringstream iss(euler_str);
-				euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-			}
-			for (size_t i = 0; i < euler.size(); i++)
-			{
-				if (mesh_paths[element->Attribute("mesh")].second[i] < 0)
-				{
-					euler[i] += M_PI;
-				}
-			}
-
-			tf2::Quaternion quat;
-			quat.setRPY(euler[0], euler[1], euler[2]);
-			std::vector<mjtNum> geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
-
-			const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
-			for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
-			{
-				if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) != MjSim::geom_pose.end())
-				{
-					MjSim::geom_pose[geom_id].reserve(7);
-					MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
-					MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
-					break;
-				}
-			}
-		}
-	}
-}
-
 bool save_geom_quat(const char *path)
 {
 	mtx.lock();
@@ -682,7 +595,67 @@ bool save_geom_quat(const char *path)
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
-		get_geom_element(worldbody_element);
+		std::function<void(tinyxml2::XMLElement *, const char *)> func = [](tinyxml2::XMLElement *parent_element, const char *element_type)
+		{
+			do_each_child_element(parent_element, element_type, [](tinyxml2::XMLElement *element)
+														{
+															if (element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
+															{
+																std::vector<mjtNum> geom_pos = {0, 0, 0};
+																if (element->Attribute("pos") != nullptr)
+																{
+																	std::string pos_str = element->Attribute("pos");
+																	std::istringstream iss(pos_str);
+																	geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+																}
+																for (size_t i = 0; i < geom_pos.size(); i++)
+																{
+																	geom_pos[i] *= mesh_paths[element->Attribute("mesh")].second[i];
+																}
+
+																std::vector<mjtNum> euler = {0, 0, 0};
+																if (element->Attribute("quat") != nullptr)
+																{
+																	std::string quat_str = element->Attribute("quat");
+																	std::istringstream iss(quat_str);
+																	std::vector<mjtNum> geom_quat = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+																	tf::Quaternion quat(geom_quat[1], geom_quat[2], geom_quat[3], geom_quat[0]);
+																	tf::Matrix3x3 rot_mat(quat);
+																	rot_mat.getRPY(euler[0], euler[1], euler[2]);
+																}
+																else if (element->Attribute("euler") != nullptr)
+																{
+																	std::string euler_str = element->Attribute("euler");
+																	std::istringstream iss(euler_str);
+																	euler = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+																}
+																for (size_t i = 0; i < euler.size(); i++)
+																{
+																	if (mesh_paths[element->Attribute("mesh")].second[i] < 0)
+																	{
+																		euler[i] += M_PI;
+																	}
+																}
+
+																tf2::Quaternion quat;
+																quat.setRPY(euler[0], euler[1], euler[2]);
+																std::vector<mjtNum> geom_quat = {quat.getW(), quat.getX(), quat.getY(), quat.getZ()};
+
+																const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
+																for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
+																{
+																	if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) != MjSim::geom_pose.end())
+																	{
+																		MjSim::geom_pose[geom_id].reserve(7);
+																		MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
+																		MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_quat.begin(), geom_quat.end());
+																		break;
+																	}
+																}
+															} });
+		};
+
+		do_each_child_element(worldbody_element, "body", "geom", func);
 	}
 	mtx.unlock();
 	return true;

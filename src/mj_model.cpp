@@ -21,6 +21,7 @@
 #include "mj_model.h"
 
 #include <ros/package.h>
+#include <tinyxml2.h>
 
 mjModel *m = NULL;
 mjData *d = NULL;

@@ -19,8 +19,8 @@
 // SOFTWARE.
 
 #include "mj_ros.h"
+#include "mj_util.h"
 
-#include <algorithm>
 #include <condition_variable>
 #include <controller_manager_msgs/ControllerState.h>
 #include <controller_manager_msgs/ListControllers.h>
@@ -28,7 +28,6 @@
 #include <ros/package.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <thread>
-#include <tinyxml2.h>
 #include <urdf/model.h>
 
 using namespace std::chrono_literals;
@@ -86,10 +85,14 @@ static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const c
     }
 }
 
-static void check_index(tinyxml2::XMLElement *element, mjtObj type)
+std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyxml2::XMLElement *element, const mjtObj type)
 {
-    std::string name = element->Attribute("name");
+    if (element->Attribute("name") == nullptr)
+    {
+        return;
+    }
     
+    std::string name = element->Attribute("name");
     while (mj_name2id(m, type, name.c_str()) != -1)
     {
         size_t last_index = name.find_last_not_of("0123456789");
@@ -98,52 +101,31 @@ static void check_index(tinyxml2::XMLElement *element, mjtObj type)
     }
     name_map[element->Attribute("name")] = name;
     element->SetAttribute("name", name.c_str());
-}
+};
 
-static void check_name(tinyxml2::XMLElement *body_element)
+std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index_cb = [](tinyxml2::XMLElement *element, const mjtObj type)
 {
-    for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement("body");
-         child_body_element != nullptr;
-         child_body_element = child_body_element->NextSiblingElement("body"))
+    switch (type)
     {
-        if (child_body_element->Attribute("name") != nullptr)
-        {
-            check_index(child_body_element, mjtObj::mjOBJ_BODY);
-        }
-        check_name(child_body_element);
+    case mjtObj::mjOBJ_BODY:
+        do_each_child_element(element, "body", type, check_index);
+        break;
+
+    case mjtObj::mjOBJ_JOINT:
+        do_each_child_element(element, "joint", type, check_index);
+        break;
+
+    case mjtObj::mjOBJ_GEOM:
+        do_each_child_element(element, "geom", type, check_index);
+        break;
+
+    default:
+        break;
     }
+};
 
-    for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
-         joint_element != nullptr;
-         joint_element = joint_element->NextSiblingElement("joint"))
-    {
-
-        if (joint_element->Attribute("name") != nullptr)
-        {
-            check_index(joint_element, mjtObj::mjOBJ_JOINT);
-        }
-    }
-
-    for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
-         geom_element != nullptr;
-         geom_element = geom_element->NextSiblingElement("geom"))
-    {
-        if (geom_element->Attribute("name") != nullptr)
-        {
-            check_index(geom_element, mjtObj::mjOBJ_GEOM);
-        }
-    }
-}
-
-static void scale_body(tinyxml2::XMLElement *body_element, const mujoco_msgs::ObjectInfo &info)
+std::function<void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &)> adjust_body = [](tinyxml2::XMLElement *body_element, const mujoco_msgs::ObjectInfo &info)
 {
-    for (tinyxml2::XMLElement *child_body_element = body_element->FirstChildElement("body");
-         child_body_element != nullptr;
-         child_body_element = child_body_element->NextSiblingElement("body"))
-    {
-        scale_body(child_body_element, info);
-    }
-
     if (mju_abs(info.rgba.r) > mjMINVAL || mju_abs(info.rgba.g) > mjMINVAL || mju_abs(info.rgba.b) > mjMINVAL || mju_abs(info.rgba.a) > mjMINVAL)
     {
         for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
@@ -253,6 +235,57 @@ static void scale_body(tinyxml2::XMLElement *body_element, const mujoco_msgs::Ob
             geom_element->SetAttribute("size", size_str.c_str());
         }
     }
+};
+
+static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, std::function<void(MjRos &, const int, const EObjectType)> function)
+{
+    for (int body_id = 1; body_id < m->nbody; body_id++)
+    {
+        std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+        switch (object_type)
+        {
+        case EObjectType::Robot:
+            if (MjSim::link_names.find(body_name) != MjSim::link_names.end())
+            {
+                function(mj_ros, body_id, object_type);
+            }
+            break;
+
+        case EObjectType::World:
+            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(body_name) == MjSim::spawned_object_names.end())
+            {
+                if (!pub_tf_of_free_bodies_only ||
+                    (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
+                {
+                    function(mj_ros, body_id, object_type);
+                }
+            }
+            break;
+
+        case EObjectType::SpawnedObject:
+            if (MjSim::spawned_object_names.find(body_name) != MjSim::spawned_object_names.end())
+            {
+                if (!pub_tf_of_free_bodies_only ||
+                    (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
+                {
+                    function(mj_ros, body_id, object_type);
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+static void check_name(tinyxml2::XMLElement *body_element)
+{
+    do_each_child_element(body_element, "body", mjtObj::mjOBJ_BODY, check_index_cb);
+
+    do_each_child_element(body_element, "body", mjtObj::mjOBJ_JOINT, check_index_cb);
+
+    do_each_child_element(body_element, "body", mjtObj::mjOBJ_GEOM, check_index_cb);
 }
 
 CmdVelCallback::CmdVelCallback(const std::string &in_robot) : robot(in_robot)
@@ -508,6 +541,10 @@ void MjRos::init()
 
     if (ros::param::has("~pub_joint_states"))
     {
+        if (!ros::param::get("~pub_joint_states/robot_bodies_rate", pub_joint_states_rate[EObjectType::Robot]))
+        {
+            pub_joint_states_rate[EObjectType::Robot] = 0.0;
+        }
         if (!ros::param::get("~pub_joint_states/world_bodies_rate", pub_joint_states_rate[EObjectType::World]))
         {
             pub_joint_states_rate[EObjectType::World] = 60.0;
@@ -627,6 +664,7 @@ void MjRos::init()
     }
 
     object_state_array_pub = n.advertise<mujoco_msgs::ObjectStateArray>("/mujoco/object_states", 0);
+    joint_states_pub[EObjectType::Robot] = n.advertise<sensor_msgs::JointState>("/mujoco/robot_joint_states", 0);
     joint_states_pub[EObjectType::World] = n.advertise<sensor_msgs::JointState>("/mujoco/world_joint_states", 0);
     joint_states_pub[EObjectType::SpawnedObject] = n.advertise<sensor_msgs::JointState>("/mujoco/object_joint_states", 0);
     sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
@@ -966,10 +1004,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
+                        check_name(copy->ToElement());
+
+                        do_each_child_element(copy->ToElement(), "body", object.info, adjust_body);
+
                         tinyxml2::XMLElement *copy_body_element = copy->FirstChildElement("body");
-
-                        check_name(copy_body_element);
-
                         name_map[copy_body_element->Attribute("name")] = object.info.name;
 
                         copy_body_element->SetAttribute("name", object.info.name.c_str());
@@ -984,8 +1023,6 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                          std::to_string(object.pose.orientation.y) + " " +
                                                          std::to_string(object.pose.orientation.z))
                                                             .c_str());
-
-                        scale_body(copy_body_element, object.info);
                     }
                     else if (strcmp(copy->Value(), "contact") == 0)
                     {
@@ -1034,9 +1071,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         default:
             break;
         }
-        
+
         body_element->SetAttribute("name", object.info.name.c_str());
-        
+
         body_element->SetAttribute("pos",
                                    (std::to_string(object.pose.position.x) + " " +
                                     std::to_string(object.pose.position.y) + " " +
@@ -1408,55 +1445,15 @@ void MjRos::publish_tf(const EObjectType object_type)
 
         transform.header = header;
 
-        // Publish tf of moving objects
-        std::string object_name;
-        for (int body_id = 1; body_id < m->nbody; body_id++)
-        {
-            if (m->body_mocapid[body_id] != -1)
-            {
-                continue;
-            }
+        do_each_object_type(*this, object_type, [&](MjRos &, const int body_id, const EObjectType object_type)
+                            {
+                                if (m->body_mocapid[body_id] != -1)
+                                {
+                                    return;
+                                }
 
-            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-
-            switch (object_type)
-            {
-            case EObjectType::Robot:
-                if (MjSim::link_names.find(object_name) != MjSim::link_names.end())
-                {
-                    set_transform(transform, body_id, object_name);
-                    br.sendTransform(transform);
-                }
-                break;
-
-            case EObjectType::World:
-                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
-                {
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        set_transform(transform, body_id, object_name);
-                        br.sendTransform(transform);
-                    }
-                }
-                break;
-
-            case EObjectType::SpawnedObject:
-                if (MjSim::spawned_object_names.find(object_name) != MjSim::spawned_object_names.end())
-                {
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        set_transform(transform, body_id, object_name);
-                        br.sendTransform(transform);
-                    }
-                }
-                break;
-
-            default:
-                break;
-            }
-        }
+                                set_transform(transform, body_id, mj_id2name(m, mjtObj::mjOBJ_BODY, body_id));
+                                br.sendTransform(transform); });
 
         ros::spinOnce();
         loop_rate.sleep();
@@ -1499,46 +1496,7 @@ void MjRos::publish_marker_array(const EObjectType object_type)
         marker[object_type].header = header;
         marker_array[object_type].markers.clear();
 
-        // Publish marker of objects
-        std::string object_name;
-        for (int body_id = 1; body_id < m->nbody; body_id++)
-        {
-            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-            switch (object_type)
-            {
-            case EObjectType::Robot:
-                if (MjSim::link_names.find(object_name) != MjSim::link_names.end())
-                {
-                    add_marker(body_id, object_type);
-                }
-                break;
-
-            case EObjectType::World:
-                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
-                {
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        add_marker(body_id, object_type);
-                    }
-                }
-                break;
-
-            case EObjectType::SpawnedObject:
-                if (MjSim::spawned_object_names.find(object_name) != MjSim::spawned_object_names.end())
-                {
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        add_marker(body_id, object_type);
-                    }
-                }
-                break;
-
-            default:
-                break;
-            }
-        }
+        do_each_object_type(*this, object_type, &MjRos::add_marker);
 
         // Publish markers
         marker_array_pub.publish(marker_array[object_type]);
@@ -1581,56 +1539,7 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
         object_state_array[object_type].header = header;
         object_state_array[object_type].object_states.clear();
 
-        // Publish marker of objects
-        std::string object_name;
-        for (int body_id = 1; body_id < m->nbody; body_id++)
-        {
-            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-            switch (object_type)
-            {
-            case EObjectType::Robot:
-                if (MjSim::link_names.find(object_name) != MjSim::link_names.end())
-                {
-                    add_object_state(body_id, object_type);
-                }
-                break;
-
-            case EObjectType::World:
-                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
-                {
-                    if (m->body_mocapid[body_id] != -1)
-                    {
-                        continue;
-                    }
-
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        add_object_state(body_id, object_type);
-                    }
-                }
-                break;
-
-            case EObjectType::SpawnedObject:
-                if (MjSim::spawned_object_names.find(object_name) != MjSim::spawned_object_names.end())
-                {
-                    if (m->body_mocapid[body_id] != -1)
-                    {
-                        continue;
-                    }
-
-                    if (!pub_tf_of_free_bodies_only ||
-                        (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
-                    {
-                        add_object_state(body_id, object_type);
-                    }
-                }
-                break;
-
-            default:
-                break;
-            }
-        }
+        do_each_object_type(*this, object_type, &MjRos::add_object_state);
 
         object_state_array_pub.publish(object_state_array[object_type]);
 
@@ -1643,8 +1552,10 @@ void MjRos::publish_joint_states(const EObjectType object_type)
 {
     if (object_type == EObjectType::None)
     {
+        std::thread publish_joint_states_robot_thread(&MjRos::publish_joint_states, this, EObjectType::Robot);
         std::thread publish_joint_states_world_thread(&MjRos::publish_joint_states, this, EObjectType::World);
         std::thread publish_joint_states_spawned_object_thread(&MjRos::publish_joint_states, this, EObjectType::SpawnedObject);
+        publish_joint_states_robot_thread.join();
         publish_joint_states_world_thread.join();
         publish_joint_states_spawned_object_thread.join();
         return;
@@ -1674,31 +1585,7 @@ void MjRos::publish_joint_states(const EObjectType object_type)
         joint_states[object_type].velocity.clear();
         joint_states[object_type].effort.clear();
 
-        // Publish joint states of objects
-        std::string object_name;
-        for (int body_id = 1; body_id < m->nbody; body_id++)
-        {
-            object_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-            switch (object_type)
-            {
-            case EObjectType::World:
-                if (MjSim::robots.find(object_name) == MjSim::robots.end() && MjSim::link_names.find(object_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(object_name) == MjSim::spawned_object_names.end())
-                {
-                    add_joint_states(body_id, object_type);
-                }
-                break;
-
-            case EObjectType::SpawnedObject:
-                if (MjSim::spawned_object_names.find(object_name) != MjSim::spawned_object_names.end())
-                {
-                    add_joint_states(body_id, object_type);
-                }
-                break;
-
-            default:
-                break;
-            }
-        }
+        do_each_object_type(*this, object_type, &MjRos::add_joint_states);
 
         joint_states_pub[object_type].publish(joint_states[object_type]);
 
@@ -2017,8 +1904,10 @@ void MjRos::add_joint_states(const int body_id, const EObjectType object_type)
         const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
         const int qpos_id = m->jnt_qposadr[joint_id];
         const int dof_id = m->jnt_dofadr[joint_id];
+        
         joint_states[object_type].name.push_back(joint_name);
         joint_states[object_type].position.push_back(d->qpos[qpos_id]);
         joint_states[object_type].velocity.push_back(d->qvel[dof_id]);
+        joint_states[object_type].effort.push_back(d->qfrc_inverse[dof_id]);
     }
 }
