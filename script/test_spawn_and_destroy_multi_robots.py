@@ -6,7 +6,7 @@ from std_msgs.msg import ColorRGBA
 from mujoco_msgs.msg import ObjectStatus, ObjectInfo
 from mujoco_msgs.srv import SpawnObject, SpawnObjectRequest, DestroyObject, DestroyObjectRequest
 
-from random import random, uniform, randint, seed
+from random import random, uniform, randint, seed, shuffle
 
 from math import pi, sin, cos
 
@@ -23,7 +23,18 @@ def spawn_object(i):
     object.info.name = "robot_" + str(i)
     object.info.type = ObjectInfo.MESH
     object.info.movable = True
-    object.info.rgba = ColorRGBA(random()*0.5+0.3, random()*0.5+0.3, random()*0.5+0.3, 1)
+
+    x = random()*0.3+0.7
+    y = random()*0.7
+    z = 1 - x*x - y*y
+
+    r_g_b = [x, y, z]
+    shuffle(r_g_b)
+
+    r = r_g_b[0]
+    g = r_g_b[1]
+    b = r_g_b[2]
+    object.info.rgba = ColorRGBA(r, g, b, 1)
     object.info.mesh = mehes[randint(0, len(mehes) - 1)]
     r = uniform(1.5, 2)
     alpha = uniform(-pi, pi)
