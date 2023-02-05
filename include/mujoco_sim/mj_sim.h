@@ -85,8 +85,6 @@ public:
 
     static std::set<std::string> link_names;
 
-    static std::set<std::string> spawned_object_names;
-
     static mjtNum sim_start;
 
     static mjtNum *u;

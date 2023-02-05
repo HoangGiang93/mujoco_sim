@@ -58,6 +58,7 @@ std::condition_variable condition;
 int spawn_nr = 0;
 std::mutex spawn_mtx;
 std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
+static std::set<std::string> object_names_to_spawn;
 bool spawn_success;
 
 int destroy_nr = 0;
@@ -261,7 +262,7 @@ static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, st
             break;
 
         case EObjectType::World:
-            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(body_name) == MjSim::spawned_object_names.end())
+            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && object_names_to_spawn.find(body_name) == object_names_to_spawn.end())
             {
                 if (!pub_tf_of_free_bodies_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
@@ -272,7 +273,7 @@ static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, st
             break;
 
         case EObjectType::SpawnedObject:
-            if (MjSim::spawned_object_names.find(body_name) != MjSim::spawned_object_names.end())
+            if (object_names_to_spawn.find(body_name) != object_names_to_spawn.end())
             {
                 if (!pub_tf_of_free_bodies_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
@@ -1158,12 +1159,12 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                MjSim::spawned_object_names.insert(name);
+                object_names_to_spawn.insert(name);
                 for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
                 {
                     if (m->body_parentid[child_body_id] == body_id)
                     {
-                        MjSim::spawned_object_names.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
+                        object_names_to_spawn.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
                     }
                 }
 
@@ -1224,12 +1225,12 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                MjSim::spawned_object_names.erase(name);
+                object_names_to_spawn.erase(name);
                 for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
                 {
                     if (m->body_parentid[child_body_id] == body_id)
                     {
-                        MjSim::spawned_object_names.erase(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
+                        object_names_to_spawn.erase(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
                     }
                 }
                 mujoco_msgs::ObjectState object_state;

@@ -14,6 +14,5 @@ var searchData=
   ['spawn_5fnr_102',['spawn_nr',['../mj__ros_8cpp.html#a05eb63fbf828446b090d9011f7d6aba8',1,'mj_ros.cpp']]],
   ['spawn_5fobject_5fcount_5fper_5fcycle_103',['spawn_object_count_per_cycle',['../mj__ros_8cpp.html#a3af75d2408bec9cea07519b9892a8171',1,'mj_ros.cpp']]],
   ['spawn_5fsuccess_104',['spawn_success',['../mj__ros_8cpp.html#a36e198c05e53a5324f02ded3a89d8ecb',1,'mj_ros.cpp']]],
-  ['spawned_5fobject_5fnames_105',['spawned_object_names',['../classMjSim.html#a893cc5a9f597dca52cb85768db696487',1,'MjSim']]],
-  ['spawnedobject_106',['SpawnedObject',['../mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670a233067a1ddef5e57bca7e55cfd55e4c7',1,'mj_ros.h']]]
+  ['spawnedobject_105',['SpawnedObject',['../mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670a233067a1ddef5e57bca7e55cfd55e4c7',1,'mj_ros.h']]]
 ];

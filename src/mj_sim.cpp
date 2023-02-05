@@ -36,8 +36,6 @@ std::map<std::string, mjtNum> MjSim::odom_vels;
 
 std::set<std::string> MjSim::link_names;
 
-std::set<std::string> MjSim::spawned_object_names;
-
 mjtNum *MjSim::u = NULL;
 
 mjtNum *MjSim::tau = NULL;
