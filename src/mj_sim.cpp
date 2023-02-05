@@ -52,6 +52,8 @@ std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
 bool MjSim::reload_mesh = true;
 
+std::set<std::string> MjSim::spawned_object_names;
+
 // Fix bug from m->geom_pos and m->geom_quat
 std::map<int, std::vector<mjtNum>> MjSim::geom_pose;
 

@@ -101,6 +101,8 @@ public:
 
     static bool reload_mesh;
 
+    static std::set<std::string> spawned_object_names;
+
     // Fix bug from m->geom_pos and m->geom_quat
     static std::map<int, std::vector<mjtNum>> geom_pose;
 };

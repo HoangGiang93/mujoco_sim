@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['window_243',['window',['../classMjVisual.html#a9e524761f07bbead6f694bb08993683a',1,'MjVisual']]],
-  ['world_5fpath_244',['world_path',['../mj__model_8cpp.html#ae517df665d331ea2030329312ed2c84b',1,'world_path():&#160;mj_model.cpp'],['../mj__model_8h.html#ae517df665d331ea2030329312ed2c84b',1,'world_path():&#160;mj_model.cpp']]]
+  ['u_244',['u',['../classMjSim.html#aa810b31343a0c16940cf482e29d504d0',1,'MjSim']]]
 ];

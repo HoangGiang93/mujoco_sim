@@ -156,6 +156,8 @@ Variables</h2></td></tr>
 <tr class="separator:a7bf9bbe0ee9787844b3776b2d029666a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe16da8f1896a9bd08df8491855e1348"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670">EObjectType</a>, mujoco_msgs::ObjectStateArray &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#afe16da8f1896a9bd08df8491855e1348">object_state_array</a></td></tr>
 <tr class="separator:afe16da8f1896a9bd08df8491855e1348"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affba0f375ba1515f264aac5afc8c8eef"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670">EObjectType</a>, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#affba0f375ba1515f264aac5afc8c8eef">free_bodies_only</a></td></tr>
+<tr class="separator:affba0f375ba1515f264aac5afc8c8eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7069d1398dd7aa7c9b026c2798f68889"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, nav_msgs::Odometry &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a7069d1398dd7aa7c9b026c2798f68889">base_poses</a></td></tr>
 <tr class="separator:a7069d1398dd7aa7c9b026c2798f68889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6389bbb21ca5b0a777cc81b063a37fde"><td class="memItemLeft" align="right" valign="top">std::condition_variable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a6389bbb21ca5b0a777cc81b063a37fde">condition</a></td></tr>
@@ -172,8 +174,6 @@ Variables</h2></td></tr>
 <tr class="separator:a01d20e426388a3fe6a0cdd62df84f882"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43430a339fe05aaa3f663fffb449d51b"><td class="memItemLeft" align="right" valign="top">std::mutex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a43430a339fe05aaa3f663fffb449d51b">destroy_mtx</a></td></tr>
 <tr class="separator:a43430a339fe05aaa3f663fffb449d51b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a179def3ba6e79b984a936aa2df8eb4f0"><td class="memItemLeft" align="right" valign="top">std::set&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a179def3ba6e79b984a936aa2df8eb4f0">object_names_to_destroy</a></td></tr>
-<tr class="separator:a179def3ba6e79b984a936aa2df8eb4f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c8a31b01276265318ef90e6546a4291"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a1c8a31b01276265318ef90e6546a4291">destroy_success</a></td></tr>
 <tr class="separator:a1c8a31b01276265318ef90e6546a4291"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c7ec55ba0a6136e5c49b280682fdb71"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a8c7ec55ba0a6136e5c49b280682fdb71">pub_tf_of_free_bodies_only</a></td></tr>
@@ -350,6 +350,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="affba0f375ba1515f264aac5afc8c8eef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affba0f375ba1515f264aac5afc8c8eef">&#9670;&nbsp;</a></span>free_bodies_only</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670">EObjectType</a>, bool&gt; free_bodies_only</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a7bf9bbe0ee9787844b3776b2d029666a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7bf9bbe0ee9787844b3776b2d029666a">&#9670;&nbsp;</a></span>joint_states</h2>
 
@@ -400,20 +414,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">std::map&lt;std::string, std::string&gt; name_map</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a179def3ba6e79b984a936aa2df8eb4f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a179def3ba6e79b984a936aa2df8eb4f0">&#9670;&nbsp;</a></span>object_names_to_destroy</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::set&lt;std::string&gt; object_names_to_destroy</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -659,8 +659,8 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="amj__ros_8cpp_html_af73ca127ffcafa41c63bb449c4e2c1bf"><div class="ttname"><a href="mj__ros_8cpp.html#af73ca127ffcafa41c63bb449c4e2c1bf">name_map</a></div><div class="ttdeci">std::map&lt; std::string, std::string &gt; name_map</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:73</div></div>
-<div class="ttc" id="amj__ros_8cpp_html_a476be205aa20463be2f746d708c32633"><div class="ttname"><a href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a></div><div class="ttdeci">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt; check_index</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:89</div></div>
+<div class="ttc" id="amj__ros_8cpp_html_af73ca127ffcafa41c63bb449c4e2c1bf"><div class="ttname"><a href="mj__ros_8cpp.html#af73ca127ffcafa41c63bb449c4e2c1bf">name_map</a></div><div class="ttdeci">std::map&lt; std::string, std::string &gt; name_map</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:72</div></div>
+<div class="ttc" id="amj__ros_8cpp_html_a476be205aa20463be2f746d708c32633"><div class="ttname"><a href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a></div><div class="ttdeci">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt; check_index</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:88</div></div>
 <div class="ttc" id="amj__model_8cpp_html_aa95761db16f4e4b06b9a3c0851a83afb"><div class="ttname"><a href="mj__model_8cpp.html#aa95761db16f4e4b06b9a3c0851a83afb">m</a></div><div class="ttdeci">mjModel * m</div><div class="ttdef"><b>Definition:</b> mj_model.cpp:26</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

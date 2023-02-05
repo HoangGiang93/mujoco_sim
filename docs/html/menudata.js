@@ -85,6 +85,7 @@ var menudata={children:[
 {text:"c",url:"globals_vars.html#index_c"},
 {text:"d",url:"globals_vars.html#index_d"},
 {text:"e",url:"globals_vars.html#index_e"},
+{text:"f",url:"globals_vars.html#index_f"},
 {text:"h",url:"globals_vars.html#index_h"},
 {text:"j",url:"globals_vars.html#index_j"},
 {text:"m",url:"globals_vars.html#index_m"},

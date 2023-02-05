@@ -50,6 +50,7 @@ std::map<EObjectType, visualization_msgs::Marker> marker;
 std::map<EObjectType, visualization_msgs::MarkerArray> marker_array;
 std::map<EObjectType, sensor_msgs::JointState> joint_states;
 std::map<EObjectType, mujoco_msgs::ObjectStateArray> object_state_array;
+std::map<EObjectType, bool> free_bodies_only;
 
 std::map<std::string, nav_msgs::Odometry> base_poses;
 
@@ -58,12 +59,10 @@ std::condition_variable condition;
 int spawn_nr = 0;
 std::mutex spawn_mtx;
 std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
-static std::set<std::string> object_names_to_spawn;
 bool spawn_success;
 
 int destroy_nr = 0;
 std::mutex destroy_mtx;
-std::set<std::string> object_names_to_destroy;
 bool destroy_success;
 
 bool pub_tf_of_free_bodies_only;
@@ -247,7 +246,7 @@ std::function<void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &)> adj
     }
 };
 
-static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, std::function<void(MjRos &, const int, const EObjectType)> function)
+static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, bool free_body_only, std::function<void(MjRos &, const int, const EObjectType)> function)
 {
     for (int body_id = 1; body_id < m->nbody; body_id++)
     {
@@ -262,9 +261,9 @@ static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, st
             break;
 
         case EObjectType::World:
-            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && object_names_to_spawn.find(body_name) == object_names_to_spawn.end())
+            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(body_name) == MjSim::spawned_object_names.end())
             {
-                if (!pub_tf_of_free_bodies_only ||
+                if (!free_body_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
                 {
                     function(mj_ros, body_id, object_type);
@@ -273,9 +272,9 @@ static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, st
             break;
 
         case EObjectType::SpawnedObject:
-            if (object_names_to_spawn.find(body_name) != object_names_to_spawn.end())
+            if (MjSim::spawned_object_names.find(body_name) != MjSim::spawned_object_names.end())
             {
-                if (!pub_tf_of_free_bodies_only ||
+                if (!free_body_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
                 {
                     function(mj_ros, body_id, object_type);
@@ -1005,7 +1004,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                                     std::to_string(scale[2]))
                                                                        .c_str());
                                     }
-                                    
+
                                     mesh_paths[mesh_element->Attribute("name")] = {mesh_element->Attribute("file"), scale};
                                 }
                             }
@@ -1159,14 +1158,9 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                object_names_to_spawn.insert(name);
-                for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
-                {
-                    if (m->body_parentid[child_body_id] == body_id)
-                    {
-                        object_names_to_spawn.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
-                    }
-                }
+                MjSim::spawned_object_names.insert(name);
+                do_each_child_body_id(m, body_id, [&](int child_body_id)
+                                      { MjSim::spawned_object_names.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id)); });
 
                 if (m->body_dofnum[body_id] != 6)
                 {
@@ -1191,6 +1185,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         mj_forward(m, d);
         mtx.unlock();
     }
+    
     objects_to_spawn.erase(std::remove_if(objects_to_spawn.begin(), objects_to_spawn.end(), [objects](const mujoco_msgs::ObjectStatus &object)
                                           { return std::find(objects.begin(), objects.end(), object) != objects.end(); }),
                            objects_to_spawn.end());
@@ -1225,14 +1220,12 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                object_names_to_spawn.erase(name);
-                for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
-                {
-                    if (m->body_parentid[child_body_id] == body_id)
-                    {
-                        object_names_to_spawn.erase(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id));
-                    }
-                }
+                MjSim::spawned_object_names.erase(name);
+
+                do_each_child_body_id(m, body_id, [&](int child_body_id)
+                                      { const char *child_name = mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id);
+                                        MjSim::spawned_object_names.erase(child_name); });
+
                 mujoco_msgs::ObjectState object_state;
                 object_state.name = name;
                 if (m->body_dofnum[body_id] != 6)
@@ -1290,6 +1283,7 @@ void MjRos::destroy_objects(const std::set<std::string> object_names)
     for (const std::string &object_name : object_names)
     {
         object_names_to_destroy.erase(object_name);
+        MjSim::spawned_object_names.erase(object_name);
     }
 }
 
@@ -1462,7 +1456,7 @@ void MjRos::publish_tf(const EObjectType object_type)
 
         transform.header = header;
 
-        do_each_object_type(*this, object_type, [&](MjRos &, const int body_id, const EObjectType object_type)
+        do_each_object_type(*this, object_type, pub_tf_of_free_bodies_only, [&](MjRos &, const int body_id, const EObjectType object_type)
                             {
                                 if (m->body_mocapid[body_id] != -1)
                                 {
@@ -1513,7 +1507,7 @@ void MjRos::publish_marker_array(const EObjectType object_type)
         marker[object_type].header = header;
         marker_array[object_type].markers.clear();
 
-        do_each_object_type(*this, object_type, &MjRos::add_marker);
+        do_each_object_type(*this, object_type, pub_object_marker_array_of_free_bodies_only, &MjRos::add_marker);
 
         // Publish markers
         marker_array_pub.publish(marker_array[object_type]);
@@ -1556,7 +1550,7 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
         object_state_array[object_type].header = header;
         object_state_array[object_type].object_states.clear();
 
-        do_each_object_type(*this, object_type, &MjRos::add_object_state);
+        do_each_object_type(*this, object_type, pub_object_state_array_of_free_bodies_only, &MjRos::add_object_state);
 
         object_state_array_pub.publish(object_state_array[object_type]);
 
@@ -1602,7 +1596,7 @@ void MjRos::publish_joint_states(const EObjectType object_type)
         joint_states[object_type].velocity.clear();
         joint_states[object_type].effort.clear();
 
-        do_each_object_type(*this, object_type, &MjRos::add_joint_states);
+        do_each_object_type(*this, object_type, false, &MjRos::add_joint_states);
 
         joint_states_pub[object_type].publish(joint_states[object_type]);
 

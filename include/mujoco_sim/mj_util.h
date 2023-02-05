@@ -54,6 +54,18 @@ static void do_each_child_element(tinyxml2::XMLElement *element, const char *chi
 	}
 }
 
+static void do_each_child_body_id(mjModel *&m, int body_id, std::function<void(int i)> function)
+{
+	for (int child_body_id = 0; child_body_id < m->nbody; child_body_id++)
+	{
+		if (m->body_parentid[child_body_id] == body_id)
+		{
+			function(child_body_id);
+			do_each_child_body_id(m, child_body_id, function);
+		}
+	}
+}
+
 template <typename T>
 static bool manage_XML(T &arg, const char *path, std::function<bool(T &arg, const char *)> func)
 {
