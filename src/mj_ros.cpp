@@ -71,6 +71,8 @@ bool pub_object_state_array_of_free_bodies_only;
 
 std::map<std::string, std::string> name_map;
 
+static int unique_index = 0;
+
 static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
     std::string robot_description_string;
@@ -93,21 +95,26 @@ std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyx
     }
 
     std::string name = element->Attribute("name");
-    while (mj_name2id(m, type, name.c_str()) != -1)
+    name_map.erase(name);
+    do
     {
         const size_t last_underscore_index = name.find_last_of("_");
         const std::string string_after_underscore = name.substr(last_underscore_index + 1);
         if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
         {
-            name += "_0";
+            name += "_" + unique_index;
         }
         else
         {
             size_t last_index = name.find_last_not_of("0123456789");
-            const int index = atoi(name.substr(last_index + 1).c_str());
-            name.replace(last_index + 1, index / 10 + 1, std::to_string(index + 1));
+            name.replace(last_index + 1, unique_index / 10 + 1, std::to_string(unique_index));
         }
-    }
+        if (mj_name2id(m, type, name.c_str()) != -1)
+        {
+            unique_index += 1;
+        }
+    } while (mj_name2id(m, type, name.c_str()) != -1);
+
     name_map[element->Attribute("name")] = name;
     element->SetAttribute("name", name.c_str());
 };
@@ -1019,7 +1026,12 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     {
                         name_map[copy->FirstChildElement()->Attribute("name")] = object.info.name;
 
-                        check_name(copy->ToElement());
+                        int i;
+                        do
+                        {
+                            i = unique_index;
+                            check_name(copy->ToElement());
+                        } while (i != unique_index);
 
                         do_each_child_element(copy->ToElement(), "body", object.info, adjust_body);
 
@@ -1381,6 +1393,12 @@ void MjRos::spawn_and_destroy_objects()
                 destroy_marker_array.markers.push_back(destroy_marker);
             }
         }
+
+        for (std::string object_name_to_destroy : object_names_to_destroy)
+        {
+            ROS_WARN("%s 1", object_name_to_destroy.c_str());
+        }
+        
 
         if (object_names_to_destroy.size() > 0)
         {
