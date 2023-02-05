@@ -63,6 +63,7 @@ bool spawn_success;
 
 int destroy_nr = 0;
 std::mutex destroy_mtx;
+static std::set<std::string> object_names_to_destroy;
 bool destroy_success;
 
 bool pub_tf_of_free_bodies_only;
@@ -102,7 +103,7 @@ std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyx
         const std::string string_after_underscore = name.substr(last_underscore_index + 1);
         if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
         {
-            name += "_" + unique_index;
+            name += "_" + std::to_string(unique_index);
         }
         else
         {
@@ -1392,13 +1393,7 @@ void MjRos::spawn_and_destroy_objects()
                 destroy_marker.id = geom_id;
                 destroy_marker_array.markers.push_back(destroy_marker);
             }
-        }
-
-        for (std::string object_name_to_destroy : object_names_to_destroy)
-        {
-            ROS_WARN("%s 1", object_name_to_destroy.c_str());
-        }
-        
+        }        
 
         if (object_names_to_destroy.size() > 0)
         {

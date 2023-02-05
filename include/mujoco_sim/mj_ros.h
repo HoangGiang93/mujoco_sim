@@ -169,6 +169,4 @@ private:
     tf2_ros::StaticTransformBroadcaster static_br;
 
     std::map<std::string, float> joint_inits;
-
-    std::set<std::string> object_names_to_destroy;
 };

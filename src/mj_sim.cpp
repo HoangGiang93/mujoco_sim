@@ -525,10 +525,6 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 		ROS_WARN("Failed to load file \"%s\"\n", xml_path);
 		return;
 	}
-	for (const std::string name : remove_body_names)
-	{
-		ROS_WARN("%s", name.c_str());
-	}
 	
 	mtx.lock();
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
@@ -573,9 +569,7 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 		std::set<std::string> joint_names_to_delete;
 		for (tinyxml2::XMLElement *body_element_to_delete : body_elements_to_delete)
 		{
-			
 			std::string body_name = body_element_to_delete->Attribute("name");
-			ROS_WARN("%s", body_name.c_str());
 			body_names_to_delete.insert(body_name);
 
 			do_each_child_element(body_element_to_delete, "body", [&](tinyxml2::XMLElement *body_element)
