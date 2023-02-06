@@ -7,50 +7,118 @@
 #include <tinyxml2.h>
 
 #ifndef TIMEOUT
-#define TIMEOUT 500000 //microsecond 
+#define TIMEOUT 500000 // microsecond
 #endif
 
 template <typename T>
-static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_elment_type, T &arg, std::function<void(tinyxml2::XMLElement *, T &)> function)
+static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_element_type, T &arg, std::function<void(tinyxml2::XMLElement *, T &)> function)
 {
-	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_elment_type);
-			 child_element != nullptr;
-			 child_element = child_element->NextSiblingElement(child_elment_type))
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_element_type);
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement(child_element_type))
 	{
 		function(child_element, arg);
-		if (strcmp(child_elment_type, "body") == 0)
-		{
-			do_each_child_element(child_element, child_elment_type, arg, function);
-		}
+	}
+
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		do_each_child_element(child_element, child_element_type, arg, function);
 	}
 }
 
 template <typename T>
-static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_elment_type, T arg, std::function<void(tinyxml2::XMLElement *, T)> function)
+static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_element_type, T arg, std::function<void(tinyxml2::XMLElement *, T)> function)
 {
-	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_elment_type);
-			 child_element != nullptr;
-			 child_element = child_element->NextSiblingElement(child_elment_type))
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_element_type);
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement(child_element_type))
 	{
 		function(child_element, arg);
-		if (strcmp(child_elment_type, "body") == 0)
-		{
-			do_each_child_element(child_element, child_elment_type, arg, function);
-		}
+	}
+	
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		do_each_child_element(child_element, child_element_type, arg, function);
 	}
 }
 
-static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_elment_type, std::function<void(tinyxml2::XMLElement *)> function)
+template <typename T>
+static void do_each_child_element(tinyxml2::XMLElement *element, T &arg, std::function<void(tinyxml2::XMLElement *, T &)> function)
 {
-	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_elment_type);
-			 child_element != nullptr;
-			 child_element = child_element->NextSiblingElement(child_elment_type))
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		function(child_element, arg);
+		do_each_child_element(child_element, arg, function);
+	}
+}
+
+template <typename T>
+static void do_each_child_element(tinyxml2::XMLElement *element, T arg, std::function<void(tinyxml2::XMLElement *, T)> function)
+{
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		function(child_element, arg);
+		do_each_child_element(child_element, arg, function);
+	}
+}
+
+template <typename T>
+static void do_each_child_element(tinyxml2::XMLElement *element, T &arg, std::function<void(tinyxml2::XMLElement *)> function)
+{
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
 	{
 		function(child_element);
-		if (strcmp(child_elment_type, "body") == 0)
-		{
-			do_each_child_element(child_element, child_elment_type, function);
-		}
+		do_each_child_element(child_element, arg, function);
+	}
+}
+
+template <typename T>
+static void do_each_child_element(tinyxml2::XMLElement *element, T arg, std::function<void(tinyxml2::XMLElement *)> function)
+{
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		function(child_element);
+		do_each_child_element(child_element, arg, function);
+	}
+}
+
+static void do_each_child_element(tinyxml2::XMLElement *element, const char *child_element_type, std::function<void(tinyxml2::XMLElement *)> function)
+{
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement(child_element_type);
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement(child_element_type))
+	{
+		function(child_element);
+	}
+	
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		do_each_child_element(child_element, child_element_type, function);
+	}
+}
+
+static void do_each_child_element(tinyxml2::XMLElement *element, std::function<void(tinyxml2::XMLElement *)> function)
+{
+	for (tinyxml2::XMLElement *child_element = element->FirstChildElement("body");
+		 child_element != nullptr;
+		 child_element = child_element->NextSiblingElement("body"))
+	{
+		function(child_element);
+		do_each_child_element(child_element, function);
 	}
 }
 
@@ -65,6 +133,31 @@ static void do_each_child_body_id(mjModel *&m, int body_id, std::function<void(i
 		}
 	}
 }
+
+static void do_each_object_type(tinyxml2::XMLElement *element, const mjtObj type, std::function<void(tinyxml2::XMLElement *, const mjtObj)> function)
+{
+	switch (type)
+	{
+	case mjtObj::mjOBJ_MESH:
+		do_each_child_element(element, "mesh", type, function);
+		break;
+
+	case mjtObj::mjOBJ_BODY:
+		do_each_child_element(element, "body", type, function);
+		break;
+
+	case mjtObj::mjOBJ_JOINT:
+		do_each_child_element(element, "joint", type, function);
+		break;
+
+	case mjtObj::mjOBJ_GEOM:
+		do_each_child_element(element, "geom", type, function);
+		break;
+
+	default:
+		break;
+	}
+};
 
 template <typename T>
 static bool manage_XML(T &arg, const char *path, std::function<bool(T &arg, const char *)> func)

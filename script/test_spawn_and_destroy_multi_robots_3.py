@@ -20,37 +20,42 @@ mehes = ["../test/pr2/pr2.xml",
 seed(10)
 
 def spawn_object(i):
-    object.info.name = "robot_" + str(i)
-    object.info.type = ObjectInfo.MESH
-    object.info.movable = True
-
-    x = random()*0.3+0.7
-    y = random()*0.7
-    z = 1 - x*x - y*y
-
-    r_g_b = [x, y, z]
-    shuffle(r_g_b)
-
-    r = r_g_b[0]
-    g = r_g_b[1]
-    b = r_g_b[2]
-    object.info.rgba = ColorRGBA(r, g, b, 1)
-    object.info.mesh = mehes[randint(0, len(mehes) - 1)]
-    r = uniform(1.5, 2)
-    alpha = uniform(-pi, pi)
-
-    object.pose.position.x = r * sin(alpha)
-    object.pose.position.y = r * cos(alpha)
-    object.pose.position.z = 5
-    object.pose.orientation.x = 0.0
-    object.pose.orientation.y = 0.0
-    object.pose.orientation.z = 0.0
-    object.pose.orientation.w = 1.0
-
     objects = SpawnObjectRequest()
-    objects.objects = [object]
+    objects.objects = []
+    for j in [0, 1, 2]:
+        object = ObjectStatus()
+        object.info.name = "robot_" + str(3*i + j)
+        object.info.type = ObjectInfo.MESH
+        object.info.movable = True
+
+        x = random()*0.3+0.7
+        y = random()*0.7
+        z = 1 - x*x - y*y
+
+        r_g_b = [x, y, z]
+        shuffle(r_g_b)
+
+        r = r_g_b[0]
+        g = r_g_b[1]
+        b = r_g_b[2]
+        object.info.rgba = ColorRGBA(r, g, b, 1)
+        object.info.mesh = mehes[randint(0, len(mehes) - 1)]
+        r = uniform(1.5, 2)
+        alpha = uniform(-pi, pi)
+
+        object.pose.position.x = r * sin(alpha)
+        object.pose.position.y = r * cos(alpha)
+        object.pose.position.z = 5
+        object.pose.orientation.x = 0.0
+        object.pose.orientation.y = 0.0
+        object.pose.orientation.z = 0.0
+        object.pose.orientation.w = 1.0
+
+        objects.objects.append(object)
+
     rospy.wait_for_service("/mujoco/spawn_objects")
     try:
+        rospy.loginfo(objects)
         spawn_objects = rospy.ServiceProxy(
             "/mujoco/spawn_objects", SpawnObject
         )
@@ -62,7 +67,8 @@ def spawn_object(i):
 def destroy_object(i):
     rospy.wait_for_service("/mujoco/destroy_objects")
     objects = DestroyObjectRequest()
-    objects.names = ["robot_" + str(i)]
+    for j in [0, 1, 2]:
+        objects.names.append("robot_" + str(3*i + j))
     try:
         destroy_objects = rospy.ServiceProxy(
             "/mujoco/destroy_objects", DestroyObject
@@ -77,11 +83,11 @@ if __name__ == "__main__":
     i = 0
     while not rospy.is_shutdown():
         spawn_object(i)
-        if i >= 8:
-            rospy.sleep(0.1)
-            destroy_object(i-8)
-            rospy.sleep(0.1)
+        if i >= 3:
+            rospy.sleep(1)
+            destroy_object(i-3)
+            rospy.sleep(1)
         else:
-            rospy.sleep(0.2)
+            rospy.sleep(2)
         i+=1
         

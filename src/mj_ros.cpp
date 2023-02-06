@@ -70,9 +70,9 @@ bool pub_tf_of_free_bodies_only;
 bool pub_object_marker_array_of_free_bodies_only;
 bool pub_object_state_array_of_free_bodies_only;
 
-std::map<std::string, std::string> name_map;
+std::map<mjtObj, std::map<std::string, std::string>> name_map;
 
-static int unique_index = 0;
+static std::map<mjtObj, int> unique_index = {{mjtObj::mjOBJ_MESH, 0}, {mjtObj::mjOBJ_BODY, 0}, {mjtObj::mjOBJ_JOINT, 0}, {mjtObj::mjOBJ_GEOM, 0}};
 
 static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const char *robot_description = "robot_description")
 {
@@ -88,173 +88,7 @@ static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const c
     }
 }
 
-std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyxml2::XMLElement *element, const mjtObj type)
-{
-    if (element->Attribute("name") == nullptr)
-    {
-        return;
-    }
-
-    std::string name = element->Attribute("name");
-    name_map.erase(name);
-    do
-    {
-        const size_t last_underscore_index = name.find_last_of("_");
-        const std::string string_after_underscore = name.substr(last_underscore_index + 1);
-        if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
-        {
-            name += "_" + std::to_string(unique_index);
-        }
-        else
-        {
-            size_t last_index = name.find_last_not_of("0123456789");
-            name.replace(last_index + 1, unique_index / 10 + 1, std::to_string(unique_index));
-        }
-        if (mj_name2id(m, type, name.c_str()) != -1)
-        {
-            unique_index += 1;
-        }
-    } while (mj_name2id(m, type, name.c_str()) != -1);
-
-    name_map[element->Attribute("name")] = name;
-    element->SetAttribute("name", name.c_str());
-};
-
-std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index_cb = [](tinyxml2::XMLElement *element, const mjtObj type)
-{
-    switch (type)
-    {
-    case mjtObj::mjOBJ_BODY:
-        do_each_child_element(element, "body", type, check_index);
-        break;
-
-    case mjtObj::mjOBJ_JOINT:
-        do_each_child_element(element, "joint", type, check_index);
-        break;
-
-    case mjtObj::mjOBJ_GEOM:
-        do_each_child_element(element, "geom", type, check_index);
-        break;
-
-    default:
-        break;
-    }
-};
-
-std::function<void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &)> adjust_body = [](tinyxml2::XMLElement *body_element, const mujoco_msgs::ObjectInfo &info)
-{
-    if (mju_abs(info.rgba.r) > mjMINVAL || mju_abs(info.rgba.g) > mjMINVAL || mju_abs(info.rgba.b) > mjMINVAL || mju_abs(info.rgba.a) > mjMINVAL)
-    {
-        for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
-             geom_element != nullptr;
-             geom_element = geom_element->NextSiblingElement("geom"))
-        {
-
-            geom_element->SetAttribute("rgba", (std::to_string(info.rgba.r) + " " +
-                                                std::to_string(info.rgba.g) + " " +
-                                                std::to_string(info.rgba.b) + " " +
-                                                std::to_string(info.rgba.a))
-                                                   .c_str());
-        }
-    }
-
-    if (mju_abs(info.size.x) > mjMINVAL || mju_abs(info.size.y) > mjMINVAL || mju_abs(info.size.z) > mjMINVAL)
-    {
-        for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
-             joint_element != nullptr;
-             joint_element = joint_element->NextSiblingElement("joint"))
-        {
-            std::vector<mjtNum> size = {info.size.x, info.size.y, info.size.z};
-
-            std::vector<mjtNum> joint_pos = {0, 0, 0};
-            if (joint_element->Attribute("pos") != nullptr)
-            {
-                const std::string pos_str = joint_element->Attribute("pos");
-                std::istringstream iss(pos_str);
-                joint_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-            }
-            for (int i = 0; i < joint_pos.size(); i++)
-            {
-                joint_pos[i] *= size[i];
-            }
-            joint_element->SetAttribute("pos", (std::to_string(joint_pos[0]) + " " +
-                                                std::to_string(joint_pos[1]) + " " +
-                                                std::to_string(joint_pos[2]))
-                                                   .c_str());
-        }
-
-        for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
-             geom_element != nullptr;
-             geom_element = geom_element->NextSiblingElement("geom"))
-        {
-            std::vector<mjtNum> size = {info.size.x, info.size.y, info.size.z};
-
-            std::vector<mjtNum> geom_pos = {0, 0, 0};
-            std::vector<mjtNum> geom_size = {1, 1, 1};
-
-            if (geom_element->Attribute("type") == nullptr)
-            {
-                geom_element->SetAttribute("type", "sphere");
-            }
-
-            if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
-            {
-                geom_size = {1};
-            }
-            else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
-            {
-                geom_size = {1, 1};
-            }
-
-            if (geom_element->Attribute("size") != nullptr)
-            {
-                std::string geom_size_str = geom_element->Attribute("size");
-                std::istringstream iss(geom_size_str);
-                geom_size = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-            }
-
-            std::string size_str = std::to_string(size[0] * geom_size[0]);
-
-            for (int i = 1; i < geom_size.size(); i++)
-            {
-                size_str += " " + std::to_string(size[i] * geom_size[i]);
-            }
-
-            if (geom_element->Attribute("pos") != nullptr)
-            {
-                const std::string pos_str = geom_element->Attribute("pos");
-                std::istringstream iss(pos_str);
-                geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-            }
-            if (strcmp(geom_element->Attribute("type"), "box") == 0 || strcmp(geom_element->Attribute("type"), "mesh"))
-            {
-                for (int i = 0; i < geom_pos.size(); i++)
-                {
-                    geom_pos[i] *= size[i];
-                }
-            }
-            else if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
-            {
-                geom_pos[0] *= size[0];
-                geom_pos[1] *= size[0];
-                geom_pos[2] *= size[0];
-            }
-            else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
-            {
-                geom_pos[0] *= size[0];
-                geom_pos[1] *= size[0];
-                geom_pos[2] *= size[1];
-            }
-            geom_element->SetAttribute("pos", (std::to_string(geom_pos[0]) + " " +
-                                               std::to_string(geom_pos[1]) + " " +
-                                               std::to_string(geom_pos[2]))
-                                                  .c_str());
-            geom_element->SetAttribute("size", size_str.c_str());
-        }
-    }
-};
-
-static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, bool free_body_only, std::function<void(MjRos &, const int, const EObjectType)> function)
+static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_body_only, std::function<void(MjRos &, const int, const EObjectType)> function)
 {
     for (int body_id = 1; body_id < m->nbody; body_id++)
     {
@@ -296,14 +130,57 @@ static void do_each_object_type(MjRos &mj_ros, const EObjectType object_type, bo
     }
 }
 
-static void check_name(tinyxml2::XMLElement *body_element)
+std::function<void(tinyxml2::XMLElement *, const mjtObj)> add_index = [](tinyxml2::XMLElement *element, const mjtObj type)
 {
-    do_each_child_element(body_element, "body", mjtObj::mjOBJ_BODY, check_index_cb);
+    if (element->Attribute("name") == nullptr)
+    {
+        return;
+    }
 
-    do_each_child_element(body_element, "body", mjtObj::mjOBJ_JOINT, check_index_cb);
+    std::string name = element->Attribute("name");
+    name += "_" + std::to_string(unique_index[type]);
+    name_map[type][element->Attribute("name")] = name;
+    element->SetAttribute("name", name.c_str());
+};
 
-    do_each_child_element(body_element, "body", mjtObj::mjOBJ_GEOM, check_index_cb);
-}
+std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyxml2::XMLElement *element, const mjtObj type)
+{
+    if (element->Attribute("name") == nullptr)
+    {
+        return;
+    }
+
+    std::string name = element->Attribute("name");
+
+    if (type != mjtObj::mjOBJ_MESH)
+    {
+        name_map[type].erase(name);
+    }
+
+    do
+    {
+        const size_t last_underscore_index = name.find_last_of("_");
+        const std::string string_after_underscore = name.substr(last_underscore_index + 1);
+        if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
+        {
+            name += "_" + std::to_string(unique_index[type]);
+        }
+        else
+        {
+            size_t last_index = name.find_last_not_of("0123456789");
+            name.replace(last_index + 1, unique_index[type] / 10 + 1, std::to_string(unique_index[type]));
+        }
+
+        if (mj_name2id(m, type, name.c_str()) != -1)
+        {
+            unique_index[type] += 1;
+        }
+    } while (mj_name2id(m, type, name.c_str()) != -1);
+
+    name_map[type][element->Attribute("name")] = name;
+
+    element->SetAttribute("name", name.c_str());
+};
 
 CmdVelCallback::CmdVelCallback(const std::string &in_robot) : robot(in_robot)
 {
@@ -379,8 +256,8 @@ void MjRos::set_params()
                 robots.push_back("robot");
             }
             for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-                 worldbody_element = worldbody_element->NextSiblingElement();
-                 worldbody_element != nullptr)
+                 worldbody_element != nullptr;
+                 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
             {
                 if (strcmp(worldbody_element->FirstChildElement()->Value(), "body") == 0)
                 {
@@ -869,12 +746,12 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
     {
         MjSim::reload_mesh = true;
         res.names = names;
-        ROS_INFO("[Spawn #%d] Spawned successfully", spawn_nr);
+        ROS_INFO("[Spawn #%d] Spawned successfully", spawn_nr++);
     }
     else
     {
         res.names = std::vector<std::string>();
-        ROS_WARN("[Spawn #%d] Spawned unsuccessfully", spawn_nr);
+        ROS_WARN("[Spawn #%d] Spawned unsuccessfully", spawn_nr++);
     }
     return true;
 }
@@ -912,8 +789,6 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         tinyxml2::XMLElement *inertial_element = object_xml_doc.NewElement("inertial");
 
         boost::filesystem::path object_mesh_path = object.info.mesh;
-
-        body_element->SetAttribute("name", object.info.name.c_str());
 
         switch (object.info.type)
         {
@@ -973,71 +848,267 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                     }
 
                     // Change path of asset
+                    else if (strcmp(copy->Value(), "asset") == 0)
+                    {
+                        do_each_child_element(copy->ToElement(), "mesh", mjtObj::mjOBJ_MESH, add_index);
+
+                        std::vector<tinyxml2::XMLElement *> elements_to_remove;
+                        do_each_child_element(copy->ToElement(), "mesh", [&](tinyxml2::XMLElement *mesh_element)
+                                              {
+                                                if (mesh_element->Attribute("file") != nullptr && mesh_element->Attribute("name") != nullptr)
+                                                {
+                                                    if (mesh_element->Attribute("file")[0] != '/')
+                                                    {
+                                                        mesh_element->SetAttribute("file", (mesh_dir / mesh_element->Attribute("file")).c_str());
+                                                    }
+                                                    std::string mesh_name = mesh_element->Attribute("name");
+                                                    if (mesh_paths.find(mesh_name) != mesh_paths.end() || mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_name.c_str()) != -1)
+                                                    {
+                                                        if (strcmp(mesh_paths[mesh_name].first.c_str(), mesh_element->Attribute("file")) == 0)
+                                                        {
+                                                            remove:
+                                                            elements_to_remove.push_back(mesh_element);
+                                                        }
+                                                        else
+                                                        {
+                                                            int i = 0;
+                                                            do
+                                                            {
+                                                                const size_t last_underscore_index = mesh_name.find_last_of("_");
+                                                                const std::string string_after_underscore = mesh_name.substr(last_underscore_index + 1);
+                                                                if (string_after_underscore.empty() || string_after_underscore.find_first_not_of("0123456789") != std::string::npos)
+                                                                {
+                                                                    mesh_name += "_" + std::to_string(i);
+                                                                }
+                                                                else
+                                                                {
+                                                                    size_t last_index = mesh_name.find_last_not_of("0123456789");
+                                                                    mesh_name.replace(last_index + 1, i / 10 + 1, std::to_string(i));
+                                                                }
+                                                                if (mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_name.c_str()) != -1 
+                                                                    && mesh_paths.find(mesh_name) != mesh_paths.end() 
+                                                                    && strcmp(mesh_paths[mesh_name].first.c_str(), mesh_element->Attribute("file")) == 0)
+                                                                {
+                                                                    goto remove;
+                                                                }
+                                                                
+                                                                i += 1;
+                                                            } while (mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_name.c_str()) != -1 || mesh_paths.find(mesh_name) != mesh_paths.end());
+
+                                                            name_map[mjtObj::mjOBJ_MESH][mesh_element->Attribute("name")] = mesh_name;
+                                                            mesh_element->SetAttribute("name", mesh_name.c_str());
+
+                                                            goto next;
+                                                        }
+                                                    }                                                    
+                                                    else
+                                                    {
+                                                        next:
+                                                        std::string scale_str = "1 1 1";
+                                                        if (mesh_element->Attribute("scale") != nullptr)
+                                                        {
+                                                            scale_str = mesh_element->Attribute("scale");
+                                                        }
+                                                        std::istringstream iss(scale_str);
+                                                        std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+
+                                                        if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
+                                                        {
+                                                            scale[0] *= object.info.size.x;
+                                                            scale[1] *= object.info.size.y;
+                                                            scale[2] *= object.info.size.z;
+                                                            mesh_element->SetAttribute("scale",
+                                                                                    (std::to_string(scale[0]) + " " +
+                                                                                        std::to_string(scale[1]) + " " +
+                                                                                        std::to_string(scale[2]))
+                                                                                        .c_str());
+                                                        }
+
+                                                        mesh_paths[mesh_element->Attribute("name")] = {mesh_element->Attribute("file"), scale};
+                                                    }
+                                                } });
+
+                        for (tinyxml2::XMLElement *mesh_element : elements_to_remove)
+                        {
+                            copy->DeleteChild(mesh_element);
+                        }
+
+                        root->InsertEndChild(copy);
+                    }
+                }
+
+                mesh_dir = object_mesh_path.parent_path();
+                for (tinyxml2::XMLNode *node = mesh_xml_doc.FirstChild()->FirstChild();
+                     node != nullptr;
+                     node = node->NextSibling())
+                {
+                    tinyxml2::XMLNode *copy = node->DeepClone(&object_xml_doc);
+
                     if (strcmp(copy->Value(), "asset") == 0)
                     {
-                        std::vector<tinyxml2::XMLElement *> elements_to_remove;
-                        for (tinyxml2::XMLElement *mesh_element = copy->FirstChildElement("mesh");
-                             mesh_element != nullptr;
-                             mesh_element = mesh_element->NextSiblingElement("mesh"))
-                        {
-                            if (mesh_element->Attribute("file") != nullptr)
-                            {
-                                if (mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_element->Attribute("name")) != -1)
-                                {
-                                    elements_to_remove.push_back(mesh_element);
-                                }
-                                else
-                                {
-                                    if (mesh_element->Attribute("file")[0] != '/')
-                                    {
-                                        mesh_element->SetAttribute("file", (mesh_dir / mesh_element->Attribute("file")).c_str());
-                                    }
-
-                                    std::string scale_str = "1 1 1";
-                                    if (mesh_element->Attribute("scale") != nullptr)
-                                    {
-                                        scale_str = mesh_element->Attribute("scale");
-                                    }
-                                    std::istringstream iss(scale_str);
-                                    std::vector<mjtNum> scale = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-
-                                    if (mju_abs(object.info.size.x) > mjMINVAL || mju_abs(object.info.size.y) > mjMINVAL || mju_abs(object.info.size.z) > mjMINVAL)
-                                    {
-                                        scale[0] *= object.info.size.x;
-                                        scale[1] *= object.info.size.y;
-                                        scale[2] *= object.info.size.z;
-                                        mesh_element->SetAttribute("scale",
-                                                                   (std::to_string(scale[0]) + " " +
-                                                                    std::to_string(scale[1]) + " " +
-                                                                    std::to_string(scale[2]))
-                                                                       .c_str());
-                                    }
-
-                                    mesh_paths[mesh_element->Attribute("name")] = {mesh_element->Attribute("file"), scale};
-                                }
-                            }
-                        }
-
-                        for (tinyxml2::XMLElement *element : elements_to_remove)
-                        {
-                            copy->DeleteChild(element);
-                        }
+                        continue;
                     }
                     else if (strcmp(copy->Value(), "worldbody") == 0)
                     {
-                        name_map[copy->FirstChildElement()->Attribute("name")] = object.info.name;
+                        tinyxml2::XMLElement *copy_body_element = copy->FirstChildElement("body");
+
+                        if (copy_body_element != nullptr && copy_body_element->Attribute("name") != nullptr)
+                        {
+                            name_map[mjtObj::mjOBJ_BODY][copy_body_element->Attribute("name")] = object.info.name;
+                        }
+                        else
+                        {
+                            ROS_WARN("Body name not found");
+                        }
+
+                        do_each_child_element(copy_body_element, mjtObj::mjOBJ_BODY, add_index);
+
+                        do_each_child_element(copy_body_element, "joint", mjtObj::mjOBJ_JOINT, add_index);
+
+                        do_each_child_element(copy_body_element, "geom", mjtObj::mjOBJ_GEOM, add_index);
 
                         int i;
                         do
                         {
-                            i = unique_index;
-                            check_name(copy->ToElement());
-                        } while (i != unique_index);
+                            i = unique_index[mjtObj::mjOBJ_BODY];
+                            do_each_child_element(copy_body_element, mjtObj::mjOBJ_BODY, check_index);
+                        } while (i != unique_index[mjtObj::mjOBJ_BODY]);
 
-                        do_each_child_element(copy->ToElement(), "body", object.info, adjust_body);
+                        do
+                        {
+                            i = unique_index[mjtObj::mjOBJ_JOINT];
+                            do_each_child_element(copy_body_element, "joint", mjtObj::mjOBJ_JOINT, check_index);
+                        } while (i != unique_index[mjtObj::mjOBJ_JOINT]);
 
-                        tinyxml2::XMLElement *copy_body_element = copy->FirstChildElement("body");
-                        name_map[copy_body_element->Attribute("name")] = object.info.name;
+                        do
+                        {
+                            i = unique_index[mjtObj::mjOBJ_GEOM];
+                            do_each_child_element(copy_body_element, "geom", mjtObj::mjOBJ_GEOM, check_index);
+                        } while (i != unique_index[mjtObj::mjOBJ_GEOM]);
+
+                        std::function<void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &)> adjust_body = [](tinyxml2::XMLElement *body_element, const mujoco_msgs::ObjectInfo &info)
+                        {
+                            if (mju_abs(info.rgba.r) > mjMINVAL || mju_abs(info.rgba.g) > mjMINVAL || mju_abs(info.rgba.b) > mjMINVAL || mju_abs(info.rgba.a) > mjMINVAL)
+                            {
+                                for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
+                                     geom_element != nullptr;
+                                     geom_element = geom_element->NextSiblingElement("geom"))
+                                {
+                                    geom_element->SetAttribute("rgba", (std::to_string(info.rgba.r) + " " +
+                                                                        std::to_string(info.rgba.g) + " " +
+                                                                        std::to_string(info.rgba.b) + " " +
+                                                                        std::to_string(info.rgba.a))
+                                                                           .c_str());
+                                }
+                            }
+
+                            if (mju_abs(info.size.x) > mjMINVAL || mju_abs(info.size.y) > mjMINVAL || mju_abs(info.size.z) > mjMINVAL)
+                            {
+                                for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
+                                     joint_element != nullptr;
+                                     joint_element = joint_element->NextSiblingElement("joint"))
+                                {
+                                    std::vector<mjtNum> size = {info.size.x, info.size.y, info.size.z};
+
+                                    std::vector<mjtNum> joint_pos = {0, 0, 0};
+                                    if (joint_element->Attribute("pos") != nullptr)
+                                    {
+                                        const std::string pos_str = joint_element->Attribute("pos");
+                                        std::istringstream iss(pos_str);
+                                        joint_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    }
+                                    for (int i = 0; i < joint_pos.size(); i++)
+                                    {
+                                        joint_pos[i] *= size[i];
+                                    }
+                                    joint_element->SetAttribute("pos", (std::to_string(joint_pos[0]) + " " +
+                                                                        std::to_string(joint_pos[1]) + " " +
+                                                                        std::to_string(joint_pos[2]))
+                                                                           .c_str());
+                                }
+
+                                for (tinyxml2::XMLElement *geom_element = body_element->FirstChildElement("geom");
+                                     geom_element != nullptr;
+                                     geom_element = geom_element->NextSiblingElement("geom"))
+                                {
+                                    std::vector<mjtNum> size = {info.size.x, info.size.y, info.size.z};
+
+                                    std::vector<mjtNum> geom_pos = {0, 0, 0};
+                                    std::vector<mjtNum> geom_size = {1, 1, 1};
+
+                                    if (geom_element->Attribute("type") == nullptr)
+                                    {
+                                        geom_element->SetAttribute("type", "sphere");
+                                    }
+
+                                    if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
+                                    {
+                                        geom_size = {1};
+                                    }
+                                    else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
+                                    {
+                                        geom_size = {1, 1};
+                                    }
+
+                                    if (geom_element->Attribute("size") != nullptr)
+                                    {
+                                        std::string geom_size_str = geom_element->Attribute("size");
+                                        std::istringstream iss(geom_size_str);
+                                        geom_size = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    }
+
+                                    std::string size_str = std::to_string(size[0] * geom_size[0]);
+
+                                    for (int i = 1; i < geom_size.size(); i++)
+                                    {
+                                        size_str += " " + std::to_string(size[i] * geom_size[i]);
+                                    }
+
+                                    if (geom_element->Attribute("pos") != nullptr)
+                                    {
+                                        const std::string pos_str = geom_element->Attribute("pos");
+                                        std::istringstream iss(pos_str);
+                                        geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    }
+                                    if (strcmp(geom_element->Attribute("type"), "box") == 0 || strcmp(geom_element->Attribute("type"), "mesh"))
+                                    {
+                                        for (int i = 0; i < geom_pos.size(); i++)
+                                        {
+                                            geom_pos[i] *= size[i];
+                                        }
+                                    }
+                                    else if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
+                                    {
+                                        geom_pos[0] *= size[0];
+                                        geom_pos[1] *= size[0];
+                                        geom_pos[2] *= size[0];
+                                    }
+                                    else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
+                                    {
+                                        geom_pos[0] *= size[0];
+                                        geom_pos[1] *= size[0];
+                                        geom_pos[2] *= size[1];
+                                    }
+                                    geom_element->SetAttribute("pos", (std::to_string(geom_pos[0]) + " " +
+                                                                       std::to_string(geom_pos[1]) + " " +
+                                                                       std::to_string(geom_pos[2]))
+                                                                          .c_str());
+                                    geom_element->SetAttribute("size", size_str.c_str());
+                                }
+                            }
+                        };
+
+                        do_each_child_element(copy->ToElement(), object.info, adjust_body);
+
+                        std::function<void(tinyxml2::XMLElement *)> rename_mesh = [](tinyxml2::XMLElement *geom_element)
+                        {
+                            if (geom_element->Attribute("type") != nullptr && strcmp(geom_element->Attribute("type"), "mesh") == 0)
+                            {
+                                geom_element->SetAttribute("mesh", name_map[mjtObj::mjOBJ_MESH][geom_element->Attribute("mesh")].c_str());
+                            }
+                        };
+
+                        do_each_child_element(copy_body_element, "geom", rename_mesh);
 
                         copy_body_element->SetAttribute("name", object.info.name.c_str());
 
@@ -1051,6 +1122,10 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                          std::to_string(object.pose.orientation.y) + " " +
                                                          std::to_string(object.pose.orientation.z))
                                                             .c_str());
+
+                        unique_index[mjtObj::mjOBJ_BODY] += 1;
+                        unique_index[mjtObj::mjOBJ_JOINT] += 1;
+                        unique_index[mjtObj::mjOBJ_GEOM] += 1;
                     }
                     else if (strcmp(copy->Value(), "contact") == 0)
                     {
@@ -1060,8 +1135,8 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                         {
                             const std::string body1 = exclude_element->Attribute("body1");
                             const std::string body2 = exclude_element->Attribute("body2");
-                            exclude_element->SetAttribute("body1", name_map[body1].c_str());
-                            exclude_element->SetAttribute("body2", name_map[body2].c_str());
+                            exclude_element->SetAttribute("body1", name_map[mjtObj::mjOBJ_BODY][body1].c_str());
+                            exclude_element->SetAttribute("body2", name_map[mjtObj::mjOBJ_BODY][body2].c_str());
                         }
                     }
                     else if (strcmp(copy->Value(), "equality") == 0)
@@ -1072,12 +1147,13 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                         {
                             const std::string joint1 = joint_element->Attribute("joint1");
                             const std::string joint2 = joint_element->Attribute("joint2");
-                            joint_element->SetAttribute("joint1", name_map[joint1].c_str());
-                            joint_element->SetAttribute("joint2", name_map[joint2].c_str());
+                            joint_element->SetAttribute("joint1", name_map[mjtObj::mjOBJ_JOINT][joint1].c_str());
+                            joint_element->SetAttribute("joint2", name_map[mjtObj::mjOBJ_JOINT][joint2].c_str());
                         }
                     }
                     root->InsertEndChild(copy);
                 }
+
                 continue;
             }
             else if (object_mesh_path.extension().compare(".stl") == 0)
@@ -1099,8 +1175,6 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         default:
             break;
         }
-
-        body_element->SetAttribute("name", object.info.name.c_str());
 
         body_element->SetAttribute("pos",
                                    (std::to_string(object.pose.position.x) + " " +
@@ -1194,11 +1268,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 spawn_success = false;
             }
         }
-        spawn_nr++;
+
         mj_forward(m, d);
         mtx.unlock();
     }
-    
+
     objects_to_spawn.erase(std::remove_if(objects_to_spawn.begin(), objects_to_spawn.end(), [objects](const mujoco_msgs::ObjectStatus &object)
                                           { return std::find(objects.begin(), objects.end(), object) != objects.end(); }),
                            objects_to_spawn.end());
@@ -1270,7 +1344,6 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
                 ROS_WARN("Object %s not found to destroy", name);
             }
         }
-        destroy_nr++;
     }
 
     std::unique_lock<std::mutex> lk(destroy_mtx);
@@ -1280,12 +1353,12 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
                              { return destroy_success; }))
     {
         res.object_states = object_states;
-        ROS_INFO("[Destroy #%d] Destroyed successfully", destroy_nr);
+        ROS_INFO("[Destroy #%d] Destroyed successfully", destroy_nr++);
     }
     else
     {
         res.object_states = std::vector<mujoco_msgs::ObjectState>();
-        ROS_WARN("[Destroy #%d] Destroyed unsuccessfully", destroy_nr);
+        ROS_WARN("[Destroy #%d] Destroyed unsuccessfully", destroy_nr++);
     }
     return true;
 }
@@ -1393,7 +1466,7 @@ void MjRos::spawn_and_destroy_objects()
                 destroy_marker.id = geom_id;
                 destroy_marker_array.markers.push_back(destroy_marker);
             }
-        }        
+        }
 
         if (object_names_to_destroy.size() > 0)
         {
@@ -1469,8 +1542,8 @@ void MjRos::publish_tf(const EObjectType object_type)
 
         transform.header = header;
 
-        do_each_object_type(*this, object_type, pub_tf_of_free_bodies_only, [&](MjRos &, const int body_id, const EObjectType object_type)
-                            {
+        set_ros_msg(*this, object_type, pub_tf_of_free_bodies_only, [&](MjRos &, const int body_id, const EObjectType object_type)
+                    {
                                 if (m->body_mocapid[body_id] != -1)
                                 {
                                     return;
@@ -1520,7 +1593,7 @@ void MjRos::publish_marker_array(const EObjectType object_type)
         marker[object_type].header = header;
         marker_array[object_type].markers.clear();
 
-        do_each_object_type(*this, object_type, pub_object_marker_array_of_free_bodies_only, &MjRos::add_marker);
+        set_ros_msg(*this, object_type, pub_object_marker_array_of_free_bodies_only, &MjRos::add_marker);
 
         // Publish markers
         marker_array_pub.publish(marker_array[object_type]);
@@ -1563,7 +1636,7 @@ void MjRos::publish_object_state_array(const EObjectType object_type)
         object_state_array[object_type].header = header;
         object_state_array[object_type].object_states.clear();
 
-        do_each_object_type(*this, object_type, pub_object_state_array_of_free_bodies_only, &MjRos::add_object_state);
+        set_ros_msg(*this, object_type, pub_object_state_array_of_free_bodies_only, &MjRos::add_object_state);
 
         object_state_array_pub.publish(object_state_array[object_type]);
 
@@ -1609,7 +1682,7 @@ void MjRos::publish_joint_states(const EObjectType object_type)
         joint_states[object_type].velocity.clear();
         joint_states[object_type].effort.clear();
 
-        do_each_object_type(*this, object_type, false, &MjRos::add_joint_states);
+        set_ros_msg(*this, object_type, false, &MjRos::add_joint_states);
 
         joint_states_pub[object_type].publish(joint_states[object_type]);
 

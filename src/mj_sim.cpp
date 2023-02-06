@@ -109,7 +109,7 @@ static void set_joint_names()
 				}
 			};
 
-			do_each_child_element(worldbody_element, "body", robot_name, func);
+			do_each_child_element(worldbody_element, robot_name, func);
 		}
 	}
 	if (MjSim::joint_names.size() == 0)
@@ -572,23 +572,23 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 			std::string body_name = body_element_to_delete->Attribute("name");
 			body_names_to_delete.insert(body_name);
 
-			do_each_child_element(body_element_to_delete, "body", [&](tinyxml2::XMLElement *body_element)
+			do_each_child_element(body_element_to_delete, [&](tinyxml2::XMLElement *body_element)
 														{
-									if (body_element->Attribute("name") != nullptr)
-									{
-										std::string body_name = body_element->Attribute("name");
-										body_names_to_delete.insert(body_name);
-									}
-									for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
-										joint_element != nullptr;
-										joint_element = joint_element->NextSiblingElement("joint"))
-									{
-										if (joint_element->Attribute("name") != nullptr)
-										{
-											std::string joint_name = joint_element->Attribute("name");
-											joint_names_to_delete.insert(joint_name);
-										}
-									} });
+															if (body_element->Attribute("name") != nullptr)
+															{
+																std::string body_name = body_element->Attribute("name");
+																body_names_to_delete.insert(body_name);
+															}
+															for (tinyxml2::XMLElement *joint_element = body_element->FirstChildElement("joint");
+																joint_element != nullptr;
+																joint_element = joint_element->NextSiblingElement("joint"))
+															{
+																if (joint_element->Attribute("name") != nullptr)
+																{
+																	std::string joint_name = joint_element->Attribute("name");
+																	joint_names_to_delete.insert(joint_name);
+																}
+															} });
 		}
 
 		for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");
@@ -724,7 +724,7 @@ bool save_geom_quat(const char *path)
 															} });
 		};
 
-		do_each_child_element(worldbody_element, "body", "geom", func);
+		do_each_child_element(worldbody_element, "geom", func);
 	}
 	mtx.unlock();
 	return true;

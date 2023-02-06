@@ -182,28 +182,38 @@ Variables</h2></td></tr>
 <tr class="separator:ad6314a2439ba1900a5e82f2dab81d7a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dc4774c1bed068f9f2183f3632e5c4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a8dc4774c1bed068f9f2183f3632e5c4a">pub_object_state_array_of_free_bodies_only</a></td></tr>
 <tr class="separator:a8dc4774c1bed068f9f2183f3632e5c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af73ca127ffcafa41c63bb449c4e2c1bf"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#af73ca127ffcafa41c63bb449c4e2c1bf">name_map</a></td></tr>
-<tr class="separator:af73ca127ffcafa41c63bb449c4e2c1bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9fb39108aa6ea80d9bf0fd9a0edcb9"><td class="memItemLeft" align="right" valign="top">std::map&lt; mjtObj, std::map&lt; std::string, std::string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#adb9fb39108aa6ea80d9bf0fd9a0edcb9">name_map</a></td></tr>
+<tr class="separator:adb9fb39108aa6ea80d9bf0fd9a0edcb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b8d18d4f9d24404054ec8eda4b8cce9"><td class="memItemLeft" align="right" valign="top">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a8b8d18d4f9d24404054ec8eda4b8cce9">add_index</a></td></tr>
+<tr class="separator:a8b8d18d4f9d24404054ec8eda4b8cce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a476be205aa20463be2f746d708c32633"><td class="memItemLeft" align="right" valign="top">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a></td></tr>
 <tr class="separator:a476be205aa20463be2f746d708c32633"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05160a740d4a3bf3bce8b28efd76e02f"><td class="memItemLeft" align="right" valign="top">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a05160a740d4a3bf3bce8b28efd76e02f">check_index_cb</a></td></tr>
-<tr class="separator:a05160a740d4a3bf3bce8b28efd76e02f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53c8aee5d4cf8b0f90ea9d92cef7f529"><td class="memItemLeft" align="right" valign="top">std::function&lt; void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &amp;)&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__ros_8cpp.html#a53c8aee5d4cf8b0f90ea9d92cef7f529">adjust_body</a></td></tr>
-<tr class="separator:a53c8aee5d4cf8b0f90ea9d92cef7f529"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a53c8aee5d4cf8b0f90ea9d92cef7f529"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53c8aee5d4cf8b0f90ea9d92cef7f529">&#9670;&nbsp;</a></span>adjust_body</h2>
+<a id="a8b8d18d4f9d24404054ec8eda4b8cce9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b8d18d4f9d24404054ec8eda4b8cce9">&#9670;&nbsp;</a></span>add_index</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::function&lt;void(tinyxml2::XMLElement *, const mujoco_msgs::ObjectInfo &amp;)&gt; adjust_body</td>
+          <td class="memname">std::function&lt;void(tinyxml2::XMLElement *, const mjtObj)&gt; add_index</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Initial value:</b><div class="fragment"><div class="line">= [](tinyxml2::XMLElement *element, <span class="keyword">const</span> mjtObj type)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordflow">if</span> (element-&gt;Attribute(<span class="stringliteral">&quot;name&quot;</span>) == <span class="keyword">nullptr</span>)</div>
+<div class="line">    {</div>
+<div class="line">        <span class="keywordflow">return</span>;</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    std::string name = element-&gt;Attribute(<span class="stringliteral">&quot;name&quot;</span>);</div>
+<div class="line">    name += <span class="stringliteral">&quot;_&quot;</span> + std::to_string(unique_index[type]);</div>
+<div class="line">    <a class="code" href="mj__ros_8cpp.html#adb9fb39108aa6ea80d9bf0fd9a0edcb9">name_map</a>[type][element-&gt;Attribute(<span class="stringliteral">&quot;name&quot;</span>)] = name;</div>
+<div class="line">    element-&gt;SetAttribute(<span class="stringliteral">&quot;name&quot;</span>, name.c_str());</div>
+<div class="line">}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a7069d1398dd7aa7c9b026c2798f68889"></a>
@@ -232,40 +242,6 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a05160a740d4a3bf3bce8b28efd76e02f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05160a740d4a3bf3bce8b28efd76e02f">&#9670;&nbsp;</a></span>check_index_cb</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::function&lt;void(tinyxml2::XMLElement *, const mjtObj)&gt; check_index_cb</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= [](tinyxml2::XMLElement *element, <span class="keyword">const</span> mjtObj type)</div>
-<div class="line">{</div>
-<div class="line">    <span class="keywordflow">switch</span> (type)</div>
-<div class="line">    {</div>
-<div class="line">    <span class="keywordflow">case</span> mjtObj::mjOBJ_BODY:</div>
-<div class="line">        do_each_child_element(element, <span class="stringliteral">&quot;body&quot;</span>, type, <a class="code" href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a>);</div>
-<div class="line">        <span class="keywordflow">break</span>;</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">case</span> mjtObj::mjOBJ_JOINT:</div>
-<div class="line">        do_each_child_element(element, <span class="stringliteral">&quot;joint&quot;</span>, type, <a class="code" href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a>);</div>
-<div class="line">        <span class="keywordflow">break</span>;</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">case</span> mjtObj::mjOBJ_GEOM:</div>
-<div class="line">        do_each_child_element(element, <span class="stringliteral">&quot;geom&quot;</span>, type, <a class="code" href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a>);</div>
-<div class="line">        <span class="keywordflow">break</span>;</div>
-<div class="line"> </div>
-<div class="line">    <span class="keywordflow">default</span>:</div>
-<div class="line">        <span class="keywordflow">break</span>;</div>
-<div class="line">    }</div>
-<div class="line">}</div>
-</div><!-- fragment -->
 </div>
 </div>
 <a id="a6389bbb21ca5b0a777cc81b063a37fde"></a>
@@ -380,14 +356,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="af73ca127ffcafa41c63bb449c4e2c1bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af73ca127ffcafa41c63bb449c4e2c1bf">&#9670;&nbsp;</a></span>name_map</h2>
+<a id="adb9fb39108aa6ea80d9bf0fd9a0edcb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb9fb39108aa6ea80d9bf0fd9a0edcb9">&#9670;&nbsp;</a></span>name_map</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::map&lt;std::string, std::string&gt; name_map</td>
+          <td class="memname">std::map&lt;mjtObj, std::map&lt;std::string, std::string&gt; &gt; name_map</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -633,7 +609,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 </div><!-- contents -->
-<div class="ttc" id="amj__ros_8cpp_html_a476be205aa20463be2f746d708c32633"><div class="ttname"><a href="mj__ros_8cpp.html#a476be205aa20463be2f746d708c32633">check_index</a></div><div class="ttdeci">std::function&lt; void(tinyxml2::XMLElement *, const mjtObj)&gt; check_index</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:91</div></div>
+<div class="ttc" id="amj__ros_8cpp_html_adb9fb39108aa6ea80d9bf0fd9a0edcb9"><div class="ttname"><a href="mj__ros_8cpp.html#adb9fb39108aa6ea80d9bf0fd9a0edcb9">name_map</a></div><div class="ttdeci">std::map&lt; mjtObj, std::map&lt; std::string, std::string &gt; &gt; name_map</div><div class="ttdef"><b>Definition:</b> mj_ros.cpp:73</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
