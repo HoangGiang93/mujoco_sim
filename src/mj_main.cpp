@@ -55,16 +55,16 @@ void simulate()
 {
     std::vector<MjHWInterface *> mj_hw_interfaces;
     std::vector<controller_manager::ControllerManager *> controller_managers;
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot_name : MjSim::robot_names)
     {
-        mj_hw_interfaces.push_back(new MjHWInterface(robot));
-        if (MjSim::robots.size() < 2)
+        mj_hw_interfaces.push_back(new MjHWInterface(robot_name));
+        if (MjSim::robot_names.size() < 2)
         {
             controller_managers.push_back(new controller_manager::ControllerManager(mj_hw_interfaces.back()));
         }
         else
         {
-            controller_managers.push_back(new controller_manager::ControllerManager(mj_hw_interfaces.back(), ros::NodeHandle(robot)));
+            controller_managers.push_back(new controller_manager::ControllerManager(mj_hw_interfaces.back(), ros::NodeHandle(robot_name)));
         }
     }
 

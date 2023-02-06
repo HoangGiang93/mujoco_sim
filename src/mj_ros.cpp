@@ -59,6 +59,7 @@ std::condition_variable condition;
 int spawn_nr = 0;
 std::mutex spawn_mtx;
 std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
+static std::set<std::string> spawned_object_names;
 bool spawn_success;
 
 int destroy_nr = 0;
@@ -92,18 +93,18 @@ static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_
 {
     for (int body_id = 1; body_id < m->nbody; body_id++)
     {
-        std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+        const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
         switch (object_type)
         {
         case EObjectType::Robot:
-            if (MjSim::link_names.find(body_name) != MjSim::link_names.end())
+            if (MjSim::robot_link_names.find(body_name) != MjSim::robot_link_names.end())
             {
                 function(mj_ros, body_id, object_type);
             }
             break;
 
         case EObjectType::World:
-            if (MjSim::robots.find(body_name) == MjSim::robots.end() && MjSim::link_names.find(body_name) == MjSim::link_names.end() && MjSim::spawned_object_names.find(body_name) == MjSim::spawned_object_names.end())
+            if (MjSim::robot_names.find(body_name) == MjSim::robot_names.end() && MjSim::robot_link_names.find(body_name) == MjSim::robot_link_names.end() && MjSim::spawned_object_body_names.find(body_name) == MjSim::spawned_object_body_names.end())
             {
                 if (!free_body_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
@@ -114,7 +115,7 @@ static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_
             break;
 
         case EObjectType::SpawnedObject:
-            if (MjSim::spawned_object_names.find(body_name) != MjSim::spawned_object_names.end())
+            if (MjSim::spawned_object_body_names.find(body_name) != MjSim::spawned_object_body_names.end())
             {
                 if (!free_body_only ||
                     (m->body_jntnum[body_id] == 1 && m->jnt_type[m->body_jntadr[body_id]] == mjJNT_FREE))
@@ -167,7 +168,7 @@ std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyx
         }
         else
         {
-            size_t last_index = name.find_last_not_of("0123456789");
+            const size_t last_index = name.find_last_not_of("0123456789");
             name.replace(last_index + 1, unique_index[type] / 10 + 1, std::to_string(unique_index[type]));
         }
 
@@ -274,14 +275,14 @@ void MjRos::set_params()
             }
         }
     }
-    MjSim::robots = std::set<std::string>(robots.begin(), robots.end());
-    if (MjSim::robots.size() == 0)
+    MjSim::robot_names = std::set<std::string>(robots.begin(), robots.end());
+    if (MjSim::robot_names.size() == 0)
     {
         ROS_WARN("No robot found in %s", model_path.c_str());
         return;
     }
-    std::string log = "Found " + std::to_string(MjSim::robots.size()) + " robots:";
-    for (const std::string &robot : MjSim::robots)
+    std::string log = "Found " + std::to_string(MjSim::robot_names.size()) + " robots:";
+    for (const std::string &robot : MjSim::robot_names)
     {
         log += " [" + robot + "]";
     }
@@ -290,14 +291,14 @@ void MjRos::set_params()
     std::vector<float> pose_init;
     if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
     {
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             MjSim::pose_inits[robot] = pose_init;
         }
     }
     else
     {
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
             {
@@ -313,7 +314,7 @@ void MjRos::set_params()
     bool add_odom_joints_bool;
     if (ros::param::get("~add_odom_joints", add_odom_joints_bool))
     {
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             MjSim::add_odom_joints[robot]["lin_odom_x_joint"] = add_odom_joints_bool;
             MjSim::add_odom_joints[robot]["lin_odom_y_joint"] = add_odom_joints_bool;
@@ -330,21 +331,21 @@ void MjRos::set_params()
         {
             if (ros::param::get("~add_odom_joints/" + odom_joint_name, odom_joint_bool))
             {
-                for (const std::string &robot : MjSim::robots)
+                for (const std::string &robot : MjSim::robot_names)
                 {
                     MjSim::add_odom_joints[robot][odom_joint_name] = odom_joint_bool;
                 }
             }
             else
             {
-                for (const std::string &robot : MjSim::robots)
+                for (const std::string &robot : MjSim::robot_names)
                 {
                     MjSim::add_odom_joints[robot][odom_joint_name] = false;
                 }
             }
         }
 
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             if (ros::param::get("~add_odom_joints/" + robot, odom_joint_bool))
             {
@@ -474,31 +475,31 @@ void MjRos::init()
 
     int joint_id;
     std::string link_name;
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         for (const std::string joint_name : MjSim::joint_names[robot])
         {
             joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
             link_name = mj_id2name(m, mjtObj::mjOBJ_BODY, m->jnt_bodyid[joint_id]);
-            MjSim::link_names.insert(link_name);
+            MjSim::robot_link_names.insert(link_name);
         }
     }
 
-    if (MjSim::robots.size() < 2)
+    if (MjSim::robot_names.size() < 2)
     {
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, n))
         {
-            root_names[*MjSim::robots.begin()] = urdf_model.getRoot()->name;
+            root_names[*MjSim::robot_names.begin()] = urdf_model.getRoot()->name;
         }
         else
         {
-            root_names[*MjSim::robots.begin()] = "world";
+            root_names[*MjSim::robot_names.begin()] = "world";
         }
     }
     else
     {
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             urdf::Model urdf_model;
             if (init_urdf(urdf_model, n, (robot + "/robot_description").c_str()))
@@ -512,7 +513,7 @@ void MjRos::init()
         }
     }
 
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ||
             MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
@@ -552,7 +553,7 @@ void MjRos::init()
     MjSim::joint_ignores = std::set<std::string>(joint_ignores_str.begin(), joint_ignores_str.end());
 
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         base_pose_pubs[robot] = n.advertise<nav_msgs::Odometry>("/" + robot + "/" + root_names[robot], 0);
     }
@@ -568,7 +569,7 @@ void MjRos::init()
 
 void MjRos::reset_robot()
 {
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         for (const std::string &joint_name : MjSim::joint_names[robot])
         {
@@ -667,7 +668,7 @@ bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::Trigger
     mtx.unlock();
     ros::Duration(100 * m->opt.timestep).sleep();
     float error_sum = 0.f;
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         for (const std::string &joint_name : MjSim::joint_names[robot])
         {
@@ -1245,9 +1246,10 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                MjSim::spawned_object_names.insert(name);
+                MjSim::spawned_object_body_names.insert(name);
+                spawned_object_names.insert(name);
                 do_each_child_body_id(m, body_id, [&](int child_body_id)
-                                      { MjSim::spawned_object_names.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id)); });
+                                      { MjSim::spawned_object_body_names.insert(mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id)); });
 
                 if (m->body_dofnum[body_id] != 6)
                 {
@@ -1307,12 +1309,6 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
             int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, name);
             if (body_id != -1)
             {
-                MjSim::spawned_object_names.erase(name);
-
-                do_each_child_body_id(m, body_id, [&](int child_body_id)
-                                      { const char *child_name = mj_id2name(m, mjtObj::mjOBJ_BODY, child_body_id);
-                                        MjSim::spawned_object_names.erase(child_name); });
-
                 mujoco_msgs::ObjectState object_state;
                 object_state.name = name;
                 if (m->body_dofnum[body_id] != 6)
@@ -1369,7 +1365,8 @@ void MjRos::destroy_objects(const std::set<std::string> object_names)
     for (const std::string &object_name : object_names)
     {
         object_names_to_destroy.erase(object_name);
-        MjSim::spawned_object_names.erase(object_name);
+        MjSim::spawned_object_body_names.erase(object_name);
+        spawned_object_names.erase(object_name);
     }
 }
 
@@ -1666,13 +1663,27 @@ void MjRos::publish_joint_states(const EObjectType object_type)
     ros::Rate loop_rate(pub_joint_states_rate[object_type]);
 
     std_msgs::Header header;
-    header.frame_id = root_frame_id;
 
     while (ros::ok())
     {
         // Set header
         header.stamp = ros::Time::now();
         header.seq += 1;
+
+        switch (object_type)
+        {
+        case EObjectType::Robot:
+            header.frame_id = root_frame_id;
+            break;
+
+        case EObjectType::World:
+            header.frame_id = root_frame_id;
+            break;
+
+        default:
+            header.frame_id = "";
+            break;
+        }
 
         joint_states[object_type] = sensor_msgs::JointState();
         joint_states[object_type].header = header;
@@ -1684,7 +1695,10 @@ void MjRos::publish_joint_states(const EObjectType object_type)
 
         set_ros_msg(*this, object_type, false, &MjRos::add_joint_states);
 
-        joint_states_pub[object_type].publish(joint_states[object_type]);
+        if (!joint_states[object_type].name.empty())
+        {
+            joint_states_pub[object_type].publish(joint_states[object_type]);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
@@ -1705,7 +1719,7 @@ void MjRos::publish_base_pose()
 
     geometry_msgs::TransformStamped transform;
 
-    for (const std::string &robot : MjSim::robots)
+    for (const std::string &robot : MjSim::robot_names)
     {
         nav_msgs::Odometry base_pose;
         base_pose.child_frame_id = root_names[robot];
@@ -1718,7 +1732,7 @@ void MjRos::publish_base_pose()
         header.stamp = ros::Time::now();
         header.seq += 1;
 
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             base_poses[robot].header = header;
         }
@@ -1727,12 +1741,12 @@ void MjRos::publish_base_pose()
 
         // Publish tf of root
         int i = 0;
-        for (const std::string &robot : MjSim::robots)
+        for (const std::string &robot : MjSim::robot_names)
         {
             const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, robot.c_str());
             if (body_id != -1)
             {
-                if (MjSim::robots.size() > 1)
+                if (MjSim::robot_names.size() > 1)
                 {
                     set_transform(transform, body_id, robot + "/" + root_names[robot]);
                 }
@@ -1997,6 +2011,22 @@ void MjRos::add_joint_states(const int body_id, const EObjectType object_type)
 {
     if (m->body_jntnum[body_id] == 1 && (m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_HINGE || m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_SLIDE))
     {
+        if (object_type == EObjectType::SpawnedObject)
+        {
+            int parent_body_id = body_id;
+            std::string parent_body_name;
+            do
+            {
+                parent_body_id = m->body_parentid[parent_body_id];
+                if (parent_body_id == -1)
+                {
+                    break;
+                }
+                parent_body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, parent_body_id);
+            } while (spawned_object_names.find(parent_body_name) == spawned_object_names.end());
+
+            joint_states[object_type].header.frame_id = parent_body_name;
+        }
         const int joint_id = m->body_jntadr[body_id];
         const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
         const int qpos_id = m->jnt_qposadr[joint_id];

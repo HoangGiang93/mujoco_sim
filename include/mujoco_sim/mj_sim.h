@@ -83,7 +83,7 @@ public:
 
     static std::map<std::string, mjtNum> odom_vels;
 
-    static std::set<std::string> link_names;
+    static std::set<std::string> robot_link_names;
 
     static mjtNum sim_start;
 
@@ -93,7 +93,7 @@ public:
 
     static std::map<std::string, std::map<std::string, bool>> add_odom_joints;
 
-    static std::set<std::string> robots;
+    static std::set<std::string> robot_names;
 
     static std::map<size_t, std::string> sensors;
 
@@ -101,7 +101,7 @@ public:
 
     static bool reload_mesh;
 
-    static std::set<std::string> spawned_object_names;
+    static std::set<std::string> spawned_object_body_names;
 
     // Fix bug from m->geom_pos and m->geom_quat
     static std::map<int, std::vector<mjtNum>> geom_pose;

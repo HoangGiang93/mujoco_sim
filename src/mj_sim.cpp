@@ -34,7 +34,7 @@ std::set<std::string> MjSim::joint_ignores;
 
 std::map<std::string, mjtNum> MjSim::odom_vels;
 
-std::set<std::string> MjSim::link_names;
+std::set<std::string> MjSim::robot_link_names;
 
 mjtNum *MjSim::u = NULL;
 
@@ -44,7 +44,7 @@ mjtNum MjSim::sim_start;
 
 std::map<std::string, std::map<std::string, bool>> MjSim::add_odom_joints;
 
-std::set<std::string> MjSim::robots;
+std::set<std::string> MjSim::robot_names;
 
 std::map<size_t, std::string> MjSim::sensors;
 
@@ -52,7 +52,7 @@ std::map<std::string, std::vector<float>> MjSim::pose_inits;
 
 bool MjSim::reload_mesh = true;
 
-std::set<std::string> MjSim::spawned_object_names;
+std::set<std::string> MjSim::spawned_object_body_names;
 
 // Fix bug from m->geom_pos and m->geom_quat
 std::map<int, std::vector<mjtNum>> MjSim::geom_pose;
@@ -78,7 +78,7 @@ static void set_joint_names()
 		if (worldbody_element->FirstChildElement("body") != nullptr && worldbody_element->FirstChildElement("body")->Attribute("name") != nullptr)
 		{
 			const std::string robot_name = worldbody_element->FirstChildElement("body")->Attribute("name");
-			if (MjSim::robots.find(robot_name) == MjSim::robots.end())
+			if (MjSim::robot_names.find(robot_name) == MjSim::robot_names.end())
 			{
 				continue;
 			}
@@ -116,7 +116,7 @@ static void set_joint_names()
 	{
 		ROS_WARN("Model %s has 0 joints", model_path.c_str());
 	}
-	for (const std::string &robot : MjSim::robots)
+	for (const std::string &robot : MjSim::robot_names)
 	{
 		ROS_INFO("Initialize model %s with %ld joints successfully", robot.c_str(), MjSim::joint_names[robot].size());
 	}
@@ -276,7 +276,7 @@ static void init_tmp()
 			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		// Add odom joints to cache_model_path if required
-		for (const std::string &robot : MjSim::robots)
+		for (const std::string &robot : MjSim::robot_names)
 		{
 			for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
 					 robot_body != nullptr;
@@ -544,8 +544,8 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 			}
 			else if (body_name != nullptr &&
 							 strcmp(body_name, model_path.stem().c_str()) != 0 &&
-							 MjSim::link_names.find(body_name) == MjSim::link_names.end() &&
-							 MjSim::robots.find(body_name) == MjSim::robots.end())
+							 MjSim::robot_link_names.find(body_name) == MjSim::robot_link_names.end() &&
+							 MjSim::robot_names.find(body_name) == MjSim::robot_names.end())
 			{
 				const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name);
 				body_element->SetAttribute("pos",
@@ -877,7 +877,7 @@ bool MjSim::remove_body(const std::set<std::string> &body_names)
 void MjSim::controller()
 {
 	mj_mulM(m, d, tau, u);
-	for (const std::string &robot : MjSim::robots)
+	for (const std::string &robot : MjSim::robot_names)
 	{
 		for (const std::string &joint_name : MjSim::joint_names[robot])
 		{
@@ -895,7 +895,7 @@ void MjSim::controller()
 
 void MjSim::set_odom_vels()
 {
-	for (const std::string &robot : MjSim::robots)
+	for (const std::string &robot : MjSim::robot_names)
 	{
 		const int odom_x_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_x_joint").c_str());
 		const int odom_y_joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, (robot + "_ang_odom_y_joint").c_str());
