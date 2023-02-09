@@ -243,6 +243,7 @@ void MjRos::set_params()
     std::vector<std::string> robots;
     if (!ros::param::get("~robots", robots))
     {
+        ROS_WARN("Robot names not found in parameter server, searching for robot names from urdf...");
         urdf::Model urdf_model;
         if (init_urdf(urdf_model, ros::NodeHandle()))
         {
@@ -250,6 +251,7 @@ void MjRos::set_params()
         }
         else
         {
+            ROS_WARN("Robot names not found in urdf, searching for robot names from mjcf...");
             tinyxml2::XMLDocument cache_model_xml_doc;
             if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
             {

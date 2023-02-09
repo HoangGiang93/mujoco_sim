@@ -71,13 +71,19 @@ static void set_joint_names()
 		ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
 		return;
 	}
-	for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-			 worldbody_element != nullptr;
-			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+	if (cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody") == nullptr)
 	{
-		if (worldbody_element->FirstChildElement("body") != nullptr && worldbody_element->FirstChildElement("body")->Attribute("name") != nullptr)
+		ROS_WARN("%s doesn't have <worldbody>", model_path.c_str());
+		return;
+	}
+	
+	for (tinyxml2::XMLElement *body_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody")->FirstChildElement("body");
+			 body_element != nullptr;
+			 body_element = body_element->NextSiblingElement("body"))
+	{
+		if (body_element->Attribute("name") != nullptr)
 		{
-			const std::string robot_name = worldbody_element->FirstChildElement("body")->Attribute("name");
+			const std::string robot_name = body_element->Attribute("name");
 			if (MjSim::robot_names.find(robot_name) == MjSim::robot_names.end())
 			{
 				continue;
@@ -109,7 +115,7 @@ static void set_joint_names()
 				}
 			};
 
-			do_each_child_element(worldbody_element, robot_name, func);
+			do_each_child_element(body_element, robot_name, func);
 		}
 	}
 	if (MjSim::joint_names.size() == 0)
