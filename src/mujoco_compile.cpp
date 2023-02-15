@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <mujoco/mujoco.h>
+#include "mj_util.cpp"
 
 #include <boost/filesystem.hpp>
 #include <cctype>
@@ -26,7 +26,6 @@
 #include <cstdio>
 #include <cstring>
 #include <ros/package.h>
-#include <tinyxml2.h>
 #include <urdf/model.h>
 
 // help
@@ -189,23 +188,72 @@ void add_robot_body(const boost::filesystem::path &model_path)
         return;
     }
 
-    for (tinyxml2::XMLElement *element = model_xml_doc.FirstChildElement()->FirstChildElement();
-         element != nullptr;
-         element = element->NextSiblingElement())
+    if (tinyxml2::XMLElement *worldbody_element = model_xml_doc.FirstChildElement()->FirstChildElement("worldbody"))
     {
-        if (strcmp(element->Value(), "worldbody") == 0)
+        tinyxml2::XMLElement *robot_element = model_xml_doc.NewElement("body");
+
+        robot_element->SetAttribute("name", model.getName().c_str());
+        while (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement())
         {
-            tinyxml2::XMLElement *robot_element = model_xml_doc.NewElement("body");
-
-            robot_element->SetAttribute("name", model.getName().c_str());
-            while (tinyxml2::XMLElement *body_element = element->FirstChildElement())
-            {
-                robot_element->LinkEndChild(body_element);
-            }
-            element->LinkEndChild(robot_element);
-
-            break;
+            robot_element->LinkEndChild(body_element);
         }
+        worldbody_element->LinkEndChild(robot_element);
+    }
+
+    model_xml_doc.SaveFile(model_path.c_str());
+}
+
+void fix_inertial(const boost::filesystem::path &model_path)
+{
+    tinyxml2::XMLDocument model_xml_doc;
+    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    {
+        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        return;
+    }
+
+    for (tinyxml2::XMLElement *worldbody_element = model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
+         worldbody_element != nullptr;
+         worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
+    {
+        do_each_child_element(worldbody_element, [&](tinyxml2::XMLElement *body_element)
+                              {
+                                tinyxml2::XMLElement *inertial_element = body_element->FirstChildElement("inertial");
+                                if (inertial_element == nullptr)
+                                {
+                                    inertial_element = model_xml_doc.NewElement("inertial");
+                                    body_element->InsertFirstChild(inertial_element);
+                                }
+
+                                if (inertial_element->Attribute("pos") == nullptr)
+                                {
+                                    inertial_element->SetAttribute("pos", "0 0 0");
+                                }
+
+                                if (inertial_element->Attribute("mass") == nullptr || std::atof(inertial_element->Attribute("mass")) < mjMINVAL)
+                                {
+                                    inertial_element->SetAttribute("mass", "0.001");
+                                }
+
+                                if (inertial_element->Attribute("inertia") == nullptr || inertial_element->Attribute("diaginertia") == nullptr)
+                                {
+                                    inertial_element->SetAttribute("diaginertia", "0.001 0.001 0.001");
+                                }
+                                
+                                if (inertial_element->Attribute("inertia") != nullptr)
+                                {
+                                    std::istringstream iss(inertial_element->Attribute("inertia"));
+                                    std::vector<mjtNum> inertia = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+                                    mjtNum sum_inertia = 0.0;
+                                    for (const mjtNum inertia_element : inertia)
+                                    {
+                                    sum_inertia += mju_abs(inertia_element);
+                                    }
+                                    if (sum_inertia < mjMINVAL)
+                                    {
+                                        inertial_element->SetAttribute("inertia", "0.001 0 0 0.001 0 0.001");
+                                    }
+                                } });
     }
 
     model_xml_doc.SaveFile(model_path.c_str());
@@ -263,7 +311,7 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
             for (int k = 0; k < disable_parent_child_collision_level; k++)
             {
                 body_parent_id = m->body_parentid[body_parent_id];
-                
+
                 tinyxml2::XMLElement *exclude_element = model_xml_doc.NewElement("exclude");
                 if (body_parent_id == 0)
                 {
@@ -466,6 +514,8 @@ int main(int argc, char **argv)
     {
         return finish(error);
     }
+
+    fix_inertial(output);
 
     add_robot_body(output);
 

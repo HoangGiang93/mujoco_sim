@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 #include "mj_ros.h"
-#include "mj_util.h"
+#include "mj_util.cpp"
 
 #include <condition_variable>
 #include <controller_manager_msgs/ControllerState.h>

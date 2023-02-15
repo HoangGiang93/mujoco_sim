@@ -72,11 +72,17 @@ include_directories(
   ${MUJOCO_SOURCE_DIR}/include
 )
 
+add_library(mj_util_lib
+  ${PROJECT_SOURCE_DIR}/src/mj_util.cpp
+)
+add_dependencies(mj_util_lib ${MUJOCO})
+
 set(MUJOCO_COMPILE_NODE mujoco_compile_node)
 add_executable(${MUJOCO_COMPILE_NODE} src/mujoco_compile.cpp)
 add_dependencies(${MUJOCO_COMPILE_NODE} ${MUJOCO})
 target_link_libraries(${MUJOCO_COMPILE_NODE}
   ${catkin_LIBRARIES}
+  mj_util_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   tinyxml2
 )
@@ -93,6 +99,7 @@ add_library(${MUJOCO_SIM_HEADLESS_NODE}_lib
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
   ${catkin_LIBRARIES}
+  mj_util_lib
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   $ENV{ROS_ROOT}/../../lib/liburdf.so
@@ -108,6 +115,7 @@ add_library(${MUJOCO_SIM_NODE}_lib
 add_dependencies(${MUJOCO_SIM_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_NODE}
   ${catkin_LIBRARIES}
+  mj_util_lib
   ${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${MUJOCO_SIM_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so

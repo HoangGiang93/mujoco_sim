@@ -1,10 +1,9 @@
-#pragma once
-
 #include <algorithm>
 #include <chrono>
 #include <mujoco/mujoco.h>
 #include <sstream>
 #include <tinyxml2.h>
+#include <functional>
 
 #ifndef TIMEOUT
 #define TIMEOUT 500000 // microsecond
