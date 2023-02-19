@@ -223,6 +223,7 @@ void MjRos::set_params()
             tmp_model_name = "current_" + model_path.filename().string();
         }
     }
+    save_path /= model_path.filename();
 
     if (ros::param::get("~max_time_step", MjSim::max_time_step))
     {
@@ -280,7 +281,7 @@ void MjRos::set_params()
     MjSim::robot_names = std::set<std::string>(robots.begin(), robots.end());
     if (MjSim::robot_names.size() == 0)
     {
-        ROS_WARN("No robot found in %s", model_path.c_str());
+        ROS_WARN("No robot found in [%s]", model_path.c_str());
         return;
     }
     std::string log = "Found " + std::to_string(MjSim::robot_names.size()) + " robots:";
@@ -530,6 +531,9 @@ void MjRos::init()
         }
     }
 
+    screenshot_server = n.advertiseService("screenshot", &MjRos::screenshot_service, this);
+    ROS_INFO("Started [%s] service.", screenshot_server.getService().c_str());
+
     reset_robot_server = n.advertiseService("reset", &MjRos::reset_robot_service, this);
     ROS_INFO("Started [%s] service.", reset_robot_server.getService().c_str());
 
@@ -630,6 +634,83 @@ void MjRos::setup_service_servers()
 {
     std::thread ros_thread(&MjRos::spawn_and_destroy_objects, this);
     ros_thread.join();
+}
+
+bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
+{
+    std::string save_path_string;
+    if (!ros::param::get("~save_path", save_path_string))
+    {
+        ROS_WARN("Parameter save_path not found or invalid, set to [%s]", save_path.c_str());
+        save_path_string = save_path.string();
+    }
+    if (boost::filesystem::exists(save_path_string))
+    {
+        save_path = save_path_string;
+    }
+    else
+    {
+        ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
+    }
+
+    if (boost::filesystem::exists(save_path))
+    {
+        const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
+        const unsigned short year = time_now.date().year();
+        const unsigned short month = time_now.date().month();
+        const unsigned short day = time_now.date().day();
+        const unsigned short hour = time_now.time_of_day().hours();
+        const unsigned short minute = time_now.time_of_day().minutes();
+        const unsigned short sec = time_now.time_of_day().seconds();
+        const unsigned short msec = time_now.time_of_day().total_milliseconds() % 1000;
+        const std::string time_stamp = std::to_string(year) + "_" + std::to_string(month) + "_" + std::to_string(day) + "_" + std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(sec) + "_" + std::to_string(msec);
+        const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
+        save_path = save_path.parent_path() / filename;
+    }
+    boost::filesystem::path save_model_path = save_path.parent_path() / (save_path.stem().string() + ".txt");
+    boost::filesystem::path save_data_path = save_path.parent_path() / (save_path.stem().string() + "_data.txt");
+
+    ROS_INFO("Trying to save screenshot to [%s]", save_path.c_str());
+
+    if (save_XML(m, save_path.c_str()))
+    {
+        if (!boost::filesystem::exists(save_path.parent_path() / model_path.stem() / "meshes"))
+        {
+            boost::filesystem::create_directories(save_path.parent_path() / model_path.stem() / "meshes");
+        }
+        
+        std::function<void(tinyxml2::XMLElement *)> copy_meshes_cb = [&](tinyxml2::XMLElement *mesh_element){
+            if (mesh_element->Attribute("name") != nullptr && mesh_element->Attribute("file") != nullptr && boost::filesystem::exists(mesh_element->Attribute("file")))
+            {
+                boost::filesystem::path file = mesh_element->Attribute("file");
+                boost::filesystem::path new_path = save_path.parent_path() / model_path.stem() / "meshes" / file.filename();
+                if (!boost::filesystem::exists(new_path))
+                {
+                    boost::filesystem::copy_file(file, new_path);
+                }
+                mesh_element->SetAttribute("file", boost::filesystem::relative(new_path, save_path.parent_path()).c_str());
+            }
+        };
+
+        tinyxml2::XMLDocument doc;
+        load_XML(doc, save_path.c_str());
+        do_each_child_element(doc.FirstChild()->FirstChildElement("asset"), "mesh", copy_meshes_cb);
+        save_XML(doc, save_path.c_str());
+
+        mj_printModel(m, save_model_path.c_str());
+        mj_printData(m, d, save_data_path.c_str());
+        res.success = true;
+        res.message = save_path.string();
+        ROS_INFO("Saved screenshot to [%s] successfully", save_path.c_str());
+    }
+    else
+    {
+        res.success = false;
+        res.message = save_path.parent_path().string() + " not found";
+        ROS_INFO("Failed to save screenshot to [%s]", save_path.c_str());
+    }
+
+    return true;
 }
 
 bool MjRos::reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
@@ -826,7 +907,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 }
                 else if (!object_mesh_path.is_absolute())
                 {
-                    ROS_WARN("Mesh path %s is not valid", object_mesh_path.c_str());
+                    ROS_WARN("Mesh path [%s] is not valid", object_mesh_path.c_str());
                 }
 
                 tinyxml2::XMLDocument mesh_xml_doc;
@@ -1852,7 +1933,7 @@ void MjRos::add_marker(const int body_id, const EObjectType object_type)
             mesh_path = boost::filesystem::relative(mesh_paths[mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id])].first, tmp_world_path.parent_path());
             if (!boost::filesystem::exists(tmp_world_path.parent_path() / mesh_path) || !mesh_path.has_extension())
             {
-                ROS_WARN("Body %s: Mesh %s - %s not found in %s", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].first.c_str(), mesh_path.parent_path().c_str());
+                ROS_WARN("Body %s: Mesh %s - %s not found in [%s]", mj_id2name(m, mjtObj::mjOBJ_BODY, body_id), mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]), mesh_paths[std::string(mj_id2name(m, mjtObj::mjOBJ_MESH, m->geom_dataid[geom_id]))].first.c_str(), mesh_path.parent_path().c_str());
                 continue;
             }
             marker[object_type].mesh_resource = "package://mujoco_sim/model/tmp/" + mesh_path.string();

@@ -14,6 +14,8 @@
 #   - joint1
 #   - joint2
 
+save_path: "" # Absolute path to save screenshot
+
 add_odom_joints: false # true for mobile robots, false for fixed-based robots
 # add_odom_joints can be specified by different ways:
 # 1. by bool: (true mean set default odom joints (lin_x, lin_y, ang_z))

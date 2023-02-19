@@ -35,6 +35,8 @@ extern double rtf;
 
 extern std::string tmp_model_name;
 
+extern boost::filesystem::path save_path;
+
 extern boost::filesystem::path model_path;
 
 extern boost::filesystem::path tmp_model_path;

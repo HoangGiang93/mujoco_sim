@@ -112,6 +112,8 @@ private:
 
 private:
 
+    bool screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
+
     bool reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
 
     bool spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_msgs::SpawnObjectResponse &res);
@@ -147,6 +149,8 @@ private:
     std::map<std::string, CmdVelCallback *> cmd_vel_callbacks;
 
     std::map<std::string, ros::Subscriber> cmd_vel_subs;
+
+    ros::ServiceServer screenshot_server;
 
     ros::ServiceServer reset_robot_server;
 

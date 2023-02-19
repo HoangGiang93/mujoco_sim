@@ -199,8 +199,7 @@ static bool save_XML(mjModel *&m, const char *path)
 	std::function<bool(mjModel *&, const char *)> save_XML_cb = [](mjModel *&m, const char *path)
 	{
 		char error[100] = "Could not save binary model";
-		mj_saveLastXML(path, m, error, 100);
-		return m != nullptr; };
+		return mj_saveLastXML(path, m, error, 100) == 1; };
 	return manage_XML(m, path, save_XML_cb);
 }
 
