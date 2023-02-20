@@ -29,7 +29,7 @@ MjHWInterface::MjHWInterface(const std::string &robot)
     joint_efforts.resize(num_joints, 0.);
 
     // joint_positions_command.resize(num_joints, 0.);
-    // joint_velocities_command.resize(num_joints, 0.);
+    joint_velocities_command.resize(num_joints, 0.);
     joint_efforts_command.resize(num_joints, 0.);
 
     for (std::size_t i = 0; i < num_joints; i++)
@@ -40,15 +40,15 @@ MjHWInterface::MjHWInterface(const std::string &robot)
         // hardware_interface::JointHandle joint_handle_position(joint_state_interface.getHandle(joint_names[i]), &joint_positions_command[i]);
         // position_joint_interface.registerHandle(joint_handle_position);
 
-        // hardware_interface::JointHandle joint_handle_velocity(joint_state_interface.getHandle(joint_names[i]), &joint_velocities_command[i]);
-        // velocity_joint_interface.registerHandle(joint_handle_velocity);
+        hardware_interface::JointHandle joint_handle_velocity(joint_state_interface.getHandle(joint_names[i]), &joint_velocities_command[i]);
+        velocity_joint_interface.registerHandle(joint_handle_velocity);
 
         hardware_interface::JointHandle joint_handle_effort(joint_state_interface.getHandle(joint_names[i]), &joint_efforts_command[i]);
         effort_joint_interface.registerHandle(joint_handle_effort);
     }
     registerInterface(&joint_state_interface);
     // registerInterface(&position_joint_interface);
-    // registerInterface(&velocity_joint_interface);
+    registerInterface(&velocity_joint_interface);
     registerInterface(&effort_joint_interface);
 }
 
@@ -78,7 +78,14 @@ void MjHWInterface::write()
         {
             const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
             const int dof_id = m->jnt_dofadr[joint_id];
-            MjSim::u[dof_id] = joint_efforts_command[i];
+            if (mju_abs(joint_velocities_command[i]) > mjMINVAL)
+            {
+                MjSim::dq[dof_id] = joint_velocities_command[i];
+            }
+            else
+            {
+                MjSim::ddq[dof_id] = joint_efforts_command[i];
+            }
         }
     }
 }

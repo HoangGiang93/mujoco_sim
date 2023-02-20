@@ -120,7 +120,7 @@ $(function() {
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// Hardware interfaces</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    hardware_interface::JointStateInterface joint_state_interface;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">// hardware_interface::PositionJointInterface position_joint_interface;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">// hardware_interface::VelocityJointInterface velocity_joint_interface;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    hardware_interface::VelocityJointInterface velocity_joint_interface;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    hardware_interface::EffortJointInterface effort_joint_interface;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">private</span>:</div>
@@ -133,7 +133,7 @@ $(function() {
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="comment">// Commands</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_positions_command;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="comment">// std::vector&lt;double&gt; joint_velocities_command;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    std::vector&lt;double&gt; joint_velocities_command;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    std::vector&lt;double&gt; joint_efforts_command;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
@@ -142,7 +142,7 @@ $(function() {
 <div class="ttc" id="aclassMjHWInterface_html_ab1a6f225173cbe8eaada609fc32e6307"><div class="ttname"><a href="classMjHWInterface.html#ab1a6f225173cbe8eaada609fc32e6307">MjHWInterface::MjHWInterface</a></div><div class="ttdeci">MjHWInterface(const std::string &amp;robot)</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:23</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_ab633a47702853e9c7dd1d00f19f3f84f"><div class="ttname"><a href="classMjHWInterface.html#ab633a47702853e9c7dd1d00f19f3f84f">MjHWInterface::~MjHWInterface</a></div><div class="ttdeci">~MjHWInterface()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:55</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_ad4714d683f19cbd3f5f697d405b3bfdf"><div class="ttname"><a href="classMjHWInterface.html#ad4714d683f19cbd3f5f697d405b3bfdf">MjHWInterface::write</a></div><div class="ttdeci">void write()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:73</div></div>
-<div class="ttc" id="aclassMjHWInterface_html_a4202b4cdb353fa2872553ee73b43d63d"><div class="ttname"><a href="classMjHWInterface.html#a4202b4cdb353fa2872553ee73b43d63d">MjHWInterface::doSwitch</a></div><div class="ttdeci">void doSwitch(const std::list&lt; hardware_interface::ControllerInfo &gt; &amp;start_list, const std::list&lt; hardware_interface::ControllerInfo &gt; &amp;stop_list)</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:86</div></div>
+<div class="ttc" id="aclassMjHWInterface_html_a4202b4cdb353fa2872553ee73b43d63d"><div class="ttname"><a href="classMjHWInterface.html#a4202b4cdb353fa2872553ee73b43d63d">MjHWInterface::doSwitch</a></div><div class="ttdeci">void doSwitch(const std::list&lt; hardware_interface::ControllerInfo &gt; &amp;start_list, const std::list&lt; hardware_interface::ControllerInfo &gt; &amp;stop_list)</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:93</div></div>
 <div class="ttc" id="aclassMjHWInterface_html_a8963dad3dd1c9616fdebb10b87c2656e"><div class="ttname"><a href="classMjHWInterface.html#a8963dad3dd1c9616fdebb10b87c2656e">MjHWInterface::read</a></div><div class="ttdeci">void read()</div><div class="ttdef"><b>Definition:</b> mj_hw_interface.cpp:59</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

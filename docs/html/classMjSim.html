@@ -116,8 +116,10 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:a660adc1cdabecfefadb448bd65e60443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memItemLeft" align="right" valign="top">static mjtNum&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd">sim_start</a></td></tr>
 <tr class="separator:aa8758b9a0d6fa36a0cfee5faa4f061bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa810b31343a0c16940cf482e29d504d0"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aa810b31343a0c16940cf482e29d504d0">u</a> = NULL</td></tr>
-<tr class="separator:aa810b31343a0c16940cf482e29d504d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae775693accb9db4cd4abcd8caa724d3"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aae775693accb9db4cd4abcd8caa724d3">ddq</a> = NULL</td></tr>
+<tr class="separator:aae775693accb9db4cd4abcd8caa724d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77dbae6fbaf35b4f371aa1df5a9fa56a"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a77dbae6fbaf35b4f371aa1df5a9fa56a">dq</a> = NULL</td></tr>
+<tr class="separator:a77dbae6fbaf35b4f371aa1df5a9fa56a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b22b4acbcbc8d870ad07f6de414402f"><td class="memItemLeft" align="right" valign="top">static mjtNum *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#a1b22b4acbcbc8d870ad07f6de414402f">tau</a> = NULL</td></tr>
 <tr class="separator:a1b22b4acbcbc8d870ad07f6de414402f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf4f7195525701e4b57ef967ca75d421"><td class="memItemLeft" align="right" valign="top">static std::map&lt; std::string, std::map&lt; std::string, bool &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMjSim.html#aaf4f7195525701e4b57ef967ca75d421">add_odom_joints</a></td></tr>
@@ -331,6 +333,50 @@ false Fail to remove </dd></dl>
       <table class="memname">
         <tr>
           <td class="memname">std::map&lt; std::string, std::map&lt; std::string, bool &gt; &gt; MjSim::add_odom_joints</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aae775693accb9db4cd4abcd8caa724d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae775693accb9db4cd4abcd8caa724d3">&#9670;&nbsp;</a></span>ddq</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">mjtNum * MjSim::ddq = NULL</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a77dbae6fbaf35b4f371aa1df5a9fa56a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77dbae6fbaf35b4f371aa1df5a9fa56a">&#9670;&nbsp;</a></span>dq</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">mjtNum * MjSim::dq = NULL</td>
         </tr>
       </table>
   </td>
@@ -628,31 +674,9 @@ false Fail to remove </dd></dl>
 
 </div>
 </div>
-<a id="aa810b31343a0c16940cf482e29d504d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa810b31343a0c16940cf482e29d504d0">&#9670;&nbsp;</a></span>u</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">mjtNum * MjSim::u = NULL</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/<a class="el" href="mj__sim_8h_source.html">mj_sim.h</a></li>
-<li>/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/<a class="el" href="mj__sim_8cpp.html">mj_sim.cpp</a></li>
+<li>/home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mujoco_sim/<a class="el" href="mj__sim_8cpp.html">mj_sim.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

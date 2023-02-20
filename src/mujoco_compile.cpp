@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "mj_util.cpp"
+#include "mujoco_sim/mj_util.cpp"
 
 #include <boost/filesystem.hpp>
 #include <cctype>

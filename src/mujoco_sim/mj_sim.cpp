@@ -36,7 +36,9 @@ std::map<std::string, mjtNum> MjSim::odom_vels;
 
 std::set<std::string> MjSim::robot_link_names;
 
-mjtNum *MjSim::u = NULL;
+mjtNum *MjSim::dq = NULL;
+
+mjtNum *MjSim::ddq = NULL;
 
 mjtNum *MjSim::tau = NULL;
 
@@ -519,8 +521,10 @@ static void init_malloc()
 {
 	MjSim::tau = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
 	mju_zero(MjSim::tau, m->nv);
-	MjSim::u = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
-	mju_zero(MjSim::u, m->nv);
+	MjSim::ddq = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
+	mju_zero(MjSim::ddq, m->nv);
+	MjSim::dq = (mjtNum *)mju_malloc(m->nv * sizeof(mjtNum *));
+	mju_zero(MjSim::dq, m->nv);
 }
 
 static void modify_xml(const char *xml_path, const std::set<std::string> &remove_body_names = {""})
@@ -882,7 +886,7 @@ bool MjSim::remove_body(const std::set<std::string> &body_names)
 
 void MjSim::controller()
 {
-	mj_mulM(m, d, tau, u);
+	mj_mulM(m, d, tau, ddq);
 	for (const std::string &robot : MjSim::robot_names)
 	{
 		for (const std::string &joint_name : MjSim::joint_names[robot])
@@ -895,8 +899,19 @@ void MjSim::controller()
 			}
 		}
 	}
+
 	mju_copy(d->qfrc_applied, tau, m->nv);
-	mju_zero(u, m->nv);
+
+	for (int dof_id = 0; dof_id < m->nv; dof_id++)
+	{
+		if (mju_abs(dq[dof_id]) > mjMINVAL)
+		{
+			d->qvel[dof_id] = dq[dof_id];
+		}
+	}
+
+	mju_zero(ddq, m->nv);
+	mju_zero(dq, m->nv);
 }
 
 void MjSim::set_odom_vels()

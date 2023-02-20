@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mj_model.cpp File Reference</title>
+<title>MujocoSim: /home/giang/Workspace/mujoco_ws/src/mujoco_sim/src/mujoco_sim/mj_model.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_54c33a3c8714c487557d6bd9e20af265.html">mujoco_sim</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -78,15 +78,15 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for mj_model.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="mj__model_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" alt=""/></div>
-<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mj__model_8cpp">
-<area shape="rect" title=" " alt="" coords="285,5,463,61"/>
-<area shape="rect" href="mj__model_8h.html" title=" " alt="" coords="194,109,293,136"/>
-<area shape="rect" title=" " alt="" coords="317,109,431,136"/>
-<area shape="rect" title=" " alt="" coords="455,109,547,136"/>
-<area shape="rect" title=" " alt="" coords="5,184,140,211"/>
-<area shape="rect" title=" " alt="" coords="164,184,323,211"/>
-<area shape="rect" title=" " alt="" coords="347,184,411,211"/>
+<div class="center"><img src="mj__model_8cpp__incl.png" border="0" usemap="#_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__sim_2mj__model_8cpp" alt=""/></div>
+<map name="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__sim_2mj__model_8cpp" id="_2home_2giang_2Workspace_2mujoco__ws_2src_2mujoco__sim_2src_2mujoco__sim_2mj__model_8cpp">
+<area shape="rect" title=" " alt="" coords="284,5,464,76"/>
+<area shape="rect" href="mj__model_8h.html" title=" " alt="" coords="194,124,293,151"/>
+<area shape="rect" title=" " alt="" coords="317,124,431,151"/>
+<area shape="rect" title=" " alt="" coords="455,124,547,151"/>
+<area shape="rect" title=" " alt="" coords="5,199,140,225"/>
+<area shape="rect" title=" " alt="" coords="164,199,323,225"/>
+<area shape="rect" title=" " alt="" coords="347,199,411,225"/>
 </map>
 </div>
 </div><table class="memberdecls">
@@ -102,15 +102,15 @@ Variables</h2></td></tr>
 <tr class="separator:a2197996e6b57e659623d3d56f5f9fd63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeecea58d25fb5f1f6169c413ab9faf6e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aeecea58d25fb5f1f6169c413ab9faf6e">tmp_model_name</a> = &quot;current.xml&quot;</td></tr>
 <tr class="separator:aeecea58d25fb5f1f6169c413ab9faf6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa20caa08dc56d77d4735d281b5894f9d"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa20caa08dc56d77d4735d281b5894f9d">save_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/save/&quot;</td></tr>
+<tr class="memitem:aa20caa08dc56d77d4735d281b5894f9d"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa20caa08dc56d77d4735d281b5894f9d">save_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/save/&quot;</td></tr>
 <tr class="separator:aa20caa08dc56d77d4735d281b5894f9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab809d073880cebd47e7223a73bf6ca5e"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/robot.xml&quot;</td></tr>
+<tr class="memitem:ab809d073880cebd47e7223a73bf6ca5e"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/tmp/robot.xml&quot;</td></tr>
 <tr class="separator:ab809d073880cebd47e7223a73bf6ca5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa3242d18959d3232e36d5ed5006cd2d2">tmp_model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/&quot;</td></tr>
+<tr class="memitem:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa3242d18959d3232e36d5ed5006cd2d2">tmp_model_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/tmp/&quot;</td></tr>
 <tr class="separator:aa3242d18959d3232e36d5ed5006cd2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb5dac2d5dd70de1f16f5189f18a8624"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#adb5dac2d5dd70de1f16f5189f18a8624">cache_model_path</a> = <a class="el" href="mj__model_8h.html#ab809d073880cebd47e7223a73bf6ca5e">model_path</a></td></tr>
 <tr class="separator:adb5dac2d5dd70de1f16f5189f18a8624"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae517df665d331ea2030329312ed2c84b"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ae517df665d331ea2030329312ed2c84b">world_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/world/empty.xml&quot;</td></tr>
+<tr class="memitem:ae517df665d331ea2030329312ed2c84b"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#ae517df665d331ea2030329312ed2c84b">world_path</a> = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/world/empty.xml&quot;</td></tr>
 <tr class="separator:ae517df665d331ea2030329312ed2c84b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa991bc10fa98d556b3da1d65863b5858"><td class="memItemLeft" align="right" valign="top">boost::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="mj__model_8cpp.html#aa991bc10fa98d556b3da1d65863b5858">tmp_world_path</a> = <a class="el" href="mj__model_8h.html#aa3242d18959d3232e36d5ed5006cd2d2">tmp_model_path</a></td></tr>
 <tr class="separator:aa991bc10fa98d556b3da1d65863b5858"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -181,7 +181,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::filesystem::path model_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/robot.xml&quot;</td>
+          <td class="memname">boost::filesystem::path model_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/tmp/robot.xml&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,7 +223,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::filesystem::path save_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/save/&quot;</td>
+          <td class="memname">boost::filesystem::path save_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/save/&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -251,7 +251,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::filesystem::path tmp_model_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/tmp/&quot;</td>
+          <td class="memname">boost::filesystem::path tmp_model_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/tmp/&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -279,7 +279,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">boost::filesystem::path world_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/<a class="el" href="mujoco__compile_8cpp.html#a2ec70ff62d5e8410a8071003425a6fe3">model</a>/world/empty.xml&quot;</td>
+          <td class="memname">boost::filesystem::path world_path = ros::package::getPath(&quot;mujoco_sim&quot;) + &quot;/model/world/empty.xml&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">

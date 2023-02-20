@@ -9,6 +9,7 @@ project(mujoco_sim)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
   mujoco_msgs
   roslib
@@ -34,13 +35,23 @@ endif (DOXYGEN_FOUND)
 
 set(MUJOCO mujoco)
 
+set(USD usd)
+
 add_custom_command(OUTPUT ${MUJOCO}_build
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMAND $(MAKE) -f MuJoCo.mk && $(MAKE) -f USD.mk
+  COMMAND $(MAKE) -f MuJoCo.mk
+  VERBATIM
+)
+
+add_custom_command(OUTPUT ${USD}_build
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMAND $(MAKE) -f USD.mk
   VERBATIM
 )
 
 add_custom_target(${MUJOCO} DEPENDS ${MUJOCO}_build)
+
+add_custom_target(${USD} DEPENDS ${USD}_build)
 
 ###################################
 ## catkin specific configuration ##
@@ -72,14 +83,13 @@ include_directories(
   ${MUJOCO_SOURCE_DIR}/include
 )
 
-add_library(mj_util_lib
-  ${PROJECT_SOURCE_DIR}/src/mj_util.cpp
-)
-add_dependencies(mj_util_lib ${MUJOCO})
-
 set(MUJOCO_COMPILE_NODE mujoco_compile_node)
 add_executable(${MUJOCO_COMPILE_NODE} src/mujoco_compile.cpp)
 add_dependencies(${MUJOCO_COMPILE_NODE} ${MUJOCO})
+add_library(mj_util_lib
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_util.cpp
+)
+add_dependencies(mj_util_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_COMPILE_NODE}
   ${catkin_LIBRARIES}
   mj_util_lib
@@ -91,10 +101,10 @@ set(MUJOCO_SIM_HEADLESS_NODE mujoco_sim_headless_node)
 add_executable(${MUJOCO_SIM_HEADLESS_NODE} src/mujoco_sim_headless.cpp)
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE} ${MUJOCO})
 add_library(${MUJOCO_SIM_HEADLESS_NODE}_lib
-  ${PROJECT_SOURCE_DIR}/src/mj_hw_interface.cpp 
-  ${PROJECT_SOURCE_DIR}/src/mj_ros.cpp
-  ${PROJECT_SOURCE_DIR}/src/mj_model.cpp
-  ${PROJECT_SOURCE_DIR}/src/mj_sim.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_hw_interface.cpp 
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_ros.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_model.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_sim.cpp
 )
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
@@ -110,7 +120,7 @@ set(MUJOCO_SIM_NODE mujoco_sim_node)
 add_executable(${MUJOCO_SIM_NODE} src/mujoco_sim.cpp)
 add_dependencies(${MUJOCO_SIM_NODE} ${MUJOCO})
 add_library(${MUJOCO_SIM_NODE}_lib
-  ${PROJECT_SOURCE_DIR}/src/mj_visual.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_visual.cpp
 )
 add_dependencies(${MUJOCO_SIM_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_NODE}

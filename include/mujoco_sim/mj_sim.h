@@ -87,7 +87,9 @@ public:
 
     static mjtNum sim_start;
 
-    static mjtNum *u;
+    static mjtNum *ddq;
+
+    static mjtNum *dq;
 
     static mjtNum *tau;
 
