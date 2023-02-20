@@ -12,7 +12,7 @@ include $(shell rospack find mk)/download_unpack_build.mk
 
 usd: $(SOURCE_DIR)/unpacked
 	echo "$(SHA256SUM) build/$(USD)" | sha256sum --check
-	python $(SOURCE_DIR)/build_scripts/build_usd.py src/USD
+	python $(SOURCE_DIR)/build_scripts/build_usd.py $(SOURCE_DIR)
 
 clean:
 	-rm -rf $(SOURCE_DIR)

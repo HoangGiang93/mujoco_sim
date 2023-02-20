@@ -11,7 +11,8 @@ UNPACK_CMD = tar xzf
 include $(shell rospack find mk)/download_unpack_build.mk
 
 mujoco: $(SOURCE_DIR)/unpacked
-	echo "$(SHA256SUM)  build/$(MUJOCO)" | sha256sum --check
+	echo "$(SHA256SUM) build/$(MUJOCO)" | sha256sum --check
+	pip install -r requirements.txt --target=$(SOURCE_DIR) --upgrade
 
 clean:
 	-rm -rf $(SOURCE_DIR)

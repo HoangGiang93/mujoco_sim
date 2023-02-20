@@ -35,23 +35,12 @@ endif (DOXYGEN_FOUND)
 
 set(MUJOCO mujoco)
 
-set(USD usd)
-
 add_custom_command(OUTPUT ${MUJOCO}_build
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   COMMAND $(MAKE) -f MuJoCo.mk
   VERBATIM
 )
-
-add_custom_command(OUTPUT ${USD}_build
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMAND $(MAKE) -f USD.mk
-  VERBATIM
-)
-
 add_custom_target(${MUJOCO} DEPENDS ${MUJOCO}_build)
-
-add_custom_target(${USD} DEPENDS ${USD}_build)
 
 ###################################
 ## catkin specific configuration ##
@@ -65,7 +54,7 @@ add_custom_target(${USD} DEPENDS ${USD}_build)
 catkin_package(
   INCLUDE_DIRS include/mujoco_sim
   # LIBRARIES
-  CATKIN_DEPENDS roscpp std_msgs roslib
+  CATKIN_DEPENDS roscpp rospy std_msgs roslib
   # DEPENDS 
 )
 
@@ -135,3 +124,7 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   GL
 )
 
+catkin_python_setup()
+
+catkin_install_python(PROGRAMS script/mujoco_to_usd.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

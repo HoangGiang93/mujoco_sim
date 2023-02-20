@@ -531,10 +531,10 @@ void MjRos::init()
         }
     }
 
-    screenshot_server = n.advertiseService("screenshot", &MjRos::screenshot_service, this);
+    screenshot_server = n.advertiseService("/mujoco/screenshot", &MjRos::screenshot_service, this);
     ROS_INFO("Started [%s] service.", screenshot_server.getService().c_str());
 
-    reset_robot_server = n.advertiseService("reset", &MjRos::reset_robot_service, this);
+    reset_robot_server = n.advertiseService("/mujoco/reset", &MjRos::reset_robot_service, this);
     ROS_INFO("Started [%s] service.", reset_robot_server.getService().c_str());
 
     spawn_objects_server = n.advertiseService("/mujoco/spawn_objects", &MjRos::spawn_objects_service, this);
