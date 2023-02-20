@@ -1,1 +1,3 @@
-include MuJoCo.mk
+all:
+	make -f build/MuJoCo.mk
+	make -f build/USD.mk

@@ -35,8 +35,8 @@ endif (DOXYGEN_FOUND)
 set(MUJOCO mujoco)
 
 add_custom_command(OUTPUT ${MUJOCO}_build
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMAND $(MAKE) mujoco
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+  COMMAND $(MAKE) -f MuJoCo.mk && $(MAKE) -f USD.mk
   VERBATIM
 )
 
