@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['object_5fstate_5farray_53',['object_state_array',['../mj__ros_8cpp.html#afe16da8f1896a9bd08df8491855e1348',1,'mj_ros.cpp']]],
-  ['objects_5fto_5fspawn_54',['objects_to_spawn',['../mj__ros_8cpp.html#a9b4a55cd0a3501440cc64a382c41f297',1,'mj_ros.cpp']]],
-  ['odom_5fvels_55',['odom_vels',['../classMjSim.html#a0dfaec832b709cfea62ec80e5fd94bad',1,'MjSim']]]
+  ['name_5fmap_68',['name_map',['../mj__ros_8cpp.html#adb9fb39108aa6ea80d9bf0fd9a0edcb9',1,'mj_ros.cpp']]],
+  ['none_69',['None',['../mj__ros_8h.html#aabe7f7aab7f558d194e94364f92de670ac9d3e887722f2bc482bcca9d41c512af',1,'mj_ros.h']]]
 ];

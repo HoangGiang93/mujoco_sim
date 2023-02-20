@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['joint_5fignores_23',['joint_ignores',['../classMjSim.html#a2dc314bfc332a1e99e052f41193b3eff',1,'MjSim']]],
-  ['joint_5fnames_24',['joint_names',['../classMjSim.html#aa4379dd751034d7ba76d7155923f3eb2',1,'MjSim']]],
-  ['joint_5fstates_25',['joint_states',['../mj__ros_8cpp.html#a7bf9bbe0ee9787844b3776b2d029666a',1,'mj_ros.cpp']]]
+  ['init_29',['init',['../classMjRos.html#ae985971c2e79cee58cf59c13d9b58c9b',1,'MjRos::init()'],['../classMjSim.html#a0d37111518dcde137b77be9a451e856d',1,'MjSim::init()'],['../classMjVisual.html#ab3172efb82db3cf1bc384e1d100b8cd3',1,'MjVisual::init()']]],
+  ['init_5fsensors_30',['init_sensors',['../classMjSim.html#a4ba7cffb42cf4ca87dc06d0deb1c54be',1,'MjSim']]],
+  ['is_5fwindow_5fclosed_31',['is_window_closed',['../classMjVisual.html#a25fc0b8a62c11ef384bd30fcab1f5b19',1,'MjVisual']]]
 ];

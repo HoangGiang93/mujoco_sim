@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['reload_5fmesh_190',['reload_mesh',['../classMjSim.html#ab8d19db292d90e508ce690a01765e0a0',1,'MjSim']]],
-  ['robot_5flink_5fnames_191',['robot_link_names',['../classMjSim.html#a660adc1cdabecfefadb448bd65e60443',1,'MjSim']]],
-  ['robot_5fnames_192',['robot_names',['../classMjSim.html#a1e0770213dc92185a0bbaa4e15e5e78f',1,'MjSim']]],
-  ['root_5fnames_193',['root_names',['../mj__ros_8cpp.html#a2cce2ad734113383f35dbd8b0aaa5c83',1,'mj_ros.cpp']]],
-  ['ros_5fstart_194',['ros_start',['../classMjRos.html#ac4fdfcf53d7e46c55046a43ba554e31b',1,'MjRos']]],
-  ['rtf_195',['rtf',['../mj__model_8cpp.html#a2197996e6b57e659623d3d56f5f9fd63',1,'rtf():&#160;mj_model.cpp'],['../mj__model_8h.html#a2197996e6b57e659623d3d56f5f9fd63',1,'rtf():&#160;mj_model.cpp']]]
+  ['object_5fstate_5farray_217',['object_state_array',['../mj__ros_8cpp.html#afe16da8f1896a9bd08df8491855e1348',1,'mj_ros.cpp']]],
+  ['objects_5fto_5fspawn_218',['objects_to_spawn',['../mj__ros_8cpp.html#a9b4a55cd0a3501440cc64a382c41f297',1,'mj_ros.cpp']]],
+  ['odom_5fvels_219',['odom_vels',['../classMjSim.html#a0dfaec832b709cfea62ec80e5fd94bad',1,'MjSim']]]
 ];

@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['name_5fmap_176',['name_map',['../mj__ros_8cpp.html#adb9fb39108aa6ea80d9bf0fd9a0edcb9',1,'mj_ros.cpp']]]
+  ['joint_5fignores_204',['joint_ignores',['../classMjSim.html#a2dc314bfc332a1e99e052f41193b3eff',1,'MjSim']]],
+  ['joint_5fnames_205',['joint_names',['../classMjSim.html#aa4379dd751034d7ba76d7155923f3eb2',1,'MjSim']]],
+  ['joint_5fstates_206',['joint_states',['../mj__ros_8cpp.html#a7bf9bbe0ee9787844b3776b2d029666a',1,'mj_ros.cpp']]]
 ];

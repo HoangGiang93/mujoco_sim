@@ -1,4 +1,7 @@
 <map id="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_hw_interface.h" name="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/include/mujoco_sim/mj_hw_interface.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,192,76"/>
-<area shape="rect" id="node2" href="$mj__hw__interface_8cpp.html" title=" " alt="" coords="9,124,189,195"/>
+<area shape="rect" id="node1" title=" " alt="" coords="228,5,415,76"/>
+<area shape="rect" id="node2" href="$mj__main_8cpp.html" title=" " alt="" coords="131,131,309,187"/>
+<area shape="rect" id="node5" href="$mj__hw__interface_8cpp.html" title=" " alt="" coords="334,124,514,195"/>
+<area shape="rect" id="node3" href="$mujoco__sim_8cpp.html" title=" " alt="" coords="5,243,192,299"/>
+<area shape="rect" id="node4" href="$mujoco__sim__headless_8cpp.html" title=" " alt="" coords="216,243,467,299"/>
 </map>

@@ -1,12 +1,13 @@
 var searchData=
 [
-  ['save_5fpath_196',['save_path',['../mj__model_8cpp.html#aa20caa08dc56d77d4735d281b5894f9d',1,'save_path():&#160;mj_model.cpp'],['../mj__model_8h.html#aa20caa08dc56d77d4735d281b5894f9d',1,'save_path():&#160;mj_model.cpp']]],
-  ['sensors_197',['sensors',['../classMjSim.html#a7ef131562c0ed903eeeb09a9eb5ea672',1,'MjSim']]],
-  ['sim_5fstart_198',['sim_start',['../classMjSim.html#aa8758b9a0d6fa36a0cfee5faa4f061bd',1,'MjSim']]],
-  ['spawn_5fand_5fdestroy_5fobjects_5frate_199',['spawn_and_destroy_objects_rate',['../mj__ros_8cpp.html#ad23f3ddbb9579d65216b8b19e4165ec4',1,'mj_ros.cpp']]],
-  ['spawn_5fmtx_200',['spawn_mtx',['../mj__ros_8cpp.html#aaad11def1728748faf11899862490bb5',1,'mj_ros.cpp']]],
-  ['spawn_5fnr_201',['spawn_nr',['../mj__ros_8cpp.html#a05eb63fbf828446b090d9011f7d6aba8',1,'mj_ros.cpp']]],
-  ['spawn_5fobject_5fcount_5fper_5fcycle_202',['spawn_object_count_per_cycle',['../mj__ros_8cpp.html#a3af75d2408bec9cea07519b9892a8171',1,'mj_ros.cpp']]],
-  ['spawn_5fsuccess_203',['spawn_success',['../mj__ros_8cpp.html#a36e198c05e53a5324f02ded3a89d8ecb',1,'mj_ros.cpp']]],
-  ['spawned_5fobject_5fbody_5fnames_204',['spawned_object_body_names',['../classMjSim.html#acc1f51d36990a7398001f7b1e8378c89',1,'MjSim']]]
+  ['pose_5finits_220',['pose_inits',['../classMjSim.html#a3cac09569d2a8805ee71453d8c2c4336',1,'MjSim']]],
+  ['pub_5fbase_5fpose_5frate_221',['pub_base_pose_rate',['../mj__ros_8cpp.html#a02924b670840fa00132c8d92e44b58b0',1,'mj_ros.cpp']]],
+  ['pub_5fjoint_5fstates_5frate_222',['pub_joint_states_rate',['../mj__ros_8cpp.html#a8d37d3174a75282deea2427aa69442ca',1,'mj_ros.cpp']]],
+  ['pub_5fmarker_5farray_5frate_223',['pub_marker_array_rate',['../mj__ros_8cpp.html#a995a367cf0e471676160d33a0a58d314',1,'mj_ros.cpp']]],
+  ['pub_5fobject_5fmarker_5farray_5fof_5ffree_5fbodies_5fonly_224',['pub_object_marker_array_of_free_bodies_only',['../mj__ros_8cpp.html#ad6314a2439ba1900a5e82f2dab81d7a1',1,'mj_ros.cpp']]],
+  ['pub_5fobject_5fstate_5farray_5fof_5ffree_5fbodies_5fonly_225',['pub_object_state_array_of_free_bodies_only',['../mj__ros_8cpp.html#a8dc4774c1bed068f9f2183f3632e5c4a',1,'mj_ros.cpp']]],
+  ['pub_5fobject_5fstate_5farray_5frate_226',['pub_object_state_array_rate',['../mj__ros_8cpp.html#a946367ca48e5e5e1f801071602680065',1,'mj_ros.cpp']]],
+  ['pub_5fsensor_5fdata_5frate_227',['pub_sensor_data_rate',['../mj__ros_8cpp.html#af15bdfc536835c1f646053f582ae780f',1,'mj_ros.cpp']]],
+  ['pub_5ftf_5fof_5ffree_5fbodies_5fonly_228',['pub_tf_of_free_bodies_only',['../mj__ros_8cpp.html#a8c7ec55ba0a6136e5c49b280682fdb71',1,'mj_ros.cpp']]],
+  ['pub_5ftf_5frate_229',['pub_tf_rate',['../mj__ros_8cpp.html#aa4172ad18bf26ab57c25418f1d62d234',1,'mj_ros.cpp']]]
 ];
