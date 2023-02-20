@@ -1,1 +1,3 @@
-include MuJoCo.mk
+all:
+	make -f MuJoCo.mk
+	make -f USD.mk
