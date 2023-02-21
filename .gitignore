@@ -1,5 +1,6 @@
 build
 model/tmp
+model/save/*
 
 # Prerequisites
 *.d

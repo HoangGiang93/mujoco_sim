@@ -644,6 +644,11 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         ROS_WARN("Parameter save_path not found or invalid, set to [%s]", save_path.c_str());
         save_path_string = save_path.string();
     }
+    if (boost::filesystem::path(save_path_string).is_relative())
+    {
+        save_path_string = ros::package::getPath("mujoco_sim") + "/" + save_path_string;
+    }
+    
     if (boost::filesystem::exists(save_path_string))
     {
         save_path = save_path_string;
@@ -653,6 +658,7 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
     }
 
+    save_path /= model_path.stem().string() + ".xml";
     if (boost::filesystem::exists(save_path))
     {
         const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
@@ -667,6 +673,7 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
         save_path = save_path.parent_path() / filename;
     }
+    
     boost::filesystem::path save_model_path = save_path.parent_path() / (save_path.stem().string() + ".txt");
     boost::filesystem::path save_data_path = save_path.parent_path() / (save_path.stem().string() + "_data.txt");
 

@@ -14,7 +14,7 @@
 #   - joint1
 #   - joint2
 
-save_path: "" # Absolute path to save screenshot
+save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
 
 add_odom_joints: false # true for mobile robots, false for fixed-based robots
 # add_odom_joints can be specified by different ways:
