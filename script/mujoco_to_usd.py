@@ -5,46 +5,57 @@ from std_srvs.srv import Trigger, TriggerResponse
 from pxr import Usd, UsdGeom, Sdf, Gf, Vt
 import mujoco
 import numpy
-
+import xml.etree.ElementTree as ET
 
 def mjcf_to_usd_handle(xml_path: str):
-    usd_path = xml_path
-    if usd_path.endswith('.xml'):
-        usd_path = usd_path.replace('xml', 'usda')
-    model = mujoco.MjModel.from_xml_path(xml_path)
-    dataid = model.geom('bowl_bottom').dataid[0]
+    usd_dir = xml_path[0:xml_path.rfind('/')]
+    usd_path = xml_path.replace('xml', 'usda')
+    
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    for asset in root.iter('asset'):
+        for mesh in asset.iter('mesh'):
+            print(mesh)
 
-    stage = Usd.Stage.CreateNew(usd_path)
-    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
+    # model = mujoco.MjModel.from_xml_path(xml_path)
 
-    mujocoPrim = UsdGeom.Xform.Define(stage, '/mujoco')
+    # for mesh_id in range(model.nmesh):
+    #     mesh = model.mesh[mesh_id]
+    #     stage = Usd.Stage.CreateNew(mesh.name + '.usd')  
+    #     mesh = UsdGeom.Mesh.Define
+    #     model.mesh[mesh_id]
 
-    meshPrim = UsdGeom.Mesh.Define(stage, '/mujoco/mesh')
+    # stage = Usd.Stage.CreateNew(usd_path)
+    # UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
 
-    print(model.mesh(dataid))
-    points = numpy.empty(shape=[model.mesh(dataid).vertnum[0], 3], dtype=float)
+    # mujocoPrim = UsdGeom.Xform.Define(stage, '/mujoco')
 
-    face_vertex_counts = numpy.empty(
-        shape=model.mesh(dataid).facenum[0], dtype=float)
-    face_vertex_counts.fill(3)
-    face_vertex_indices = numpy.empty(
-        shape=model.mesh(dataid).facenum[0] * 3, dtype=float)
+    # meshPrim = UsdGeom.Mesh.Define(stage, '/mujoco/mesh')
 
-    for i in range(model.mesh(dataid).vertnum[0]):
-        vertid = model.mesh(dataid).vertadr[0] + i
-        points[i] = model.mesh_vert[vertid]
+    # print(model.mesh(dataid))
+    # points = numpy.empty(shape=[model.mesh(dataid).vertnum[0], 3], dtype=float)
 
-    for i in range(model.mesh(dataid).facenum[0]):
-        faceid = model.mesh(dataid).faceadr[0] + i
-        face_vertex_indices[3*i] = model.mesh_face[faceid][0]
-        face_vertex_indices[3*i + 1] = model.mesh_face[faceid][1]
-        face_vertex_indices[3*i + 2] = model.mesh_face[faceid][2]
+    # face_vertex_counts = numpy.empty(
+    #     shape=model.mesh(dataid).facenum[0], dtype=float)
+    # face_vertex_counts.fill(3)
+    # face_vertex_indices = numpy.empty(
+    #     shape=model.mesh(dataid).facenum[0] * 3, dtype=float)
 
-    meshPrim.CreatePointsAttr(points)
-    meshPrim.CreateFaceVertexCountsAttr(face_vertex_counts)
-    meshPrim.CreateFaceVertexIndicesAttr(face_vertex_indices)
+    # for i in range(model.mesh(dataid).vertnum[0]):
+    #     vertid = model.mesh(dataid).vertadr[0] + i
+    #     points[i] = model.mesh_vert[vertid]
 
-    stage.GetRootLayer().Save()
+    # for i in range(model.mesh(dataid).facenum[0]):
+    #     faceid = model.mesh(dataid).faceadr[0] + i
+    #     face_vertex_indices[3*i] = model.mesh_face[faceid][0]
+    #     face_vertex_indices[3*i + 1] = model.mesh_face[faceid][1]
+    #     face_vertex_indices[3*i + 2] = model.mesh_face[faceid][2]
+
+    # meshPrim.CreatePointsAttr(points)
+    # meshPrim.CreateFaceVertexCountsAttr(face_vertex_counts)
+    # meshPrim.CreateFaceVertexIndicesAttr(face_vertex_indices)
+
+    # stage.GetRootLayer().Save()
 
     return
 

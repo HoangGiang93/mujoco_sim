@@ -257,22 +257,18 @@ void MjRos::set_params()
             if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
             {
                 ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
-                robots.push_back("robot");
             }
             for (tinyxml2::XMLElement *worldbody_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
                  worldbody_element != nullptr;
                  worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
             {
-                if (strcmp(worldbody_element->FirstChildElement()->Value(), "body") == 0)
+                for (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement();
+                     body_element != nullptr;
+                     body_element = body_element->NextSiblingElement())
                 {
-                    for (tinyxml2::XMLElement *body_element = worldbody_element->FirstChildElement();
-                         body_element = body_element->NextSiblingElement();
-                         body_element != nullptr)
+                    if (body_element->Attribute("name") != nullptr)
                     {
-                        if (body_element->Attribute("name") != nullptr)
-                        {
-                            robots.push_back(body_element->Attribute("name"));
-                        }
+                        robots.push_back(body_element->Attribute("name"));
                     }
                 }
             }
@@ -648,7 +644,7 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
     {
         save_path_string = ros::package::getPath("mujoco_sim") + "/" + save_path_string;
     }
-    
+
     if (boost::filesystem::exists(save_path_string))
     {
         save_path = save_path_string;
@@ -673,7 +669,7 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
         save_path = save_path.parent_path() / filename;
     }
-    
+
     boost::filesystem::path save_model_path = save_path.parent_path() / (save_path.stem().string() + ".txt");
     boost::filesystem::path save_data_path = save_path.parent_path() / (save_path.stem().string() + "_data.txt");
 
@@ -681,16 +677,17 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
 
     if (save_XML(m, save_path.c_str()))
     {
-        if (!boost::filesystem::exists(save_path.parent_path() / model_path.stem() / "meshes"))
+        if (!boost::filesystem::exists(save_path.parent_path() / model_path.stem() / "stl"))
         {
-            boost::filesystem::create_directories(save_path.parent_path() / model_path.stem() / "meshes");
+            boost::filesystem::create_directories(save_path.parent_path() / model_path.stem() / "stl");
         }
-        
-        std::function<void(tinyxml2::XMLElement *)> copy_meshes_cb = [&](tinyxml2::XMLElement *mesh_element){
+
+        std::function<void(tinyxml2::XMLElement *)> copy_meshes_cb = [&](tinyxml2::XMLElement *mesh_element)
+        {
             if (mesh_element->Attribute("name") != nullptr && mesh_element->Attribute("file") != nullptr && boost::filesystem::exists(mesh_element->Attribute("file")))
             {
                 boost::filesystem::path file = mesh_element->Attribute("file");
-                boost::filesystem::path new_path = save_path.parent_path() / model_path.stem() / "meshes" / file.filename();
+                boost::filesystem::path new_path = save_path.parent_path() / model_path.stem() / "stl" / file.filename();
                 if (!boost::filesystem::exists(new_path))
                 {
                     boost::filesystem::copy_file(file, new_path);

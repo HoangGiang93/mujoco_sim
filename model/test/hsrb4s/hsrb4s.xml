@@ -1,5 +1,5 @@
 <mujoco model="hsrb">
-    <compiler angle="radian" meshdir="hsrb4s/meshes/" />
+    <compiler angle="radian" meshdir="hsrb4s/stl/" />
     <default />
     <asset>
         <mesh name="base" file="base.stl" />

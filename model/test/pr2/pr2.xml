@@ -2,24 +2,24 @@
     <compiler angle="radian" autolimits="true" />
     <default />
     <asset>
-        <mesh name="base_L" file="pr2/meshes/base_L.stl" />
-        <mesh name="caster_L" file="pr2/meshes/caster_L.stl" />
-        <mesh name="torso_lift_L" file="pr2/meshes/torso_lift_L.stl" />
-        <mesh name="head_pan_L" file="pr2/meshes/head_pan_L.stl" />
-        <mesh name="head_tilt_L" file="pr2/meshes/head_tilt_L.stl" />
-        <mesh name="tilting_hokuyo_L" file="pr2/meshes/tilting_hokuyo_L.stl" />
-        <mesh name="shoulder_pan" file="pr2/meshes/shoulder_pan.stl" />
-        <mesh name="shoulder_lift" file="pr2/meshes/shoulder_lift.stl" />
-        <mesh name="upper_arm_roll_L" file="pr2/meshes/upper_arm_roll_L.stl" />
-        <mesh name="upper_arm" file="pr2/meshes/upper_arm.stl" />
-        <mesh name="forearm_roll_L" file="pr2/meshes/forearm_roll_L.stl" />
-        <mesh name="elbow_flex" file="pr2/meshes/elbow_flex.stl" />
-        <mesh name="forearm" file="pr2/meshes/forearm.stl" />
-        <mesh name="wrist_flex" file="pr2/meshes/wrist_flex.stl" />
-        <mesh name="wrist_roll_L" file="pr2/meshes/wrist_roll_L.stl" />
-        <mesh name="gripper_palm" file="pr2/meshes/gripper_palm.stl" />
-        <mesh name="l_finger" file="pr2/meshes/l_finger.stl" />
-        <mesh name="l_finger_tip" file="pr2/meshes/l_finger_tip.stl" />
+        <mesh name="base_L" file="pr2/stl/base_L.stl" />
+        <mesh name="caster_L" file="pr2/stl/caster_L.stl" />
+        <mesh name="torso_lift_L" file="pr2/stl/torso_lift_L.stl" />
+        <mesh name="head_pan_L" file="pr2/stl/head_pan_L.stl" />
+        <mesh name="head_tilt_L" file="pr2/stl/head_tilt_L.stl" />
+        <mesh name="tilting_hokuyo_L" file="pr2/stl/tilting_hokuyo_L.stl" />
+        <mesh name="shoulder_pan" file="pr2/stl/shoulder_pan.stl" />
+        <mesh name="shoulder_lift" file="pr2/stl/shoulder_lift.stl" />
+        <mesh name="upper_arm_roll_L" file="pr2/stl/upper_arm_roll_L.stl" />
+        <mesh name="upper_arm" file="pr2/stl/upper_arm.stl" />
+        <mesh name="forearm_roll_L" file="pr2/stl/forearm_roll_L.stl" />
+        <mesh name="elbow_flex" file="pr2/stl/elbow_flex.stl" />
+        <mesh name="forearm" file="pr2/stl/forearm.stl" />
+        <mesh name="wrist_flex" file="pr2/stl/wrist_flex.stl" />
+        <mesh name="wrist_roll_L" file="pr2/stl/wrist_roll_L.stl" />
+        <mesh name="gripper_palm" file="pr2/stl/gripper_palm.stl" />
+        <mesh name="l_finger" file="pr2/stl/l_finger.stl" />
+        <mesh name="l_finger_tip" file="pr2/stl/l_finger_tip.stl" />
     </asset>
     <worldbody>
         <body name="pr2">

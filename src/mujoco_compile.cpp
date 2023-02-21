@@ -367,7 +367,7 @@ void load_urdf(const char *input, const char *output)
         ROS_ERROR("Couldn't read file in [%s]\n", input);
     }
 
-    meshes_path_string = output_file_path.stem().string() + "/meshes";
+    meshes_path_string = output_file_path.stem().string() + "/stl";
 
     boost::filesystem::create_directories(output_file_path.parent_path() / meshes_path_string);
     boost::filesystem::path meshes_path = output_file_path.parent_path() / meshes_path_string;

@@ -183,7 +183,7 @@ static void init_tmp()
 	}
 
 	// Create directory tmp_world_mesh_path if not exist
-	std::string world_path_tail = world_path.stem().string() + "/meshes/";
+	std::string world_path_tail = world_path.stem().string() + "/stl/";
 	boost::filesystem::path tmp_world_mesh_path = tmp_world_path / world_path_tail;
 	if (!boost::filesystem::exists(tmp_world_mesh_path))
 	{

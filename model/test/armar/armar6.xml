@@ -2,22 +2,22 @@
     <compiler angle="radian" autolimits="true"/>
     <default/>
     <asset>
-        <mesh name="platform" file="armar6/meshes/platform.stl"/>
-        <mesh name="torso" file="armar6/meshes/torso.stl"/>
-        <mesh name="lower_neck" file="armar6/meshes/lower_neck.stl"/>
-        <mesh name="middle_neck" file="armar6/meshes/middle_neck.stl"/>
-        <mesh name="upper_neck" file="armar6/meshes/upper_neck.stl"/>
-        <mesh name="arml_cla" file="armar6/meshes/arml_cla.stl"/>
-        <mesh name="arml_t12" file="armar6/meshes/arml_t12.stl"/>
-        <mesh name="arml_t23" file="armar6/meshes/arml_t23.stl"/>
-        <mesh name="arml_t34" file="armar6/meshes/arml_t34.stl"/>
-        <mesh name="arml_t45" file="armar6/meshes/arml_t45.stl"/>
-        <mesh name="arml_t56" file="armar6/meshes/arml_t56.stl"/>
-        <mesh name="arml_t67" file="armar6/meshes/arml_t67.stl"/>
-        <mesh name="arml_t78" file="armar6/meshes/arml_t78.stl"/>
-        <mesh name="arml_t8" file="armar6/meshes/arml_t8.stl"/>
-        <mesh name="left_hand_fixed" file="armar6/meshes/left_hand_fixed.stl"/>
-        <mesh name="right_hand_fixed" file="armar6/meshes/right_hand_fixed.stl"/>
+        <mesh name="platform" file="armar6/stl/platform.stl"/>
+        <mesh name="torso" file="armar6/stl/torso.stl"/>
+        <mesh name="lower_neck" file="armar6/stl/lower_neck.stl"/>
+        <mesh name="middle_neck" file="armar6/stl/middle_neck.stl"/>
+        <mesh name="upper_neck" file="armar6/stl/upper_neck.stl"/>
+        <mesh name="arml_cla" file="armar6/stl/arml_cla.stl"/>
+        <mesh name="arml_t12" file="armar6/stl/arml_t12.stl"/>
+        <mesh name="arml_t23" file="armar6/stl/arml_t23.stl"/>
+        <mesh name="arml_t34" file="armar6/stl/arml_t34.stl"/>
+        <mesh name="arml_t45" file="armar6/stl/arml_t45.stl"/>
+        <mesh name="arml_t56" file="armar6/stl/arml_t56.stl"/>
+        <mesh name="arml_t67" file="armar6/stl/arml_t67.stl"/>
+        <mesh name="arml_t78" file="armar6/stl/arml_t78.stl"/>
+        <mesh name="arml_t8" file="armar6/stl/arml_t8.stl"/>
+        <mesh name="left_hand_fixed" file="armar6/stl/left_hand_fixed.stl"/>
+        <mesh name="right_hand_fixed" file="armar6/stl/right_hand_fixed.stl"/>
     </asset>
     <worldbody>
         <body name="armar6" >

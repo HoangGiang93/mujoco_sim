@@ -1,5 +1,5 @@
 <mujoco model="ridgeback">
-    <compiler angle="radian" meshdir="ridgeback_panda/meshes/"/>
+    <compiler angle="radian" meshdir="ridgeback_panda/stl/"/>
     <default/>
     <asset>
         <mesh name="body-collision" file="body-collision.stl"/>

@@ -1,5 +1,5 @@
 <mujoco model="box">
-    <compiler angle="radian" meshdir="box/meshes/" autolimits="true" />
+    <compiler angle="radian" meshdir="box/stl/" autolimits="true" />
     <default />
     <asset>
         <mesh name="BoxTopLayerBottom" file="BoxTopLayerBottom.stl" />

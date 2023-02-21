@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="box">
     <mujoco>
-        <compiler meshdir="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_world/mujoco_world/model/box/box/box/meshes" strippath="false" balanceinertia="true" discardvisual="true"/>
+        <compiler meshdir="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_world/mujoco_world/model/box/box/box/stl" strippath="false" balanceinertia="true" discardvisual="true"/>
     </mujoco>
     <link name="box_body">
         <visual>

@@ -1,5 +1,5 @@
 <mujoco model="tiago">
-    <compiler angle="radian" meshdir="tiago/meshes/" />
+    <compiler angle="radian" meshdir="tiago/stl/" />
     <asset>
         <mesh name="base_collision" file="base_collision.stl" />
         <mesh name="torso_lift_collision_core" file="torso_lift_collision_core.stl" />
