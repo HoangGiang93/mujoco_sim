@@ -46,7 +46,7 @@ def mjcf_to_usd_handle(xml_path: str):
 
         UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
         UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
-        usd_mesh = UsdGeom.Mesh.Define(stage, "/" + mj_mesh.name)
+        usd_mesh = UsdGeom.Mesh.Define(stage, "/" + mj_mesh.name.replace('-', '_'))
         stage.SetDefaultPrim(usd_mesh.GetPrim())
 
         points = numpy.empty(
@@ -136,7 +136,7 @@ def mjcf_to_usd_handle(xml_path: str):
             if geom.name == "":
                 geom_path = body_path.AppendPath("geom_" + str(geom_id))
             else:
-                geom_path = body_path.AppendPath(geom.name)
+                geom_path = body_path.AppendPath(geom.name.replace('-', '_'))
 
             mat = Gf.Matrix4d()
             mat.SetTranslateOnly(
@@ -166,60 +166,31 @@ def mjcf_to_usd_handle(xml_path: str):
                     )
                 )
                 mat = mat_scale * mat
-                extend_attr = geom_prim.GetExtentAttr()
-                extend_attr.Set(
-                    extend_attr.Get()
-                    * numpy.array(
-                        [
-                            [
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[1],
-                                model.geom(geom_id).size[2],
-                            ],
-                            [
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[1],
-                                model.geom(geom_id).size[2],
-                            ],
-                        ]
-                    )
-                )
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_SPHERE:
                 geom_prim = UsdGeom.Sphere.Define(stage, geom_path)
-                radius_attr = geom_prim.GetRadiusAttr()
-                radius_attr.Set(radius_attr.Get() *
-                                model.geom(geom_id).size[0])
-                extend_attr = geom_prim.GetExtentAttr()
-                extend_attr.Set(extend_attr.Get() *
-                                model.geom(geom_id).size[0])
+                geom_prim.CreateRadiusAttr(model.geom(geom_id).size[0])
+                geom_prim.CreateExtentAttr(
+                    numpy.array([-1, -1, -1, 1, 1, 1]) * model.geom(geom_id).size[0])
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_CYLINDER:
                 geom_prim = UsdGeom.Cylinder.Define(stage, geom_path)
-                radius_attr = geom_prim.GetRadiusAttr()
-                radius_attr.Set(radius_attr.Get() *
-                                model.geom(geom_id).size[0])
-                height_attr = geom_prim.GetHeightAttr()
-                height_attr.Set(height_attr.Get() *
-                                model.geom(geom_id).size[1])
-                extend_attr = geom_prim.GetExtentAttr()
-                extend_attr.Set(
-                    extend_attr.Get()
-                    * numpy.array(
+                geom_prim.CreateRadiusAttr(model.geom(geom_id).size[0])
+                geom_prim.CreateHeightAttr(model.geom(geom_id).size[1]*2)
+                geom_prim.CreateExtentAttr(numpy.array(
+                    [
                         [
-                            [
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[1],
-                            ],
-                            [
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[1],
-                            ],
-                        ]
-                    )
-                )
+                            -model.geom(geom_id).size[0],
+                            -model.geom(geom_id).size[0],
+                            -model.geom(geom_id).size[1],
+                        ],
+                        [
+                            model.geom(geom_id).size[0],
+                            model.geom(geom_id).size[0],
+                            model.geom(geom_id).size[1],
+                        ],
+                    ]
+                ))
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_MESH:
                 mesh_id = geom.dataid[0]
@@ -230,6 +201,9 @@ def mjcf_to_usd_handle(xml_path: str):
 
             transform = geom_prim.AddTransformOp()
             transform.Set(mat)
+            
+            geom_prim.CreateDisplayColorAttr(geom.rgba[:3])
+            geom_prim.CreateDisplayOpacityAttr(geom.rgba[3])
 
     stage.SetDefaultPrim(root_prim.GetPrim())
 

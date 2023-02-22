@@ -705,7 +705,9 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         save_XML(doc, save_path.c_str());
 
         mj_printModel(m, save_model_path.c_str());
+        mtx.lock();
         mj_printData(m, d, save_data_path.c_str());
+        mtx.unlock();
         res.success = true;
         res.message = save_path.string();
         ROS_INFO("Saved screenshot to [%s] successfully", save_path.c_str());
