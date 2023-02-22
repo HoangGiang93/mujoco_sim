@@ -223,7 +223,6 @@ void MjRos::set_params()
             tmp_model_name = "current_" + model_path.filename().string();
         }
     }
-    save_path /= model_path.filename();
 
     if (ros::param::get("~max_time_step", MjSim::max_time_step))
     {
@@ -637,6 +636,10 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
     std::string save_path_string;
     if (!ros::param::get("~save_path", save_path_string))
     {
+        if (strcmp(save_path.extension().c_str(), ".xml") == 0)
+        {
+            save_path = save_path.parent_path();
+        }
         ROS_WARN("Parameter save_path not found or invalid, set to [%s]", save_path.c_str());
         save_path_string = save_path.string();
     }

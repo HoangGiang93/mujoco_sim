@@ -9,7 +9,7 @@ os.system('make -f USD.mk')
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
     packages=['pxr', 'mujoco'],
-    package_dir={'pxr': 'build/USD-23.02/lib/python/pxr', 'mujoco': 'build/mujoco-2.3.2/mujoco'},
+    package_dir={'pxr': 'build/USD/lib/python/pxr', 'mujoco': 'build/mujoco/mujoco'},
 )
 
 setup(**setup_args)
