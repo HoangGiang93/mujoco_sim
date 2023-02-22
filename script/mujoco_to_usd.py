@@ -31,7 +31,8 @@ def mjcf_to_usd_handle(xml_path: str):
             mesh_file = os.path.basename(mesh.attrib.get("file"))
             mesh_file = mesh_file.replace("stl", "usda")
             mesh_dir = os.path.dirname(mesh_dir) + "/usd"
-            mesh_dict[mesh_name] = os.path.join(mesh_root_dir, mesh_dir, mesh_file)
+            mesh_dict[mesh_name] = os.path.join(
+                mesh_root_dir, mesh_dir, mesh_file)
 
     model = mujoco.MjModel.from_xml_path(xml_path)
 
@@ -48,8 +49,10 @@ def mjcf_to_usd_handle(xml_path: str):
         usd_mesh = UsdGeom.Mesh.Define(stage, "/" + mj_mesh.name)
         stage.SetDefaultPrim(usd_mesh.GetPrim())
 
-        points = numpy.empty(shape=[model.mesh(mesh_id).vertnum[0], 3], dtype=float)
-        normals = numpy.empty(shape=[model.mesh(mesh_id).vertnum[0], 3], dtype=float)
+        points = numpy.empty(
+            shape=[model.mesh(mesh_id).vertnum[0], 3], dtype=float)
+        normals = numpy.empty(
+            shape=[model.mesh(mesh_id).vertnum[0], 3], dtype=float)
 
         face_vertex_counts = numpy.empty(
             shape=model.mesh(mesh_id).facenum[0], dtype=float
@@ -170,13 +173,13 @@ def mjcf_to_usd_handle(xml_path: str):
                         [
                             [
                                 model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[0],
                                 model.geom(geom_id).size[1],
+                                model.geom(geom_id).size[2],
                             ],
                             [
                                 model.geom(geom_id).size[0],
-                                model.geom(geom_id).size[0],
                                 model.geom(geom_id).size[1],
+                                model.geom(geom_id).size[2],
                             ],
                         ]
                     )
@@ -185,16 +188,20 @@ def mjcf_to_usd_handle(xml_path: str):
             elif geom.type == mujoco.mjtGeom.mjGEOM_SPHERE:
                 geom_prim = UsdGeom.Sphere.Define(stage, geom_path)
                 radius_attr = geom_prim.GetRadiusAttr()
-                radius_attr.Set(radius_attr.Get() * model.geom(geom_id).size[0])
+                radius_attr.Set(radius_attr.Get() *
+                                model.geom(geom_id).size[0])
                 extend_attr = geom_prim.GetExtentAttr()
-                extend_attr.Set(extend_attr.Get() * model.geom(geom_id).size[0])
+                extend_attr.Set(extend_attr.Get() *
+                                model.geom(geom_id).size[0])
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_CYLINDER:
                 geom_prim = UsdGeom.Cylinder.Define(stage, geom_path)
                 radius_attr = geom_prim.GetRadiusAttr()
-                radius_attr.Set(radius_attr.Get() * model.geom(geom_id).size[0])
+                radius_attr.Set(radius_attr.Get() *
+                                model.geom(geom_id).size[0])
                 height_attr = geom_prim.GetHeightAttr()
-                height_attr.Set(height_attr.Get() * model.geom(geom_id).size[1])
+                height_attr.Set(height_attr.Get() *
+                                model.geom(geom_id).size[1])
                 extend_attr = geom_prim.GetExtentAttr()
                 extend_attr.Set(
                     extend_attr.Get()
@@ -218,7 +225,8 @@ def mjcf_to_usd_handle(xml_path: str):
                 mesh_id = geom.dataid[0]
                 mesh_name = model.mesh(mesh_id).name
                 geom_prim = UsdGeom.Mesh.Define(stage, geom_path)
-                geom_prim.GetPrim().GetReferences().AddReference(mesh_dict[mesh_name])
+                geom_prim.GetPrim().GetReferences(
+                ).AddReference(mesh_dict[mesh_name])
 
             transform = geom_prim.AddTransformOp()
             transform.Set(mat)

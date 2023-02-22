@@ -37,7 +37,7 @@ set(MUJOCO mujoco)
 
 add_custom_command(OUTPUT ${MUJOCO}_build
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  COMMAND $(MAKE) -f MuJoCo.mk
+  COMMAND $(MAKE) mujoco
   VERBATIM
 )
 add_custom_target(${MUJOCO} DEPENDS ${MUJOCO}_build)
@@ -123,8 +123,6 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   tinyxml2
   GL
 )
-
-catkin_python_setup()
 
 catkin_install_python(PROGRAMS script/mujoco_to_usd.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
