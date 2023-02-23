@@ -235,7 +235,7 @@ void fix_inertial(const boost::filesystem::path &model_path)
                                     inertial_element->SetAttribute("mass", "0.001");
                                 }
 
-                                if (inertial_element->Attribute("inertia") == nullptr || inertial_element->Attribute("diaginertia") == nullptr)
+                                if (inertial_element->Attribute("inertia") == nullptr && inertial_element->Attribute("diaginertia") == nullptr)
                                 {
                                     inertial_element->SetAttribute("diaginertia", "0.001 0.001 0.001");
                                 }

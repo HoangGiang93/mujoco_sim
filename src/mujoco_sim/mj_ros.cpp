@@ -680,17 +680,17 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
 
     if (save_XML(m, save_path.c_str()))
     {
-        if (!boost::filesystem::exists(save_path.parent_path() / model_path.stem() / "stl"))
-        {
-            boost::filesystem::create_directories(save_path.parent_path() / model_path.stem() / "stl");
-        }
-
         std::function<void(tinyxml2::XMLElement *)> copy_meshes_cb = [&](tinyxml2::XMLElement *mesh_element)
         {
             if (mesh_element->Attribute("name") != nullptr && mesh_element->Attribute("file") != nullptr && boost::filesystem::exists(mesh_element->Attribute("file")))
             {
                 boost::filesystem::path file = mesh_element->Attribute("file");
-                boost::filesystem::path new_path = save_path.parent_path() / model_path.stem() / "stl" / file.filename();
+                boost::filesystem::path new_path = save_path.parent_path() / file.parent_path().parent_path().filename() / file.parent_path().filename();
+                if (!boost::filesystem::exists(new_path))
+                {
+                    boost::filesystem::create_directories(new_path);
+                }
+                new_path /= file.filename();
                 if (!boost::filesystem::exists(new_path))
                 {
                     boost::filesystem::copy_file(file, new_path);
@@ -699,9 +699,16 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
             }
         };
 
+        std::function<void(tinyxml2::XMLElement *)> change_meshdir_cb = [&](tinyxml2::XMLElement *compiler_element)
+        {
+            compiler_element->DeleteAttribute("meshdir");
+        };
+
         tinyxml2::XMLDocument doc;
         load_XML(doc, save_path.c_str());
-        do_each_child_element(doc.FirstChild()->FirstChildElement("asset"), "mesh", copy_meshes_cb);
+        do_each_child_element(doc.FirstChildElement()->FirstChildElement("asset"), "mesh", copy_meshes_cb);
+        do_each_child_element(doc.FirstChildElement(), "compiler", change_meshdir_cb);
+
         save_XML(doc, save_path.c_str());
 
         mj_printModel(m, save_model_path.c_str());

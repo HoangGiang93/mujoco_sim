@@ -7,6 +7,21 @@ import mujoco
 import numpy
 import xml.etree.ElementTree as ET
 import os
+import csv
+
+
+def get_data(data, key: list, i: int, length: int) -> None:
+    i += 1
+    while True:
+        try:
+            if length != 9:
+                key.append([float(data[i][j]) for j in range(length)])
+            else:
+                key.append([[float(data[i][3*k + j])
+                           for j in range(3)] for k in range(3)])
+            i += 1
+        except ValueError:
+            return None
 
 
 def mjcf_to_usd_handle(xml_path: str):
@@ -46,7 +61,8 @@ def mjcf_to_usd_handle(xml_path: str):
 
         UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
         UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
-        usd_mesh = UsdGeom.Mesh.Define(stage, "/" + mj_mesh.name.replace('-', '_'))
+        usd_mesh = UsdGeom.Mesh.Define(
+            stage, "/Mesh_" + mj_mesh.name.replace('-', '_'))
         stage.SetDefaultPrim(usd_mesh.GetPrim())
 
         points = numpy.empty(
@@ -79,6 +95,27 @@ def mjcf_to_usd_handle(xml_path: str):
         usd_mesh.CreateFaceVertexIndicesAttr(face_vertex_indices)
 
         stage.Save()
+
+    xpos = []
+    xmat = []
+
+    data_dir = os.path.dirname(xml_path)
+    data_file = os.path.basename(xml_path)
+    data_file = data_file.replace(".xml", "_data.txt")
+
+    with open(os.path.join(data_dir, data_file), newline='') as csvfile:
+        reader = csv.reader(csvfile, delimiter=' ',
+                            skipinitialspace=True, quoting=csv.QUOTE_NONE)
+        data = [row for row in reader]
+
+    for i in range(len(data)):
+        if len(data[i]) == 0:
+            continue
+        if data[i][0] == 'XPOS':
+            get_data(data, xpos, i, 3)
+
+        elif data[i][0] == 'XMAT':
+            get_data(data, xmat, i, 9)
 
     stage = Usd.Stage.CreateNew(os.path.join(usd_dir, usd_file))
 
@@ -113,21 +150,9 @@ def mjcf_to_usd_handle(xml_path: str):
         body_prim = UsdGeom.Xform.Define(stage, body_path)
         transform = body_prim.AddTransformOp()
         mat = Gf.Matrix4d()
-        mat.SetTranslateOnly(
-            Gf.Vec3d(
-                model.body(body_id).pos[0],
-                model.body(body_id).pos[1],
-                model.body(body_id).pos[2],
-            )
-        )
+        mat.SetTranslateOnly(Gf.Vec3d(body.pos[0], body.pos[1], body.pos[2]))
         mat.SetRotateOnly(
-            Gf.Quatd(
-                model.body(body_id).quat[0],
-                model.body(body_id).quat[1],
-                model.body(body_id).quat[2],
-                model.body(body_id).quat[3],
-            )
-        )
+            Gf.Quatd(body.quat[0], body.quat[1], body.quat[2], body.quat[3]))
         transform.Set(mat)
 
         for i in range(body.geomnum[0]):
@@ -140,56 +165,32 @@ def mjcf_to_usd_handle(xml_path: str):
 
             mat = Gf.Matrix4d()
             mat.SetTranslateOnly(
-                Gf.Vec3d(
-                    model.geom(geom_id).pos[0],
-                    model.geom(geom_id).pos[1],
-                    model.geom(geom_id).pos[2],
-                )
-            )
+                Gf.Vec3d(geom.pos[0], geom.pos[1], geom.pos[2]))
             mat.SetRotateOnly(
-                Gf.Quatd(
-                    model.geom(geom_id).quat[0],
-                    model.geom(geom_id).quat[1],
-                    model.geom(geom_id).quat[2],
-                    model.geom(geom_id).quat[3],
-                )
+                Gf.Quatd(geom.quat[0], geom.quat[1],
+                         geom.quat[2], geom.quat[3])
             )
 
             if geom.type == mujoco.mjtGeom.mjGEOM_BOX:
                 geom_prim = UsdGeom.Cube.Define(stage, geom_path)
                 mat_scale = Gf.Matrix4d()
                 mat_scale.SetScale(
-                    Gf.Vec3d(
-                        model.geom(geom_id).size[0],
-                        model.geom(geom_id).size[1],
-                        model.geom(geom_id).size[2],
-                    )
-                )
+                    Gf.Vec3d(geom.size[0], geom.size[1], geom.size[2]))
                 mat = mat_scale * mat
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_SPHERE:
                 geom_prim = UsdGeom.Sphere.Define(stage, geom_path)
-                geom_prim.CreateRadiusAttr(model.geom(geom_id).size[0])
+                geom_prim.CreateRadiusAttr(geom.size[0])
                 geom_prim.CreateExtentAttr(
-                    numpy.array([-1, -1, -1, 1, 1, 1]) * model.geom(geom_id).size[0])
+                    numpy.array([-1, -1, -1, 1, 1, 1]) * geom.size[0])
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_CYLINDER:
                 geom_prim = UsdGeom.Cylinder.Define(stage, geom_path)
-                geom_prim.CreateRadiusAttr(model.geom(geom_id).size[0])
-                geom_prim.CreateHeightAttr(model.geom(geom_id).size[1]*2)
+                geom_prim.CreateRadiusAttr(geom.size[0])
+                geom_prim.CreateHeightAttr(geom.size[1]*2)
                 geom_prim.CreateExtentAttr(numpy.array(
-                    [
-                        [
-                            -model.geom(geom_id).size[0],
-                            -model.geom(geom_id).size[0],
-                            -model.geom(geom_id).size[1],
-                        ],
-                        [
-                            model.geom(geom_id).size[0],
-                            model.geom(geom_id).size[0],
-                            model.geom(geom_id).size[1],
-                        ],
-                    ]
+                    [[-geom.size[0], -geom.size[0], -geom.size[1]],
+                        [geom.size[0], geom.size[0], geom.size[1]]]
                 ))
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_MESH:
@@ -201,7 +202,7 @@ def mjcf_to_usd_handle(xml_path: str):
 
             transform = geom_prim.AddTransformOp()
             transform.Set(mat)
-            
+
             geom_prim.CreateDisplayColorAttr(geom.rgba[:3])
             geom_prim.CreateDisplayOpacityAttr(geom.rgba[3])
 
