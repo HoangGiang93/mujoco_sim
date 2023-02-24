@@ -18,8 +18,9 @@ def get_data(data, key: list, i: int, length: int) -> None:
             if length != 9:
                 key.append([float(data[i][j]) for j in range(length)])
             else:
-                key.append([[float(data[i][3*k + j])
-                           for j in range(3)] for k in range(3)])
+                key.append(
+                    [[float(data[i][3 * k + j]) for j in range(3)] for k in range(3)]
+                )
             i += 1
         except ValueError:
             return None
@@ -47,8 +48,7 @@ def mjcf_to_usd_handle(xml_path: str):
             mesh_file = os.path.basename(mesh.attrib.get("file"))
             mesh_file = mesh_file.replace("stl", "usda")
             mesh_dir = os.path.dirname(mesh_dir) + "/usd"
-            mesh_dict[mesh_name] = os.path.join(
-                mesh_root_dir, mesh_dir, mesh_file)
+            mesh_dict[mesh_name] = os.path.join(mesh_root_dir, mesh_dir, mesh_file)
 
     mj_model = mujoco.MjModel.from_xml_path(xml_path)
     mj_data = mujoco.MjData(mj_model)
@@ -64,14 +64,11 @@ def mjcf_to_usd_handle(xml_path: str):
 
         UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
         UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
-        usd_mesh = UsdGeom.Mesh.Define(
-            stage, '/Mesh_' + mj_mesh.name.replace('-', '_'))
+        usd_mesh = UsdGeom.Mesh.Define(stage, "/Mesh_" + mj_mesh.name.replace("-", "_"))
         stage.SetDefaultPrim(usd_mesh.GetPrim())
 
-        points = numpy.empty(
-            shape=[mj_model.mesh(mesh_id).vertnum[0], 3], dtype=float)
-        normals = numpy.empty(
-            shape=[mj_model.mesh(mesh_id).vertnum[0], 3], dtype=float)
+        points = numpy.empty(shape=[mj_model.mesh(mesh_id).vertnum[0], 3], dtype=float)
+        normals = numpy.empty(shape=[mj_model.mesh(mesh_id).vertnum[0], 3], dtype=float)
 
         face_vertex_counts = numpy.empty(
             shape=mj_model.mesh(mesh_id).facenum[0], dtype=float
@@ -106,18 +103,19 @@ def mjcf_to_usd_handle(xml_path: str):
     data_file = os.path.basename(xml_path)
     data_file = data_file.replace(".xml", "_data.txt")
 
-    with open(os.path.join(data_dir, data_file), newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=' ',
-                            skipinitialspace=True, quoting=csv.QUOTE_NONE)
+    with open(os.path.join(data_dir, data_file), newline="") as csvfile:
+        reader = csv.reader(
+            csvfile, delimiter=" ", skipinitialspace=True, quoting=csv.QUOTE_NONE
+        )
         data = [row for row in reader]
 
     for i in range(len(data)):
         if len(data[i]) == 0:
             continue
-        if data[i][0] == 'XPOS':
+        if data[i][0] == "XPOS":
             get_data(data, xpos, i, 3)
 
-        elif data[i][0] == 'XMAT':
+        elif data[i][0] == "XMAT":
             get_data(data, xmat, i, 9)
 
     stage = Usd.Stage.CreateNew(os.path.join(usd_dir, usd_file))
@@ -125,7 +123,7 @@ def mjcf_to_usd_handle(xml_path: str):
     UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
     UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
 
-    root_path = Sdf.Path('/').AppendPath(mj_model.body(0).name)
+    root_path = Sdf.Path("/").AppendPath(mj_model.body(0).name)
     root_prim = UsdGeom.Xform.Define(stage, root_path)
 
     body_path = root_path
@@ -135,16 +133,27 @@ def mjcf_to_usd_handle(xml_path: str):
             if body.name == "":
                 body_path = root_path.AppendPath("body_" + str(geom_id))
             else:
-                body_path = root_path.AppendPath(body.name.replace('-', '_'))
+                body_path = root_path.AppendPath(body.name.replace("-", "_"))
 
             body_prim = UsdGeom.Xform.Define(stage, body_path)
 
             transform = body_prim.AddTransformOp()
             mat = Gf.Matrix4d()
-            mat.SetTranslateOnly(Gf.Vec3d(
-                mj_data.xpos[body_id][0], mj_data.xpos[body_id][1], mj_data.xpos[body_id][2]))
+            mat.SetTranslateOnly(
+                Gf.Vec3d(
+                    mj_data.xpos[body_id][0],
+                    mj_data.xpos[body_id][1],
+                    mj_data.xpos[body_id][2],
+                )
+            )
             mat.SetRotateOnly(
-                Gf.Quatd(mj_data.xquat[body_id][0], mj_data.xquat[body_id][1], mj_data.xquat[body_id][2], mj_data.xquat[body_id][3]))
+                Gf.Quatd(
+                    mj_data.xquat[body_id][0],
+                    mj_data.xquat[body_id][1],
+                    mj_data.xquat[body_id][2],
+                    mj_data.xquat[body_id][3],
+                )
+            )
             transform.Set(mat)
 
             physics_rigid_body_api = UsdPhysics.RigidBodyAPI(body_prim)
@@ -152,13 +161,18 @@ def mjcf_to_usd_handle(xml_path: str):
 
             physics_mass_api = UsdPhysics.MassAPI(body_prim)
             physics_mass_api.CreateCenterOfMassAttr(
-                Gf.Vec3f(body.ipos[0], body.ipos[1], body.ipos[2]))
+                Gf.Vec3f(body.ipos[0], body.ipos[1], body.ipos[2])
+            )
             physics_mass_api.CreateMassAttr(body.mass[0])
             physics_mass_api.CreateDiagonalInertiaAttr(
-                Gf.Vec3f(body.inertia[0], body.inertia[1], body.inertia[2]))
+                Gf.Vec3f(body.inertia[0], body.inertia[1], body.inertia[2])
+            )
             physics_mass_api.Apply(body_prim.GetPrim())
 
-            if body.jntnum[0] != 1 or (body.jntnum[0] == 1 and mj_model.joint(body.jntadr[0]).type == mujoco.mjtJoint.mjJNT_FREE):
+            if body.jntnum[0] != 1 or (
+                body.jntnum[0] == 1
+                and mj_model.joint(body.jntadr[0]).type == mujoco.mjtJoint.mjJNT_FREE
+            ):
                 articulation_root_api = UsdPhysics.ArticulationRootAPI(body_prim)
                 articulation_root_api.Apply(body_prim.GetPrim())
 
@@ -168,77 +182,72 @@ def mjcf_to_usd_handle(xml_path: str):
 
             if body.parentid[0] != 0:
                 parent_body = mj_model.body(body.parentid[0])
-                if parent_body.name == '':
+                if parent_body.name == "":
                     parent_body_path = root_path.AppendPath(
-                        "body_" + str(body.parentid[0]))
+                        "body_" + str(body.parentid[0])
+                    )
                 else:
                     parent_body_path = root_path.AppendPath(
-                        parent_body.name.replace('-', '_'))
+                        parent_body.name.replace("-", "_")
+                    )
             else:
                 parent_body_path = root_path
-                
+
             if joint.name == "":
-                joint_path = parent_body_path.AppendPath(
-                    "joint_" + str(joint_id))
+                joint_path = parent_body_path.AppendPath("joint_" + str(joint_id))
             else:
-                joint_path = parent_body_path.AppendPath(
-                    joint.name.replace('-', '_'))
+                joint_path = parent_body_path.AppendPath(joint.name.replace("-", "_"))
 
             if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
                 joint_prim = UsdPhysics.RevoluteJoint.Define(stage, joint_path)
             elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
-                joint_prim = UsdPhysics.PrismaticJoint.Define(
-                    stage, joint_path)
+                joint_prim = UsdPhysics.PrismaticJoint.Define(stage, joint_path)
             elif joint.type != mujoco.mjtJoint.mjJNT_FREE:
-                rospy.logwarn('Joint type %d of %s not implemented' %
-                            (joint.type, joint_path))
+                rospy.logwarn(
+                    "Joint type %d of %s not implemented" % (joint.type, joint_path)
+                )
                 continue
-            
+
             if joint.type != mujoco.mjtJoint.mjJNT_FREE:
                 joint_prim.GetBody0Rel().SetTargets([parent_body_path])
                 joint_prim.GetBody1Rel().SetTargets([body_path])
 
                 joint_prim.CreateCollisionEnabledAttr(False)
 
-                mat0 = Gf.Matrix4d()
-                mat0.SetTranslateOnly(
-                    Gf.Vec3d(body.pos[0], body.pos[1], body.pos[2]))
-                mat0.SetRotateOnly(
-                    Gf.Quatd(body.quat[0],
-                            body.quat[1],
-                            body.quat[2],
-                            body.quat[3])
-                )
-                mat1 = Gf.Matrix4d()
-                mat1.SetTranslate(
-                    Gf.Vec3d(joint.pos[0], joint.pos[1], joint.pos[2])
-                )
-                mat = mat0*mat1
+                body1_pos = Gf.Vec3f(parent_body.pos[0], parent_body.pos[1], parent_body.pos[2])
+                body1_rot = Gf.Quatf(
+                        parent_body.quat[0],
+                        parent_body.quat[1],
+                        parent_body.quat[2],
+                        parent_body.quat[3],
+                    )
+                
+                body2_pos = Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2])
+                body2_rot = Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3])
 
-                joint_prim.CreateLocalPos0Attr(mat.ExtractTranslation())
+                joint_pos = Gf.Vec3f(joint.pos[0], joint.pos[1], joint.pos[2])
+                joint_rot = Gf.Quatf(1, 0, 0, 0)
+
+                joint_prim.CreateAxisAttr("Z")
+                if numpy.array_equal(joint.axis, [1, 0, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0, 0.7071068, 0)
+                elif numpy.array_equal(joint.axis, [0, 1, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, -0.7071068, 0, 0)
+                elif numpy.array_equal(joint.axis, [0, 0, 1]):
+                    joint_rot = Gf.Quatf(1, 0, 0, 0)
+                elif numpy.array_equal(joint.axis, [-1, 0, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0, -0.7071068, 0)
+                elif numpy.array_equal(joint.axis, [0, -1, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0.7071068, 0, 0)
+                elif numpy.array_equal(joint.axis, [0, 0, -1]):
+                    joint_rot = Gf.Quatf(0, 0, 1, 0)
+
+                joint_prim.CreateLocalPos0Attr(body2_pos + body1_rot.Transform(joint_pos))
                 joint_prim.CreateLocalPos1Attr(Gf.Vec3f())
 
-                if numpy.array_equal(joint.axis, [1, 0, 0]):
-                    joint_prim.CreateAxisAttr('X')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf())
-                elif numpy.array_equal(joint.axis, [0, 1, 0]):
-                    joint_prim.CreateAxisAttr('Y')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf())
-                elif numpy.array_equal(joint.axis, [0, 0, 1]):
-                    joint_prim.CreateAxisAttr('Z')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf())
-                elif numpy.array_equal(joint.axis, [-1, 0, 0]):
-                    joint_prim.CreateAxisAttr('X')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf(0, 0, 1, 0))
-                elif numpy.array_equal(joint.axis, [0, -1, 0]):
-                    joint_prim.CreateAxisAttr('Y')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf(1, 0, 0, 0))
-                elif numpy.array_equal(joint.axis, [0, 0, -1]):
-                    joint_prim.CreateAxisAttr('Z')
-                    joint_prim.CreateLocalRot1Attr(Gf.Quatf(-0.7071068, 0.7071068, 0, 0))
+                joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
+                joint_prim.CreateLocalRot1Attr(joint_rot)
 
-                joint_prim.CreateLocalRot0Attr(Gf.Quatf(mat.ExtractRotationQuat()))
-                
                 if joint.limited[0]:
                     if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
                         joint_prim.CreateLowerLimitAttr(degrees(joint.range[0]))
@@ -253,73 +262,77 @@ def mjcf_to_usd_handle(xml_path: str):
             if geom.name == "":
                 geom_path = body_path.AppendPath("geom_" + str(geom_id))
             else:
-                geom_path = body_path.AppendPath(geom.name.replace('-', '_'))
+                geom_path = body_path.AppendPath(geom.name.replace("-", "_"))
 
             mat = Gf.Matrix4d()
-            mat.SetTranslateOnly(
-                Gf.Vec3d(geom.pos[0], geom.pos[1], geom.pos[2]))
+            mat.SetTranslateOnly(Gf.Vec3d(geom.pos[0], geom.pos[1], geom.pos[2]))
             mat.SetRotateOnly(
-                Gf.Quatd(geom.quat[0], geom.quat[1],
-                         geom.quat[2], geom.quat[3])
+                Gf.Quatd(geom.quat[0], geom.quat[1], geom.quat[2], geom.quat[3])
             )
 
             if geom.type == mujoco.mjtGeom.mjGEOM_BOX:
                 geom_prim = UsdGeom.Cube.Define(stage, geom_path)
                 mat_scale = Gf.Matrix4d()
-                mat_scale.SetScale(
-                    Gf.Vec3d(geom.size[0], geom.size[1], geom.size[2]))
+                mat_scale.SetScale(Gf.Vec3d(geom.size[0], geom.size[1], geom.size[2]))
                 mat = mat_scale * mat
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_SPHERE:
                 geom_prim = UsdGeom.Sphere.Define(stage, geom_path)
                 geom_prim.CreateRadiusAttr(geom.size[0])
                 geom_prim.CreateExtentAttr(
-                    numpy.array([-1, -1, -1, 1, 1, 1]) * geom.size[0])
+                    numpy.array([-1, -1, -1, 1, 1, 1]) * geom.size[0]
+                )
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_CYLINDER:
                 geom_prim = UsdGeom.Cylinder.Define(stage, geom_path)
                 geom_prim.CreateRadiusAttr(geom.size[0])
-                geom_prim.CreateHeightAttr(geom.size[1]*2)
-                geom_prim.CreateExtentAttr(numpy.array(
-                    [[-geom.size[0], -geom.size[0], -geom.size[1]],
-                        [geom.size[0], geom.size[0], geom.size[1]]]
-                ))
+                geom_prim.CreateHeightAttr(geom.size[1] * 2)
+                geom_prim.CreateExtentAttr(
+                    numpy.array(
+                        [
+                            [-geom.size[0], -geom.size[0], -geom.size[1]],
+                            [geom.size[0], geom.size[0], geom.size[1]],
+                        ]
+                    )
+                )
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_MESH:
                 mesh_id = geom.dataid[0]
                 mesh_name = mj_model.mesh(mesh_id).name
                 geom_prim = UsdGeom.Mesh.Define(stage, geom_path)
-                geom_prim.GetPrim().GetReferences(
-                ).AddReference(mesh_dict[mesh_name])
+                geom_prim.GetPrim().GetReferences().AddReference(mesh_dict[mesh_name])
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_PLANE:
                 geom_prim = UsdGeom.Mesh.Define(stage, geom_path)
                 geom_prim.CreatePointsAttr(
-                    [(-0.5, -0.5, 0), (0.5, -0.5, 0), (-0.5, 0.5, 0), (0.5, 0.5, 0)])
+                    [(-0.5, -0.5, 0), (0.5, -0.5, 0), (-0.5, 0.5, 0), (0.5, 0.5, 0)]
+                )
                 geom_prim.CreateExtentAttr([(-0.5, -0.5, 0), (0.5, 0.5, 0)])
                 geom_prim.CreateNormalsAttr(
-                    [(0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1)])
+                    [(0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1)]
+                )
                 geom_prim.CreateFaceVertexCountsAttr([4])
                 geom_prim.CreateFaceVertexIndicesAttr([0, 1, 3, 2])
                 mat.SetScale(Gf.Vec3d(100, 100, 100))
 
             else:
-                rospy.logwarn('Geom type %d of %s not implemented' %
-                              (geom.type, geom_path))
+                rospy.logwarn(
+                    "Geom type %d of %s not implemented" % (geom.type, geom_path)
+                )
 
             transform = geom_prim.AddTransformOp()
             transform.Set(mat)
 
-            # physics_collision_api = UsdPhysics.CollisionAPI(geom_prim)
-            # physics_collision_api.CreateCollisionEnabledAttr(True)
-            # physics_collision_api.Apply(geom_prim.GetPrim())
+            physics_collision_api = UsdPhysics.CollisionAPI(geom_prim)
+            physics_collision_api.CreateCollisionEnabledAttr(True)
+            physics_collision_api.Apply(geom_prim.GetPrim())
 
-            # physics_mesh_collision_api = UsdPhysics.MeshCollisionAPI(geom_prim)
-            # if geom.type != mujoco.mjtGeom.mjGEOM_PLANE:
-            #     physics_mesh_collision_api.CreateApproximationAttr("convexHull")
-            # else:
-            #     physics_mesh_collision_api.CreateApproximationAttr("none")
-            # physics_mesh_collision_api.Apply(geom_prim.GetPrim())
+            physics_mesh_collision_api = UsdPhysics.MeshCollisionAPI(geom_prim)
+            if geom.type != mujoco.mjtGeom.mjGEOM_PLANE:
+                physics_mesh_collision_api.CreateApproximationAttr("convexHull")
+            else:
+                physics_mesh_collision_api.CreateApproximationAttr("none")
+            physics_mesh_collision_api.Apply(geom_prim.GetPrim())
 
             geom_prim.CreateDisplayColorAttr(geom.rgba[:3])
             geom_prim.CreateDisplayOpacityAttr(geom.rgba[3])
