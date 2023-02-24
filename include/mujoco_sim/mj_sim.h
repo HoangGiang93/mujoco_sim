@@ -105,6 +105,8 @@ public:
 
     static std::set<std::string> spawned_object_body_names;
 
+    static bool disable_gravity;
+
     // Fix bug from m->geom_pos and m->geom_quat
     static std::map<int, std::vector<mjtNum>> geom_pose;
 };

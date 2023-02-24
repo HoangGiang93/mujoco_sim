@@ -224,9 +224,15 @@ void MjRos::set_params()
         }
     }
 
+    if (!ros::param::get("~disable_gravity", MjSim::disable_gravity))
+    {
+        MjSim::disable_gravity = true;
+    }
+    ROS_INFO("Set disable_gravity to %s", MjSim::disable_gravity ? "true" : "false");
+
     if (ros::param::get("~max_time_step", MjSim::max_time_step))
     {
-        ROS_INFO("Set max time step = %f", MjSim::max_time_step);
+        ROS_INFO("Set max_time_step = %f", MjSim::max_time_step);
     }
     else
     {

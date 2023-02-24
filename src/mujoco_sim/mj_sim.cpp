@@ -58,6 +58,8 @@ std::set<std::string> MjSim::spawned_object_body_names;
 // Fix bug from m->geom_pos and m->geom_quat
 std::map<int, std::vector<mjtNum>> MjSim::geom_pose;
 
+bool MjSim::disable_gravity = true;
+
 MjSim::~MjSim()
 {
 	mju_free(tau);
@@ -283,7 +285,15 @@ static void init_tmp()
 			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
 		do_each_child_element(worldbody_element, [](tinyxml2::XMLElement *body_element)
-													{ body_element->SetAttribute("gravcomp", "1"); });
+													{ 
+														if (MjSim::disable_gravity)
+														{
+															body_element->SetAttribute("gravcomp", "1");
+														}
+														else
+														{
+															body_element->SetAttribute("gravcomp", "0");
+														} });
 
 		for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
 				 robot_body != nullptr;

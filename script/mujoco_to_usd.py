@@ -52,7 +52,7 @@ def mjcf_to_usd_handle(xml_path: str):
             xml_mesh_dict[mesh_name] = os.path.join(mesh_root_dir, mesh_dir, mesh_file)
 
     for body_id, xml_body in enumerate(xml_root.iter('body')):
-        xml_body_gravcomp_dict[body_id] = xml_body.attrib.get('gravcomp', '0')
+        xml_body_gravcomp_dict[body_id] = float(xml_body.attrib.get('gravcomp', '0'))
 
     mj_model = mujoco.MjModel.from_xml_path(xml_path)
     mj_data = mujoco.MjData(mj_model)
@@ -180,12 +180,15 @@ def mjcf_to_usd_handle(xml_path: str):
                 and mj_model.joint(body.jntadr[0]).type == mujoco.mjtJoint.mjJNT_FREE
             ):
                 physics_scene = UsdPhysics.Scene.Define(stage, body_path.AppendPath('physics_scene'))
-                physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
 
-                if body.gravcomp == 0:
-                    physics_scene.CreateGravityMagnitudeAttr(9.81)
-                elif body.gravcomp == 1:
-                    physics_scene.CreateGravityMagnitudeAttr(0)
+                grav_comp = xml_body_gravcomp_dict[body_id] - 1
+                if grav_comp >= 0:
+                    physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, 1))
+                    physics_scene.CreateGravityMagnitudeAttr(9.81 * grav_comp)
+                else:
+                    physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
+                    physics_scene.CreateGravityMagnitudeAttr(-9.81 * grav_comp)
+
                 articulation_root_api = UsdPhysics.ArticulationRootAPI(body_prim)
                 articulation_root_api.Apply(body_prim.GetPrim())
 
@@ -234,7 +237,7 @@ def mjcf_to_usd_handle(xml_path: str):
                 mesh_id = geom.dataid[0]
                 mesh_name = mj_model.mesh(mesh_id).name
                 geom_prim = UsdGeom.Mesh.Define(stage, geom_path)
-                geom_prim.GetPrim().GetReferences().AddReference(mesh_dict[mesh_name])
+                geom_prim.GetPrim().GetReferences().AddReference(xml_mesh_dict[mesh_name])
 
             elif geom.type == mujoco.mjtGeom.mjGEOM_PLANE:
                 geom_prim = UsdGeom.Mesh.Define(stage, geom_path)

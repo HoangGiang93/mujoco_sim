@@ -12,6 +12,8 @@
 
 save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
 
+disable_gravity: true # Disable gravity or not
+
 add_odom_joints: false # true for mobile robots, false for fixed-based robots
 # add_odom_joints can be specified by different ways:
 # 1. by bool: (true mean set default odom joints (lin_x, lin_y, ang_z))
