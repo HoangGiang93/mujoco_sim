@@ -543,16 +543,6 @@ void MjRos::init()
         ROS_WARN("joint_inits not found, will set to default value (0)");
     }
 
-    std::vector<std::string> joint_ignores_str;
-    if (ros::param::get("~joint_ignores", joint_ignores_str))
-    {
-        for (const std::string &joint_ignore : joint_ignores_str)
-        {
-            ROS_INFO("Ignore joint: %s", joint_ignore.c_str());
-        }
-    }
-    MjSim::joint_ignores = std::set<std::string>(joint_ignores_str.begin(), joint_ignores_str.end());
-
     marker_array_pub = n.advertise<visualization_msgs::MarkerArray>("/mujoco/visualization_marker_array", 0);
     for (const std::string &robot : MjSim::robot_names)
     {
@@ -629,6 +619,38 @@ void MjRos::setup_service_servers()
 {
     std::thread ros_thread(&MjRos::spawn_and_destroy_objects, this);
     ros_thread.join();
+}
+
+void MjRos::get_controlled_joints()
+{
+    ros::Rate loop_rate(1);
+    int i = 0;
+    while (ros::ok())
+    {
+        if (i++ == 10)
+        {
+            break;
+        }
+        ros::ServiceClient list_controllers_client = n.serviceClient<controller_manager_msgs::ListControllers>("controller_manager/list_controllers");
+        controller_manager_msgs::ListControllers list_controllers_srv;
+        if (list_controllers_client.call(list_controllers_srv))
+        {
+            for (const controller_manager_msgs::ControllerState &controller_state : list_controllers_srv.response.controller)
+            {
+                if (controller_state.state.compare("running") == 0 && (controller_state.type.find("position_controllers") != std::string::npos || controller_state.type.find("velocity_controllers") != std::string::npos || controller_state.type.find("effort_controllers") != std::string::npos))
+                {
+                    for (const controller_manager_msgs::HardwareInterfaceResources &claimed_resources : controller_state.claimed_resources)
+                    {
+                        for (const std::string &joint_name : claimed_resources.resources)
+                        {
+                            MjSim::controlled_joints.insert(joint_name);
+                        }
+                    }
+                }
+            }
+        }
+        loop_rate.sleep();
+    }
 }
 
 bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res)
@@ -964,7 +986,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                     std::string mesh_name = mesh_element->Attribute("name");
                                                     if (mesh_paths.find(mesh_name) != mesh_paths.end() || mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_name.c_str()) != -1)
                                                     {
-                                                        if (strcmp(mesh_paths[mesh_name].first.c_str(), mesh_element->Attribute("file")) == 0)
+                                                        if (mesh_element->Attribute("file", mesh_paths[mesh_name].first.c_str()))
                                                         {
                                                             remove:
                                                             elements_to_remove.push_back(mesh_element);
@@ -987,7 +1009,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                                                 }
                                                                 if (mj_name2id(m, mjtObj::mjOBJ_MESH, mesh_name.c_str()) != -1 
                                                                     && mesh_paths.find(mesh_name) != mesh_paths.end() 
-                                                                    && strcmp(mesh_paths[mesh_name].first.c_str(), mesh_element->Attribute("file")) == 0)
+                                                                    && mesh_element->Attribute("file", mesh_paths[mesh_name].first.c_str()))
                                                                 {
                                                                     goto remove;
                                                                 }
@@ -1141,11 +1163,11 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                         geom_element->SetAttribute("type", "sphere");
                                     }
 
-                                    if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
+                                    if (geom_element->Attribute("type", "sphere"))
                                     {
                                         geom_size = {1};
                                     }
-                                    else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
+                                    else if (geom_element->Attribute("type", "cylinder"))
                                     {
                                         geom_size = {1, 1};
                                     }
@@ -1170,20 +1192,20 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                                         std::istringstream iss(pos_str);
                                         geom_pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
                                     }
-                                    if (strcmp(geom_element->Attribute("type"), "box") == 0 || strcmp(geom_element->Attribute("type"), "mesh"))
+                                    if (geom_element->Attribute("type", "box") || geom_element->Attribute("type", "mesh"))
                                     {
                                         for (int i = 0; i < geom_pos.size(); i++)
                                         {
                                             geom_pos[i] *= size[i];
                                         }
                                     }
-                                    else if (strcmp(geom_element->Attribute("type"), "sphere") == 0)
+                                    else if (geom_element->Attribute("type", "sphere"))
                                     {
                                         geom_pos[0] *= size[0];
                                         geom_pos[1] *= size[0];
                                         geom_pos[2] *= size[0];
                                     }
-                                    else if (strcmp(geom_element->Attribute("type"), "cylinder") == 0)
+                                    else if (geom_element->Attribute("type", "cylinder"))
                                     {
                                         geom_pos[0] *= size[0];
                                         geom_pos[1] *= size[0];
@@ -1202,7 +1224,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
 
                         std::function<void(tinyxml2::XMLElement *)> rename_mesh = [](tinyxml2::XMLElement *geom_element)
                         {
-                            if (geom_element->Attribute("type") != nullptr && strcmp(geom_element->Attribute("type"), "mesh") == 0)
+                            if (geom_element->Attribute("type", "mesh"))
                             {
                                 geom_element->SetAttribute("mesh", name_map[mjtObj::mjOBJ_MESH][geom_element->Attribute("mesh")].c_str());
                             }

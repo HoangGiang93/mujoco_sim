@@ -74,7 +74,7 @@ void MjHWInterface::write()
 {
     for (std::size_t i = 0; i < joint_names.size(); i++)
     {
-        if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_names[i]) == MjSim::joint_ignores.end())
+        if (MjSim::controlled_joints.find(joint_names[i]) != MjSim::controlled_joints.end())
         {
             const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_names[i].c_str());
             const int dof_id = m->jnt_dofadr[joint_id];
@@ -99,14 +99,10 @@ void MjHWInterface::doSwitch(const std::list<hardware_interface::ControllerInfo>
         {
             for (const std::string &joint_name : interface_resource.resources)
             {
-                if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_name) == MjSim::joint_ignores.end())
+                std::vector<std::string>::iterator it = std::find(joint_names.begin(), joint_names.end(), joint_name);
+                if (it != joint_names.end())
                 {
-
-                    std::vector<std::string>::iterator it = std::find(joint_names.begin(), joint_names.end(), joint_name);
-                    if (it != joint_names.end())
-                    {
-                        joint_efforts_command[it - joint_names.begin()] = 0.;
-                    }
+                    joint_efforts_command[it - joint_names.begin()] = 0.;
                 }
             }
         }

@@ -22,15 +22,12 @@
 #include "mj_util.cpp"
 
 #include <ros/package.h>
-#include <ros/param.h>
 #include <tf/tf.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 double MjSim::max_time_step;
 
 std::map<std::string, std::vector<std::string>> MjSim::joint_names;
-
-std::set<std::string> MjSim::joint_ignores;
 
 std::map<std::string, mjtNum> MjSim::odom_vels;
 
@@ -45,6 +42,8 @@ mjtNum *MjSim::tau = NULL;
 mjtNum MjSim::sim_start;
 
 std::map<std::string, std::map<std::string, bool>> MjSim::add_odom_joints;
+
+std::set<std::string> MjSim::controlled_joints;
 
 std::set<std::string> MjSim::robot_names;
 
@@ -78,7 +77,7 @@ static void set_joint_names()
 		ROS_WARN("%s doesn't have <worldbody>", model_path.c_str());
 		return;
 	}
-	
+
 	for (tinyxml2::XMLElement *body_element = cache_model_xml_doc.FirstChildElement()->FirstChildElement("worldbody")->FirstChildElement("body");
 			 body_element != nullptr;
 			 body_element = body_element->NextSiblingElement("body"))
@@ -283,30 +282,34 @@ static void init_tmp()
 			 worldbody_element != nullptr;
 			 worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
 	{
+		do_each_child_element(worldbody_element, [](tinyxml2::XMLElement *body_element)
+													{ body_element->SetAttribute("gravcomp", "1"); });
+
+		for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
+				 robot_body != nullptr;
+				 robot_body = robot_body->NextSiblingElement("body"))
+		{
+			const char *robot = robot_body->Attribute("name");
+			if (robot != nullptr && MjSim::robot_names.find(robot) != MjSim::robot_names.end() && MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
+			{
+				robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
+																				 std::to_string(MjSim::pose_inits[robot][1]) + " " +
+																				 std::to_string(MjSim::pose_inits[robot][2]))
+																						.c_str());
+				tf2::Quaternion quat;
+				quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
+				robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
+																					std::to_string(quat.getX()) + " " +
+																					std::to_string(quat.getY()) + " " +
+																					std::to_string(quat.getZ()))
+																						 .c_str());
+				break;
+			}
+		}
+
 		// Add odom joints to cache_model_path if required
 		for (const std::string &robot : MjSim::robot_names)
 		{
-			for (tinyxml2::XMLElement *robot_body = worldbody_element->FirstChildElement("body");
-					 robot_body != nullptr;
-					 robot_body = robot_body->NextSiblingElement("body"))
-			{
-				if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0 && MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
-				{
-					robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
-																					 std::to_string(MjSim::pose_inits[robot][1]) + " " +
-																					 std::to_string(MjSim::pose_inits[robot][2]))
-																							.c_str());
-					tf2::Quaternion quat;
-					quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
-					robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
-																						std::to_string(quat.getX()) + " " +
-																						std::to_string(quat.getY()) + " " +
-																						std::to_string(quat.getZ()))
-																							 .c_str());
-					break;
-				}
-			}
-
 			if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] ||
 					MjSim::add_odom_joints[robot]["lin_odom_y_joint"] ||
 					MjSim::add_odom_joints[robot]["lin_odom_z_joint"] ||
@@ -320,7 +323,7 @@ static void init_tmp()
 						 robot_body != nullptr;
 						 robot_body = robot_body->NextSiblingElement("body"))
 				{
-					if (strcmp(robot_body->Attribute("name"), robot.c_str()) == 0)
+					if (robot_body->Attribute("name", robot.c_str()))
 					{
 						if (MjSim::add_odom_joints[robot]["lin_odom_x_joint"] || (MjSim::add_odom_joints[robot]["lin_odom_y_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]) || (MjSim::add_odom_joints[robot]["lin_odom_y_joint"] && MjSim::add_odom_joints[robot]["ang_odom_z_joint"]))
 						{
@@ -535,7 +538,7 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 		ROS_WARN("Failed to load file \"%s\"\n", xml_path);
 		return;
 	}
-	
+
 	mtx.lock();
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
 	std::set<tinyxml2::XMLElement *> body_elements_to_delete;
@@ -678,7 +681,7 @@ bool save_geom_quat(const char *path)
 		{
 			do_each_child_element(parent_element, element_type, [](tinyxml2::XMLElement *element)
 														{
-															if (element->Attribute("type") != nullptr && strcmp(element->Attribute("type"), "mesh") == 0)
+															if (element->Attribute("type") != nullptr && element->Attribute("type", "mesh"))
 															{
 																std::vector<mjtNum> geom_pos = {0, 0, 0};
 																if (element->Attribute("pos") != nullptr)
@@ -787,7 +790,7 @@ bool load_tmp_model(bool reset)
 		mtx.unlock();
 
 		MjSim::geom_pose.clear();
-		
+
 		return save_geom_quat((tmp_model_path.parent_path() / "add.xml").c_str()) && save_geom_quat(tmp_model_path.c_str());
 	}
 }
@@ -887,17 +890,11 @@ bool MjSim::remove_body(const std::set<std::string> &body_names)
 void MjSim::controller()
 {
 	mj_mulM(m, d, tau, ddq);
-	for (const std::string &robot : MjSim::robot_names)
+	for (const std::string &joint_name : MjSim::controlled_joints)
 	{
-		for (const std::string &joint_name : MjSim::joint_names[robot])
-		{
-			if (std::find(MjSim::joint_ignores.begin(), MjSim::joint_ignores.end(), joint_name) == MjSim::joint_ignores.end())
-			{
-				const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
-				const int dof_id = m->jnt_dofadr[joint_id];
-				tau[dof_id] += d->qfrc_bias[dof_id];
-			}
-		}
+		const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, joint_name.c_str());
+		const int dof_id = m->jnt_dofadr[joint_id];
+		tau[dof_id] += d->qfrc_bias[dof_id];
 	}
 
 	mju_copy(d->qfrc_applied, tau, m->nv);

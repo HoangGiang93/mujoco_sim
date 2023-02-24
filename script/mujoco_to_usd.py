@@ -29,26 +29,30 @@ def get_data(data, key: list, i: int, length: int) -> None:
 def mjcf_to_usd_handle(xml_path: str):
     usd_dir = os.path.dirname(xml_path)
     usd_file = os.path.basename(xml_path)
-    usd_file = usd_file.replace("xml", "usda")
+    usd_file = usd_file.replace('xml', 'usda')
 
-    mesh_dict = {}
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
+    xml_mesh_dict = {}
+    xml_body_gravcomp_dict = {}
+    xml_tree = ET.parse(xml_path)
+    xml_root = xml_tree.getroot()
 
     mesh_root_dir = usd_dir
-    for compiler in root.iter("compiler"):
-        if compiler.attrib.get("meshdir") is not None:
-            mesh_root_dir = compiler.attrib.get("meshdir")
+    for compiler in xml_root.iter('compiler'):
+        if compiler.attrib.get('meshdir') is not None:
+            mesh_root_dir = compiler.attrib.get('meshdir')
             break
 
-    for asset in root.iter("asset"):
-        for mesh in asset.iter("mesh"):
-            mesh_name = mesh.attrib.get("name")
-            mesh_dir = os.path.dirname(mesh.attrib.get("file"))
-            mesh_file = os.path.basename(mesh.attrib.get("file"))
-            mesh_file = mesh_file.replace("stl", "usda")
-            mesh_dir = os.path.dirname(mesh_dir) + "/usd"
-            mesh_dict[mesh_name] = os.path.join(mesh_root_dir, mesh_dir, mesh_file)
+    for xml_asset in xml_root.iter('asset'):
+        for xml_mesh in xml_asset.iter('mesh'):
+            mesh_name = xml_mesh.attrib.get('name')
+            mesh_dir = os.path.dirname(xml_mesh.attrib.get('file'))
+            mesh_file = os.path.basename(xml_mesh.attrib.get('file'))
+            mesh_file = mesh_file.replace('stl', 'usda')
+            mesh_dir = os.path.dirname(mesh_dir) + '/usd'
+            xml_mesh_dict[mesh_name] = os.path.join(mesh_root_dir, mesh_dir, mesh_file)
+
+    for body_id, xml_body in enumerate(xml_root.iter('body')):
+        xml_body_gravcomp_dict[body_id] = xml_body.attrib.get('gravcomp', '0')
 
     mj_model = mujoco.MjModel.from_xml_path(xml_path)
     mj_data = mujoco.MjData(mj_model)
@@ -57,14 +61,14 @@ def mjcf_to_usd_handle(xml_path: str):
     for mesh_id in range(mj_model.nmesh):
         mj_mesh = mj_model.mesh(mesh_id)
 
-        if os.path.exists(mesh_dict[mj_mesh.name]):
+        if os.path.exists(xml_mesh_dict[mj_mesh.name]):
             continue
 
-        stage = Usd.Stage.CreateNew(mesh_dict[mj_mesh.name])
+        stage = Usd.Stage.CreateNew(xml_mesh_dict[mj_mesh.name])
 
         UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
         UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
-        usd_mesh = UsdGeom.Mesh.Define(stage, "/Mesh_" + mj_mesh.name.replace("-", "_"))
+        usd_mesh = UsdGeom.Mesh.Define(stage, '/Mesh_' + mj_mesh.name.replace('-', '_'))
         stage.SetDefaultPrim(usd_mesh.GetPrim())
 
         points = numpy.empty(shape=[mj_model.mesh(mesh_id).vertnum[0], 3], dtype=float)
@@ -101,21 +105,21 @@ def mjcf_to_usd_handle(xml_path: str):
 
     data_dir = os.path.dirname(xml_path)
     data_file = os.path.basename(xml_path)
-    data_file = data_file.replace(".xml", "_data.txt")
+    data_file = data_file.replace('.xml', '_data.txt')
 
-    with open(os.path.join(data_dir, data_file), newline="") as csvfile:
+    with open(os.path.join(data_dir, data_file), newline='') as csvfile:
         reader = csv.reader(
-            csvfile, delimiter=" ", skipinitialspace=True, quoting=csv.QUOTE_NONE
+            csvfile, delimiter=' ', skipinitialspace=True, quoting=csv.QUOTE_NONE
         )
         data = [row for row in reader]
 
     for i in range(len(data)):
         if len(data[i]) == 0:
             continue
-        if data[i][0] == "XPOS":
+        if data[i][0] == 'XPOS':
             get_data(data, xpos, i, 3)
 
-        elif data[i][0] == "XMAT":
+        elif data[i][0] == 'XMAT':
             get_data(data, xmat, i, 9)
 
     stage = Usd.Stage.CreateNew(os.path.join(usd_dir, usd_file))
@@ -123,17 +127,19 @@ def mjcf_to_usd_handle(xml_path: str):
     UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
     UsdGeom.SetStageMetersPerUnit(stage, UsdGeom.LinearUnits.meters)
 
-    root_path = Sdf.Path("/").AppendPath(mj_model.body(0).name)
+    root_path = Sdf.Path('/').AppendPath(mj_model.body(0).name)
     root_prim = UsdGeom.Xform.Define(stage, root_path)
 
     body_path = root_path
     for body_id in range(mj_model.nbody):
+
+        # Convert mujoco body to Xform
         body = mj_model.body(body_id)
         if body_id != 0:
-            if body.name == "":
-                body_path = root_path.AppendPath("body_" + str(geom_id))
+            if body.name == '':
+                body_path = root_path.AppendPath('body_' + str(geom_id))
             else:
-                body_path = root_path.AppendPath(body.name.replace("-", "_"))
+                body_path = root_path.AppendPath(body.name.replace('-', '_'))
 
             body_prim = UsdGeom.Xform.Define(stage, body_path)
 
@@ -173,96 +179,24 @@ def mjcf_to_usd_handle(xml_path: str):
                 body.jntnum[0] == 1
                 and mj_model.joint(body.jntadr[0]).type == mujoco.mjtJoint.mjJNT_FREE
             ):
+                physics_scene = UsdPhysics.Scene.Define(stage, body_path.AppendPath('physics_scene'))
+                physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
+
+                if body.gravcomp == 0:
+                    physics_scene.CreateGravityMagnitudeAttr(9.81)
+                elif body.gravcomp == 1:
+                    physics_scene.CreateGravityMagnitudeAttr(0)
                 articulation_root_api = UsdPhysics.ArticulationRootAPI(body_prim)
                 articulation_root_api.Apply(body_prim.GetPrim())
 
-        if body.jntnum[0] == 1:
-            joint_id = body.jntadr[0]
-            joint = mj_model.joint(joint_id)
-
-            if body.parentid[0] != 0:
-                parent_body = mj_model.body(body.parentid[0])
-                if parent_body.name == "":
-                    parent_body_path = root_path.AppendPath(
-                        "body_" + str(body.parentid[0])
-                    )
-                else:
-                    parent_body_path = root_path.AppendPath(
-                        parent_body.name.replace("-", "_")
-                    )
-            else:
-                parent_body_path = root_path
-
-            if joint.name == "":
-                joint_path = parent_body_path.AppendPath("joint_" + str(joint_id))
-            else:
-                joint_path = parent_body_path.AppendPath(joint.name.replace("-", "_"))
-
-            if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
-                joint_prim = UsdPhysics.RevoluteJoint.Define(stage, joint_path)
-            elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
-                joint_prim = UsdPhysics.PrismaticJoint.Define(stage, joint_path)
-            elif joint.type != mujoco.mjtJoint.mjJNT_FREE:
-                rospy.logwarn(
-                    "Joint type %d of %s not implemented" % (joint.type, joint_path)
-                )
-                continue
-
-            if joint.type != mujoco.mjtJoint.mjJNT_FREE:
-                joint_prim.GetBody0Rel().SetTargets([parent_body_path])
-                joint_prim.GetBody1Rel().SetTargets([body_path])
-
-                joint_prim.CreateCollisionEnabledAttr(False)
-
-                body1_pos = Gf.Vec3f(parent_body.pos[0], parent_body.pos[1], parent_body.pos[2])
-                body1_rot = Gf.Quatf(
-                        parent_body.quat[0],
-                        parent_body.quat[1],
-                        parent_body.quat[2],
-                        parent_body.quat[3],
-                    )
-                
-                body2_pos = Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2])
-                body2_rot = Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3])
-
-                joint_pos = Gf.Vec3f(joint.pos[0], joint.pos[1], joint.pos[2])
-                joint_rot = Gf.Quatf(1, 0, 0, 0)
-
-                joint_prim.CreateAxisAttr("Z")
-                if numpy.array_equal(joint.axis, [1, 0, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0, 0.7071068, 0)
-                elif numpy.array_equal(joint.axis, [0, 1, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, -0.7071068, 0, 0)
-                elif numpy.array_equal(joint.axis, [0, 0, 1]):
-                    joint_rot = Gf.Quatf(1, 0, 0, 0)
-                elif numpy.array_equal(joint.axis, [-1, 0, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0, -0.7071068, 0)
-                elif numpy.array_equal(joint.axis, [0, -1, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0.7071068, 0, 0)
-                elif numpy.array_equal(joint.axis, [0, 0, -1]):
-                    joint_rot = Gf.Quatf(0, 0, 1, 0)
-
-                joint_prim.CreateLocalPos0Attr(body2_pos + body1_rot.Transform(joint_pos))
-                joint_prim.CreateLocalPos1Attr(Gf.Vec3f())
-
-                joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
-                joint_prim.CreateLocalRot1Attr(joint_rot)
-
-                if joint.limited[0]:
-                    if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
-                        joint_prim.CreateLowerLimitAttr(degrees(joint.range[0]))
-                        joint_prim.CreateUpperLimitAttr(degrees(joint.range[1]))
-                    elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
-                        joint_prim.CreateLowerLimitAttr(joint.range[0])
-                        joint_prim.CreateUpperLimitAttr(joint.range[1])
-
+        # Convert mujoco geom to UsdGeom
         for i in range(body.geomnum[0]):
             geom_id = body.geomadr[0] + i
             geom = mj_model.geom(geom_id)
-            if geom.name == "":
-                geom_path = body_path.AppendPath("geom_" + str(geom_id))
+            if geom.name == '':
+                geom_path = body_path.AppendPath('geom_' + str(geom_id))
             else:
-                geom_path = body_path.AppendPath(geom.name.replace("-", "_"))
+                geom_path = body_path.AppendPath(geom.name.replace('-', '_'))
 
             mat = Gf.Matrix4d()
             mat.SetTranslateOnly(Gf.Vec3d(geom.pos[0], geom.pos[1], geom.pos[2]))
@@ -317,7 +251,7 @@ def mjcf_to_usd_handle(xml_path: str):
 
             else:
                 rospy.logwarn(
-                    "Geom type %d of %s not implemented" % (geom.type, geom_path)
+                    'Geom type %d of %s not implemented' % (geom.type, geom_path)
                 )
 
             transform = geom_prim.AddTransformOp()
@@ -329,13 +263,93 @@ def mjcf_to_usd_handle(xml_path: str):
 
             physics_mesh_collision_api = UsdPhysics.MeshCollisionAPI(geom_prim)
             if geom.type != mujoco.mjtGeom.mjGEOM_PLANE:
-                physics_mesh_collision_api.CreateApproximationAttr("convexHull")
+                physics_mesh_collision_api.CreateApproximationAttr('convexHull')
             else:
-                physics_mesh_collision_api.CreateApproximationAttr("none")
+                physics_mesh_collision_api.CreateApproximationAttr('none')
             physics_mesh_collision_api.Apply(geom_prim.GetPrim())
 
             geom_prim.CreateDisplayColorAttr(geom.rgba[:3])
             geom_prim.CreateDisplayOpacityAttr(geom.rgba[3])
+        
+        # Convert mujoco joint to UsdJoint
+        if body_id != 0:
+            parent_body = mj_model.body(body.parentid[0])
+            if body.parentid[0] != 0:
+                if parent_body.name == '':
+                    parent_body_path = root_path.AppendPath(
+                        'body_' + str(body.parentid[0])
+                    )
+                else:
+                    parent_body_path = root_path.AppendPath(
+                        parent_body.name.replace('-', '_')
+                    )
+            else:
+                parent_body_path = root_path
+
+            if body.jntnum[0] == 0:
+                joint_path = parent_body_path.AppendPath('fixed_joint')
+                joint_prim = UsdPhysics.FixedJoint.Define(stage, joint_path)
+                joint_prim.GetBody0Rel().SetTargets([body_path])
+
+            elif body.jntnum[0] == 1 and mj_model.joint(body.jntadr[0]).type != mujoco.mjtJoint.mjJNT_FREE:
+                joint_id = body.jntadr[0]
+                joint = mj_model.joint(joint_id)
+
+                joint_pos = Gf.Vec3f(joint.pos[0], joint.pos[1], joint.pos[2])
+                joint_rot = Gf.Quatf(1, 0, 0, 0)
+
+                if joint.name == '':
+                    joint_path = parent_body_path.AppendPath('joint_' + str(joint_id))
+                else:
+                    joint_path = parent_body_path.AppendPath(joint.name.replace('-', '_'))
+
+                if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
+                    joint_prim = UsdPhysics.RevoluteJoint.Define(stage, joint_path)
+                    if joint.limited[0]:
+                        joint_prim.CreateLowerLimitAttr(degrees(joint.range[0]))
+                        joint_prim.CreateUpperLimitAttr(degrees(joint.range[1]))
+                elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
+                    joint_prim = UsdPhysics.PrismaticJoint.Define(stage, joint_path)
+                    if joint.limited[0]:
+                        joint_prim.CreateLowerLimitAttr(joint.range[0])
+                        joint_prim.CreateUpperLimitAttr(joint.range[1])
+                elif joint.type == mujoco.mjtJoint.mjJNT_BALL:
+                    joint_prim = UsdPhysics.SphericalJoint.Define(stage, joint_path)
+
+                joint_prim.CreateAxisAttr('Z')
+                if numpy.array_equal(joint.axis, [1, 0, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0, 0.7071068, 0)
+                elif numpy.array_equal(joint.axis, [0, 1, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, -0.7071068, 0, 0)
+                elif numpy.array_equal(joint.axis, [0, 0, 1]):
+                    joint_rot = Gf.Quatf(1, 0, 0, 0)
+                elif numpy.array_equal(joint.axis, [-1, 0, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0, -0.7071068, 0)
+                elif numpy.array_equal(joint.axis, [0, -1, 0]):
+                    joint_rot = Gf.Quatf(0.7071068, 0.7071068, 0, 0)
+                elif numpy.array_equal(joint.axis, [0, 0, -1]):
+                    joint_rot = Gf.Quatf(0, 0, 1, 0)
+
+                joint_prim.CreateCollisionEnabledAttr(False)
+
+                joint_prim.GetBody0Rel().SetTargets([parent_body_path])
+                joint_prim.GetBody1Rel().SetTargets([body_path])
+
+                body1_rot = Gf.Quatf(
+                        parent_body.quat[0],
+                        parent_body.quat[1],
+                        parent_body.quat[2],
+                        parent_body.quat[3],
+                    )
+                
+                body2_pos = Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2])
+                body2_rot = Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3])
+
+                joint_prim.CreateLocalPos0Attr(body2_pos + body1_rot.Transform(joint_pos))
+                joint_prim.CreateLocalPos1Attr(Gf.Vec3f())
+
+                joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
+                joint_prim.CreateLocalRot1Attr(joint_rot)
 
     stage.SetDefaultPrim(root_prim.GetPrim())
 
@@ -345,15 +359,15 @@ def mjcf_to_usd_handle(xml_path: str):
 
 
 def mjcf_to_usd_client():
-    rospy.wait_for_service("/mujoco/screenshot")
+    rospy.wait_for_service('/mujoco/screenshot')
     try:
-        screenshot_srv = rospy.ServiceProxy("/mujoco/screenshot", Trigger)
+        screenshot_srv = rospy.ServiceProxy('/mujoco/screenshot', Trigger)
         resp: TriggerResponse = screenshot_srv()
         mjcf_to_usd_handle(resp.message)
         return
     except rospy.ServiceException as e:
-        rospy.logwarn("Service call failed: %s" % e)
+        rospy.logwarn('Service call failed: %s' % e)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     mjcf_to_usd_client()

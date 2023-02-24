@@ -94,6 +94,12 @@ public:
      */
     void setup_service_servers();
 
+    /**
+     * @brief Get the controlled joints from ros_control
+     * 
+     */
+    void get_controlled_joints();
+
 private:
 
     void publish_tf(const EObjectType object_type = EObjectType::None);

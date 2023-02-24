@@ -72,6 +72,7 @@ void simulate()
     spinner.start();
     ros::Time last_sim_time = MjRos::ros_start;
     double time_step = m->opt.timestep;
+
     while (ros::ok())
     {
         {
@@ -191,6 +192,7 @@ int main(int argc, char **argv)
 
     std::thread ros_thread1(&MjRos::setup_publishers, mj_ros);
     std::thread ros_thread2(&MjRos::setup_service_servers, mj_ros);
+    std::thread ros_thread3(&MjRos::get_controlled_joints, mj_ros);
 
     // start simulation thread
     std::thread sim_thread(simulate);
@@ -218,6 +220,7 @@ int main(int argc, char **argv)
 
     ros_thread1.join();
     ros_thread2.join();
+    ros_thread3.join();
     sim_thread.join();
 
     // free MuJoCo model and data, deactivate

@@ -79,7 +79,7 @@ public:
 
     static std::map<std::string, std::vector<std::string>> joint_names;
 
-    static std::set<std::string> joint_ignores;
+    static std::set<std::string> controlled_joints;
 
     static std::map<std::string, mjtNum> odom_vels;
 

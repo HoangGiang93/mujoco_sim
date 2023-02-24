@@ -10,10 +10,6 @@
 #   joint1: 0
 #   joint2: 1
 
-# joint_ignores: # Ignore to control the following joints
-#   - joint1
-#   - joint2
-
 save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
 
 add_odom_joints: false # true for mobile robots, false for fixed-based robots
