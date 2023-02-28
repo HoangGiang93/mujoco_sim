@@ -1,4 +1,6 @@
 build
+docs/html
+docs/latex
 model/tmp
 model/save/*
 
