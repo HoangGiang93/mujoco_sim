@@ -129,20 +129,30 @@ def mjcf_to_usd_handle(xml_path: str):
 
     root_path = Sdf.Path('/').AppendPath(mj_model.body(0).name)
     root_prim = UsdGeom.Xform.Define(stage, root_path)
-
-    body_path = root_path
-    for body_id in range(mj_model.nbody):
-
-        # Convert mujoco body to Xform
+    
+    for body_id, _ in enumerate(xml_tree.iter('body')):
         body = mj_model.body(body_id)
+        body_path = root_path
         if body_id != 0:
+            parent_body = mj_model.body(body.parentid[0])
+            if body.parentid[0] != 0:
+                if parent_body.name == '':
+                    parent_body_path = root_path.AppendPath(
+                        'body_' + str(body.parentid[0])
+                    )
+                else:
+                    parent_body_path = root_path.AppendPath(
+                        parent_body.name.replace('-', '_')
+                    )
+            else:
+                parent_body_path = root_path
+
             if body.name == '':
-                body_path = root_path.AppendPath('body_' + str(geom_id))
+                body_path = root_path.AppendPath('body_' + str(body_id))
             else:
                 body_path = root_path.AppendPath(body.name.replace('-', '_'))
 
             body_prim = UsdGeom.Xform.Define(stage, body_path)
-
             transform = body_prim.AddTransformOp()
             mat = Gf.Matrix4d()
             mat.SetTranslateOnly(
@@ -162,37 +172,26 @@ def mjcf_to_usd_handle(xml_path: str):
             )
             transform.Set(mat)
 
-            physics_rigid_body_api = UsdPhysics.RigidBodyAPI(body_prim)
-            physics_rigid_body_api.Apply(body_prim.GetPrim())
-
-            physics_mass_api = UsdPhysics.MassAPI(body_prim)
-            physics_mass_api.CreateCenterOfMassAttr(
-                Gf.Vec3f(body.ipos[0], body.ipos[1], body.ipos[2])
-            )
-            physics_mass_api.CreateMassAttr(body.mass[0])
-            physics_mass_api.CreateDiagonalInertiaAttr(
-                Gf.Vec3f(body.inertia[0], body.inertia[1], body.inertia[2])
-            )
-            physics_mass_api.Apply(body_prim.GetPrim())
-
-            if body.jntnum[0] != 1 or (
-                body.jntnum[0] == 1
-                and mj_model.joint(body.jntadr[0]).type == mujoco.mjtJoint.mjJNT_FREE
-            ):
-                physics_scene = UsdPhysics.Scene.Define(stage, body_path.AppendPath('physics_scene'))
-
-                grav_comp = xml_body_gravcomp_dict[body_id] - 1
-                if grav_comp >= 0:
-                    physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, 1))
-                    physics_scene.CreateGravityMagnitudeAttr(9.81 * grav_comp)
+            if body.geomnum[0] > 0:
+                physics_rigid_body_api = UsdPhysics.RigidBodyAPI(body_prim)
+                parent_body_prim = stage.GetPrimAtPath(parent_body_path)
+                parent_physics_rigid_body_api = UsdPhysics.RigidBodyAPI(parent_body_prim)
+                if not parent_physics_rigid_body_api.GetRigidBodyEnabledAttr().Get() and body.jntnum[0] == 0:
+                    physics_rigid_body_api.CreateRigidBodyEnabledAttr(False)
                 else:
-                    physics_scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
-                    physics_scene.CreateGravityMagnitudeAttr(-9.81 * grav_comp)
+                    physics_rigid_body_api.CreateRigidBodyEnabledAttr(True)
+                physics_rigid_body_api.Apply(body_prim.GetPrim())
 
-                articulation_root_api = UsdPhysics.ArticulationRootAPI(body_prim)
-                articulation_root_api.Apply(body_prim.GetPrim())
+                physics_mass_api = UsdPhysics.MassAPI(body_prim)
+                physics_mass_api.CreateCenterOfMassAttr(
+                    Gf.Vec3f(body.ipos[0], body.ipos[1], body.ipos[2])
+                )
+                physics_mass_api.CreateMassAttr(body.mass[0])
+                physics_mass_api.CreateDiagonalInertiaAttr(
+                    Gf.Vec3f(body.inertia[0], body.inertia[1], body.inertia[2])
+                )
+                physics_mass_api.Apply(body_prim.GetPrim())
 
-        # Convert mujoco geom to UsdGeom
         for i in range(body.geomnum[0]):
             geom_id = body.geomadr[0] + i
             geom = mj_model.geom(geom_id)
@@ -274,25 +273,17 @@ def mjcf_to_usd_handle(xml_path: str):
             geom_prim.CreateDisplayColorAttr(geom.rgba[:3])
             geom_prim.CreateDisplayOpacityAttr(geom.rgba[3])
         
-        # Convert mujoco joint to UsdJoint
         if body_id != 0:
-            parent_body = mj_model.body(body.parentid[0])
-            if body.parentid[0] != 0:
-                if parent_body.name == '':
-                    parent_body_path = root_path.AppendPath(
-                        'body_' + str(body.parentid[0])
-                    )
-                else:
-                    parent_body_path = root_path.AppendPath(
-                        parent_body.name.replace('-', '_')
-                    )
-            else:
-                parent_body_path = root_path
-
-            if body.jntnum[0] == 0:
-                joint_path = parent_body_path.AppendPath('fixed_joint')
+            physics_rigid_body_api = UsdPhysics.RigidBodyAPI(body_prim)
+            if body.jntnum[0] == 0 and physics_rigid_body_api.GetRigidBodyEnabledAttr().Get():
+                # print(body.name)
+                joint_path = parent_body_path.AppendPath(body.name + '_fixed_joint')
                 joint_prim = UsdPhysics.FixedJoint.Define(stage, joint_path)
-                joint_prim.GetBody0Rel().SetTargets([body_path])
+                joint_prim.GetBody0Rel().SetTargets([parent_body_path])
+                joint_prim.GetBody1Rel().SetTargets([body_path])
+
+                joint_prim.CreateLocalPos0Attr(Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2]))
+                joint_prim.CreateLocalRot0Attr(Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3]))
 
             elif body.jntnum[0] == 1 and mj_model.joint(body.jntadr[0]).type != mujoco.mjtJoint.mjJNT_FREE:
                 joint_id = body.jntadr[0]
