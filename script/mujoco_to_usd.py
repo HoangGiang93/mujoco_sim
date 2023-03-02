@@ -2,7 +2,7 @@
 
 import rospy
 from std_srvs.srv import Trigger, TriggerResponse
-from pxr import Usd, UsdGeom, Sdf, Gf, Vt, UsdPhysics
+from pxr import Usd, UsdGeom, Sdf, Gf, UsdPhysics
 import mujoco
 import numpy
 import xml.etree.ElementTree as ET
@@ -272,7 +272,7 @@ def mjcf_to_usd_handle(xml_path: str):
                 )
                 geom_prim.CreateFaceVertexCountsAttr([4])
                 geom_prim.CreateFaceVertexIndicesAttr([0, 1, 3, 2])
-                mat.SetScale(Gf.Vec3d(100, 100, 100))
+                mat.SetScale(Gf.Vec3d(1, 1, 100))
 
             else:
                 rospy.logwarn(
