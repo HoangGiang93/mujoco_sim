@@ -21,8 +21,8 @@ def usd_to_owl(file_path: str) -> None:
                 break
 
     onto_path.append("/home/giangnguyen/Workspace/mujoco_ws")
-    TBox_onto = get_ontology('file:///home/giangnguyen/Workspace/mujoco_ws/TBox.owl')
-    ABox_onto = get_ontology('file:///home/giangnguyen/Workspace/mujoco_ws/ABox.owl')
+    TBox_onto = get_ontology('http://iai_apartment/TBox.owl')
+    ABox_onto = get_ontology('http://iai_apartment/ABox.owl')
 
     soma_onto = get_ontology(
         'http://www.ease-crc.org/ont/SOMA.owl')
@@ -121,7 +121,6 @@ def usd_to_owl(file_path: str) -> None:
             elif prim_type == 'CoffeeTableDrawer':
                 prim = CoffeeTableDrawer(prim_name)
             
-
     TBox_onto.save(file='TBox.owl')
     ABox_onto.save(file='ABox.owl')
     return None
