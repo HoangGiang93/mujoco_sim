@@ -34,44 +34,44 @@ using namespace std::chrono_literals;
 
 ros::Time MjRos::ros_start;
 
-std::map<std::string, std::string> root_names;
+static std::map<std::string, std::string> root_names;
 
-std::map<EObjectType, double> pub_marker_array_rate;
-std::map<EObjectType, double> pub_tf_rate;
-std::map<EObjectType, double> pub_object_state_array_rate;
-std::map<EObjectType, double> pub_joint_states_rate;
+static std::map<EObjectType, double> pub_marker_array_rate;
+static std::map<EObjectType, double> pub_tf_rate;
+static std::map<EObjectType, double> pub_object_state_array_rate;
+static std::map<EObjectType, double> pub_joint_states_rate;
 
-double pub_base_pose_rate;
-double pub_sensor_data_rate;
-double spawn_and_destroy_objects_rate;
-int spawn_object_count_per_cycle;
+static double pub_base_pose_rate;
+static double pub_sensor_data_rate;
+static double spawn_and_destroy_objects_rate;
+static int spawn_object_count_per_cycle;
 
-std::map<EObjectType, visualization_msgs::Marker> marker;
-std::map<EObjectType, visualization_msgs::MarkerArray> marker_array;
-std::map<EObjectType, sensor_msgs::JointState> joint_states;
-std::map<EObjectType, mujoco_msgs::ObjectStateArray> object_state_array;
-std::map<EObjectType, bool> free_bodies_only;
+static std::map<EObjectType, visualization_msgs::Marker> marker;
+static std::map<EObjectType, visualization_msgs::MarkerArray> marker_array;
+static std::map<EObjectType, sensor_msgs::JointState> joint_states;
+static std::map<EObjectType, mujoco_msgs::ObjectStateArray> object_state_array;
+static std::map<EObjectType, bool> free_bodies_only;
 
-std::map<std::string, nav_msgs::Odometry> base_poses;
+static std::map<std::string, nav_msgs::Odometry> base_poses;
 
-std::condition_variable condition;
+static std::condition_variable condition;
 
-int spawn_nr = 0;
-std::mutex spawn_mtx;
-std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
+static int spawn_nr = 0;
+static std::mutex spawn_mtx;
+static std::vector<mujoco_msgs::ObjectStatus> objects_to_spawn;
 static std::set<std::string> spawned_object_names;
-bool spawn_success;
+static bool spawn_success;
 
-int destroy_nr = 0;
-std::mutex destroy_mtx;
+static int destroy_nr = 0;
+static std::mutex destroy_mtx;
 static std::set<std::string> object_names_to_destroy;
-bool destroy_success;
+static bool destroy_success;
 
-bool pub_tf_of_free_bodies_only;
-bool pub_object_marker_array_of_free_bodies_only;
-bool pub_object_state_array_of_free_bodies_only;
+static bool pub_tf_of_free_bodies_only;
+static bool pub_object_marker_array_of_free_bodies_only;
+static bool pub_object_state_array_of_free_bodies_only;
 
-std::map<mjtObj, std::map<std::string, std::string>> name_map;
+static std::map<mjtObj, std::map<std::string, std::string>> name_map;
 
 static std::map<mjtObj, int> unique_index = {{mjtObj::mjOBJ_MESH, 0}, {mjtObj::mjOBJ_BODY, 0}, {mjtObj::mjOBJ_JOINT, 0}, {mjtObj::mjOBJ_GEOM, 0}};
 
@@ -131,7 +131,7 @@ static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_
     }
 }
 
-std::function<void(tinyxml2::XMLElement *, const mjtObj)> add_index = [](tinyxml2::XMLElement *element, const mjtObj type)
+static std::function<void(tinyxml2::XMLElement *, const mjtObj)> add_index = [](tinyxml2::XMLElement *element, const mjtObj type)
 {
     if (element->Attribute("name") == nullptr)
     {
@@ -144,7 +144,7 @@ std::function<void(tinyxml2::XMLElement *, const mjtObj)> add_index = [](tinyxml
     element->SetAttribute("name", name.c_str());
 };
 
-std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyxml2::XMLElement *element, const mjtObj type)
+static std::function<void(tinyxml2::XMLElement *, const mjtObj)> check_index = [](tinyxml2::XMLElement *element, const mjtObj type)
 {
     if (element->Attribute("name") == nullptr)
     {
