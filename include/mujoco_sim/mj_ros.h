@@ -62,11 +62,17 @@ enum EObjectType : std::int8_t
 };
 
 class MjRos
-{
+{   
 public:
-    MjRos() = default;
+    MjRos(const MjRos &) = delete;
 
-    ~MjRos();
+    void operator=(MjRos const &) = delete;
+
+    static MjRos &get_instance()
+    {
+        static MjRos mj_ros;
+        return mj_ros;
+    }
 
 public:
     /**
@@ -84,24 +90,31 @@ public:
 
     /**
      * @brief Setup publish threads
-     * 
+     *
      */
     void setup_publishers();
 
     /**
      * @brief Setup service server threads
-     * 
+     *
      */
     void setup_service_servers();
 
     /**
      * @brief Get the controlled joints from ros_control
-     * 
+     *
      */
     void get_controlled_joints();
 
+public:
+    static ros::Time ros_start;
+    
 private:
+    MjRos() = default; // Singleton
 
+    ~MjRos();
+
+private:
     void publish_tf(const EObjectType object_type = EObjectType::None);
 
     void publish_marker_array(const EObjectType object_type = EObjectType::None);
@@ -117,7 +130,6 @@ private:
     void spawn_and_destroy_objects();
 
 private:
-
     bool screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
 
     bool reset_robot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerResponse &res);
@@ -142,12 +154,7 @@ private:
 
     void reset_robot();
 
-public:
-
-    static ros::Time ros_start;
-
 private:
-
     ros::NodeHandle n;
 
     std::string root_frame_id;

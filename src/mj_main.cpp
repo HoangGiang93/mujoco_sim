@@ -28,9 +28,9 @@
 #include <controller_manager/controller_manager.h>
 #include <thread>
 
-static MjSim mj_sim;
+static MjSim &mj_sim = MjSim::get_instance();
 #ifdef VISUAL
-static MjVisual mj_visual;
+static MjVisual &mj_visual = MjVisual::get_instance();
 #endif
 
 static int i = 0;
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
     ROS_INFO("Initialize MuJoCo simulator successfully");
 
     ROS_INFO("Initializing ROS interface...");
-    MjRos mj_ros;
+    MjRos &mj_ros = MjRos::get_instance();
     mj_ros.init();
     ROS_INFO("Initialize ROS interface successfully");
 
@@ -190,9 +190,9 @@ int main(int argc, char **argv)
 
     mjcb_control = controller;
 
-    std::thread ros_thread1(&MjRos::setup_publishers, mj_ros);
-    std::thread ros_thread2(&MjRos::setup_service_servers, mj_ros);
-    std::thread ros_thread3(&MjRos::get_controlled_joints, mj_ros);
+    std::thread ros_thread1(&MjRos::setup_publishers, &mj_ros);
+    std::thread ros_thread2(&MjRos::setup_service_servers, &mj_ros);
+    std::thread ros_thread3(&MjRos::get_controlled_joints, &mj_ros);
 
     // start simulation thread
     std::thread sim_thread(simulate);

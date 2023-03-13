@@ -29,9 +29,15 @@
 class MjSim
 {
 public:
-    MjSim() = default;
+    MjSim(const MjSim &) = delete;
 
-    ~MjSim();
+    void operator=(MjSim const &) = delete;
+
+    static MjSim &get_instance()
+    {
+        static MjSim mj_sim;
+        return mj_sim;
+    }
 
 public:
     /**
@@ -109,4 +115,9 @@ public:
 
     // Fix bug from m->geom_pos and m->geom_quat
     static std::map<int, std::vector<mjtNum>> geom_pose;
+
+private:
+    MjSim() = default;
+
+    ~MjSim();
 };

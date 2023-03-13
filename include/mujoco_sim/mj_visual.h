@@ -27,17 +27,22 @@
 class MjVisual
 {
 public:
-    MjVisual() = default;
+    MjVisual(const MjVisual &) = delete;
 
-    ~MjVisual();
+    void operator=(MjVisual const &) = delete;
 
-public:
+    static MjVisual &get_instance()
+    {
+        static MjVisual mj_visual;
+        return mj_visual;
+    }
+
     /**
      * @brief Initialize the window
      *
      */
     void init();
-    
+
     /**
      * @brief mouse button callback
      *
@@ -88,6 +93,11 @@ public:
 
 public:
     GLFWwindow *window = NULL;
+
+private:
+    MjVisual() = default; // Singleton
+
+    ~MjVisual();
 
 private:
     static mjvCamera cam;  // abstract camera
