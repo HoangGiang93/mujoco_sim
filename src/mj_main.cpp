@@ -24,6 +24,7 @@
 #endif
 #include "mj_hw_interface.h"
 #include "mj_ros.h"
+#include "mj_socket.h"
 
 #include <controller_manager/controller_manager.h>
 #include <thread>
@@ -197,7 +198,11 @@ int main(int argc, char **argv)
     // start simulation thread
     std::thread sim_thread(simulate);
 
+    start_socket();
+
     mjtNum sim_step_start = d->time;
+
+    std::thread socket_thread(run_socket);
 
 #ifdef VISUAL
     while (ros::ok())
@@ -222,6 +227,9 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
+    socket_thread.join();
+
+    close_socket();
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);
