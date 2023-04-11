@@ -81,7 +81,6 @@ void send_msg_thread(int data_socket)
             }
 
             std::string data_str = data_json.toStyledString();
-            ROS_INFO("Data size: %ld byte", data_str.size());
             if (data_str.size() > BUFFER_SIZE)
             {
                 ROS_WARN("Data too big (%ld byte)", data_str.size());
