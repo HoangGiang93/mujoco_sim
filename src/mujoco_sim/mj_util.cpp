@@ -171,7 +171,7 @@ static bool manage_XML(T &arg, const char *path, std::function<bool(T &arg, cons
 	if (duration.count() > TIMEOUT)
 	{
 		oss << "Load" << path << " takes " << duration.count() / 1000000.0 << " seconds";
-		mju_warning(oss.str().c_str());
+		mju_warning("%s", oss.str().c_str());
 	}
 
 	return success;
