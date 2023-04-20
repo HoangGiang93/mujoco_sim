@@ -118,7 +118,7 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     tinyxml2::XMLDocument doc;
     if (doc.LoadFile(model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_error_s("Couldn't read file in [%s]\n", model_urdf_path.c_str());
+        mju_error("Couldn't read file in [%s]\n", model_urdf_path.c_str());
     }
 
     tinyxml2::XMLElement *mujoco_element;
@@ -180,7 +180,7 @@ void add_robot_body(const boost::filesystem::path &model_path)
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -204,7 +204,7 @@ void fix_inertial(const boost::filesystem::path &model_path)
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -265,7 +265,7 @@ void add_mimic_joints(const boost::filesystem::path &model_path)
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -296,7 +296,7 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
     tinyxml2::XMLDocument model_xml_doc;
     if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_warning_s("Failed to load file \"%s\"\n", model_path.c_str());
+        mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
     }
 
@@ -334,7 +334,7 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
     }
     else if (disable_parent_child_collision_level < m->nbody)
     {
-        mju_warning_s("Disable self collision of %s", model.getName().c_str());
+        mju_warning("Disable self collision of %s", model.getName().c_str());
         for (int body_1_id = 0; body_1_id < m->nbody; body_1_id++)
         {
             for (int body_2_id = body_1_id + 1; body_2_id < m->nbody; body_2_id++)
