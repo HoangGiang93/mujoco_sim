@@ -903,6 +903,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         }
 
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
+        body_element->SetAttribute("name", object.info.name.c_str());
         if (object.info.movable)
         {
             tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
