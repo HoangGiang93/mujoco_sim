@@ -736,7 +736,7 @@ bool save_geom_quat(const char *path)
 																const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
 																for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
 																{
-																	if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) != MjSim::geom_pose.end())
+																	if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) == MjSim::geom_pose.end())
 																	{
 																		MjSim::geom_pose[geom_id].reserve(7);
 																		MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());
