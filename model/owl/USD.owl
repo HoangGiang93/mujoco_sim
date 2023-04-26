@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://ease-crc.org/ont/USD#"
+     xml:base="https://ease-crc.org/ont/USD"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="https://ease-crc.org/ont/USD">
+        <owl:imports rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#APISchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#APISchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#PrimSchema"/>
+        <rdfs:comment>A schema that serves as a API for reading and writing related data.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Attribute -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Attribute">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Property"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#GeomSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#GeomSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Layer -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Layer">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Collection"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Prim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Prim">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
+        <rdfs:comment>Prims are the primary container objects in USD files. Each prim has a specifier defining its role on a Stage. Prims may further contain sub-prims, attributes and relationships (properties). Attributes of prims have typed values that may change over time. Prims and attributes may also have meta data (constant over time). Each prim *may* have at most one schema typeName that restricts what data it contains.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#PrimSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrimSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Property -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Property">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Abstract"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#PropertySchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PropertySchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Relationship -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Relationship">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Property"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#SchadeSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SchadeSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Schema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Schema">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Description"/>
+        <rdfs:comment>Schemas are used to establish concrete representations and client API for common (computer graphics) concepts. They can be used for prims (&quot;prim schemas&quot;) or for properties (&quot;property schemas&quot;).</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Stage -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Stage">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Collection"/>
+        <rdfs:comment>Represents a scene graph derived from a USD file.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#TypedSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#TypedSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#PrimSchema"/>
+        <rdfs:comment>A schema used to define the role or purpose of a prim. Each TypedSchema defines &quot;typeName&quot; metadata (i.e. const over time). A prim may subscribe to at most one TypedSchema. Also called &quot;IsASchema&quot;.</rdfs:comment>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
