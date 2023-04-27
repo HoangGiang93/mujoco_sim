@@ -41,18 +41,87 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#GeomSchema -->
+    <!-- https://ease-crc.org/ont/USD#BoundableSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#GeomSchema">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#BoundableSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Xformable"/>
+        <rdfs:comment>A schema of prims with a finite spatial extend.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#ClassPrim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#ClassPrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#CollisionAPI -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CollisionAPI">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Layer -->
+    <!-- https://ease-crc.org/ont/USD#CubeSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Layer">
-        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Collection"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CubeSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+        <rdfs:comment>The schema of a cube-shaped prim.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#CylinderSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CylinderSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+        <rdfs:comment>The schema of a cylinder-shaped prim.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#DefinedPrim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#DefinedPrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Gprim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Gprim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#BoundableSchema"/>
+        <rdfs:comment>A schema that serves as a base class for all schemas of geometric primitives.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#JointSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#JointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+        <rdfs:comment>Contains properties that are used to constrain the motion of prims.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#MassAPI -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#MassAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#OverwritePrim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#OverwritePrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
     </owl:Class>
     
 
@@ -61,6 +130,13 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD#Prim">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isDescribedBy"/>
+                <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
+                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:comment>Prims are the primary container objects in USD files. Each prim has a specifier defining its role on a Stage. Prims may further contain sub-prims, attributes and relationships (properties). Attributes of prims have typed values that may change over time. Prims and attributes may also have meta data (constant over time). Each prim *may* have at most one schema typeName that restricts what data it contains.</rdfs:comment>
     </owl:Class>
     
@@ -70,6 +146,21 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrimSchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>A schema that used for describing prims.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#PrismaticJointSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrismaticJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#JointSchema"/>
     </owl:Class>
     
 
@@ -86,6 +177,7 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD#PropertySchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+        <rdfs:comment>A schema used for describing properties.</rdfs:comment>
     </owl:Class>
     
 
@@ -98,10 +190,27 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#SchadeSchema -->
+    <!-- https://ease-crc.org/ont/USD#RevoluteJointSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SchadeSchema">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#RevoluteJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#JointSchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#RigidBodyAPI -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#RigidBodyAPI">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#SceneSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SceneSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+        <rdfs:comment>A schema that models general properties used for simulation.</rdfs:comment>
     </owl:Class>
     
 
@@ -110,7 +219,24 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD#Schema">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Description"/>
-        <rdfs:comment>Schemas are used to establish concrete representations and client API for common (computer graphics) concepts. They can be used for prims (&quot;prim schemas&quot;) or for properties (&quot;property schemas&quot;).</rdfs:comment>
+        <rdfs:comment>USD Schemas are used to establish concrete representations of data. They entail that a certain set of properties is used for describing some phenomena such as properties used to quantify the mass of an object. As such they describe objects where certain qualities of the object are quantified in a specific way. They may also imply type constraints for objects they describe. Most of the schemas are used to describe prims, however, USD also has some builtin schemas for describing properties.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#SemanticsAPI -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SemanticsAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#SphereSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SphereSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+        <rdfs:comment>The schema of a sphere-shaped prim.</rdfs:comment>
     </owl:Class>
     
 
@@ -128,7 +254,25 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD#TypedSchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#PrimSchema"/>
-        <rdfs:comment>A schema used to define the role or purpose of a prim. Each TypedSchema defines &quot;typeName&quot; metadata (i.e. const over time). A prim may subscribe to at most one TypedSchema. Also called &quot;IsASchema&quot;.</rdfs:comment>
+        <rdfs:comment>A schema used to define the role or purpose of a prim. Also called &quot;IsASchema&quot;. Each prim may subscribe to at most one TypedSchema.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Xform -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Xform">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Xformable"/>
+        <rdfs:comment>A concrete Xformable schema, meaning that it refers to a concrete object in the scene.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD#Xformable -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Xformable">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+        <rdfs:comment>A schema of prims that can be transformed in space.</rdfs:comment>
     </owl:Class>
 </rdf:RDF>
 
