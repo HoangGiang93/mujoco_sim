@@ -29,7 +29,7 @@ def get_data(data, key: list, i: int, length: int) -> None:
                     [[float(data[i][3 * k + j]) for j in range(3)] for k in range(3)]
                 )
             i += 1
-        except ValueError:
+        except (IndexError, ValueError):
             return None
 
 
@@ -141,6 +141,7 @@ def mjcf_to_usd_handle(xml_path: str):
     body_paths = {}
     body_paths[0] = body_path
     for body_id, body_element in enumerate(xml_tree.iter('body')):
+        body_id += 1
         body = mj_model.body(body_id)
         if body_id != 0:
             parent_body_id = body.parentid[0]
@@ -296,65 +297,68 @@ def mjcf_to_usd_handle(xml_path: str):
         
         if body_id != 0:
             physics_rigid_body_api = UsdPhysics.RigidBodyAPI(body_prim)
-            if body.jntnum[0] == 1 and mj_model.joint(body.jntadr[0]).type != mujoco.mjtJoint.mjJNT_FREE:
-                joint_id = body.jntadr[0]
-                joint = mj_model.joint(joint_id)
+            if body.jntnum[0] > 0:
+                for joint_nr in range(body.jntnum[0]):
+                    if mj_model.joint(body.jntadr[joint_nr]).type == mujoco.mjtJoint.mjJNT_FREE:
+                        continue
+                    joint_id = body.jntadr[joint_nr]
+                    joint = mj_model.joint(joint_id)
 
-                joint_pos = Gf.Vec3f(joint.pos[0], joint.pos[1], joint.pos[2])
-                joint_rot = Gf.Quatf(1, 0, 0, 0)
-
-                if joint.name == '':
-                    joint_path = parent_body_path.AppendPath('joint_' + str(joint_id))
-                else:
-                    joint_path = parent_body_path.AppendPath(joint.name.replace('-', '_'))
-
-                if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
-                    joint_prim = UsdPhysics.RevoluteJoint.Define(stage, joint_path)
-                    if joint.limited[0]:
-                        joint_prim.CreateLowerLimitAttr(degrees(joint.range[0]))
-                        joint_prim.CreateUpperLimitAttr(degrees(joint.range[1]))
-                elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
-                    joint_prim = UsdPhysics.PrismaticJoint.Define(stage, joint_path)
-                    if joint.limited[0]:
-                        joint_prim.CreateLowerLimitAttr(joint.range[0])
-                        joint_prim.CreateUpperLimitAttr(joint.range[1])
-                elif joint.type == mujoco.mjtJoint.mjJNT_BALL:
-                    joint_prim = UsdPhysics.SphericalJoint.Define(stage, joint_path)
-
-                joint_prim.CreateAxisAttr('Z')
-                if numpy.array_equal(joint.axis, [1, 0, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0, 0.7071068, 0)
-                elif numpy.array_equal(joint.axis, [0, 1, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, -0.7071068, 0, 0)
-                elif numpy.array_equal(joint.axis, [0, 0, 1]):
+                    joint_pos = Gf.Vec3f(joint.pos[0], joint.pos[1], joint.pos[2])
                     joint_rot = Gf.Quatf(1, 0, 0, 0)
-                elif numpy.array_equal(joint.axis, [-1, 0, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0, -0.7071068, 0)
-                elif numpy.array_equal(joint.axis, [0, -1, 0]):
-                    joint_rot = Gf.Quatf(0.7071068, 0.7071068, 0, 0)
-                elif numpy.array_equal(joint.axis, [0, 0, -1]):
-                    joint_rot = Gf.Quatf(0, 0, 1, 0)
 
-                joint_prim.CreateCollisionEnabledAttr(False)
+                    if joint.name == '':
+                        joint_path = parent_body_path.AppendPath('joint_' + str(joint_id))
+                    else:
+                        joint_path = parent_body_path.AppendPath(joint.name.replace('-', '_'))
 
-                joint_prim.GetBody0Rel().SetTargets([parent_body_path])
-                joint_prim.GetBody1Rel().SetTargets([body_path])
+                    if joint.type == mujoco.mjtJoint.mjJNT_HINGE:
+                        joint_prim = UsdPhysics.RevoluteJoint.Define(stage, joint_path)
+                        if joint.limited[0]:
+                            joint_prim.CreateLowerLimitAttr(degrees(joint.range[0]))
+                            joint_prim.CreateUpperLimitAttr(degrees(joint.range[1]))
+                    elif joint.type == mujoco.mjtJoint.mjJNT_SLIDE:
+                        joint_prim = UsdPhysics.PrismaticJoint.Define(stage, joint_path)
+                        if joint.limited[0]:
+                            joint_prim.CreateLowerLimitAttr(joint.range[0])
+                            joint_prim.CreateUpperLimitAttr(joint.range[1])
+                    elif joint.type == mujoco.mjtJoint.mjJNT_BALL:
+                        joint_prim = UsdPhysics.SphericalJoint.Define(stage, joint_path)
 
-                body1_rot = Gf.Quatf(
-                        parent_body.quat[0],
-                        parent_body.quat[1],
-                        parent_body.quat[2],
-                        parent_body.quat[3],
-                    )
-                
-                body2_pos = Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2])
-                body2_rot = Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3])
+                    joint_prim.CreateAxisAttr('Z')
+                    if numpy.array_equal(joint.axis, [1, 0, 0]):
+                        joint_rot = Gf.Quatf(0.7071068, 0, 0.7071068, 0)
+                    elif numpy.array_equal(joint.axis, [0, 1, 0]):
+                        joint_rot = Gf.Quatf(0.7071068, -0.7071068, 0, 0)
+                    elif numpy.array_equal(joint.axis, [0, 0, 1]):
+                        joint_rot = Gf.Quatf(1, 0, 0, 0)
+                    elif numpy.array_equal(joint.axis, [-1, 0, 0]):
+                        joint_rot = Gf.Quatf(0.7071068, 0, -0.7071068, 0)
+                    elif numpy.array_equal(joint.axis, [0, -1, 0]):
+                        joint_rot = Gf.Quatf(0.7071068, 0.7071068, 0, 0)
+                    elif numpy.array_equal(joint.axis, [0, 0, -1]):
+                        joint_rot = Gf.Quatf(0, 0, 1, 0)
 
-                joint_prim.CreateLocalPos0Attr(body2_pos + body1_rot.Transform(joint_pos))
-                joint_prim.CreateLocalPos1Attr(Gf.Vec3f())
+                    joint_prim.CreateCollisionEnabledAttr(False)
 
-                joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
-                joint_prim.CreateLocalRot1Attr(joint_rot)
+                    joint_prim.GetBody0Rel().SetTargets([parent_body_path])
+                    joint_prim.GetBody1Rel().SetTargets([body_path])
+
+                    body1_rot = Gf.Quatf(
+                            parent_body.quat[0],
+                            parent_body.quat[1],
+                            parent_body.quat[2],
+                            parent_body.quat[3],
+                        )
+                    
+                    body2_pos = Gf.Vec3f(body.pos[0], body.pos[1], body.pos[2])
+                    body2_rot = Gf.Quatf(body.quat[0], body.quat[1], body.quat[2], body.quat[3])
+
+                    joint_prim.CreateLocalPos0Attr(body2_pos + body1_rot.Transform(joint_pos))
+                    joint_prim.CreateLocalPos1Attr(Gf.Vec3f())
+
+                    joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
+                    joint_prim.CreateLocalRot1Attr(joint_rot)
 
     stage.SetDefaultPrim(root_prim.GetPrim())
 
