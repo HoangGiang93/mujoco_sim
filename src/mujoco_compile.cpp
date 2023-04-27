@@ -147,6 +147,8 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     compiler_element->SetAttribute("strippath", false);
     compiler_element->SetAttribute("balanceinertia", true);
     compiler_element->SetAttribute("discardvisual", true);
+    compiler_element->SetAttribute("boundmass", "0.001");
+    compiler_element->SetAttribute("boundinertia", "0.001");
 
     for (tinyxml2::XMLElement *link_element = doc.FirstChildElement()->FirstChildElement("link");
          link_element != nullptr;
@@ -194,67 +196,6 @@ void add_robot_body(const boost::filesystem::path &model_path)
             robot_element->LinkEndChild(body_element);
         }
         worldbody_element->LinkEndChild(robot_element);
-    }
-
-    model_xml_doc.SaveFile(model_path.c_str());
-}
-
-void fix_inertial(const boost::filesystem::path &model_path)
-{
-    tinyxml2::XMLDocument model_xml_doc;
-    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
-    {
-        mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
-        return;
-    }
-
-    for (tinyxml2::XMLElement *worldbody_element = model_xml_doc.FirstChildElement()->FirstChildElement("worldbody");
-         worldbody_element != nullptr;
-         worldbody_element = worldbody_element->NextSiblingElement("worldbody"))
-    {
-        do_each_child_element(worldbody_element, [&](tinyxml2::XMLElement *body_element)
-                              {
-                                if (body_element->FirstChildElement("joint") == nullptr || body_element->FirstChildElement("joint")->Attribute("type", "fixed"))
-                                {
-                                    return;
-                                }
-                                
-                                tinyxml2::XMLElement *inertial_element = body_element->FirstChildElement("inertial");
-                                if (inertial_element == nullptr)
-                                {
-                                    inertial_element = model_xml_doc.NewElement("inertial");
-                                    body_element->InsertFirstChild(inertial_element);
-                                }
-
-                                if (inertial_element->Attribute("pos") == nullptr)
-                                {
-                                    inertial_element->SetAttribute("pos", "0 0 0");
-                                }
-
-                                if (inertial_element->Attribute("mass") == nullptr || std::atof(inertial_element->Attribute("mass")) < mjMINVAL)
-                                {
-                                    inertial_element->SetAttribute("mass", "0.001");
-                                }
-
-                                if (inertial_element->Attribute("inertia") == nullptr && inertial_element->Attribute("diaginertia") == nullptr)
-                                {
-                                    inertial_element->SetAttribute("diaginertia", "0.001 0.001 0.001");
-                                }
-                                
-                                if (inertial_element->Attribute("inertia") != nullptr)
-                                {
-                                    std::istringstream iss(inertial_element->Attribute("inertia"));
-                                    std::vector<mjtNum> inertia = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
-                                    mjtNum sum_inertia = 0.0;
-                                    for (const mjtNum inertia_element : inertia)
-                                    {
-                                    sum_inertia += mju_abs(inertia_element);
-                                    }
-                                    if (sum_inertia < mjMINVAL)
-                                    {
-                                        inertial_element->SetAttribute("inertia", "0.001 0 0 0.001 0 0.001");
-                                    }
-                                } });
     }
 
     model_xml_doc.SaveFile(model_path.c_str());
@@ -515,8 +456,6 @@ int main(int argc, char **argv)
     {
         return finish(error);
     }
-
-    fix_inertial(output);
 
     add_robot_body(output);
 
