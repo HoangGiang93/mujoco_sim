@@ -730,8 +730,8 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         std::function<void(tinyxml2::XMLElement *)> change_meshdir_cb = [&](tinyxml2::XMLElement *compiler_element)
         {
             compiler_element->DeleteAttribute("meshdir");
-            compiler_element->SetAttribute("boundmass", "0.001");
-            compiler_element->SetAttribute("boundinertia", "0.001");
+            compiler_element->SetAttribute("boundmass", "0.000001");
+            compiler_element->SetAttribute("boundinertia", "0.000001");
         };
 
         tinyxml2::XMLDocument doc;
@@ -1608,9 +1608,11 @@ void MjRos::spawn_and_destroy_objects()
             condition.notify_all();
         }
 
-        // Publish destroy markers
-
-        marker_array_pub.publish(destroy_marker_array);
+        if (destroy_marker_array.markers.size() > 0)
+        {
+            // Publish destroy markers
+            marker_array_pub.publish(destroy_marker_array);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
