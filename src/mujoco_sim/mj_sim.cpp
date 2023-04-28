@@ -550,6 +550,15 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 	}
 
 	mtx.lock();
+
+	std::function<void(tinyxml2::XMLElement *)> add_bound_cb = [&](tinyxml2::XMLElement *compiler_element)
+	{
+		compiler_element->SetAttribute("boundmass", "0.001");
+		compiler_element->SetAttribute("boundinertia", "0.001");
+	};
+
+	do_each_child_element(doc.FirstChildElement(), "compiler", add_bound_cb);
+
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
 	std::set<tinyxml2::XMLElement *> body_elements_to_delete;
 	for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");

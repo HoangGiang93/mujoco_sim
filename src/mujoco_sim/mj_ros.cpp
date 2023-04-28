@@ -730,6 +730,8 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         std::function<void(tinyxml2::XMLElement *)> change_meshdir_cb = [&](tinyxml2::XMLElement *compiler_element)
         {
             compiler_element->DeleteAttribute("meshdir");
+            compiler_element->SetAttribute("boundmass", "0.001");
+            compiler_element->SetAttribute("boundinertia", "0.001");
         };
 
         tinyxml2::XMLDocument doc;
