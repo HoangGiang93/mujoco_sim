@@ -865,7 +865,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
 
     std::unique_lock<std::mutex> lk(spawn_mtx);
     spawn_success = false;
-    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 1000ms, [&]
                              { return spawn_success; }))
     {
         MjSim::reload_mesh = true;
@@ -1469,7 +1469,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     std::unique_lock<std::mutex> lk(destroy_mtx);
 
     destroy_success = false;
-    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 1000ms, [&]
                              { return destroy_success; }))
     {
         res.object_states = object_states;
