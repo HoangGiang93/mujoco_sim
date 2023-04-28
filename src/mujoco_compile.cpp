@@ -147,8 +147,8 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
     compiler_element->SetAttribute("strippath", false);
     compiler_element->SetAttribute("balanceinertia", true);
     compiler_element->SetAttribute("discardvisual", true);
-    compiler_element->SetAttribute("boundmass", "0.001");
-    compiler_element->SetAttribute("boundinertia", "0.001");
+    compiler_element->SetAttribute("boundmass", "0.000001");
+    compiler_element->SetAttribute("boundinertia", "0.000001");
 
     for (tinyxml2::XMLElement *link_element = doc.FirstChildElement()->FirstChildElement("link");
          link_element != nullptr;
