@@ -131,6 +131,35 @@
     
 
 
+    <!-- https://ease-crc.org/ont/USD.owl#hasConnection -->
+
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasConnection">
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
+        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasConnection"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
+        <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
+        <rdfs:comment>A transitive and symmetric relation that expresses (indirect) connection between entities.</rdfs:comment>
+        <rdfs:label>has connection</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#hasDirectConnection -->
+
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasDirectConnection">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasConnection"/>
+        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasDirectConnection"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+        <rdfs:domain rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
+        <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
+        <rdfs:comment>A symmetric relation that expresses direct connection between entities.</rdfs:comment>
+        <rdfs:label>has direct connection</rdfs:label>
+    </owl:ObjectProperty>
+    
+
+
     <!-- https://ease-crc.org/ont/USD.owl#hasPhysics -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasPhysics">
@@ -187,18 +216,10 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#physicsRelation -->
-
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physicsRelation">
-        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://ease-crc.org/ont/USD.owl#physics:body0 -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body0">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasDirectConnection"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
@@ -210,7 +231,7 @@
     <!-- https://ease-crc.org/ont/USD.owl#physics:body1 -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body1">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasDirectConnection"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
@@ -222,7 +243,7 @@
     <!-- https://ease-crc.org/ont/USD.owl#physics:simulationOwner -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:simulationOwner">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
