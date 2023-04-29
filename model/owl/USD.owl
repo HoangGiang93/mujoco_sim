@@ -8,8 +8,9 @@
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:xformOp="https://ease-crc.org/ont/USD#xformOp:">
-    <owl:Ontology rdf:about="https://ease-crc.org/ont/USD">
+     xmlns:xformOp="https://ease-crc.org/ont/USD#xformOp:"
+     xmlns:xformOp1="https://ease-crc.org/ont/USD.owl#xformOp:">
+    <owl:Ontology rdf:about="https://ease-crc.org/ont/USD.owl">
         <owl:imports rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl"/>
     </owl:Ontology>
     
@@ -26,85 +27,85 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#color3f_array -->
+    <!-- https://ease-crc.org/ont/USD.owl#color3f_array -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#color3f_array"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#color3f_array"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#double3 -->
+    <!-- https://ease-crc.org/ont/USD.owl#double3 -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#double3">
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#double3">
         <rdfs:comment>A vector of three double values.</rdfs:comment>
     </rdfs:Datatype>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#float3 -->
+    <!-- https://ease-crc.org/ont/USD.owl#float3 -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#float3">
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#float3">
         <rdfs:comment>A vector of three float values.</rdfs:comment>
     </rdfs:Datatype>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#float4 -->
+    <!-- https://ease-crc.org/ont/USD.owl#float4 -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#float4">
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#float4">
         <rdfs:comment>A vector of four float values.</rdfs:comment>
     </rdfs:Datatype>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#float_array -->
+    <!-- https://ease-crc.org/ont/USD.owl#float_array -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#float_array"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#float_array"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#matrix4d -->
+    <!-- https://ease-crc.org/ont/USD.owl#matrix4d -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#matrix4d">
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#matrix4d">
         <rdfs:comment>A 4x4 matrix with double elements.</rdfs:comment>
     </rdfs:Datatype>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#point3f -->
+    <!-- https://ease-crc.org/ont/USD.owl#point3f -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#point3f"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#point3f"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#quatf -->
+    <!-- https://ease-crc.org/ont/USD.owl#quatf -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#quatf">
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#quatf">
         <rdfs:comment>A quaternion with float values.</rdfs:comment>
     </rdfs:Datatype>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#token -->
+    <!-- https://ease-crc.org/ont/USD.owl#token -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#token"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#token"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#token_array -->
+    <!-- https://ease-crc.org/ont/USD.owl#token_array -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#token_array"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#token_array"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#u_token -->
+    <!-- https://ease-crc.org/ont/USD.owl#u_token -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#u_token"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#u_token"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#vector3f -->
+    <!-- https://ease-crc.org/ont/USD.owl#vector3f -->
 
-    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD#vector3f"/>
+    <rdfs:Datatype rdf:about="https://ease-crc.org/ont/USD.owl#vector3f"/>
     
 
 
@@ -119,101 +120,103 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#hasColor -->
+    <!-- https://ease-crc.org/ont/USD.owl#hasColor -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#hasColor">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasColor">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
-        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD#isColorOf"/>
+        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isColorOf"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#Color"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Color"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#hasPhysics -->
+    <!-- https://ease-crc.org/ont/USD.owl#hasPhysics -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#hasPhysics">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasPhysics">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Scene"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#hasShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#hasShape -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#hasShape">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasShape">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
-        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD#isShapeOf"/>
+        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isShapeOf"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#hasTypedSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#hasTypedSchema -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#hasTypedSchema">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasTypedSchema">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isDescribedBy"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#isColorOf -->
+    <!-- https://ease-crc.org/ont/USD.owl#isColorOf -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#isColorOf">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#isColorOf">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isQualityOf"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Color"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Color"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#isShapeOf -->
+    <!-- https://ease-crc.org/ont/USD.owl#isShapeOf -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#isShapeOf">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#isShapeOf">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isQualityOf"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Entity"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physicsRelation -->
+    <!-- https://ease-crc.org/ont/USD.owl#physicsRelation -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#physicsRelation"/>
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:body0 -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:body0 -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#physics:body0">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsRelation"/>
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body0">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:body1 -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:body1 -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#physics:body1">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsRelation"/>
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body1">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:simulationOwner -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:simulationOwner -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD#physics:simulationOwner">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsRelation"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:simulationOwner">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
         <rdfs:comment>todo: what is the range? i.e. who can be an owner?</rdfs:comment>
     </owl:ObjectProperty>
     
@@ -230,281 +233,281 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#height -->
+    <!-- https://ease-crc.org/ont/USD.owl#height -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#height">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#height">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physicsDataValue -->
+    <!-- https://ease-crc.org/ont/USD.owl#physicsDataValue -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physicsDataValue">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physicsDataValue">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#primvars -->
+    <!-- https://ease-crc.org/ont/USD.owl#primvars -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#primvars">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#primvars">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#radius -->
+    <!-- https://ease-crc.org/ont/USD.owl#radius -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#radius">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#radius">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#size -->
+    <!-- https://ease-crc.org/ont/USD.owl#size -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#size">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#size">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOp -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOp -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOp">
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOp">
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOpOrder -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOpOrder -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOpOrder">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#xformOp"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#token_array"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOpOrder">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#token_array"/>
         <rdfs:comment>Order of transformation operations</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:angularVelocity -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:angularVelocity -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:angularVelocity">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#vector3f"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:angularVelocity">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#vector3f"/>
         <rdfs:comment>Angular velocity in the prim’s local space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:axis -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:axis -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:axis">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#u_token"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:axis">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#u_token"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:centerOfMass -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:centerOfMass -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:centerOfMass">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#point3f"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:centerOfMass">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#point3f"/>
         <rdfs:comment>Center of mass in the prim’s local space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:collisionEnabled -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:collisionEnabled -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:collisionEnabled">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:collisionEnabled">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <rdfs:comment>Determines if the PhysicsCollisionAPI is enabled</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:density -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:density -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:density">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:density">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:comment>Density of the object</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:diagonalInertia -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:diagonalInertia -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:diagonalInertia">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#float3"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:diagonalInertia">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#float3"/>
         <rdfs:comment>Diagonalized inertia tensor along the principal axes</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:gravityDirection -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:gravityDirection -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:gravityDirection">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#vector3f"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:gravityDirection">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#vector3f"/>
         <rdfs:comment>Gravity direction vector in simulation world space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:gravityMagnitude -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:gravityMagnitude -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:gravityMagnitude">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:gravityMagnitude">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:comment>Gravity acceleration magnitude in simulation world space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:lowerLimit -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:lowerLimit -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:lowerLimit">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:lowerLimit">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:mass -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:mass -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:mass">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:mass">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
         <rdfs:comment>Mass of the object</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:principalAxes -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:principalAxes -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:principalAxes">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#quatf"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:principalAxes">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#quatf"/>
         <rdfs:comment>Orientation of the inertia tensor’s principal axes in the prim’s local space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:rigidBodyEnabled -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:rigidBodyEnabled -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:rigidBodyEnabled">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:rigidBodyEnabled">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <rdfs:comment>Determines if this PhysicsRigidBodyAPI is enabled</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:upperLimit -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:upperLimit -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:upperLimit">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:upperLimit">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#float"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#physics:velocity -->
+    <!-- https://ease-crc.org/ont/USD.owl#physics:velocity -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#physics:velocity">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#physicsDataValue"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#vector3f"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:velocity">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#vector3f"/>
         <rdfs:comment>Linear velocity in the prim’s local space</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#primvars:displayColor -->
+    <!-- https://ease-crc.org/ont/USD.owl#primvars:displayColor -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#primvars:displayColor">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#primvars"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#color3f_array"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#primvars:displayColor">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#primvars"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#color3f_array"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#primvars:displayOpacity -->
+    <!-- https://ease-crc.org/ont/USD.owl#primvars:displayOpacity -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#primvars:displayOpacity">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#primvars"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#float_array"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#primvars:displayOpacity">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#primvars"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#float_array"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOp:rotate -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOp:rotate -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOp:rotate">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#xformOp"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#float4"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOp:rotate">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#float4"/>
         <rdfs:comment>Rotation as a quaternion</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOp:scale -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOp:scale -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOp:scale">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#xformOp"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#float3"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOp:scale">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#float3"/>
         <rdfs:comment>Scale factor</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOp:transform -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOp:transform -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOp:transform">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#xformOp"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#matrix4d"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOp:transform">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#matrix4d"/>
         <rdfs:comment>3D transformation matrix</rdfs:comment>
     </owl:DatatypeProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#xformOp:translate -->
+    <!-- https://ease-crc.org/ont/USD.owl#xformOp:translate -->
 
-    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD#xformOp:translate">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD#xformOp"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD#double3"/>
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#xformOp:translate">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#double3"/>
         <rdfs:comment>Translation vector</rdfs:comment>
     </owl:DatatypeProperty>
     
@@ -521,45 +524,45 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#APISchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#APISchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#APISchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#PrimSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#APISchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#PrimSchema"/>
         <rdfs:comment>A schema that serves as a API for reading and writing related data.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#BoundableSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#BoundableSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#BoundableSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Xformable"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#BoundableSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Xformable"/>
         <rdfs:comment>A schema of prims with a finite spatial extend.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#ClassPrim -->
+    <!-- https://ease-crc.org/ont/USD.owl#ClassPrim -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#ClassPrim">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#ClassPrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#CollisionAPI -->
+    <!-- https://ease-crc.org/ont/USD.owl#CollisionAPI -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CollisionAPI">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CollisionAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:collisionEnabled"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:collisionEnabled"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -571,25 +574,25 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Color -->
+    <!-- https://ease-crc.org/ont/USD.owl#Color -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Color">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Color">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#CubeSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#CubeSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CubeSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CubeSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
-                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#CubeShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
+                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeShape"/>
                     </owl:Restriction>
                 </owl:allValuesFrom>
             </owl:Restriction>
@@ -599,10 +602,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#size"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#size"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -615,25 +618,25 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#CubeShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#CubeShape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CubeShape">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CubeShape">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#CylinderSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#CylinderSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CylinderSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CylinderSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
-                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#CylinderShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
+                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CylinderShape"/>
                     </owl:Restriction>
                 </owl:allValuesFrom>
             </owl:Restriction>
@@ -643,10 +646,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#height"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#height"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -659,10 +662,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#radius"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#radius"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -675,26 +678,26 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#CylinderShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#CylinderShape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#CylinderShape">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CylinderShape">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#DefinedPrim -->
+    <!-- https://ease-crc.org/ont/USD.owl#DefinedPrim -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#DefinedPrim">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#DefinedPrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Gprim -->
+    <!-- https://ease-crc.org/ont/USD.owl#Gprim -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Gprim">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#BoundableSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Gprim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#BoundableSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
@@ -704,7 +707,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#WithDisplayColor"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithDisplayColor"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:comment>A schema that serves as a base class for all schemas of geometric primitives.</rdfs:comment>
@@ -712,23 +715,23 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Joint -->
+    <!-- https://ease-crc.org/ont/USD.owl#Joint -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Joint">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Joint">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
         <rdfs:comment>todo: rather import this notion!</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#JointSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#JointSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#JointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#JointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#Joint"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:comment>Contains properties that are used to constrain the motion of prims.</rdfs:comment>
@@ -736,19 +739,19 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#MassAPI -->
+    <!-- https://ease-crc.org/ont/USD.owl#MassAPI -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#MassAPI">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#MassAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:centerOfMass"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:centerOfMass"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -761,10 +764,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:density"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:density"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -777,10 +780,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:diagonalInertia"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:diagonalInertia"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -793,10 +796,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:mass"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:mass"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -809,10 +812,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:principalAxes"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:principalAxes"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -824,45 +827,54 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#OverwritePrim -->
+    <!-- https://ease-crc.org/ont/USD.owl#OverwritePrim -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#OverwritePrim">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#OverwritePrim">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Physics -->
+    <!-- https://ease-crc.org/ont/USD.owl#Physics -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Physics">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Physics">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Prim -->
+    <!-- https://ease-crc.org/ont/USD.owl#PhysicsScene -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Prim">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PhysicsScene">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalPlace"/>
+        <rdfs:comment>todo: what is the difference between scene vs. stage?</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#Prim -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Prim">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD#Color"/>
+                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD.owl#Color"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasTypedSchema"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
                 <owl:maxQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:maxQualifiedCardinality>
-                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:comment>Prims are the primary container objects in USD files. Each prim has a specifier defining its role on a Stage. Prims may further contain sub-prims, attributes and relationships (properties). Attributes of prims have typed values that may change over time. Prims and attributes may also have meta data (constant over time). Each prim *may* have at most one schema typeName that restricts what data it contains.</rdfs:comment>
@@ -872,14 +884,14 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#PrimSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#PrimSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrimSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PrimSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:comment>A schema that used for describing prims.</rdfs:comment>
@@ -887,74 +899,74 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#PrismaticJoint -->
+    <!-- https://ease-crc.org/ont/USD.owl#PrismaticJoint -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrismaticJoint">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Joint"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PrismaticJoint">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:comment>todo: rather import this notion!</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#PrismaticJointSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#PrismaticJointSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PrismaticJointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#JointSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PrismaticJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#JointSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#PrismaticJoint"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PrismaticJoint"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#PropertySchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#PropertySchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#PropertySchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Schema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PropertySchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
         <rdfs:comment>A schema used for describing properties.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#RevoluteJoint -->
+    <!-- https://ease-crc.org/ont/USD.owl#RevoluteJoint -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#RevoluteJoint">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Joint"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#RevoluteJoint">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:comment>todo: rather import this notion!</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#RevoluteJointSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#RevoluteJointSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#RevoluteJointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#JointSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#RevoluteJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#JointSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#RevoluteJoint"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RevoluteJoint"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#RigidBodyAPI -->
+    <!-- https://ease-crc.org/ont/USD.owl#RigidBodyAPI -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#RigidBodyAPI">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#RigidBodyAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:simulationOwner"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:simulationOwner"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -967,10 +979,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:angularVelocity"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:angularVelocity"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -983,10 +995,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:rigidBodyEnabled"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:rigidBodyEnabled"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -999,10 +1011,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:velocity"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:velocity"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -1014,23 +1026,14 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Scene -->
+    <!-- https://ease-crc.org/ont/USD.owl#SceneSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Scene">
-        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalPlace"/>
-        <rdfs:comment>todo: what is the difference between scene vs. stage?</rdfs:comment>
-    </owl:Class>
-    
-
-
-    <!-- https://ease-crc.org/ont/USD#SceneSchema -->
-
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SceneSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#SceneSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#Scene"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1038,10 +1041,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:gravityDirection"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:gravityDirection"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -1054,10 +1057,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasPhysics"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#physics:gravityMagnitude"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics:gravityMagnitude"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -1070,42 +1073,42 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Schema -->
+    <!-- https://ease-crc.org/ont/USD.owl#Schema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Schema">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Schema">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Description"/>
         <rdfs:comment>USD Schemas are used to establish concrete representations of data. They entail that a certain set of properties is used for describing some phenomena such as properties used to quantify the mass of an object. As such they describe objects where certain qualities of the object are quantified in a specific way. They may also imply type constraints for objects they describe. Most of the schemas are used to describe prims, however, USD also has some builtin schemas for describing properties.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#SemanticsAPI -->
+    <!-- https://ease-crc.org/ont/USD.owl#SemanticsAPI -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SemanticsAPI">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#APISchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#SemanticsAPI">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Shape -->
+    <!-- https://ease-crc.org/ont/USD.owl#Shape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Shape">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Shape">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#SphereSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#SphereSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SphereSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Gprim"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#SphereSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
-                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#SphereShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
+                        <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#SphereShape"/>
                     </owl:Restriction>
                 </owl:allValuesFrom>
             </owl:Restriction>
@@ -1115,10 +1118,10 @@
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
-                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
                         <owl:someValuesFrom>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#radius"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#radius"/>
                                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
                             </owl:Restriction>
                         </owl:someValuesFrom>
@@ -1131,48 +1134,48 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#SphereShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#SphereShape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#SphereShape">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#SphereShape">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Stage -->
+    <!-- https://ease-crc.org/ont/USD.owl#Stage -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Stage">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Stage">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Collection"/>
         <rdfs:comment>Represents a scene graph derived from a USD file.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#TypedSchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#TypedSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#TypedSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#PrimSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#TypedSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#PrimSchema"/>
         <rdfs:comment>A schema used to define the role or purpose of a prim. Also called &quot;IsASchema&quot;. Each prim may subscribe to at most one TypedSchema.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#WithDisplayColor -->
+    <!-- https://ease-crc.org/ont/USD.owl#WithDisplayColor -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#WithDisplayColor">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#WithDisplayColor">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasColor"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasColor"/>
                 <owl:someValuesFrom>
                     <owl:Class>
                         <owl:intersectionOf rdf:parseType="Collection">
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#primvars:displayColor"/>
-                                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#color3f_array"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#primvars:displayColor"/>
+                                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#color3f_array"/>
                             </owl:Restriction>
                             <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#primvars:displayOpacity"/>
-                                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#float_array"/>
+                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#primvars:displayOpacity"/>
+                                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#float_array"/>
                             </owl:Restriction>
                         </owl:intersectionOf>
                     </owl:Class>
@@ -1184,13 +1187,13 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#WithXformShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#WithXformShape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#WithXformShape">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#WithXformShape">
         <owl:equivalentClass>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasShape"/>
-                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#XformShape"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
+                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformShape"/>
             </owl:Restriction>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Object"/>
@@ -1198,66 +1201,66 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Xform -->
+    <!-- https://ease-crc.org/ont/USD.owl#Xform -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Xform">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Xformable"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Xform">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Xformable"/>
         <rdfs:comment>A concrete Xformable schema, meaning that it refers to a concrete object in the scene.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#XformShape -->
+    <!-- https://ease-crc.org/ont/USD.owl#XformShape -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#XformShape">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#Shape"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#XformShape">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#xformOpOrder"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#xformOpOrder"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD#token_array"/>
+                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD.owl#token_array"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#xformOp:rotate"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp:rotate"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD#float4"/>
+                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD.owl#float4"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#xformOp:scale"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp:scale"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD#float3"/>
+                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD.owl#float3"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#xformOp:transform"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp:transform"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD#matrix4d"/>
+                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD.owl#matrix4d"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#xformOp:translate"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#xformOp:translate"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD#double3"/>
+                <owl:onDataRange rdf:resource="https://ease-crc.org/ont/USD.owl#double3"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Xformable -->
+    <!-- https://ease-crc.org/ont/USD.owl#Xformable -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD#Xformable">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD#TypedSchema"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Xformable">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD#WithXformShape"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithXformShape"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -1291,36 +1294,36 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Prim_0 -->
+    <!-- https://ease-crc.org/ont/USD.owl#Prim_0 -->
 
-    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD#Prim_0">
-        <rdf:type rdf:resource="https://ease-crc.org/ont/USD#Prim"/>
+    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD.owl#Prim_0">
+        <rdf:type rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
         <rdf:type>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD#hasTypedSchema"/>
-                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD#CubeSchema"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
+                <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
             </owl:Restriction>
         </rdf:type>
-        <DUL:hasQuality rdf:resource="https://ease-crc.org/ont/USD#Quality_0"/>
-        <DUL:hasQuality rdf:resource="https://ease-crc.org/ont/USD#Quality_1"/>
+        <DUL:hasQuality rdf:resource="https://ease-crc.org/ont/USD.owl#Quality_0"/>
+        <DUL:hasQuality rdf:resource="https://ease-crc.org/ont/USD.owl#Quality_1"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Quality_0 -->
+    <!-- https://ease-crc.org/ont/USD.owl#Quality_0 -->
 
-    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD#Quality_0">
+    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD.owl#Quality_0">
         <rdf:type rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
-        <xformOp:scale rdf:datatype="https://ease-crc.org/ont/USD#float3">[1,1,1]</xformOp:scale>
+        <xformOp1:scale rdf:datatype="https://ease-crc.org/ont/USD.owl#float3">[1,1,1]</xformOp1:scale>
     </owl:NamedIndividual>
     
 
 
-    <!-- https://ease-crc.org/ont/USD#Quality_1 -->
+    <!-- https://ease-crc.org/ont/USD.owl#Quality_1 -->
 
-    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD#Quality_1">
+    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD.owl#Quality_1">
         <rdf:type rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
-        <xformOp:rotate rdf:datatype="https://ease-crc.org/ont/USD#float4">[1,0,0,0]</xformOp:rotate>
+        <xformOp1:rotate rdf:datatype="https://ease-crc.org/ont/USD.owl#float4">[1,0,0,0]</xformOp1:rotate>
     </owl:NamedIndividual>
 </rdf:RDF>
 
