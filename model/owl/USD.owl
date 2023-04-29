@@ -187,18 +187,10 @@
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#physicsRelation -->
-
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physicsRelation">
-        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://ease-crc.org/ont/USD.owl#physics:body0 -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body0">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasComponent"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
@@ -210,7 +202,7 @@
     <!-- https://ease-crc.org/ont/USD.owl#physics:body1 -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:body1">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasComponent"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
         <rdfs:range rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
@@ -222,7 +214,7 @@
     <!-- https://ease-crc.org/ont/USD.owl#physics:simulationOwner -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#physics:simulationOwner">
-        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#physicsRelation"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
