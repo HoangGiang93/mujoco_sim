@@ -14,9 +14,7 @@
         <rdfs:comment rdf:datatype="http://www.w3.org/2001/XMLSchema#string">The purpose of the USD ontology is to establish a graph model of the USD language, and to support translation from USD to a KG representation of scene graphs. To this end, the core vocabulary of USD is defined in terms of an upper-level ontology. In addition, a set of re-usable built-in schemata that are used in the USD language to describe prims are defined. In order to fasciliate translation, the ontological model attempts to replicate the structure of USD as closely as possible while in addition entailing semantics of USD entities.</rdfs:comment>
         <rdfs:label>USD Ontology</rdfs:label>
         <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1</owl:versionInfo>
-        <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Created by Daniel Beßler.
-
-In 0.1, the scope of the ontology is limited to syntactic features of the USD language needed for a usecase scenario (box opening) investigated in the scope of a scientific article.</owl:versionInfo>
+        <owl:versionInfo rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1 created by Daniel Beßler. The scope of the ontology is limited to syntactic features of the USD language needed for a usecase scenario (box opening) investigated in the scope of a scientific article.</owl:versionInfo>
     </owl:Ontology>
     
 
@@ -125,13 +123,15 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#hasAPISchema -->
+    <!-- https://ease-crc.org/ont/USD.owl#hasAPI -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasAPISchema">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasAPI">
         <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasSchema"/>
-        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isAPISchemaOf"/>
+        <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isAPIOf"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
+        <rdfs:comment>Links prims with API schemata applied to it.</rdfs:comment>
+        <rdfs:label>has api</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -151,7 +151,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <!-- https://ease-crc.org/ont/USD.owl#hasConnection -->
 
     <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasConnection">
-        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasLocation"/>
         <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#hasConnection"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
@@ -183,7 +183,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
         <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isPhysicsOf"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
-        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Scene"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
     </owl:ObjectProperty>
     
@@ -196,6 +196,8 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <owl:inverseOf rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
+        <rdfs:comment>Links prims with schemata applied to it.</rdfs:comment>
+        <rdfs:label>has schema</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -220,16 +222,20 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
+        <rdfs:comment>Links prims with typed schemata applied to it.</rdfs:comment>
+        <rdfs:label>has typed schema</rdfs:label>
     </owl:ObjectProperty>
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#isAPISchemaOf -->
+    <!-- https://ease-crc.org/ont/USD.owl#isAPIOf -->
 
-    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#isAPISchemaOf">
+    <owl:ObjectProperty rdf:about="https://ease-crc.org/ont/USD.owl#isAPIOf">
         <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
+        <rdfs:comment>Links prims with API schemata applied to it.</rdfs:comment>
+        <rdfs:label>is api of</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -262,6 +268,8 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
+        <rdfs:comment>Links prims with schemata applied to it.</rdfs:comment>
+        <rdfs:label>is schema of</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -284,6 +292,8 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#InverseFunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
+        <rdfs:comment>Links prims with typed schemata applied to it.</rdfs:comment>
+        <rdfs:label>is typed schema of</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -318,7 +328,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#associatedWith"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Physics"/>
-        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
+        <rdfs:range rdf:resource="https://ease-crc.org/ont/USD.owl#Scene"/>
         <rdfs:comment>PhysicsScene that will simulate this body</rdfs:comment>
     </owl:ObjectProperty>
     
@@ -689,6 +699,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#APISchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
         <rdfs:comment>A schema that serves as a API for reading and writing related data.</rdfs:comment>
+        <rdfs:label>API schema</rdfs:label>
     </owl:Class>
     
 
@@ -696,7 +707,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <!-- https://ease-crc.org/ont/USD.owl#BoundableSchema -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#BoundableSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Xformable"/>
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#XformableSchema"/>
         <rdfs:comment>A schema of prims with a finite spatial extend.</rdfs:comment>
     </owl:Class>
     
@@ -708,7 +719,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -739,10 +750,10 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <!-- https://ease-crc.org/ont/USD.owl#CubeSchema -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CubeSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#GprimSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -753,7 +764,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -783,10 +794,10 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <!-- https://ease-crc.org/ont/USD.owl#CylinderSchema -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#CylinderSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#GprimSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -797,7 +808,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -813,7 +824,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -840,19 +851,19 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#Gprim -->
+    <!-- https://ease-crc.org/ont/USD.owl#GprimSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Gprim">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#GprimSchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#BoundableSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalArtifact"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithDisplayColor"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -865,27 +876,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Joint">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
-    </owl:Class>
-    
-
-
-    <!-- https://ease-crc.org/ont/USD.owl#JointSchema -->
-
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#JointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointPhysics"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:comment>Contains properties that are used to constrain the motion of prims.</rdfs:comment>
+        <rdfs:comment>A joint constrains the motion of objects relative to each other.</rdfs:comment>
     </owl:Class>
     
 
@@ -896,7 +887,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -912,7 +903,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -928,7 +919,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -944,7 +935,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -960,7 +951,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -988,11 +979,63 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#PhysicsScene -->
+    <!-- https://ease-crc.org/ont/USD.owl#PhysicsJointSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PhysicsScene">
-        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
-        <rdfs:comment>A scene in a USD file that can be simulated.</rdfs:comment>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PhysicsJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointPhysics"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>Contains properties that are used to constrain the motion of prims.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#PhysicsPrismaticJointSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PhysicsPrismaticJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsJointSchema"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PrismaticJoint"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointLimits"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#PhysicsRevoluteJointSchema -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PhysicsRevoluteJointSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsJointSchema"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RevoluteJoint"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointLimits"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1003,13 +1046,13 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsScene"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Scene"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1025,7 +1068,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1083,8 +1126,6 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:comment>Prims are the primary container objects in USD files. Prims may further contain sub-prims, attributes and relationships (properties). Attributes of prims have typed values that may change over time. Prims and attributes may also have meta data (constant over time). Each prim *may* have at most one typed schema that restricts what data it contains.</rdfs:comment>
-        <rdfs:comment>todo: bool 	IsGroup () const</rdfs:comment>
-        <rdfs:comment>todo: bool 	IsModel () const</rdfs:comment>
     </owl:Class>
     
 
@@ -1097,50 +1138,10 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#PrismaticJointSchema -->
-
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#PrismaticJointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#JointSchema"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PrismaticJoint"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointLimits"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- https://ease-crc.org/ont/USD.owl#RevoluteJoint -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#RevoluteJoint">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
-    </owl:Class>
-    
-
-
-    <!-- https://ease-crc.org/ont/USD.owl#RevoluteJointSchema -->
-
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#RevoluteJointSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#JointSchema"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RevoluteJoint"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
-                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithJointLimits"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -1151,7 +1152,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#APISchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1167,7 +1168,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1183,7 +1184,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1199,7 +1200,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
@@ -1218,6 +1219,15 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
+    <!-- https://ease-crc.org/ont/USD.owl#Scene -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Scene">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
+        <rdfs:comment>A scene spatially encloses a set of physical objects.</rdfs:comment>
+    </owl:Class>
+    
+
+
     <!-- https://ease-crc.org/ont/USD.owl#Schema -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Schema">
@@ -1228,7 +1238,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
                 <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:comment>USD Schemas are used to establish concrete representations of data. They entail that a certain set of properties is used for describing some phenomena such as properties used to quantify the mass of an object. As such they describe objects where certain qualities of the object are quantified in a specific way. They may also imply type constraints for objects they describe. Most of the schemas are used to describe prims, however, USD also has some builtin schemas for describing properties.</rdfs:comment>
+        <rdfs:comment>USD Schemas are used to establish concrete representations of data. They entail that a certain set of properties is used for describing some phenomena such as properties used to quantify the mass of an object. As such they describe objects where certain qualities of the object are quantified in a specific way. They may also imply type constraints for objects they describe.</rdfs:comment>
     </owl:Class>
     
 
@@ -1245,10 +1255,10 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <!-- https://ease-crc.org/ont/USD.owl#SphereSchema -->
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#SphereSchema">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Gprim"/>
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#GprimSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -1259,7 +1269,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom>
                     <owl:Restriction>
                         <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasShape"/>
@@ -1296,7 +1306,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
                 <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:comment>A scene graph represnted in a USD file.</rdfs:comment>
+        <rdfs:comment>A scene graph represented in a USD file.</rdfs:comment>
     </owl:Class>
     
 
@@ -1306,6 +1316,7 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#TypedSchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Schema"/>
         <rdfs:comment>A schema used to define the role or purpose of a prim. Also called &quot;IsASchema&quot;. Each prim may subscribe to at most one TypedSchema.</rdfs:comment>
+        <rdfs:label>Typed schema</rdfs:label>
     </owl:Class>
     
 
@@ -1454,28 +1465,28 @@ In 0.1, the scope of the ontology is limited to syntactic features of the USD la
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#Xform -->
+    <!-- https://ease-crc.org/ont/USD.owl#XformSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Xform">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Xformable"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#XformSchema">
+        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#XformableSchema"/>
         <rdfs:comment>A concrete Xformable schema, meaning that it refers to a concrete object in the scene.</rdfs:comment>
     </owl:Class>
     
 
 
-    <!-- https://ease-crc.org/ont/USD.owl#Xformable -->
+    <!-- https://ease-crc.org/ont/USD.owl#XformableSchema -->
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Xformable">
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#XformableSchema">
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#TypedSchema"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#describes"/>
+                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#isSchemaOf"/>
                 <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#WithXform"/>
             </owl:Restriction>
         </rdfs:subClassOf>
