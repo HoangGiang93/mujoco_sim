@@ -3,6 +3,7 @@
      xml:base="https://ease-crc.org/ont/usd/BoxScenario_test1.owl"
      xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:DUL="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#"
+     xmlns:USD="https://ease-crc.org/ont/USD.owl#"
      xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
@@ -47,7 +48,7 @@
 
     <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD.owl#Quality_0">
         <rdf:type rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
-        <xformOp:scale rdf:datatype="https://ease-crc.org/ont/USD.owl#float3">[1,1,1]</xformOp:scale>
+        <USD:xformOp_scale rdf:datatype="https://ease-crc.org/ont/USD.owl#float3">[1,1,1]</USD:xformOp_scale>
     </owl:NamedIndividual>
     
 
@@ -56,7 +57,7 @@
 
     <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/USD.owl#Quality_1">
         <rdf:type rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
-        <xformOp:rotate rdf:datatype="https://ease-crc.org/ont/USD.owl#float4">[1,0,0,0]</xformOp:rotate>
+        <USD:xformOp_rotate rdf:datatype="https://ease-crc.org/ont/USD.owl#float4">[1,0,0,0]</USD:xformOp_rotate>
     </owl:NamedIndividual>
     
 
@@ -73,8 +74,8 @@
 
     <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#PrismaticJoint_0">
         <rdf:type rdf:resource="https://ease-crc.org/ont/USD.owl#PrismaticJoint"/>
-        <physics:body0 rdf:resource="https://ease-crc.org/ont/USD.owl#Prim_0"/>
-        <physics:body1 rdf:resource="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1"/>
+        <USD:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#Prim_0"/>
+        <USD:physics_body1 rdf:resource="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1"/>
     </owl:NamedIndividual>
 </rdf:RDF>
 
