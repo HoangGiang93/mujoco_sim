@@ -9,11 +9,11 @@
 )
 
 def Xform "world"(
-    inherits = </_class_usd/_class_prim>
+    inherits = </_class_prim>
 )
 {
     def Xform "box" (
-        inherits = </_class_usd/_class_prim>
+        inherits = </_class_prim>
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
@@ -25,7 +25,7 @@ def Xform "world"(
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Cube "geom_1" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
@@ -37,7 +37,7 @@ def Xform "world"(
         }
 
         def Cube "geom_2" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
@@ -49,7 +49,7 @@ def Xform "world"(
         }
 
         def Cube "geom_3" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
@@ -61,7 +61,7 @@ def Xform "world"(
         }
 
         def Cube "geom_4" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
@@ -73,7 +73,7 @@ def Xform "world"(
         }
 
         def Cube "geom_5" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI"]
         )
         {
@@ -85,7 +85,7 @@ def Xform "world"(
         }
 
         def PhysicsRevoluteJoint "box_flap_side_1_joint" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
         )
         {
             uniform token physics:axis = "Z"
@@ -99,7 +99,7 @@ def Xform "world"(
         }
 
         def PhysicsRevoluteJoint "box_flap_side_2_joint" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
         )
         {
             uniform token physics:axis = "Z"
@@ -114,7 +114,7 @@ def Xform "world"(
     }
 
     def Xform "box_flap_side_1" (
-        inherits = </_class_usd/_class_prim>
+        inherits = </_class_prim>
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
@@ -126,7 +126,7 @@ def Xform "world"(
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Mesh "geom_6" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
             prepend references = @/home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/save/box/usd/BoxFlapSide1.usda@
         )
@@ -141,7 +141,7 @@ def Xform "world"(
     }
 
     def Xform "box_flap_side_2" (
-        inherits = </_class_usd/_class_prim>
+        inherits = </_class_prim>
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
     )
     {
@@ -153,7 +153,7 @@ def Xform "world"(
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Mesh "geom_7" (
-            inherits = </_class_usd/_class_prim>
+            inherits = </_class_prim>
             prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
             prepend references = @/home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/save/box/usd/BoxFlapSide2.usda@
         )

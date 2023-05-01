@@ -1,12 +1,15 @@
 #usda 1.0
 
-class "_class_usd"
+class "_class_usd" (
+    prepend apiSchemas = ["RdfAPI"]
+)
 {
-    class "_class_prim" (
-        prepend apiSchemas = ["RdfAPI"]
-    )
-    {
-        custom string rdf:namespace = "https://ease-crc.org/ont/USD.owl#"
-        custom string rdf:className = "Prim"
-    }
+    custom string rdf:namespace = "https://ease-crc.org/ont/USD.owl#"
+}
+
+class "_class_prim" (
+    inherits = </_class_usd>
+)
+{
+    custom string rdf:className = "Prim"
 }
