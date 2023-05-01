@@ -27,11 +27,13 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOpOrder"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOp_transform"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_rigidBodyEnabled"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#MassAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_mass"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_centerOfMass"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOpOrder"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOp_transform"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
@@ -46,16 +48,6 @@
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint"/>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint"/>
 </USD.:Prim>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOpOrder">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOp_transform">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 2.0, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_rigidBodyEnabled">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -72,11 +64,22 @@
   <USD.:physics_centerOfMass rdf:datatype="https://ease-crc.org/ont/USD.owl#point3f">[0.0, 0.0, -0.034677907824516296]</USD.:physics_centerOfMass>
 </DUL.:Quality>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOpOrder">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
+</DUL.:Quality>
+
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_xformOp_transform">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 2.0, 1.0]]</USD.:xformOp_transform>
+</DUL.:Quality>
+
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_1">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_dislayOpacity"/>
   <rdf:type>
@@ -88,6 +91,11 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_size"/>
 </USD.:Prim>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
@@ -96,11 +104,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.17, 0.0, 0.0, 0.0], [0.0, 0.16, 0.0, 0.0], [0.0, 0.0, 0.0025, 0.0], [0.0, 0.0, -0.1675, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_dislayColor">
@@ -120,9 +123,10 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_2">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_dislayOpacity"/>
   <rdf:type>
@@ -134,6 +138,11 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_size"/>
 </USD.:Prim>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
@@ -142,11 +151,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.002578, 0.0, 0.0, 0.0], [0.0, 0.16, 0.0, 0.0], [0.0, 0.0, 0.1675, 0.0], [0.167578, 0.0, -0.0025, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_dislayColor">
@@ -166,9 +170,10 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_3">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_dislayOpacity"/>
   <rdf:type>
@@ -180,6 +185,11 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_size"/>
 </USD.:Prim>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
@@ -188,11 +198,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.002578, 0.0, 0.0, 0.0], [0.0, 0.16, 0.0, 0.0], [0.0, 0.0, 0.1675, 0.0], [-0.167578, 0.0, -0.0025, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_dislayColor">
@@ -212,9 +217,10 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_4">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_dislayOpacity"/>
   <rdf:type>
@@ -226,6 +232,11 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_size"/>
 </USD.:Prim>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
@@ -234,11 +245,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.170156, 0.0, 0.0, 0.0], [0.0, 0.0025, 0.0, 0.0], [0.0, 0.0, 0.1675, 0.0], [0.0, 0.1575, -0.0025, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_dislayColor">
@@ -258,9 +264,10 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_5">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_dislayOpacity"/>
   <rdf:type>
@@ -272,6 +279,11 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_size"/>
 </USD.:Prim>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
@@ -280,11 +292,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.170156, 0.0, 0.0, 0.0], [0.0, 0.0025, 0.0, 0.0], [0.0, 0.0, 0.1675, 0.0], [0.0, -0.1575, -0.0025, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_dislayColor">
@@ -338,11 +345,13 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOpOrder"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOp_transform"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_rigidBodyEnabled"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#MassAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_mass"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_centerOfMass"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOpOrder"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOp_transform"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
@@ -351,16 +360,6 @@
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#geom_6"/>
 </USD.:Prim>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOpOrder">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOp_transform">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.17, 0.0, 2.166, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_rigidBodyEnabled">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -377,14 +376,30 @@
   <USD.:physics_centerOfMass rdf:datatype="https://ease-crc.org/ont/USD.owl#point3f">[-0.17000000178813934, -1.5240807504923737e-09, -3.309754914582186e-09]</USD.:physics_centerOfMass>
 </DUL.:Quality>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOpOrder">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
+</DUL.:Quality>
+
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_xformOp_transform">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.17, 0.0, 2.166, 1.0]]</USD.:xformOp_transform>
+</DUL.:Quality>
+
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_6">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_dislayOpacity"/>
 </USD.:Prim>
+
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -394,11 +409,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-2.220446049250313e-16, 0.0, 1.0000000000000002, 0.0], [0.0, -1.0000000000000004, 0.0, 0.0], [1.0000000000000002, 0.0, -2.220446049250313e-16, 0.0], [-0.1700000072951671, -1.5240807574521301e-09, -3.3097549890378998e-09, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_6_dislayColor">
@@ -413,11 +423,13 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOpOrder"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOp_transform"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_rigidBodyEnabled"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#MassAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_mass"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_centerOfMass"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOpOrder"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOp_transform"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
@@ -426,16 +438,6 @@
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#geom_7"/>
 </USD.:Prim>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOpOrder">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOp_transform">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [-0.17, 0.0, 2.168, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_rigidBodyEnabled">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -452,14 +454,30 @@
   <USD.:physics_centerOfMass rdf:datatype="https://ease-crc.org/ont/USD.owl#point3f">[0.17000001668930054, -3.853585228696943e-10, -1.7394633910344792e-12]</USD.:physics_centerOfMass>
 </DUL.:Quality>
 
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOpOrder">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOpOrder rdf:datatype="https://ease-crc.org/ont/USD.owl#token_array">[xformOp:transform]</USD.:xformOpOrder>
+</DUL.:Quality>
+
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_xformOp_transform">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [-0.17, 0.0, 2.168, 1.0]]</USD.:xformOp_transform>
+</DUL.:Quality>
+
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_7">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#CollisionAPI"/>
+  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_xformOpOrder"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_xformOp_transform"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_rigidBodyEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_dislayColor"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_dislayOpacity"/>
 </USD.:Prim>
+
+<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_rigidBodyEnabled">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
+</DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_xformOpOrder">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -469,11 +487,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-2.220446049250313e-16, 0.0, 1.0000000000000002, 0.0], [0.0, -1.0000000000000004, 0.0, 0.0], [1.0000000000000002, 0.0, -2.220446049250313e-16, 0.0], [0.17000000947241017, -3.853585327311238e-10, -1.7394634132564953e-12, 1.0]]</USD.:xformOp_transform>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_rigidBodyEnabled">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</USD.:physics_collisionEnabled>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_7_dislayColor">

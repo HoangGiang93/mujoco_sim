@@ -135,6 +135,39 @@ def usd_to_owl(file_path: str) -> None:
                 prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
                 iri_map[prim] = prim_inst
 
+                if prim.HasAPI(UsdPhysics.RigidBodyAPI):
+                    prim_inst.hasAPI.append(usd_onto.RigidBodyAPI)
+                    rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
+                    rigidBodyEnabled_inst = dul_onto.Quality(
+                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
+                    prim_inst.hasQuality.append(rigidBodyEnabled_inst)
+                    rigidBodyEnabled_inst.physics_rigidBodyEnabled = [
+                        rigidBodyAPI.GetRigidBodyEnabledAttr().Get()]
+
+                if prim.HasAPI(UsdPhysics.CollisionAPI):
+                    prim_inst.hasAPI.append(usd_onto.CollisionAPI)
+                    collisionAPI = UsdPhysics.CollisionAPI.Apply(prim)
+                    rigidCollisionEnabled_inst = dul_onto.Quality(
+                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
+                    prim_inst.hasQuality.append(rigidCollisionEnabled_inst)
+                    rigidCollisionEnabled_inst.physics_collisionEnabled = [
+                        collisionAPI.GetCollisionEnabledAttr().Get()]
+
+                if prim.HasAPI(UsdPhysics.MassAPI):
+                    prim_inst.hasAPI.append(usd_onto.MassAPI)
+                    massAPI = UsdPhysics.MassAPI.Apply(prim)
+                    mass_inst = dul_onto.Quality(
+                        prim.GetName() + '_mass', namespace=dul_onto)
+                    prim_inst.hasQuality.append(mass_inst)
+                    mass_inst.physics_mass = [
+                        float32(massAPI.GetMassAttr().Get())]
+
+                    com_inst = dul_onto.Quality(
+                        prim.GetName() + '_centerOfMass', namespace=dul_onto)
+                    prim_inst.hasQuality.append(com_inst)
+                    com_inst.physics_centerOfMass = [
+                        massAPI.GetCenterOfMassAttr().Get()]
+
                 if prim.IsA(UsdGeom.Xformable):
                     xformable = UsdGeom.Xformable(prim)
                     xformOpOrderAttr = xformable.GetXformOpOrderAttr().Get()
@@ -152,36 +185,6 @@ def usd_to_owl(file_path: str) -> None:
                                         xformOpTransform_inst)
                                     xformOpTransform_inst.xformOp_transform = [
                                         prim.GetAttribute(xformOp).Get()]
-
-                if prim.HasAPI(UsdPhysics.RigidBodyAPI):
-                    rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
-                    rigidBodyEnabled_inst = dul_onto.Quality(
-                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
-                    prim_inst.hasQuality.append(rigidBodyEnabled_inst)
-                    rigidBodyEnabled_inst.physics_rigidBodyEnabled = [
-                        rigidBodyAPI.GetRigidBodyEnabledAttr().Get()]
-
-                if prim.HasAPI(UsdPhysics.CollisionAPI):
-                    collisionAPI = UsdPhysics.CollisionAPI.Apply(prim)
-                    rigidCollisionEnabled_inst = dul_onto.Quality(
-                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
-                    prim_inst.hasQuality.append(rigidCollisionEnabled_inst)
-                    rigidCollisionEnabled_inst.physics_collisionEnabled = [
-                        collisionAPI.GetCollisionEnabledAttr().Get()]
-
-                if prim.HasAPI(UsdPhysics.MassAPI):
-                    massAPI = UsdPhysics.MassAPI.Apply(prim)
-                    mass_inst = dul_onto.Quality(
-                        prim.GetName() + '_mass', namespace=dul_onto)
-                    prim_inst.hasQuality.append(mass_inst)
-                    mass_inst.physics_mass = [
-                        float32(massAPI.GetMassAttr().Get())]
-
-                    com_inst = dul_onto.Quality(
-                        prim.GetName() + '_centerOfMass', namespace=dul_onto)
-                    prim_inst.hasQuality.append(com_inst)
-                    com_inst.physics_centerOfMass = [
-                        massAPI.GetCenterOfMassAttr().Get()]
 
                 if prim.IsA(UsdGeom.Gprim):
                     displayColor_inst = dul_onto.Quality(
