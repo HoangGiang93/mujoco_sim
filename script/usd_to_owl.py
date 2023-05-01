@@ -131,7 +131,6 @@ def usd_to_owl(file_path: str) -> None:
     stage = Usd.Stage.Open(file_path)
     with ABox_onto:
         for prim in stage.Traverse():
-            print(prim, prim.HasAPI(UsdOntology.RdfAPI))
             if prim.HasAPI(UsdOntology.RdfAPI):
                 prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
                 iri_map[prim] = prim_inst
