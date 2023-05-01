@@ -131,121 +131,180 @@ def usd_to_owl(file_path: str) -> None:
     stage = Usd.Stage.Open(file_path)
     with ABox_onto:
         for prim in stage.Traverse():
-            if prim.HasAPI(UsdOntology.RdfAPI):
-                prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
-                iri_map[prim] = prim_inst
+            if not prim.HasAPI(UsdOntology.RdfAPI):
+                continue
+            prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
+            iri_map[prim] = prim_inst
 
-                if prim.HasAPI(UsdPhysics.RigidBodyAPI):
-                    hasAPI_prop = usd_onto.hasAPI
-                    prim_inst.is_a.append(
-                        hasAPI_prop.some(usd_onto.RigidBodyAPI))
-                    rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
-                    rigidBodyEnabled_inst = dul_onto.Quality(
-                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
-                    prim_inst.hasQuality.append(rigidBodyEnabled_inst)
-                    rigidBodyEnabled_inst.physics_rigidBodyEnabled = [
-                        rigidBodyAPI.GetRigidBodyEnabledAttr().Get()]
+            if prim.HasAPI(UsdPhysics.RigidBodyAPI):
+                hasAPI_prop = usd_onto.hasAPI
+                prim_inst.is_a.append(
+                    hasAPI_prop.some(usd_onto.RigidBodyAPI))
+                
+                rigidBodyEnabled_inst = dul_onto.Quality(
+                    prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
+                prim_inst.hasQuality.append(rigidBodyEnabled_inst)
 
-                if prim.HasAPI(UsdPhysics.CollisionAPI):
-                    hasAPI_prop = usd_onto.hasAPI
-                    prim_inst.is_a.append(
-                        hasAPI_prop.some(usd_onto.CollisionAPI))
-                    collisionAPI = UsdPhysics.CollisionAPI.Apply(prim)
-                    rigidCollisionEnabled_inst = dul_onto.Quality(
-                        prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
-                    prim_inst.hasQuality.append(rigidCollisionEnabled_inst)
-                    rigidCollisionEnabled_inst.physics_collisionEnabled = [
-                        collisionAPI.GetCollisionEnabledAttr().Get()]
+                rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
+                rigidBodyEnabled_inst.physics_rigidBodyEnabled = [
+                    rigidBodyAPI.GetRigidBodyEnabledAttr().Get()]
 
-                if prim.HasAPI(UsdPhysics.MassAPI):
-                    hasAPI_prop = usd_onto.hasAPI
-                    prim_inst.is_a.append(
-                        hasAPI_prop.some(usd_onto.MassAPI))
-                    massAPI = UsdPhysics.MassAPI.Apply(prim)
-                    mass_inst = dul_onto.Quality(
-                        prim.GetName() + '_mass', namespace=dul_onto)
-                    prim_inst.hasQuality.append(mass_inst)
-                    mass_inst.physics_mass = [
-                        float32(massAPI.GetMassAttr().Get())]
+            if prim.HasAPI(UsdPhysics.CollisionAPI):
+                hasAPI_prop = usd_onto.hasAPI
+                prim_inst.is_a.append(
+                    hasAPI_prop.some(usd_onto.CollisionAPI))
+                
+                rigidCollisionEnabled_inst = dul_onto.Quality(
+                    prim.GetName() + '_rigidCollisionEnabled', namespace=dul_onto)
+                prim_inst.hasQuality.append(rigidCollisionEnabled_inst)
 
-                    com_inst = dul_onto.Quality(
-                        prim.GetName() + '_centerOfMass', namespace=dul_onto)
-                    prim_inst.hasQuality.append(com_inst)
-                    com_inst.physics_centerOfMass = [
-                        massAPI.GetCenterOfMassAttr().Get()]
+                collisionAPI = UsdPhysics.CollisionAPI.Apply(prim)
+                rigidCollisionEnabled_inst.physics_collisionEnabled = [
+                    collisionAPI.GetCollisionEnabledAttr().Get()]
 
-                if prim.IsA(UsdGeom.Xformable):
-                    xformable = UsdGeom.Xformable(prim)
-                    xformOpOrderAttr = xformable.GetXformOpOrderAttr().Get()
-                    if xformOpOrderAttr is not None:
-                        xformOpOrder_inst = dul_onto.Quality(
-                            prim.GetName() + '_xformOpOrder', namespace=dul_onto)
-                        prim_inst.hasQuality.append(xformOpOrder_inst)
-                        xformOpOrder_inst.xformOpOrder = [xformOpOrderAttr]
-                        for xformOp in xformOpOrderAttr:
-                            if prim.HasAttribute(xformOp):
-                                if xformOp == 'xformOp:transform':
-                                    xformOpTransform_inst = dul_onto.Quality(
-                                        prim.GetName() + '_xformOp_transform', namespace=dul_onto)
-                                    prim_inst.hasQuality.append(
-                                        xformOpTransform_inst)
-                                    xformOpTransform_inst.xformOp_transform = [
-                                        prim.GetAttribute(xformOp).Get()]
+            if prim.HasAPI(UsdPhysics.MassAPI):
+                hasAPI_prop = usd_onto.hasAPI
+                prim_inst.is_a.append(
+                    hasAPI_prop.some(usd_onto.MassAPI))
+                
+                mass_inst = dul_onto.Quality(
+                    prim.GetName() + '_mass', namespace=dul_onto)
+                prim_inst.hasQuality.append(mass_inst)
+                com_inst = dul_onto.Quality(
+                    prim.GetName() + '_centerOfMass', namespace=dul_onto)
+                prim_inst.hasQuality.append(com_inst)
 
-                if prim.IsA(UsdGeom.Gprim):
-                    displayColor_inst = dul_onto.Quality(
-                        prim.GetName() + '_dislayColor', namespace=dul_onto)
-                    prim_inst.hasQuality.append(displayColor_inst)
-                    displayOpacity_inst = dul_onto.Quality(
-                        prim.GetName() + '_dislayOpacity', namespace=dul_onto)
-                    prim_inst.hasQuality.append(displayOpacity_inst)
-                    gprim = UsdGeom.Gprim(prim)
-                    displayColor_inst.primvars_displayColor = [
-                        gprim.GetDisplayColorPrimvar().Get()]
-                    displayOpacity_inst.primvars_displayOpacity = [
-                        gprim.GetDisplayOpacityPrimvar().Get()]
+                massAPI = UsdPhysics.MassAPI.Apply(prim)
+                mass_inst.physics_mass = [
+                    float32(massAPI.GetMassAttr().Get())]
+                com_inst.physics_centerOfMass = [
+                    massAPI.GetCenterOfMassAttr().Get()]
 
-                if prim.IsA(UsdGeom.Xform):
-                    hasXformSchema_prop = usd_onto.hasTypedSchema
-                    prim_inst.is_a.append(
-                        hasXformSchema_prop.some(usd_onto.XformSchema))
-                elif prim.IsA(UsdGeom.Cube):
-                    hasCubeSchema_prop = usd_onto.hasTypedSchema
-                    prim_inst.is_a.append(
-                        hasCubeSchema_prop.some(usd_onto.CubeSchema))
-                    size_inst = dul_onto.Quality(
-                        prim.GetName() + '_size', namespace=dul_onto)
-                    prim_inst.hasQuality.append(size_inst)
-                    cube = UsdGeom.Cube(prim)
-                    size_inst.size = [float64(cube.GetSizeAttr().Get())]
-                elif prim.IsA(UsdGeom.Sphere):
-                    hasSphereSchema_prop = usd_onto.hasTypedSchema
-                    prim_inst.is_a.append(
-                        hasSphereSchema_prop.some(usd_onto.SphereSchema))
-                    radius_inst = dul_onto.Quality(
-                        prim.GetName() + '_radius', namespace=dul_onto)
-                    prim_inst.hasQuality.append(radius_inst)
-                    sphere = UsdGeom.Sphere(prim)
-                    radius_inst.radius = [
-                        float64(sphere.GetRadiusAttr().Get())]
-                elif prim.IsA(UsdGeom.Cylinder):
-                    hasCylinderSchema_prop = usd_onto.hasTypedSchema
-                    prim_inst.is_a.append(
-                        hasCylinderSchema_prop.some(usd_onto.CylinderSchema))
-                    radius_inst = dul_onto.Quality(
-                        prim.GetName() + '_radius', namespace=dul_onto)
-                    prim_inst.hasQuality.append(radius_inst)
-                    height_inst = dul_onto.Quality(
-                        prim.GetName() + '_height', namespace=dul_onto)
-                    prim_inst.hasQuality.append(height_inst)
-                    cylinder = UsdGeom.Cylinder(prim)
-                    radius_inst.radius = [
-                        float64(cylinder.GetRadiusAttr().Get())]
-                    height_inst.height = [
-                        float64(cylinder.GetHeightAttr().Get())]
+            if prim.IsA(UsdGeom.Xformable):
+                xformable = UsdGeom.Xformable(prim)
+                xformOpOrderAttr = xformable.GetXformOpOrderAttr().Get()
+                if xformOpOrderAttr is None:
+                    continue
+
+                xformOpOrder_inst = dul_onto.Quality(
+                    prim.GetName() + '_xformOpOrder', namespace=dul_onto)
+                prim_inst.hasQuality.append(xformOpOrder_inst)
+
+                xformOpOrder_inst.xformOpOrder = [xformOpOrderAttr]
+
+                for xformOp in xformOpOrderAttr:
+                    if not prim.HasAttribute(xformOp):
+                        continue
+                    if xformOp == 'xformOp:translate':
+                        xformOpTranslate_inst = dul_onto.Quality(
+                            prim.GetName() + '_xformOp_translate', namespace=dul_onto)
+                        prim_inst.hasQuality.append(
+                            xformOpTranslate_inst)
+                        
+                        xformOpTransform_inst.xformOp_translate = [
+                            prim.GetAttribute(xformOp).Get()]
+                        
+                    if xformOp == 'xformOp:rotate':
+                        xformOpRotate_inst = dul_onto.Quality(
+                            prim.GetName() + '_xformOp_rotate', namespace=dul_onto)
+                        prim_inst.hasQuality.append(
+                            xformOpRotate_inst)
+                        
+                        xformOpRotate_inst.xformOp_rotate = [
+                            prim.GetAttribute(xformOp).Get()]
+                        
+                    if xformOp == 'xformOp:transform':
+                        xformOpTransform_inst = dul_onto.Quality(
+                            prim.GetName() + '_xformOp_transform', namespace=dul_onto)
+                        prim_inst.hasQuality.append(
+                            xformOpTransform_inst)
+                        
+                        xformOpTransform_inst.xformOp_transform = [
+                            prim.GetAttribute(xformOp).Get()]
+                        
+                    if xformOp == 'xformOp:transform':
+                        xformOpTransform_inst = dul_onto.Quality(
+                            prim.GetName() + '_xformOp_transform', namespace=dul_onto)
+                        prim_inst.hasQuality.append(
+                            xformOpTransform_inst)
+                        
+                        xformOpTransform_inst.xformOp_transform = [
+                            prim.GetAttribute(xformOp).Get()]
+
+            if prim.IsA(UsdGeom.Gprim):
+                displayColor_inst = dul_onto.Quality(
+                    prim.GetName() + '_dislayColor', namespace=dul_onto)
+                prim_inst.hasQuality.append(displayColor_inst)
+                displayOpacity_inst = dul_onto.Quality(
+                    prim.GetName() + '_dislayOpacity', namespace=dul_onto)
+                prim_inst.hasQuality.append(displayOpacity_inst)
+
+                gprim = UsdGeom.Gprim(prim)
+                displayColor_inst.primvars_displayColor = [
+                    gprim.GetDisplayColorPrimvar().Get()]
+                displayOpacity_inst.primvars_displayOpacity = [
+                    gprim.GetDisplayOpacityPrimvar().Get()]
+
+            if prim.IsA(UsdGeom.Xform):
+                hasXformSchema_prop = usd_onto.hasTypedSchema
+                prim_inst.is_a.append(
+                    hasXformSchema_prop.some(usd_onto.XformSchema))
+                
+            elif prim.IsA(UsdGeom.Cube):
+                hasCubeSchema_prop = usd_onto.hasTypedSchema
+                prim_inst.is_a.append(
+                    hasCubeSchema_prop.some(usd_onto.CubeSchema))
+                
+                size_inst = dul_onto.Quality(
+                    prim.GetName() + '_size', namespace=dul_onto)
+                prim_inst.hasQuality.append(size_inst)
+
+                cube = UsdGeom.Cube(prim)
+                size_inst.size = [float64(cube.GetSizeAttr().Get())]
+
+            elif prim.IsA(UsdGeom.Sphere):
+                hasSphereSchema_prop = usd_onto.hasTypedSchema
+                prim_inst.is_a.append(
+                    hasSphereSchema_prop.some(usd_onto.SphereSchema))
+                
+                radius_inst = dul_onto.Quality(
+                    prim.GetName() + '_radius', namespace=dul_onto)
+                prim_inst.hasQuality.append(radius_inst)
+
+                sphere = UsdGeom.Sphere(prim)
+                radius_inst.radius = [
+                    float64(sphere.GetRadiusAttr().Get())]
+                
+            elif prim.IsA(UsdGeom.Cylinder):
+                hasCylinderSchema_prop = usd_onto.hasTypedSchema
+                prim_inst.is_a.append(
+                    hasCylinderSchema_prop.some(usd_onto.CylinderSchema))
+                
+                radius_inst = dul_onto.Quality(
+                    prim.GetName() + '_radius', namespace=dul_onto)
+                prim_inst.hasQuality.append(radius_inst)
+                height_inst = dul_onto.Quality(
+                    prim.GetName() + '_height', namespace=dul_onto)
+                prim_inst.hasQuality.append(height_inst)
+
+                cylinder = UsdGeom.Cylinder(prim)
+                radius_inst.radius = [
+                    float64(cylinder.GetRadiusAttr().Get())]
+                height_inst.height = [
+                    float64(cylinder.GetHeightAttr().Get())]
 
         for prim in stage.Traverse():
-            if prim.HasAPI(UsdOntology.RdfAPI) and prim.IsA(UsdPhysics.RevoluteJoint):
+            if not prim.HasAPI(UsdOntology.RdfAPI):
+                continue
+            prim_inst = iri_map.get(prim)
+            if prim_inst is None:
+                continue
+            for prim_child in prim.GetChildren():
+                prim_child_inst = iri_map.get(prim_child)
+                if prim_child_inst is not None:
+                    prim_inst.hasPart.append(prim_child_inst)
+        
+            if prim.IsA(UsdPhysics.RevoluteJoint):
                 prim_inst = iri_map.get(prim)
                 hasRevoluteJointSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(hasRevoluteJointSchema_prop.some(
@@ -274,7 +333,6 @@ def usd_to_owl(file_path: str) -> None:
                 body1 = stage.GetPrimAtPath(
                     revoluteJoint.GetBody1Rel().GetTargets()[0])
                 prim_inst.physics_body1 = iri_map.get(body1)
-
                 collisionEnabled_inst.physics_collisionEnabled = [
                     revoluteJoint.GetCollisionEnabledAttr().Get()]
                 pos0_inst.physics_localPos0 = [
@@ -285,15 +343,6 @@ def usd_to_owl(file_path: str) -> None:
                     revoluteJoint.GetLocalRot0Attr().Get()]
                 rot1_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
-
-        for prim in stage.Traverse():
-            if prim.HasAPI(UsdOntology.RdfAPI):
-                prim_inst = iri_map.get(prim)
-                if prim_inst is not None:
-                    for prim_child in prim.GetChildren():
-                        prim_child_inst = iri_map.get(prim_child)
-                        if prim_child_inst is not None:
-                            prim_inst.hasPart.append(prim_child_inst)
 
     ABox_onto.save(file=save_path + 'BoxScenarioTest1.owl', format="rdfxml")
 
