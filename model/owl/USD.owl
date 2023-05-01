@@ -1383,43 +1383,47 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#WithJointPhysics">
         <owl:equivalentClass>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
-                <owl:someValuesFrom>
-                    <owl:Class>
-                        <owl:intersectionOf rdf:parseType="Collection">
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_body0"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_body1"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_collisionEnabled"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localPos0"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localPos1"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localRot0"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                            </owl:Restriction>
-                            <owl:Restriction>
-                                <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localRot1"/>
-                                <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
-                            </owl:Restriction>
-                        </owl:intersectionOf>
-                    </owl:Class>
-                </owl:someValuesFrom>
-            </owl:Restriction>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasPhysics"/>
+                        <owl:someValuesFrom>
+                            <owl:Class>
+                                <owl:intersectionOf rdf:parseType="Collection">
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_collisionEnabled"/>
+                                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                                    </owl:Restriction>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localPos0"/>
+                                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                                    </owl:Restriction>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localPos1"/>
+                                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                                    </owl:Restriction>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localRot0"/>
+                                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                                    </owl:Restriction>
+                                    <owl:Restriction>
+                                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_localRot1"/>
+                                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+                                    </owl:Restriction>
+                                </owl:intersectionOf>
+                            </owl:Class>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_body0"/>
+                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#physics_body1"/>
+                        <owl:someValuesFrom rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Prim"/>
     </owl:Class>
