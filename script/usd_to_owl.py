@@ -136,6 +136,9 @@ def usd_to_owl(file_path: str) -> None:
                 iri_map[prim] = prim_inst
 
                 if prim.HasAPI(UsdPhysics.RigidBodyAPI):
+                    hasAPI_prop = usd_onto.hasAPI
+                    prim_inst.is_a.append(
+                        hasAPI_prop.some(usd_onto.RigidBodyAPI))
                     prim_inst.hasAPI.append(usd_onto.RigidBodyAPI)
                     rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
                     rigidBodyEnabled_inst = dul_onto.Quality(
@@ -145,7 +148,9 @@ def usd_to_owl(file_path: str) -> None:
                         rigidBodyAPI.GetRigidBodyEnabledAttr().Get()]
 
                 if prim.HasAPI(UsdPhysics.CollisionAPI):
-                    prim_inst.hasAPI.append(usd_onto.CollisionAPI)
+                    hasAPI_prop = usd_onto.hasAPI
+                    prim_inst.is_a.append(
+                        hasAPI_prop.some(usd_onto.CollisionAPI))
                     collisionAPI = UsdPhysics.CollisionAPI.Apply(prim)
                     rigidCollisionEnabled_inst = dul_onto.Quality(
                         prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
@@ -154,7 +159,9 @@ def usd_to_owl(file_path: str) -> None:
                         collisionAPI.GetCollisionEnabledAttr().Get()]
 
                 if prim.HasAPI(UsdPhysics.MassAPI):
-                    prim_inst.hasAPI.append(usd_onto.MassAPI)
+                    hasAPI_prop = usd_onto.hasAPI
+                    prim_inst.is_a.append(
+                        hasAPI_prop.some(usd_onto.MassAPI))
                     massAPI = UsdPhysics.MassAPI.Apply(prim)
                     mass_inst = dul_onto.Quality(
                         prim.GetName() + '_mass', namespace=dul_onto)
@@ -200,22 +207,22 @@ def usd_to_owl(file_path: str) -> None:
                         gprim.GetDisplayOpacityPrimvar().Get()]
 
                 if prim.IsA(UsdGeom.Xform):
-                    hasXformSchemaProp = usd_onto.hasTypedSchema
+                    hasXformSchema_prop = usd_onto.hasTypedSchema
                     prim_inst.is_a.append(
-                        hasXformSchemaProp.some(usd_onto.XformSchema))
+                        hasXformSchema_prop.some(usd_onto.XformSchema))
                 elif prim.IsA(UsdGeom.Cube):
-                    hasCubeSchemaProp = usd_onto.hasTypedSchema
+                    hasCubeSchema_prop = usd_onto.hasTypedSchema
                     prim_inst.is_a.append(
-                        hasCubeSchemaProp.some(usd_onto.CubeSchema))
+                        hasCubeSchema_prop.some(usd_onto.CubeSchema))
                     size_inst = dul_onto.Quality(
                         prim.GetName() + '_size', namespace=dul_onto)
                     prim_inst.hasQuality.append(size_inst)
                     cube = UsdGeom.Cube(prim)
                     size_inst.size = [float64(cube.GetSizeAttr().Get())]
                 elif prim.IsA(UsdGeom.Sphere):
-                    hasSphereSchemaProp = usd_onto.hasTypedSchema
+                    hasSphereSchema_prop = usd_onto.hasTypedSchema
                     prim_inst.is_a.append(
-                        hasSphereSchemaProp.some(usd_onto.SphereSchema))
+                        hasSphereSchema_prop.some(usd_onto.SphereSchema))
                     radius_inst = dul_onto.Quality(
                         prim.GetName() + '_radius', namespace=dul_onto)
                     prim_inst.hasQuality.append(radius_inst)
@@ -223,9 +230,9 @@ def usd_to_owl(file_path: str) -> None:
                     radius_inst.radius = [
                         float64(sphere.GetRadiusAttr().Get())]
                 elif prim.IsA(UsdGeom.Cylinder):
-                    hasCylinderSchemaProp = usd_onto.hasTypedSchema
+                    hasCylinderSchema_prop = usd_onto.hasTypedSchema
                     prim_inst.is_a.append(
-                        hasCylinderSchemaProp.some(usd_onto.CylinderSchema))
+                        hasCylinderSchema_prop.some(usd_onto.CylinderSchema))
                     radius_inst = dul_onto.Quality(
                         prim.GetName() + '_radius', namespace=dul_onto)
                     prim_inst.hasQuality.append(radius_inst)
@@ -241,8 +248,8 @@ def usd_to_owl(file_path: str) -> None:
         for prim in stage.Traverse():
             if prim.HasAPI(UsdOntology.RdfAPI) and prim.IsA(UsdPhysics.RevoluteJoint):
                 prim_inst = iri_map.get(prim)
-                hasRevoluteJointSchemaProp = usd_onto.hasTypedSchema
-                prim_inst.is_a.append(hasRevoluteJointSchemaProp.some(
+                hasRevoluteJointSchema_prop = usd_onto.hasTypedSchema
+                prim_inst.is_a.append(hasRevoluteJointSchema_prop.some(
                     usd_onto.PhysicsRevoluteJointSchema))
 
                 # body0_inst = dul_onto.Quality(prim.GetName() + '_body0', namespace = dul_onto)
