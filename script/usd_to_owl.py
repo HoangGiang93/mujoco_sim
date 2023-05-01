@@ -110,6 +110,7 @@ def usd_to_owl(file_path: str) -> None:
                 rdfAPI = UsdOntology.RdfAPI.Apply(prim)
                 iri = rdfAPI.GetRdfNamespaceAttr().Get() + prim.GetName()
                 prim_inst = usd_onto.Prim(iri)
+                iri_map[prim] = prim_inst
 
                 if prim.IsA(UsdGeom.Xformable):
                     xformable = UsdGeom.Xformable(prim)
@@ -199,16 +200,14 @@ def usd_to_owl(file_path: str) -> None:
                 revoluteJoint = UsdPhysics.RevoluteJoint(prim)
                 body0 = stage.GetPrimAtPath(
                     revoluteJoint.GetBody0Rel().GetTargets()[0])
-                if body0.HasAPI(UsdOntology.RdfAPI):
-                    body0_rdfAPI = UsdOntology.RdfAPI.Apply(body0)
-                    body0_iri = body0_rdfAPI.GetRdfNamespaceAttr().Get() + body0.GetName()
-                    prim_inst.physics_body0 = ABox_onto[body0_iri]
+                body0_inst = iri_map.get(body0)
+                if body0_inst is not None:
+                    prim_inst.physics_body0 = body0_inst
                 body1 = stage.GetPrimAtPath(
                     revoluteJoint.GetBody1Rel().GetTargets()[0])
-                if body1.HasAPI(UsdOntology.RdfAPI):
-                    body1_rdfAPI = UsdOntology.RdfAPI.Apply(body1)
-                    body1_iri = body1_rdfAPI.GetRdfNamespaceAttr().Get() + body1.GetName()
-                    prim_inst.physics_body1 = ABox_onto[body1_iri]
+                body1_inst = iri_map.get(body1)
+                if body1_inst is not None:
+                    prim_inst.physics_body1 = body1_inst
 
                 prim_inst.physics_collisionEnabled = [
                     revoluteJoint.GetCollisionEnabledAttr().Get()]
@@ -220,6 +219,15 @@ def usd_to_owl(file_path: str) -> None:
                     revoluteJoint.GetLocalRot0Attr().Get()]
                 prim_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
+                
+        for prim in stage.Traverse():
+            if prim.HasAPI(UsdOntology.RdfAPI):
+                prim_inst = iri_map.get(prim)
+                if prim_inst is not None:
+                    for prim_child in prim.GetChildren():
+                        prim_child_inst = iri_map.get(prim_child)
+                        if prim_child_inst is not None:
+                            prim_inst.hasPart.append(prim_child_inst)
 
     ABox_onto.save(file=save_path + 'BoxScenarioTest1.owl', format="rdfxml")
 

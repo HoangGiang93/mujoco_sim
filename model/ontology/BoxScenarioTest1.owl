@@ -19,6 +19,9 @@
 <USD.:Prim rdf:about="#https://ease-crc.org/ont/USD.owl#world">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#box"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_1"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_2"/>
 </USD.:Prim>
 
 <USD.:Prim rdf:about="#https://ease-crc.org/ont/USD.owl#box">
@@ -29,6 +32,13 @@
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_mass"/>
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_centerOfMass"/>
   <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_1"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_2"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_3"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_4"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_5"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint"/>
 </USD.:Prim>
 
 <DUL.:Quality rdf:about="#https://ease-crc.org/ont/USD.owl#box_xformOpOrder">
@@ -268,6 +278,7 @@
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_1_mass"/>
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_1_centerOfMass"/>
   <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_6"/>
 </USD.:Prim>
 
 <DUL.:Quality rdf:about="#https://ease-crc.org/ont/USD.owl#box_flap_side_1_xformOpOrder">
@@ -332,6 +343,7 @@
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_2_mass"/>
   <DUL.:hasQuality rdf:resource="#https://ease-crc.org/ont/USD.owl#box_flap_side_2_centerOfMass"/>
   <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+  <DUL.:hasPart rdf:resource="#https://ease-crc.org/ont/USD.owl#geom_7"/>
 </USD.:Prim>
 
 <DUL.:Quality rdf:about="#https://ease-crc.org/ont/USD.owl#box_flap_side_2_xformOpOrder">
