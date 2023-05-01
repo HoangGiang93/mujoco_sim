@@ -17,7 +17,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
@@ -35,7 +35,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#geom_1"/>
@@ -82,7 +82,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_1_size"/>
@@ -128,7 +128,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_2_size"/>
@@ -174,7 +174,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_3_size"/>
@@ -220,7 +220,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_4_size"/>
@@ -266,7 +266,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#CubeSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#geom_5_size"/>
@@ -304,26 +304,36 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#RevoluteJoint"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_body0"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_body1"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsRevoluteJointSchema"/>
+    </owl:Restriction>
+  </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_collisionEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_pos0"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_pos1"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_rot0"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_rot1"/>
+  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
+  <USD.:physics_body1 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_1"/>
 </USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#RevoluteJoint"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_body0"/>
-  <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_body1"/>
+  <rdf:type>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#PhysicsRevoluteJointSchema"/>
+    </owl:Restriction>
+  </rdf:type>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_collisionEnabled"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_pos0"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_pos1"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_rot0"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_rot1"/>
+  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
+  <USD.:physics_body1 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_2"/>
 </USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1">
@@ -336,7 +346,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#geom_6"/>
@@ -411,7 +421,7 @@
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
-      <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
+      <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
     </owl:Restriction>
   </rdf:type>
   <DUL.:hasPart rdf:resource="https://ease-crc.org/ont/USD.owl#geom_7"/>
@@ -476,16 +486,6 @@
   <USD.:primvars_displayOpacity rdf:datatype="https://ease-crc.org/ont/USD.owl#float_array">[1.0]</USD.:primvars_displayOpacity>
 </DUL.:Quality>
 
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_body0">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_body1">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_1"/>
-</DUL.:Quality>
-
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_collisionEnabled">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</USD.:physics_collisionEnabled>
@@ -509,16 +509,6 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_rot1">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:physics_localRot1 rdf:datatype="https://ease-crc.org/ont/USD.owl#quatf">[0.7071068286895752-0.7071068286895752, 0.0, 0.0]</USD.:physics_localRot1>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_body0">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
-</DUL.:Quality>
-
-<DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_body1">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_2"/>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_collisionEnabled">
