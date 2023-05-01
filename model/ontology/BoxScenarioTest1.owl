@@ -12,10 +12,6 @@
   <owl:imports rdf:resource="https://ease-crc.org/ont/USD.owl"/>
 </owl:Ontology>
 
-<USD.:Prim rdf:about="#https://ease-crc.org/ont/USD.owl#usd">
-  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-</USD.:Prim>
-
 <USD.:Prim rdf:about="#https://ease-crc.org/ont/USD.owl#world">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:hasTypedSchema rdf:resource="https://ease-crc.org/ont/USD.owl#XformSchema"/>
