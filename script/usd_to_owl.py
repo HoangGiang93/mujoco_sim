@@ -139,7 +139,6 @@ def usd_to_owl(file_path: str) -> None:
                     hasAPI_prop = usd_onto.hasAPI
                     prim_inst.is_a.append(
                         hasAPI_prop.some(usd_onto.RigidBodyAPI))
-                    prim_inst.hasAPI.append(usd_onto.RigidBodyAPI)
                     rigidBodyAPI = UsdPhysics.RigidBodyAPI.Apply(prim)
                     rigidBodyEnabled_inst = dul_onto.Quality(
                         prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)

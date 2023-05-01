@@ -33,7 +33,6 @@
       <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
     </owl:Restriction>
   </rdf:type>
-  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_rigidBodyEnabled"/>
   <rdf:type>
     <owl:Restriction>
@@ -387,7 +386,6 @@
       <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
     </owl:Restriction>
   </rdf:type>
-  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_rigidBodyEnabled"/>
   <rdf:type>
     <owl:Restriction>
@@ -481,7 +479,6 @@
       <owl:someValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
     </owl:Restriction>
   </rdf:type>
-  <USD.:hasAPI rdf:resource="https://ease-crc.org/ont/USD.owl#RigidBodyAPI"/>
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_rigidBodyEnabled"/>
   <rdf:type>
     <owl:Restriction>
