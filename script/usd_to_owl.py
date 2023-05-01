@@ -251,10 +251,6 @@ def usd_to_owl(file_path: str) -> None:
                 prim_inst.is_a.append(hasRevoluteJointSchema_prop.some(
                     usd_onto.PhysicsRevoluteJointSchema))
 
-                # body0_inst = dul_onto.Quality(prim.GetName() + '_body0', namespace = dul_onto)
-                # prim_inst.hasQuality.append(body0_inst)
-                # body1_inst = dul_onto.Quality(prim.GetName() + '_body1', namespace = dul_onto)
-                # prim_inst.hasQuality.append(body1_inst)
                 collisionEnabled_inst = dul_onto.Quality(
                     prim.GetName() + '_collisionEnabled', namespace=dul_onto)
                 prim_inst.hasQuality.append(collisionEnabled_inst)
