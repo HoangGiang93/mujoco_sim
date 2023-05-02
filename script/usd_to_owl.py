@@ -115,16 +115,16 @@ def import_ontos(onto) -> None:
 
 def usd_to_owl(file_path: str) -> None:
     rospack = rospkg.RosPack()
+
+    usd_onto_path = rospack.get_path('mujoco_sim') + '/model/owl/'
+    onto_path.append(usd_onto_path)
     save_path = rospack.get_path('mujoco_sim') + '/model/ontology/'
     onto_path.append(save_path)
     
     ABox_onto = get_ontology(
         'https://ease-crc.org/ont/usd/BoxScenario_ABox.owl')
 
-    # usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
-    usd_onto = get_ontology(
-        'file:///' + rospack.get_path('mujoco_sim') + '/model/owl/USD.owl')
-    usd_onto.load()
+    usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
     onto_map[usd_onto.base_iri] = usd_onto
 
     dul_onto = get_ontology(
