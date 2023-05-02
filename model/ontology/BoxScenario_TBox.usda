@@ -1,0 +1,52 @@
+#usda 1.0
+
+class "_class_box_scenario_namespace" (
+    prepend apiSchemas = ["RdfAPI"]
+)
+{
+    custom string rdf:namespace = "https://ease-crc.org/ont/usd/BoxScenario.owl#"
+}
+
+class "_class_soma_namespace" (
+    prepend apiSchemas = ["RdfAPI"]
+)
+{
+    custom string rdf:namespace = "http://www.ease-crc.org/ont/SOMA.owl#"
+}
+
+class "_class_soma_obj_namespace" (
+    prepend apiSchemas = ["RdfAPI"]
+)
+{
+    custom string rdf:namespace = "http://www.ease-crc.org/ont/SOMA-OBJ.owl#"
+}
+
+class "_class_soma" 
+{
+    class "_class_box" (
+        inherits = </_class_soma_namespace>
+    )
+    {
+        custom string rdf:className = "Box"
+    }
+}
+
+class "_class_soma_obj" 
+{
+    class "_class_joint" (
+        inherits = </_class_soma_obj_namespace>
+    )
+    {
+        custom string rdf:className = "Joint"
+    }
+}
+
+class "_class_box_scenario" 
+{
+    class "_class_box_flap" (
+        inherits = </_class_box_scenario_namespace>
+    )
+    {
+        custom string rdf:className = "BoxFlap"
+    }
+}

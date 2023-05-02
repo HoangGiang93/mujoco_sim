@@ -7,6 +7,7 @@ import types
 from numpy import float32, float64
 import rospkg
 
+onto_map = dict()
 
 def float_parser(string: str):
     return float32(string)
@@ -104,43 +105,66 @@ declare_datatype(Gf.Quatf, 'https://ease-crc.org/ont/USD.owl#quatf',
                  quatf_parser, quatf_unparser)
 
 
+def import_ontos(onto) -> None:
+    for imported_onto in onto.imported_ontologies:
+        imported_onto.load()
+        onto_map[imported_onto.base_iri] = imported_onto
+        import_ontos(imported_onto)
+
+    return None
+
 def usd_to_owl(file_path: str) -> None:
     rospack = rospkg.RosPack()
     save_path = rospack.get_path('mujoco_sim') + '/model/ontology/'
     onto_path.append(save_path)
-
+    
     ABox_onto = get_ontology(
-        'https://ease-crc.org/ont/usd/BoxScenarioTest1.owl')
+        'https://ease-crc.org/ont/usd/BoxScenario_ABox.owl')
 
     # usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
     usd_onto = get_ontology(
         'file:///' + rospack.get_path('mujoco_sim') + '/model/owl/USD.owl')
     usd_onto.load()
-
-    owl_onto = get_ontology('http://www.w3.org/2002/07/owl')
-    owl_onto.load()
+    onto_map[usd_onto.base_iri] = usd_onto
 
     dul_onto = get_ontology(
         'http://www.ontologydesignpatterns.org/ont/dul/DUL.owl')
     dul_onto.load()
+    onto_map[dul_onto.base_iri] = dul_onto
+    
+    TBox_onto = get_ontology(
+        'file:///' + rospack.get_path('mujoco_sim') + '/model/ontology/BoxScenario_TBox.owl')
+    TBox_onto.load()
+    onto_map[TBox_onto.base_iri] = TBox_onto
+
+    import_ontos(TBox_onto)
 
     ABox_onto.imported_ontologies.append(usd_onto)
 
-    iri_map = dict()
+    prim_dict = dict()
 
     stage = Usd.Stage.Open(file_path)
     with ABox_onto:
         for prim in stage.Traverse():
-            if not prim.HasAPI(UsdOntology.RdfAPI):
-                continue
             prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
-            iri_map[prim] = prim_inst
+            prim_dict[prim] = prim_inst
+
+            if prim.HasAPI(UsdOntology.IriAPI):
+                iriAPI = UsdOntology.IriAPI.Apply(prim)
+                for prim_path in iriAPI.GetIriClassRel().GetTargets():
+                    rdfAPI = UsdOntology.RdfAPI.Apply(stage.GetPrimAtPath(prim_path))
+                    onto_ns = rdfAPI.GetRdfNamespaceAttr().Get()
+                    onto = onto_map.get(onto_ns)
+                    if onto is None:
+                        print(f'{onto_ns} not found in onto_map')
+                        continue
+                    prim_inst.is_a.append(onto[rdfAPI.GetRdfClassNameAttr().Get()])
 
             if prim.HasAPI(UsdPhysics.RigidBodyAPI):
                 hasAPI_prop = usd_onto.hasAPI
                 prim_inst.is_a.append(
                     hasAPI_prop.some(usd_onto.RigidBodyAPI))
-                
+
                 rigidBodyEnabled_inst = dul_onto.Quality(
                     prim.GetName() + '_rigidBodyEnabled', namespace=dul_onto)
                 prim_inst.hasQuality.append(rigidBodyEnabled_inst)
@@ -153,7 +177,7 @@ def usd_to_owl(file_path: str) -> None:
                 hasAPI_prop = usd_onto.hasAPI
                 prim_inst.is_a.append(
                     hasAPI_prop.some(usd_onto.CollisionAPI))
-                
+
                 rigidCollisionEnabled_inst = dul_onto.Quality(
                     prim.GetName() + '_rigidCollisionEnabled', namespace=dul_onto)
                 prim_inst.hasQuality.append(rigidCollisionEnabled_inst)
@@ -166,7 +190,7 @@ def usd_to_owl(file_path: str) -> None:
                 hasAPI_prop = usd_onto.hasAPI
                 prim_inst.is_a.append(
                     hasAPI_prop.some(usd_onto.MassAPI))
-                
+
                 mass_inst = dul_onto.Quality(
                     prim.GetName() + '_mass', namespace=dul_onto)
                 prim_inst.hasQuality.append(mass_inst)
@@ -200,34 +224,34 @@ def usd_to_owl(file_path: str) -> None:
                             prim.GetName() + '_xformOp_translate', namespace=dul_onto)
                         prim_inst.hasQuality.append(
                             xformOpTranslate_inst)
-                        
+
                         xformOpTransform_inst.xformOp_translate = [
                             prim.GetAttribute(xformOp).Get()]
-                        
+
                     if xformOp == 'xformOp:rotate':
                         xformOpRotate_inst = dul_onto.Quality(
                             prim.GetName() + '_xformOp_rotate', namespace=dul_onto)
                         prim_inst.hasQuality.append(
                             xformOpRotate_inst)
-                        
+
                         xformOpRotate_inst.xformOp_rotate = [
                             prim.GetAttribute(xformOp).Get()]
-                        
+
                     if xformOp == 'xformOp:transform':
                         xformOpTransform_inst = dul_onto.Quality(
                             prim.GetName() + '_xformOp_transform', namespace=dul_onto)
                         prim_inst.hasQuality.append(
                             xformOpTransform_inst)
-                        
+
                         xformOpTransform_inst.xformOp_transform = [
                             prim.GetAttribute(xformOp).Get()]
-                        
+
                     if xformOp == 'xformOp:transform':
                         xformOpTransform_inst = dul_onto.Quality(
                             prim.GetName() + '_xformOp_transform', namespace=dul_onto)
                         prim_inst.hasQuality.append(
                             xformOpTransform_inst)
-                        
+
                         xformOpTransform_inst.xformOp_transform = [
                             prim.GetAttribute(xformOp).Get()]
 
@@ -249,12 +273,12 @@ def usd_to_owl(file_path: str) -> None:
                 hasXformSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(
                     hasXformSchema_prop.some(usd_onto.XformSchema))
-                
+
             elif prim.IsA(UsdGeom.Cube):
                 hasCubeSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(
                     hasCubeSchema_prop.some(usd_onto.CubeSchema))
-                
+
                 size_inst = dul_onto.Quality(
                     prim.GetName() + '_size', namespace=dul_onto)
                 prim_inst.hasQuality.append(size_inst)
@@ -266,7 +290,7 @@ def usd_to_owl(file_path: str) -> None:
                 hasSphereSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(
                     hasSphereSchema_prop.some(usd_onto.SphereSchema))
-                
+
                 radius_inst = dul_onto.Quality(
                     prim.GetName() + '_radius', namespace=dul_onto)
                 prim_inst.hasQuality.append(radius_inst)
@@ -274,12 +298,12 @@ def usd_to_owl(file_path: str) -> None:
                 sphere = UsdGeom.Sphere(prim)
                 radius_inst.radius = [
                     float64(sphere.GetRadiusAttr().Get())]
-                
+
             elif prim.IsA(UsdGeom.Cylinder):
                 hasCylinderSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(
                     hasCylinderSchema_prop.some(usd_onto.CylinderSchema))
-                
+
                 radius_inst = dul_onto.Quality(
                     prim.GetName() + '_radius', namespace=dul_onto)
                 prim_inst.hasQuality.append(radius_inst)
@@ -294,18 +318,16 @@ def usd_to_owl(file_path: str) -> None:
                     float64(cylinder.GetHeightAttr().Get())]
 
         for prim in stage.Traverse():
-            if not prim.HasAPI(UsdOntology.RdfAPI):
-                continue
-            prim_inst = iri_map.get(prim)
+            prim_inst = prim_dict.get(prim)
             if prim_inst is None:
                 continue
             for prim_child in prim.GetChildren():
-                prim_child_inst = iri_map.get(prim_child)
+                prim_child_inst = prim_dict.get(prim_child)
                 if prim_child_inst is not None:
                     prim_inst.hasPart.append(prim_child_inst)
-        
+
             if prim.IsA(UsdPhysics.RevoluteJoint):
-                prim_inst = iri_map.get(prim)
+                prim_inst = prim_dict.get(prim)
                 hasRevoluteJointSchema_prop = usd_onto.hasTypedSchema
                 prim_inst.is_a.append(hasRevoluteJointSchema_prop.some(
                     usd_onto.PhysicsRevoluteJointSchema))
@@ -329,10 +351,10 @@ def usd_to_owl(file_path: str) -> None:
                 revoluteJoint = UsdPhysics.RevoluteJoint(prim)
                 body0 = stage.GetPrimAtPath(
                     revoluteJoint.GetBody0Rel().GetTargets()[0])
-                prim_inst.physics_body0 = iri_map.get(body0)
+                prim_inst.physics_body0 = prim_dict.get(body0)
                 body1 = stage.GetPrimAtPath(
                     revoluteJoint.GetBody1Rel().GetTargets()[0])
-                prim_inst.physics_body1 = iri_map.get(body1)
+                prim_inst.physics_body1 = prim_dict.get(body1)
                 collisionEnabled_inst.physics_collisionEnabled = [
                     revoluteJoint.GetCollisionEnabledAttr().Get()]
                 pos0_inst.physics_localPos0 = [
@@ -344,7 +366,7 @@ def usd_to_owl(file_path: str) -> None:
                 rot1_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
 
-    ABox_onto.save(file=save_path + 'BoxScenarioTest1.owl', format="rdfxml")
+    ABox_onto.save(file=save_path + 'BoxScenario_ABox.owl', format="rdfxml")
 
     return None
 

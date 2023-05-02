@@ -3,12 +3,12 @@
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:owl="http://www.w3.org/2002/07/owl#"
-         xml:base="https://ease-crc.org/ont/usd/BoxScenarioTest1.owl"
-         xmlns="https://ease-crc.org/ont/usd/BoxScenarioTest1.owl#"
+         xml:base="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl"
+         xmlns="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl#"
          xmlns:USD.="https://ease-crc.org/ont/USD.owl#"
          xmlns:DUL.="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#">
 
-<owl:Ontology rdf:about="https://ease-crc.org/ont/usd/BoxScenarioTest1.owl">
+<owl:Ontology rdf:about="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl">
   <owl:imports rdf:resource="https://ease-crc.org/ont/USD.owl"/>
 </owl:Ontology>
 
@@ -21,6 +21,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="http://www.ease-crc.org/ont/SOMA.owl#Box"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>
@@ -340,6 +341,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="http://www.ease-crc.org/ont/SOMA-OBJ.owl#Joint"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
@@ -357,6 +359,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="http://www.ease-crc.org/ont/SOMA-OBJ.owl#Joint"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasTypedSchema"/>
@@ -374,6 +377,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#BoxFlap"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>
@@ -467,6 +471,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#BoxFlap"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>

@@ -10,11 +10,12 @@
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
     <owl:Ontology rdf:about="https://ease-crc.org/ont/usd/BoxScenario.owl">
         <owl:imports rdf:resource="https://ease-crc.org/ont/USD.owl"/>
-        <owl:imports rdf:resource="http://www.ease-crc.org/ont/SOMA.owl"/>
+        <owl:imports rdf:resource="http://www.ease-crc.org/ont/SOMA-HOME.owl"/>
+        <owl:imports rdf:resource="http://www.ease-crc.org/ont/SOMA-OBJ.owl"/>
     </owl:Ontology>
 
-    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#BoxFlap">
-        <rdfs:subClassOf rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
+    <owl:Class rdf:about="https://ease-crc.org/ont/usd/BoxScenario.owl#BoxFlap">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
     </owl:Class>
 
 </rdf:RDF>
