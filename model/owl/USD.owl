@@ -355,6 +355,17 @@
     
 
 
+    <!-- https://ease-crc.org/ont/USD.owl#hasJointValue -->
+
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#hasJointValue">
+        <rdfs:subPropertyOf rdf:resource="https://ease-crc.org/ont/USD.owl#simulatorDataValue"/>
+        <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#JointState"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#double"/>
+        <rdfs:comment>The value of a joint.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- https://ease-crc.org/ont/USD.owl#height -->
 
     <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#height">
@@ -613,6 +624,15 @@
         <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
         <rdfs:domain rdf:resource="https://ease-crc.org/ont/USD.owl#Shape"/>
         <rdfs:comment>A data value of a shape quality.</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#simulatorDataValue -->
+
+    <owl:DatatypeProperty rdf:about="https://ease-crc.org/ont/USD.owl#simulatorDataValue">
+        <rdfs:subPropertyOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasDataValue"/>
+        <rdfs:comment>A data value computed by a simulator.</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -876,7 +896,29 @@
 
     <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#Joint">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#PhysicalObject"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#hasQuality"/>
+                <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
+                <owl:onClass rdf:resource="https://ease-crc.org/ont/USD.owl#JointState"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:comment>A joint constrains the motion of objects relative to each other.</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- https://ease-crc.org/ont/USD.owl#JointState -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/USD.owl#JointState">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Quality"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#isQualityOf"/>
+                <owl:allValuesFrom rdf:resource="https://ease-crc.org/ont/USD.owl#Joint"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:comment>The state of a joint.</rdfs:comment>
     </owl:Class>
     
 
