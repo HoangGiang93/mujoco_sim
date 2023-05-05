@@ -300,20 +300,48 @@ static void init_tmp()
 				 robot_body = robot_body->NextSiblingElement("body"))
 		{
 			const char *robot = robot_body->Attribute("name");
-			if (robot != nullptr && MjSim::robot_names.find(robot) != MjSim::robot_names.end() && MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
+			if (robot != nullptr && MjSim::robot_names.find(robot) != MjSim::robot_names.end())
 			{
-				robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
-																				 std::to_string(MjSim::pose_inits[robot][1]) + " " +
-																				 std::to_string(MjSim::pose_inits[robot][2]))
-																						.c_str());
-				tf2::Quaternion quat;
-				quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
-				robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
-																					std::to_string(quat.getX()) + " " +
-																					std::to_string(quat.getY()) + " " +
-																					std::to_string(quat.getZ()))
-																						 .c_str());
-				break;
+				if (MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
+				{
+					robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
+																					 std::to_string(MjSim::pose_inits[robot][1]) + " " +
+																					 std::to_string(MjSim::pose_inits[robot][2]))
+																							.c_str());
+					tf2::Quaternion quat;
+					quat.setRPY(MjSim::pose_inits[robot][3], MjSim::pose_inits[robot][4], MjSim::pose_inits[robot][5]);
+					robot_body->SetAttribute("quat", (std::to_string(quat.getW()) + " " +
+																						std::to_string(quat.getX()) + " " +
+																						std::to_string(quat.getY()) + " " +
+																						std::to_string(quat.getZ()))
+																							 .c_str());
+				}
+				else
+				{
+					std::vector<mjtNum> pos = {0, 0, 0};
+					std::vector<mjtNum> euler = {0, 0, 0};
+					if(robot_body->Attribute("pos"))
+					{
+						std::string pos_str = robot_body->Attribute("pos");
+						std::istringstream iss(pos_str);
+						pos = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+					}
+					if(robot_body->Attribute("quat"))
+					{
+						std::string quat_str = robot_body->Attribute("quat");
+						std::istringstream iss(quat_str);
+						std::vector<mjtNum> quat_vec = std::vector<mjtNum>{std::istream_iterator<mjtNum>(iss), std::istream_iterator<mjtNum>()};
+						tf::Quaternion quat(quat_vec[1], quat_vec[2], quat_vec[3], quat_vec[0]);
+						tf::Matrix3x3 matrix(quat);
+    				matrix.getRPY(euler[0], euler[1], euler[2]);
+					}
+					MjSim::pose_inits[robot][0] = pos[0];
+					MjSim::pose_inits[robot][1] = pos[1];
+					MjSim::pose_inits[robot][2] = pos[2];
+					MjSim::pose_inits[robot][0] = pos[0];
+					MjSim::pose_inits[robot][1] = pos[1];
+					MjSim::pose_inits[robot][2] = pos[2];
+				}
 			}
 		}
 

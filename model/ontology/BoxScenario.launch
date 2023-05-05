@@ -1,0 +1,13 @@
+<launch>
+
+	<arg name="robot" default="$(find mujoco_sim)/model/ontology/box.xml" />
+	<arg name="world" default="$(find mujoco_sim)/model/world/empty.xml" />
+	<arg name="config" default="$(find mujoco_sim)/src/config/robot.yaml" />
+
+	<node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
+		<rosparam command="load" file="$(arg config)" />
+		<param name="world" value="$(arg world)" />
+		<param name="robot" type="str" value="$(arg robot)" />
+	</node>
+
+</launch>
