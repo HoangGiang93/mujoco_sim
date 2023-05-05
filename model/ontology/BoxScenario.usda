@@ -43,10 +43,24 @@ class "_class_soma_obj"
 
 class "_class_box_scenario" 
 {
+    class "_class_box" (
+        inherits = </_class_box_scenario_namespace>
+    )
+    {
+        custom string rdf:className = "Box"
+    }
+
     class "_class_box_flap" (
         inherits = </_class_box_scenario_namespace>
     )
     {
         custom string rdf:className = "BoxFlap"
+    }
+
+    class "_class_flap" (
+        inherits = </_class_box_scenario_namespace>
+    )
+    {
+        custom string rdf:className = "Flap"
     }
 }

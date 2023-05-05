@@ -9,6 +9,7 @@ import rospkg
 
 onto_map = dict()
 
+
 def float_parser(string: str):
     return float32(string)
 
@@ -113,6 +114,7 @@ def import_ontos(onto) -> None:
 
     return None
 
+
 def usd_to_owl(file_path: str) -> None:
     rospack = rospkg.RosPack()
 
@@ -120,26 +122,23 @@ def usd_to_owl(file_path: str) -> None:
     onto_path.append(usd_onto_path)
     save_path = rospack.get_path('mujoco_sim') + '/model/ontology/'
     onto_path.append(save_path)
-    
-    ABox_onto = get_ontology(
-        'https://ease-crc.org/ont/usd/BoxScenario_ABox.owl')
+
+    ABox_onto = get_ontology('https://ease-crc.org/ont/usd/BoxScenario_ABox.owl')
 
     usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
     onto_map[usd_onto.base_iri] = usd_onto
 
-    dul_onto = get_ontology(
-        'http://www.ontologydesignpatterns.org/ont/dul/DUL.owl')
+    dul_onto = get_ontology('http://www.ontologydesignpatterns.org/ont/dul/DUL.owl')
     dul_onto.load()
     onto_map[dul_onto.base_iri] = dul_onto
-    
-    TBox_onto = get_ontology(
-        'file:///' + rospack.get_path('mujoco_sim') + '/model/ontology/BoxScenario_TBox.owl')
+
+    TBox_onto = get_ontology('https://ease-crc.org/ont/usd/BoxScenario.owl')
     TBox_onto.load()
     onto_map[TBox_onto.base_iri] = TBox_onto
 
     import_ontos(TBox_onto)
 
-    ABox_onto.imported_ontologies.append(usd_onto)
+    ABox_onto.imported_ontologies.append(TBox_onto)
 
     prim_dict = dict()
 
@@ -149,16 +148,18 @@ def usd_to_owl(file_path: str) -> None:
             prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
             prim_dict[prim] = prim_inst
 
-            if prim.HasAPI(UsdOntology.IriAPI):
-                iriAPI = UsdOntology.IriAPI.Apply(prim)
-                for prim_path in iriAPI.GetIriClassRel().GetTargets():
-                    rdfAPI = UsdOntology.RdfAPI.Apply(stage.GetPrimAtPath(prim_path))
+            if prim.HasAPI(UsdOntology.SemanticTagAPI):
+                semanticTagAPI = UsdOntology.SemanticTagAPI.Apply(prim)
+                for prim_path in semanticTagAPI.GetSemanticRelationRel().GetTargets():
+                    rdfAPI = UsdOntology.RdfAPI.Apply(
+                        stage.GetPrimAtPath(prim_path))
                     onto_ns = rdfAPI.GetRdfNamespaceAttr().Get()
                     onto = onto_map.get(onto_ns)
                     if onto is None:
                         print(f'{onto_ns} not found in onto_map')
                         continue
-                    prim_inst.is_a.append(onto[rdfAPI.GetRdfClassNameAttr().Get()])
+                    prim_inst.is_a.append(
+                        onto[rdfAPI.GetRdfClassNameAttr().Get()])
 
             if prim.HasAPI(UsdPhysics.RigidBodyAPI):
                 hasAPI_prop = usd_onto.hasAPI
