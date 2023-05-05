@@ -10,7 +10,8 @@
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:physics="https://ease-crc.org/ont/USD.owl#physics:"
-     xmlns:xformOp="https://ease-crc.org/ont/USD.owl#xformOp:">
+     xmlns:xformOp="https://ease-crc.org/ont/USD.owl#xformOp:"
+     xmlns:BoxScenario="https://ease-crc.org/ont/usd/BoxScenario.owl#">
     <owl:Ontology rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl">
         <owl:imports rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl"/>
     </owl:Ontology>
@@ -62,6 +63,24 @@
     
 
 
+    <!-- https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Box_0 -->
+
+    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Box_0">
+        <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#Box"/>
+        <DUL:hasPart rdf:resource="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://ease-crc.org/ont/usd/BoxScenario_test1.owl#JointState_0 -->
+
+    <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#JointState_0">
+        <rdf:type rdf:resource="https://ease-crc.org/ont/USD.owl#JointState"/>
+        <USD:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.6</USD:hasJointValue>
+    </owl:NamedIndividual>
+    
+
+
     <!-- https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1 -->
 
     <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1">
@@ -74,6 +93,7 @@
 
     <owl:NamedIndividual rdf:about="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#PrismaticJoint_0">
         <rdf:type rdf:resource="https://ease-crc.org/ont/USD.owl#PrismaticJoint"/>
+        <DUL:hasQuality rdf:resource="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#JointState_0"/>
         <USD:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#Prim_0"/>
         <USD:physics_body1 rdf:resource="https://ease-crc.org/ont/usd/BoxScenario_test1.owl#Prim_1"/>
     </owl:NamedIndividual>
