@@ -3,14 +3,30 @@
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:owl="http://www.w3.org/2002/07/owl#"
-         xml:base="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl"
-         xmlns="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl#"
+         xml:base="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/BoxScenario_ABox.owl"
+         xmlns="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/BoxScenario_ABox.owl#"
          xmlns:USD.="https://ease-crc.org/ont/USD.owl#"
          xmlns:DUL.="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#">
 
-<owl:Ontology rdf:about="https://ease-crc.org/ont/usd/BoxScenario_ABox.owl">
+<owl:Ontology rdf:about="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/BoxScenario_ABox.owl">
   <owl:imports rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl"/>
 </owl:Ontology>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#_class_BoxScenario">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#_class_owl">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#_class_DUL">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#_class_USD">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#world">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -21,7 +37,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#Box"/>
+  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#Corpus"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>

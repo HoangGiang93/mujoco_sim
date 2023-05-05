@@ -4,7 +4,7 @@
     metersPerUnit = 1
     upAxis = "Z"
     subLayers = [
-        @./BoxScenario.usda@
+        @./BoxScenario_TBox.usda@
     ]
 )
 
@@ -14,7 +14,7 @@ def Xform "world"
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "SemanticTagAPI"]
     )
     {
-        rel semanticTag:semanticRelation = [</_class_box_scenario/_class_box>]
+        rel semanticTag:semanticRelation = [</_class_BoxScenario/_class_Corpus>]
         point3f physics:centerOfMass = (0, 0, -0.034677908)
         float3 physics:diagonalInertia = (0.089647055, 0.08021242, 0.075281166)
         float physics:mass = 2.7894917
@@ -110,7 +110,7 @@ def Xform "world"
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "SemanticTagAPI"]
     )
     {
-        rel semanticTag:semanticRelation = [</_class_box_scenario/_class_flap>]
+        rel semanticTag:semanticRelation = [</_class_BoxScenario/_class_Flap>]
         point3f physics:centerOfMass = (-0.17, -1.5240808e-9, -3.309755e-9)
         float3 physics:diagonalInertia = (0.0039196294, 0.0020787641, 0.0018410094)
         float physics:mass = 0.21652657
@@ -136,7 +136,7 @@ def Xform "world"
         prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "SemanticTagAPI"]
     )
     {
-        rel semanticTag:semanticRelation = [</_class_box_scenario/_class_flap>]
+        rel semanticTag:semanticRelation = [</_class_BoxScenario/_class_Flap>]
         point3f physics:centerOfMass = (0.17000002, -3.8535852e-10, -1.7394634e-12)
         float3 physics:diagonalInertia = (0.0039196294, 0.0020787637, 0.0018410094)
         float physics:mass = 0.21652657

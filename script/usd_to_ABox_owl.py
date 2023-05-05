@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 from pxr import Usd, UsdOntology, UsdGeom, UsdPhysics, Gf, Vt
 from owlready2 import onto_path, get_ontology, declare_datatype
-import types
 from numpy import float32, float64
 import rospkg
 
@@ -115,15 +115,16 @@ def import_ontos(onto) -> None:
     return None
 
 
-def usd_to_owl(file_path: str) -> None:
+def usd_to_owl(usd_file : str, onto_file : str) -> None:
     rospack = rospkg.RosPack()
 
-    usd_onto_path = rospack.get_path('mujoco_sim') + '/model/owl/'
-    onto_path.append(usd_onto_path)
-    save_path = rospack.get_path('mujoco_sim') + '/model/ontology/'
-    onto_path.append(save_path)
+    onto_path.append(rospack.get_path('mujoco_sim') + '/model/owl/')
 
-    ABox_onto = get_ontology('https://ease-crc.org/ont/usd/BoxScenario_ABox.owl')
+    save_path = os.path.splitext(os.path.basename(usd_file))[0]
+    save_path = os.path.join(os.path.dirname(usd_file), save_path)
+    save_path += '.owl'
+    print(save_path)
+    ABox_onto = get_ontology('file://' + save_path)
 
     usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
     onto_map[usd_onto.base_iri] = usd_onto
@@ -132,7 +133,7 @@ def usd_to_owl(file_path: str) -> None:
     dul_onto.load()
     onto_map[dul_onto.base_iri] = dul_onto
 
-    TBox_onto = get_ontology('https://ease-crc.org/ont/usd/BoxScenario.owl')
+    TBox_onto = get_ontology('file://' + onto_file)
     TBox_onto.load()
     onto_map[TBox_onto.base_iri] = TBox_onto
 
@@ -142,7 +143,7 @@ def usd_to_owl(file_path: str) -> None:
 
     prim_dict = dict()
 
-    stage = Usd.Stage.Open(file_path)
+    stage = Usd.Stage.Open(usd_file)
     with ABox_onto:
         for prim in stage.Traverse():
             prim_inst = usd_onto.Prim(prim.GetName(), namespace=usd_onto)
@@ -151,15 +152,16 @@ def usd_to_owl(file_path: str) -> None:
             if prim.HasAPI(UsdOntology.SemanticTagAPI):
                 semanticTagAPI = UsdOntology.SemanticTagAPI.Apply(prim)
                 for prim_path in semanticTagAPI.GetSemanticRelationRel().GetTargets():
-                    rdfAPI = UsdOntology.RdfAPI.Apply(
-                        stage.GetPrimAtPath(prim_path))
-                    onto_ns = rdfAPI.GetRdfNamespaceAttr().Get()
-                    onto = onto_map.get(onto_ns)
-                    if onto is None:
-                        print(f'{onto_ns} not found in onto_map')
-                        continue
-                    prim_inst.is_a.append(
-                        onto[rdfAPI.GetRdfClassNameAttr().Get()])
+                    label_prim = stage.GetPrimAtPath(prim_path)
+                    if label_prim.IsValid():
+                        rdfAPI = UsdOntology.RdfAPI.Apply(label_prim)
+                        onto_ns = rdfAPI.GetRdfNamespaceAttr().Get()
+                        onto = onto_map.get(onto_ns)
+                        if onto is None:
+                            print(f'{onto_ns} not found in onto_map')
+                            continue
+                        prim_inst.is_a.append(
+                            onto[rdfAPI.GetRdfClassNameAttr().Get()])
 
             if prim.HasAPI(UsdPhysics.RigidBodyAPI):
                 hasAPI_prop = usd_onto.hasAPI
@@ -366,21 +368,22 @@ def usd_to_owl(file_path: str) -> None:
                     revoluteJoint.GetLocalRot0Attr().Get()]
                 rot1_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
-                
+
                 jointValue_inst = dul_onto.Quality(
                     prim.GetName() + '_jointValue', namespace=usd_onto)
                 prim_inst.hasQuality.append(jointValue_inst)
                 jointValue_inst.hasJointValue = [float64(0.5)]
 
-    ABox_onto.save(file=save_path + 'BoxScenario_ABox.owl', format="rdfxml")
+    print(save_path)
+    ABox_onto.save(save_path)
 
     return None
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        file_path = sys.argv[1]
+    if len(sys.argv) == 3:
+        (usd_file, onto_file) = (sys.argv[1], sys.argv[2])
     else:
-        print('Usage: file_path.usda')
+        print('Usage: in_usd.usda in_onto.owl')
         sys.exit(1)
-    usd_to_owl(file_path)
+    usd_to_owl(usd_file, onto_file)
