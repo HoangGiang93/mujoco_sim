@@ -354,6 +354,7 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_1_joint_rot1"/>
   <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
   <USD.:physics_body1 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_1"/>
+  <DUL.:hasQuality rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint_jointValue"/>
 </USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint">
@@ -371,6 +372,7 @@
   <DUL.:hasQuality rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_rot1"/>
   <USD.:physics_body0 rdf:resource="https://ease-crc.org/ont/USD.owl#box"/>
   <USD.:physics_body1 rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_2"/>
+  <DUL.:hasQuality rdf:resource="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint_jointValue"/>
 </USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1">
@@ -586,6 +588,11 @@
   <USD.:physics_localRot1 rdf:datatype="https://ease-crc.org/ont/USD.owl#quatf">[0.7071068286895752-0.7071068286895752, 0.0, 0.0]</USD.:physics_localRot1>
 </DUL.:Quality>
 
+<DUL.:Quality rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_1_joint_jointValue">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</USD.:hasJointValue>
+</DUL.:Quality>
+
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_collisionEnabled">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:physics_collisionEnabled rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</USD.:physics_collisionEnabled>
@@ -609,6 +616,11 @@
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_side_2_joint_rot1">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
   <USD.:physics_localRot1 rdf:datatype="https://ease-crc.org/ont/USD.owl#quatf">[0.70710682868957520.7071068286895752, 0.0, 0.0]</USD.:physics_localRot1>
+</DUL.:Quality>
+
+<DUL.:Quality rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_side_2_joint_jointValue">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</USD.:hasJointValue>
 </DUL.:Quality>
 
 

@@ -366,6 +366,11 @@ def usd_to_owl(file_path: str) -> None:
                     revoluteJoint.GetLocalRot0Attr().Get()]
                 rot1_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
+                
+                jointValue_inst = dul_onto.Quality(
+                    prim.GetName() + '_jointValue', namespace=usd_onto)
+                prim_inst.hasQuality.append(jointValue_inst)
+                jointValue_inst.hasJointValue = [float64(0.5)]
 
     ABox_onto.save(file=save_path + 'BoxScenario_ABox.owl', format="rdfxml")
 
