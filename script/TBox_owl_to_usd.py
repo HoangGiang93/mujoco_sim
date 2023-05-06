@@ -12,7 +12,7 @@ onto_set = set()
 N = 1
 
 
-def create_path(name: str, is_ns: bool) -> str:
+def create_path(name: str, is_ns: bool, prefix = '/_class_') -> str:
     usd_path = name.replace('https://', '')
     usd_path = usd_path.replace('http://', '')
     usd_path = usd_path.replace('www', '')
@@ -20,9 +20,9 @@ def create_path(name: str, is_ns: bool) -> str:
     usd_path = re.sub(r'[^a-zA-Z/]+', '', usd_path)
     words = usd_path.split('/')[-N:]
     if is_ns:
-        usd_path = '/_class_' + '/'.join(words) + '_namespace'
+        usd_path = prefix + '/'.join(words) + '_namespace'
     else:
-        usd_path = '/_class_' + '/'.join(words)
+        usd_path = prefix + '/'.join(words)
     return usd_path
 
 
@@ -37,8 +37,9 @@ def owl_to_usd_impl(stage: Usd.Stage, concepts: list) -> None:
             S[iri_prefix] = prim
 
         prim_child = stage.CreateClassPrim(create_path(
-            iri_prefix, False) + create_path(iri_name, False))
+            iri_prefix, False, '/') + create_path(iri_name, False))
         prim_child.GetInherits().AddInherit(S.get(iri_prefix).GetPrimPath())
+
         rdfAPI = UsdOntology.RdfAPI.Apply(prim_child)
         rdfAPI.CreateRdfClassNameAttr().Set(iri_name)
     return None

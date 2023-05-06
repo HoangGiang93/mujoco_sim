@@ -195,6 +195,12 @@
     <owl:Class rdf:about="https://ease-crc.org/ont/usd/BoxScenario.owl#Table">
         <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#DesignedArtifact"/>
     </owl:Class>
+
+    <!-- https://ease-crc.org/ont/usd/BoxScenario.owl#Cat -->
+
+    <owl:Class rdf:about="https://ease-crc.org/ont/usd/BoxScenario.owl#Cat">
+        <rdfs:subClassOf rdf:resource="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#Object"/>
+    </owl:Class>
 </rdf:RDF>
 
 

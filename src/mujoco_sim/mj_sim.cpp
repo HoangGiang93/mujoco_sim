@@ -137,6 +137,19 @@ static void save_mesh_paths(tinyxml2::XMLDocument &doc, const boost::filesystem:
 			 asset_element != nullptr;
 			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
+		for (tinyxml2::XMLElement *texture_element = asset_element->FirstChildElement("texture");
+				 texture_element != nullptr;
+				 texture_element = texture_element->NextSiblingElement("texture"))
+		{
+			if (texture_element->Attribute("file") != nullptr)
+			{
+				const boost::filesystem::path file_path = texture_element->Attribute("file");
+				if (file_path.is_relative())
+				{
+					texture_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+				}
+			}
+		}
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
 				 mesh_element != nullptr;
 				 mesh_element = mesh_element->NextSiblingElement("mesh"))
@@ -407,6 +420,19 @@ static void init_tmp()
 			 asset_element != nullptr;
 			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
+		for (tinyxml2::XMLElement *texture_element = asset_element->FirstChildElement("texture");
+				 texture_element != nullptr;
+				 texture_element = texture_element->NextSiblingElement("texture"))
+		{
+			if (texture_element->Attribute("file") != nullptr)
+			{
+				const boost::filesystem::path file_path = texture_element->Attribute("file");
+				if (file_path.is_relative())
+				{
+					texture_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+				}
+			}
+		}
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
 				 mesh_element != nullptr;
 				 mesh_element = mesh_element->NextSiblingElement("mesh"))

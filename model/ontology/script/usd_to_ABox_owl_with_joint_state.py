@@ -368,10 +368,12 @@ def usd_to_owl(usd_file : str, onto_file : str) -> None:
                 rot1_inst.physics_localRot1 = [
                     revoluteJoint.GetLocalRot1Attr().Get()]
 
-                jointValue_inst = dul_onto.Quality(
-                    prim.GetName() + '_jointValue', namespace=usd_onto)
-                prim_inst.hasQuality.append(jointValue_inst)
-                jointValue_inst.hasJointValue = [float64(0.5)]
+                joint_value = prim.GetAttribute("usd:jointValue").Get()
+                if joint_value is not None:
+                    jointValue_inst = dul_onto.Quality(
+                        prim.GetName() + '_jointValue', namespace=usd_onto)
+                    prim_inst.hasQuality.append(jointValue_inst)
+                    jointValue_inst.hasJointValue = [float64(joint_value)]
 
     print(f'Save usd stage that represents {onto_file} to {save_path}')
     ABox_onto.save(save_path)

@@ -10,7 +10,6 @@ import os
 import csv
 from math import degrees
 
-
 def get_sum_mass(body_element: ET.Element) -> float:
     mass = float(body_element.attrib.get('mass', '0'))
     for child_body_element in body_element.findall('body'):
@@ -23,13 +22,15 @@ def get_data(data, key: list, i: int, length: int) -> None:
     i += 1
     while True:
         try:
-            if length == 3:
+            if length == 1:
+                key.append(numpy.float64(data[i][0]))
+            elif length == 3:
                 key.append(Gf.Vec3d(float(data[i][0]), float(
                     data[i][1]), float(data[i][2])))
             elif length == 9:
-                key.append(Gf.Matrix3d(float(data[i][0]), float(data[i][3]), float(data[i][6]),
-                                       float(data[i][1]), float(data[i][4]), float(data[i][7]),
-                                       float(data[i][2]), float(data[i][5]), float(data[i][8])))
+                key.append(Gf.Matrix3d(numpy.float64(data[i][0]), numpy.float64(data[i][3]), numpy.float64(data[i][6]),
+                                       numpy.float64(data[i][1]), numpy.float64(data[i][4]), numpy.float64(data[i][7]),
+                                       numpy.float64(data[i][2]), numpy.float64(data[i][5]), numpy.float64(data[i][8])))
             i += 1
         except (IndexError, ValueError):
             return None
@@ -119,6 +120,7 @@ def mjcf_to_usd_handle(xml_path: str):
 
     xpos = []
     xmat = []
+    qpos = []
 
     data_dir = os.path.dirname(xml_path)
     data_file = os.path.basename(xml_path)
@@ -138,6 +140,9 @@ def mjcf_to_usd_handle(xml_path: str):
 
         elif data[i][0] == 'XMAT':
             get_data(data, xmat, i, 9)
+
+        elif data[i][0] == 'QPOS':
+            get_data(data, qpos, i, 1)
 
     stage = Usd.Stage.CreateNew(os.path.join(usd_dir, usd_file))
 
@@ -377,6 +382,9 @@ def mjcf_to_usd_handle(xml_path: str):
 
                     joint_prim.CreateLocalRot0Attr(body2_rot * joint_rot)
                     joint_prim.CreateLocalRot1Attr(joint_rot)
+
+                    joint_value = joint_prim.GetPrim().CreateAttribute("usd:jointValue", Sdf.ValueTypeNames.Double)
+                    joint_value.Set(qpos[joint_id] / (2*numpy.pi))
 
     stage.SetDefaultPrim(root_prim.GetPrim())
 
