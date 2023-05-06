@@ -160,7 +160,7 @@ def usd_to_owl(usd_file : str, onto_file : str) -> None:
                             print(f'{onto_ns} not found in onto_map')
                             continue
                         prim_inst.is_a.append(
-                            onto[rdfAPI.GetRdfClassNameAttr().Get()])
+                            onto[rdfAPI.GetRdfConceptNameAttr().Get()])
 
             if prim.HasAPI(UsdPhysics.RigidBodyAPI):
                 hasAPI_prop = usd_onto.hasAPI

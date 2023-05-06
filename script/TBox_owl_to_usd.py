@@ -41,7 +41,7 @@ def owl_to_usd_impl(stage: Usd.Stage, concepts: list) -> None:
         prim_child.GetInherits().AddInherit(S.get(iri_prefix).GetPrimPath())
 
         rdfAPI = UsdOntology.RdfAPI.Apply(prim_child)
-        rdfAPI.CreateRdfClassNameAttr().Set(iri_name)
+        rdfAPI.CreateRdfConceptNameAttr().Set(iri_name)
     return None
 
 

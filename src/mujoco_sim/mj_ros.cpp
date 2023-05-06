@@ -688,17 +688,18 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
     save_path /= model_path.stem().string() + ".xml";
     if (boost::filesystem::exists(save_path))
     {
-        const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
-        const unsigned short year = time_now.date().year();
-        const unsigned short month = time_now.date().month();
-        const unsigned short day = time_now.date().day();
-        const unsigned short hour = time_now.time_of_day().hours();
-        const unsigned short minute = time_now.time_of_day().minutes();
-        const unsigned short sec = time_now.time_of_day().seconds();
-        const unsigned short msec = time_now.time_of_day().total_milliseconds() % 1000;
-        const std::string time_stamp = std::to_string(year) + "_" + std::to_string(month) + "_" + std::to_string(day) + "_" + std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(sec) + "_" + std::to_string(msec);
-        const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
-        save_path = save_path.parent_path() / filename;
+        boost::filesystem::remove_all(save_path.parent_path());
+        // const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
+        // const unsigned short year = time_now.date().year();
+        // const unsigned short month = time_now.date().month();
+        // const unsigned short day = time_now.date().day();
+        // const unsigned short hour = time_now.time_of_day().hours();
+        // const unsigned short minute = time_now.time_of_day().minutes();
+        // const unsigned short sec = time_now.time_of_day().seconds();
+        // const unsigned short msec = time_now.time_of_day().total_milliseconds() % 1000;
+        // const std::string time_stamp = std::to_string(year) + "_" + std::to_string(month) + "_" + std::to_string(day) + "_" + std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(sec) + "_" + std::to_string(msec);
+        // const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
+        // save_path = save_path.parent_path() / filename;
     }
 
     boost::filesystem::path save_model_path = save_path.parent_path() / (save_path.stem().string() + ".txt");

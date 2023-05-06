@@ -8,7 +8,7 @@ joint_inits:
 
 save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
 
-disable_gravity: false # Disable gravity or not
+disable_gravity: True # Disable gravity or not
 
 max_time_step: 0.005 # Maximal time step (bigger value <=> faster but more unstable)
 
