@@ -4,7 +4,7 @@
         <flag energy="enable"/>
     </option>
     <asset>
-        <texture type="2d" name="Cat" file="/home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/cat.png"/>
+        <texture type="2d" name="Cat" file="model/ontology/cat.png"/>
         <texture type="2d" name="grid" builtin="checker" rgb1="0.1 0.2 0.3" rgb2="0.2 0.3 0.4" width="512" height="512"/>
         <material name="Cat" texture="Cat"/>
         <material name="grid" texture="grid" texuniform="true" reflectance="0.2"/>

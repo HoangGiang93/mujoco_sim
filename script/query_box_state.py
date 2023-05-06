@@ -20,7 +20,7 @@ def query_box_state(file_path: str) -> None:
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
+    if len(sys.argv) >= 2:
         file_path = sys.argv[1]
     else:
         print('Usage: file_path.usda')

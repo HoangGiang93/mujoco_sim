@@ -75,7 +75,7 @@ def usd_to_owl(onto_file : str, usd_file: str) -> None:
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         (onto_file, usd_file) = (sys.argv[1], sys.argv[2])
     else:
         print('Usage: in_onto.owl out_usd.usda')

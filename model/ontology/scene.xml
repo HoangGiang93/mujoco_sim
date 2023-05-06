@@ -5,8 +5,8 @@
   </option>
 
   <asset>
-    <texture name="Cat" file="cat.png" type="2d" />
-    <material name="Cat" texture="Cat" />
+    <texture name="cat" file="cat/cat.png" type="2d" />
+    <material name="cat" texture="cat" />
     <texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3"
       rgb2=".2 .3 .4" />
     <material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2" />

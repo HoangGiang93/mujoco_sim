@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import ColorRGBA
 
 from mujoco_msgs.msg import ObjectStatus, ObjectInfo
 from mujoco_msgs.srv import SpawnObject, SpawnObjectRequest, DestroyObject, DestroyObjectRequest
@@ -16,7 +15,7 @@ def spawn_cat():
     cat.info.name = cat_name
     cat.info.type = ObjectInfo.MESH
     cat.info.movable = True
-    cat.info.mesh = 'cat.xml'
+    cat.info.mesh = 'cat/cat.xml'
     alpha = uniform(-pi, pi)
     r = uniform(0.0, 0.5)
     cat.pose.position.x = r * sin(alpha)
@@ -53,7 +52,7 @@ def destroy_cat():
         print("Service call failed: %s" % e)
 
 if __name__ == "__main__":
-    rospy.init_node("test")
+    rospy.init_node("spawn_cat")
     destroy_cat()
     rospy.sleep(1)
     spawn_cat()
