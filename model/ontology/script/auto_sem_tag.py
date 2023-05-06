@@ -14,7 +14,6 @@ sem_TBox = {}
 
 
 def auto_sem_tag(usd_ABox_file: str, usd_TBox_file: str) -> None:
-    print(usd_ABox_file)
     stage_TBox = Usd.Stage.Open(usd_TBox_file)
     for prim in stage_TBox.Traverse():
         for prim_class in prim.GetAllChildren():
