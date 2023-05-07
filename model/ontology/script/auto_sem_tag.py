@@ -20,7 +20,7 @@ def auto_sem_tag(usd_ABox_file: str, usd_TBox_file: str) -> None:
             sem_TBox[prim_class.GetName()] = prim_class.GetPrimPath()
 
     stage_ABox = Usd.Stage.Open(usd_ABox_file)
-    stage_ABox.GetRootLayer().subLayerPaths.append(usd_TBox_file)
+    stage_ABox.GetRootLayer().subLayerPaths = [usd_TBox_file]
 
     for prim in stage_ABox.Traverse():
         if prim.GetName() in sem_labels:
