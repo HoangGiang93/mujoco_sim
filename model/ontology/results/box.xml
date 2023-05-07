@@ -4,13 +4,13 @@
         <flag energy="enable"/>
     </option>
     <asset>
-        <texture type="2d" name="Cat" file="model/ontology/cat.png"/>
+        <texture type="2d" name="cat" file="../cat/cat.png"/>
         <texture type="2d" name="grid" builtin="checker" rgb1="0.1 0.2 0.3" rgb2="0.2 0.3 0.4" width="512" height="512"/>
-        <material name="Cat" texture="Cat"/>
+        <material name="cat" texture="cat"/>
         <material name="grid" texture="grid" texuniform="true" reflectance="0.2"/>
-        <mesh name="BoxFlap1" file="box/stl/BoxFlap1.stl"/>
-        <mesh name="BoxFlap2" file="box/stl/BoxFlap2.stl"/>
-        <mesh name="Cat_0" file="model/ontology/cat.obj" scale="0.005 0.005 0.005"/>
+        <mesh name="BoxFlap1" file="../box/stl/BoxFlap1.stl"/>
+        <mesh name="BoxFlap2" file="../box/stl/BoxFlap2.stl"/>
+        <mesh name="cat_0" file="../cat/cat.obj" scale="0.005 0.005 0.005"/>
     </asset>
     <worldbody>
         <geom name="floor" size="0 0 0.05" type="plane" condim="4" friction="2 0.05 0.01" material="grid"/>
@@ -30,9 +30,9 @@
                 <geom type="mesh" rgba="1 0.8 0 1" mesh="BoxFlap2"/>
             </body>
         </body>
-        <body name="cat" pos="0.46799 -0.068951 0.5">
+        <body name="cat" pos="0 0 0.2">
             <joint type="free"/>
-            <geom type="mesh" material="Cat" mesh="Cat_0"/>
+            <geom type="mesh" material="cat" mesh="cat_0"/>
         </body>
     </worldbody>
     <contact>

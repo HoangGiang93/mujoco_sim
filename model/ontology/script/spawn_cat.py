@@ -17,10 +17,10 @@ def spawn_cat():
     cat.info.movable = True
     cat.info.mesh = 'cat/cat.xml'
     alpha = uniform(-pi, pi)
-    r = uniform(0.0, 0.5)
-    cat.pose.position.x = r * sin(alpha)
-    cat.pose.position.y = r * cos(alpha)
-    cat.pose.position.z = 0.5
+    r = uniform(0.0, 0)
+    cat.pose.position.x = 0
+    cat.pose.position.y = 0.0
+    cat.pose.position.z = 0.2
     cat.pose.orientation.x = 0.0
     cat.pose.orientation.y = 0.0
     cat.pose.orientation.z = 0.0

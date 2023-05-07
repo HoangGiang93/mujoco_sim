@@ -1,0 +1,12 @@
+<launch>
+
+  <node name="mujoco_to_usd" pkg="mujoco_sim" type="mujoco_to_usd_with_joint_state.py"
+    output="screen" />
+
+  <node name="auto_sem_tag" pkg="mujoco_sim" type="auto_sem_tag.py" output="screen"
+    args="$(find mujoco_sim)/model/save/box.usda $(find mujoco_sim)/model/save/BoxScenario_TBox.usda" launch-prefix="bash -c 'sleep 2; $0 $@' " />
+
+  <node name="usd_to_ABox_owl_with_joint_state" pkg="mujoco_sim" type="usd_to_ABox_owl_with_joint_state.py" output="screen"
+    args="$(find mujoco_sim)/model/save/box.usda $(find mujoco_sim)/model/owl/BoxScenario.owl" launch-prefix="bash -c 'sleep 3; $0 $@' " />
+
+</launch>

@@ -3,14 +3,26 @@
          xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
          xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
          xmlns:owl="http://www.w3.org/2002/07/owl#"
-         xml:base="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/results/box.owl"
-         xmlns="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/results/box.owl#"
+         xml:base="https://ease-crc.org/ont/usd/box.owl"
+         xmlns="https://ease-crc.org/ont/usd/box.owl#"
          xmlns:USD.="https://ease-crc.org/ont/USD.owl#"
          xmlns:DUL.="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#">
 
-<owl:Ontology rdf:about="file:///home/giang/Workspace/mujoco_ws/src/mujoco_sim/model/ontology/results/box.owl">
+<owl:Ontology rdf:about="https://ease-crc.org/ont/usd/box.owl">
   <owl:imports rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl"/>
 </owl:Ontology>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#USD">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#BoxScenario">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
+
+<USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#DUL">
+  <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+</USD.:Prim>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#world">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
@@ -22,6 +34,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#box">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#Box"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>
@@ -413,7 +426,7 @@
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_1_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-0.23, 0.0, 0.97, 0.0], [0.0, 1.0, 0.0, 0.0], [-0.97, 0.0, -0.23, 0.0], [0.17, 0.0, 0.34, 1.0]]</USD.:xformOp_transform>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-0.49, 0.0, 0.87, 0.0], [0.0, 1.0, 0.0, 0.0], [-0.87, 0.0, -0.49, 0.0], [0.17, 0.0, 0.34, 1.0]]</USD.:xformOp_transform>
 </DUL.:Quality>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_6">
@@ -506,7 +519,7 @@
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_2_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-0.18, -0.0, -0.98, 0.0], [0.0, 1.0, -0.0, 0.0], [0.98, 0.0, -0.18, 0.0], [-0.17, 0.0, 0.34, 1.0]]</USD.:xformOp_transform>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[-0.52, -0.0, -0.85, 0.0], [0.0, 1.0, -0.0, 0.0], [0.85, 0.0, -0.52, 0.0], [-0.17, 0.0, 0.34, 1.0]]</USD.:xformOp_transform>
 </DUL.:Quality>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_7">
@@ -551,6 +564,7 @@
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#cat">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
+  <rdf:type rdf:resource="https://ease-crc.org/ont/usd/BoxScenario.owl#Cat"/>
   <rdf:type>
     <owl:Restriction>
       <owl:onProperty rdf:resource="https://ease-crc.org/ont/USD.owl#hasAPI"/>
@@ -599,7 +613,7 @@
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#cat_xformOp_transform">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[1.0, -0.001, -0.00029, 0.0], [0.001, 1.0, 0.0023, 0.0], [0.00029, -0.0023, 1.0, 0.0], [0.47, -0.069, -0.00078, 1.0]]</USD.:xformOp_transform>
+  <USD.:xformOp_transform rdf:datatype="https://ease-crc.org/ont/USD.owl#matrix4d">[[0.71, -0.71, -0.00027, 0.0], [0.69, 0.69, -0.2, 0.0], [0.14, 0.14, 0.98, 0.0], [-0.1, -0.095, 0.018, 1.0]]</USD.:xformOp_transform>
 </DUL.:Quality>
 
 <USD.:Prim rdf:about="https://ease-crc.org/ont/USD.owl#geom_8">
@@ -669,7 +683,7 @@
 
 <DUL.:Quality rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_1_joint_jointValue">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.716197243913529</USD.:hasJointValue>
+  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</USD.:hasJointValue>
 </DUL.:Quality>
 
 <DUL.:Quality rdf:about="http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#box_flap_2_joint_collisionEnabled">
@@ -699,7 +713,7 @@
 
 <DUL.:Quality rdf:about="https://ease-crc.org/ont/USD.owl#box_flap_2_joint_jointValue">
   <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#NamedIndividual"/>
-  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.716197243913529</USD.:hasJointValue>
+  <USD.:hasJointValue rdf:datatype="http://www.w3.org/2001/XMLSchema#double">0.5</USD.:hasJointValue>
 </DUL.:Quality>
 
 

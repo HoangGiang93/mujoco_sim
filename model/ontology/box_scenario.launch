@@ -1,0 +1,32 @@
+<launch>
+
+	<include file="$(find mujoco_sim)/launch/mujoco_sim.launch">
+		<arg name="world" value="$(find mujoco_sim)/model/ontology/scene.xml" />
+		<arg name="config" value="$(find mujoco_sim)/model/ontology/box_scenario.yaml" />
+		<arg name="robot" value="$(find mujoco_sim)/model/ontology/box/box.xml" />
+		<arg name="use_urdf" value="true" />
+		<arg name="disable_parent_child_collision_level" value="1" />
+	</include>
+
+	<!-- Load controller manager -->
+	<param name="robot_description"
+		command="$(find xacro)/xacro '$(find mujoco_sim)/model/ontology/box/box.urdf'" />
+	<rosparam command="load" file="$(find mujoco_sim)/model/ontology/box/box.yaml" />
+	<node name="controller_manager" pkg="controller_manager" type="controller_manager" respawn="false"
+		output="screen"
+		args="spawn 
+		joint_state_controller 
+		box_flap_1_joint_pos_controller
+		box_flap_2_joint_pos_controller" />
+
+	<node name="joint_position_command_publisher" pkg="mujoco_sim"
+		type="joint_position_command_publisher.py" />
+	<node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui"
+		type="joint_state_publisher_gui">
+		<remap from="joint_states" to="desired_joint_states" />
+	</node>
+
+	<node name="TBox_usd" pkg="mujoco_sim" type="TBox_owl_to_usd.py" output="screen"
+		args="$(find mujoco_sim)/model/owl/BoxScenario.owl $(find mujoco_sim)/model/save/box_TBox.usda" />
+
+</launch>

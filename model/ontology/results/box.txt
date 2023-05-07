@@ -61,9 +61,9 @@ meansize              0.27
 extent                2       
 center                0        0        0       
 
-qpos0                 0         0         0.47     -0.069     0.5       1         0         0         0        
+qpos0                 0         0         0         0         0.2       1         0         0         0        
 
-qpos_spring           0         0         0.47     -0.069     0.5       1         0         0         0        
+qpos_spring           0         0         0         0         0.2       1         0         0         0        
 
 
 BODY 0:
@@ -188,7 +188,7 @@ BODY 4:
   body_geomadr          8 
   body_simple           0 
   body_sameframe        0 
-  body_pos              0.47     -0.069     0.5      
+  body_pos              0         0         0.2      
   body_quat             1         0         0         0        
   body_ipos             1.2e-07  -0.003     0.093    
   body_iquat            0.82      0.57     -1.5e-06  -1e-06    
@@ -609,7 +609,7 @@ LIGHT 0:
   light_active          1 
   light_pos             0         0         5        
   light_dir             0         0        -1        
-  light_poscom0        -0.12      0.019     4.7      
+  light_poscom0        -3e-08     0.0008    4.8      
   light_pos0            0         0         5        
   light_dir0            0         0        -1        
   light_attenuation     1         0         0        
@@ -649,7 +649,7 @@ MESH 1:
   qhull vert            56
 
 MESH 2:
-  name                  Cat_0
+  name                  cat_0
   mesh_vertadr          222 
   mesh_vertnum          35290 
   mesh_normaladr        222 
@@ -664,7 +664,7 @@ MESH 2:
 
 
 TEXTURE 0:
-  name                  Cat
+  name                  cat
   tex_type              0 
   tex_height            1024 
   tex_width             1024 
@@ -679,7 +679,7 @@ TEXTURE 1:
 
 
 MATERIAL 0:
-  name                  Cat
+  name                  cat
   mat_texid             0 
   mat_texuniform        0 
   mat_texrepeat         1         1        

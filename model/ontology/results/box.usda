@@ -17,7 +17,7 @@ def Xform "world"
         point3f physics:centerOfMass = (0, 0, -0.034677908)
         float3 physics:diagonalInertia = (0.089647055, 0.08021242, 0.075281166)
         float physics:mass = 0
-        prepend rel semanticTag:semanticRelation = </BoxScenario/_class_Box>
+        prepend rel semanticTag:semanticLabel = </BoxScenario/_class_Box>
         matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0.17, 1) )
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
@@ -88,7 +88,7 @@ def Xform "world"
             quatf physics:localRot1 = (0.7071068, -0.7071068, 0, 0)
             float physics:lowerLimit = -89.95438
             float physics:upperLimit = 269.29016
-            custom double usd:jointValue = 0.716197243913529
+            custom double usd:jointValue = 0.6684507609859605
         }
 
         def PhysicsRevoluteJoint "box_flap_2_joint"
@@ -103,7 +103,7 @@ def Xform "world"
             quatf physics:localRot1 = (0.7071068, 0.7071068, 0, 0)
             float physics:lowerLimit = -89.95438
             float physics:upperLimit = 269.29016
-            custom double usd:jointValue = 0.716197243913529
+            custom double usd:jointValue = 0.6684507609859605
         }
     }
 
@@ -115,12 +115,12 @@ def Xform "world"
         float3 physics:diagonalInertia = (0.0039196294, 0.0020787641, 0.0018410094)
         float physics:mass = 0.21652657
         bool physics:rigidBodyEnabled = 1
-        matrix4d xformOp:transform = ( (-0.23, 0, 0.97, 0), (0, 1, 0, 0), (-0.97, 0, -0.23, 0), (0.17, 0, 0.34, 1) )
+        matrix4d xformOp:transform = ( (-0.49, 0, 0.87, 0), (0, 1, 0, 0), (-0.87, 0, -0.49, 0), (0.17, 0, 0.34, 1) )
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Mesh "geom_6" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
-            prepend references = @./box/usd/BoxFlap1.usda@
+            prepend references = @../box/usd/BoxFlap1.usda@
         )
         {
             uniform token physics:approximation = "convexHull"
@@ -140,12 +140,12 @@ def Xform "world"
         float3 physics:diagonalInertia = (0.0039196294, 0.0020787637, 0.0018410094)
         float physics:mass = 0.21652657
         bool physics:rigidBodyEnabled = 1
-        matrix4d xformOp:transform = ( (-0.18, -0, -0.98, 0), (0, 1, -0, 0), (0.98, 0, -0.18, 0), (-0.17, 0, 0.34, 1) )
+        matrix4d xformOp:transform = ( (-0.52, -0, -0.85, 0), (0, 1, -0, 0), (0.85, 0, -0.52, 0), (-0.17, 0, 0.34, 1) )
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Mesh "geom_7" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
-            prepend references = @./box/usd/BoxFlap2.usda@
+            prepend references = @../box/usd/BoxFlap2.usda@
         )
         {
             uniform token physics:approximation = "convexHull"
@@ -165,13 +165,13 @@ def Xform "world"
         float3 physics:diagonalInertia = (0.005019804, 0.0038922601, 0.0015858749)
         float physics:mass = 1.1450002
         bool physics:rigidBodyEnabled = 1
-        prepend rel semanticTag:semanticRelation = </BoxScenario/_class_Cat>
-        matrix4d xformOp:transform = ( (1, -0.001, -0.00029, 0), (0.001, 1, 0.0023, 0), (0.00029, -0.0023, 1, 0), (0.47, -0.069, -0.00078, 1) )
+        prepend rel semanticTag:semanticLabel = </BoxScenario/_class_Cat>
+        matrix4d xformOp:transform = ( (0.71, -0.71, -0.00027, 0), (0.69, 0.69, -0.2, 0), (0.14, 0.14, 0.98, 0), (-0.1, -0.095, 0.018, 1) )
         uniform token[] xformOpOrder = ["xformOp:transform"]
 
         def Mesh "geom_8" (
             prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
-            prepend references = @./model/usd/cat.usda@
+            prepend references = @../cat/cat.usda@
         )
         {
             uniform token physics:approximation = "convexHull"
