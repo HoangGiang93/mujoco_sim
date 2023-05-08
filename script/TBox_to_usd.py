@@ -2,6 +2,7 @@
 
 import sys
 import os
+import shutil
 from pxr import Usd, UsdOntology
 from owlready2 import onto_path, get_ontology
 import re
@@ -56,7 +57,13 @@ def import_ontos(onto) -> None:
 
 def usd_to_owl(onto_file : str, usd_file: str) -> None:
     rospack = rospkg.RosPack()
-    onto_path.append(rospack.get_path('mujoco_sim') + '/model/owl/')
+    upper_onto_path = rospack.get_path('mujoco_sim') + '/model/owl/'
+    onto_path.append(upper_onto_path)
+
+    for file in os.listdir(upper_onto_path):
+        src_file = os.path.join(upper_onto_path, file)
+        dst_file = os.path.join(os.path.dirname(usd_file), file)
+        shutil.copy(src_file, dst_file)
 
     TBox_onto = get_ontology('file://' + onto_file)
     TBox_onto.load()
@@ -70,6 +77,8 @@ def usd_to_owl(onto_file : str, usd_file: str) -> None:
         owl_to_usd_impl(stage, list(onto.classes()))
 
     stage.GetRootLayer().Save()
+
+
 
     return None
 

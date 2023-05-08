@@ -679,13 +679,14 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
     if (boost::filesystem::exists(save_path_string))
     {
         save_path = save_path_string;
+        save_path /= model_path.stem().string() + ".xml";
     }
     else
     {
-        ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
+        save_path = save_path_string;
+        // ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
     }
 
-    save_path /= model_path.stem().string() + ".xml";
     // if (boost::filesystem::exists(save_path))
     // {
 

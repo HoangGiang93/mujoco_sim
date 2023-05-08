@@ -26,7 +26,7 @@
 		<remap from="joint_states" to="desired_joint_states" />
 	</node>
 
-	<node name="TBox_usd" pkg="mujoco_sim" type="TBox_owl_to_usd.py" output="screen"
-		args="$(find mujoco_sim)/model/owl/BoxScenario.owl $(find mujoco_sim)/model/save/box_TBox.usda" />
+	<node name="TBox_usd" pkg="mujoco_sim" type="TBox_to_usd.py" output="screen"
+		args="$(find mujoco_sim)/model/owl/box_scenario_TBox.owl $(find mujoco_sim)/model/save/box_scenario_TBox.usda" />
 
 </launch>

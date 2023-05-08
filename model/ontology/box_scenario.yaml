@@ -6,7 +6,7 @@ joint_inits:
   box_flap_1_joint: 0
   box_flap_2_joint: 0
 
-save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
+save_path: "model/save/box_scenario.xml" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
 
 disable_gravity: True # Disable gravity or not
 

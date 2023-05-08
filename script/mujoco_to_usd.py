@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import rospy
 from std_srvs.srv import Trigger, TriggerResponse
 from pxr import Usd, UsdGeom, Sdf, Gf, UsdPhysics
 import mujoco
 import numpy
 import xml.etree.ElementTree as ET
-import os
 import csv
 from math import degrees
 
@@ -28,17 +29,19 @@ def get_data(data, key: list, i: int, length: int) -> None:
                     data[i][1]), float(data[i][2])))
             elif length == 9:
                 key.append(Gf.Matrix3d(float(data[i][0]), float(data[i][3]), float(data[i][6]),
-                                       float(data[i][1]), float(data[i][4]), float(data[i][7]),
+                                       float(data[i][1]), float(
+                                           data[i][4]), float(data[i][7]),
                                        float(data[i][2]), float(data[i][5]), float(data[i][8])))
             i += 1
         except (IndexError, ValueError):
             return None
 
 
-def mjcf_to_usd_handle(xml_path: str):
+def mjcf_to_usd_handle(xml_path: str, usd_file: str):
     usd_dir = os.path.dirname(xml_path)
-    usd_file = os.path.basename(xml_path)
-    usd_file = usd_file.replace('xml', 'usda')
+    if usd_file is None:
+        usd_file = os.path.basename(xml_path)
+        usd_file = usd_file.replace('xml', 'usda')
 
     xml_mesh_dict = {}
     xml_body_gravcomp_dict = {}
@@ -385,16 +388,19 @@ def mjcf_to_usd_handle(xml_path: str):
     return
 
 
-def mjcf_to_usd_client():
+def mjcf_to_usd_client(usd_file):
     rospy.wait_for_service('/mujoco/screenshot')
     try:
         screenshot_srv = rospy.ServiceProxy('/mujoco/screenshot', Trigger)
         resp: TriggerResponse = screenshot_srv()
-        mjcf_to_usd_handle(resp.message)
+        mjcf_to_usd_handle(resp.message, usd_file)
         return
     except rospy.ServiceException as e:
         rospy.logwarn('Service call failed: %s' % e)
 
 
 if __name__ == '__main__':
-    mjcf_to_usd_client()
+    usd_file = None
+    if len(sys.argv) >= 2:
+        usd_file = sys.argv[1]
+    mjcf_to_usd_client(usd_file)

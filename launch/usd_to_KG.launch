@@ -1,0 +1,21 @@
+<launch>
+
+  <arg name="screen" default="" />
+
+  <node name="mujoco_to_usd" pkg="mujoco_sim" type="mujoco_to_usd.py" output="screen" args="$(find mujoco_sim)/model/save/$(arg screen)_ABox.usda"/>
+
+  <node name="auto_sem_tag" pkg="mujoco_sim" type="auto_sem_tag.py" output="screen"
+    args="$(find mujoco_sim)/model/save/$(arg screen)_ABox.usda $(find mujoco_sim)/model/save/$(arg screen)_TBox.usda"
+    launch-prefix="bash -c 'sleep 1; $0 $@' " />
+
+  <node name="usd_to_ABox" pkg="mujoco_sim"
+    type="usd_to_ABox.py" output="screen"
+    args="$(find mujoco_sim)/model/save/$(arg screen)_ABox.usda $(find mujoco_sim)/model/owl/$(arg screen)_TBox.owl"
+    launch-prefix="bash -c 'sleep 2; $0 $@' " />
+
+  <node name="mujoco_to_ABox" pkg="mujoco_sim"
+    type="mujoco_to_ABox.py" output="screen"
+    args="$(find mujoco_sim)/model/save/$(arg screen)_ABox.owl"
+    launch-prefix="bash -c 'sleep 3; $0 $@' " />
+
+</launch>

@@ -125,12 +125,12 @@ def usd_to_owl(usd_file : str, onto_file : str) -> None:
     save_path += '.owl'
     ABox_onto = get_ontology('file://' + save_path)
 
-    usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
-    onto_map[usd_onto.base_iri] = usd_onto
-
     dul_onto = get_ontology('http://www.ontologydesignpatterns.org/ont/dul/DUL.owl')
     dul_onto.load()
     onto_map[dul_onto.base_iri] = dul_onto
+
+    usd_onto = get_ontology('https://ease-crc.org/ont/USD.owl')
+    onto_map[usd_onto.base_iri] = usd_onto
 
     TBox_onto = get_ontology('file://' + onto_file)
     TBox_onto.load()
@@ -380,7 +380,7 @@ def usd_to_owl(usd_file : str, onto_file : str) -> None:
 
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         (usd_file, onto_file) = (sys.argv[1], sys.argv[2])
     else:
         print('Usage: in_usd.usda in_onto.owl')
