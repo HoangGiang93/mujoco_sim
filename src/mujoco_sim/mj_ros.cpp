@@ -683,8 +683,14 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
     }
     else
     {
+        if (!boost::filesystem::exists(save_path_string))
+        {
+            if (!boost::filesystem::create_directory(save_path_string))
+            {
+                ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
+            }
+        }
         save_path = save_path_string;
-        // ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
     }
 
     // if (boost::filesystem::exists(save_path))
