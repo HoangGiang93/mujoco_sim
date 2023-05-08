@@ -676,7 +676,7 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         save_path_string = ros::package::getPath("mujoco_sim") + "/" + save_path_string;
     }
 
-    if (boost::filesystem::exists(save_path_string))
+    if (boost::filesystem::exists(save_path_string) && strcmp(save_path.extension().c_str(), ".xml") != 0)
     {
         save_path = save_path_string;
         save_path /= model_path.stem().string() + ".xml";
