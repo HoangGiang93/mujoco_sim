@@ -10,6 +10,7 @@ ROS interface for MuJoCo simulator
 ## Key Features
 - Incorporates an advanced physics engine sourced from https://mujoco.org/
 - Supports import and export of URDF and MJCF formats
+- Enables exporting of simulation results in the USD format
 - Integrates controller interfaces, controller managers, and hardware interfaces sourced from http://wiki.ros.org/ros_control
 - Implements PD computed-torque control for enhanced stability
 - Enables spawning and destruction of objects during run-time via rosservice
