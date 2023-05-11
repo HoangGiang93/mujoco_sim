@@ -41,59 +41,6 @@ catkin_make                                 # build packages (or catkin build)
 source ~/mujoco_ws/devel/setup.bash         # source new overlay
 ```
 
-## Quick start
-This tutorial shows a quick view of some basic functionalities of this software. To learn more details please checkout this [Wiki](https://github.com/HoangGiang93/mujoco_sim/wiki)
-1) Import robot from **URDF**
-
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159138084-c8cad813-6d55-4dab-874d-82870c793484.mp4)
-
-2) Control the robot
-
-mujoco_sim integrates hardware interfaces from http://wiki.ros.org/ros_control. Currently only **effort-based joints** are supported, so PID gains are required. It's recommended to set the parameters as ```{p: 2000, i: 100, d: 50}```
-
-Here are some examples:
-- Joint position controller
-  - Include `ur_pos_control.launch` in the launch file `ur5_display.launch`, then launch it
-```
-roslaunch ur_mujoco ur5_display.launch        # Show up everything
-rosrun ur_control test_joint_pos_publisher.py # Run a test
-```
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139781-3c3bc83f-d6df-46ac-a679-e7591d252b85.mp4)
-
-- Joint velocity controller
-  - Include `ur_vel_control.launch` in the launch file `ur5_display.launch`, then launch it
-```
-roslaunch ur_mujoco ur5_display.launch        # Show up everything
-rosrun ur_control test_joint_vel_publisher.py # Run a test
-```
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139857-8beef478-e300-44c8-86b1-e1d28ce41519.mp4)
-
-- Joint trajectory controller (using [test_trajectory](https://github.com/PickNikRobotics/ros_control_boilerplate/blob/noetic-devel/src/tools/test_trajectory.cpp) from http://wiki.ros.org/ros_control_boilerplate)
-  - Include `ur_traj_control.launch` in the launch file `ur5_display.launch`, then launch it
-```
-roslaunch ur_mujoco ur5_display.launch          # Show up everything
-roslaunch ur_control ur_test_trajectory.launch  # Run a test
-```
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159139999-4913c350-a5e7-4218-973d-2e73525f06cd.mp4)
-
-- Cartesian trajectory controller (using [giskard](http://giskard.de/wiki:tutorials), a cool framework for constraint- and optimization-based robot motion control, which is **highly recommended**)
-  - Include `franka_traj_control.launch` in the launch file `panda_arm_display.launch`, then launch it
-```
-roslaunch franka_mujoco panda_arm_display.launch          # Show up everything
-roslaunch giskardpy giskardpy_panda_arm.launch            # Run giskard
-```
-[![Watch the video]()](https://user-images.githubusercontent.com/64316740/159140897-b5781e0e-e5e6-4473-89ef-03b5c79241c4.mp4)
-
-- Run the whole pick-and-place demo (using [giskard](http://giskard.de/wiki:tutorials), please update the following [.rosinstall](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall))
-```
-wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/giskard.rosinstall
-wstool update -t ~/mujoco_ws/src
-cd ~/mujoco_ws/src
-catkin build
-source ~/mujoco_ws/devel/setup.bash
-roslaunch franka_mujoco dual_panda_arm_demo.launch
-```
-
 ## Troubleshooting
 1) `ERROR: gladLoadGL error`
 - Solution: `sudo apt install nvidia-driver-515`
