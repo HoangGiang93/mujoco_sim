@@ -10,7 +10,7 @@
 #   joint1: 0
 #   joint2: 1
 
-save_path: "model/save" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
+save_path: "model/save" # Path to save screenshot, which can be either a relative path to mujoco_sim or an absolute path
 
 disable_gravity: true # Disable gravity or not
 

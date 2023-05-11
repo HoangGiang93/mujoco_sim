@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
+from random import uniform, randint
+from math import pi, sin, cos
+
 import rospy
 from std_msgs.msg import ColorRGBA
 
 from mujoco_msgs.msg import ObjectStatus, ObjectInfo
 from mujoco_msgs.srv import SpawnObject, SpawnObjectRequest, DestroyObject, DestroyObjectRequest
 
-from random import random, uniform, randint
-
-from math import pi, sin, cos
-
-object = ObjectStatus()
-types = [ObjectInfo.MESH]
-meshes = ["../test/box.xml"]
+object_status = ObjectStatus()
+types = [ObjectInfo.CUBE, ObjectInfo.SPHERE,
+         ObjectInfo.CYLINDER, ObjectInfo.MESH]
+meshes = ["../test/box.xml", "../test/cup.xml"]
 
 colors = [
     ColorRGBA(0, 0, 1, 1),
@@ -24,36 +24,37 @@ colors = [
     ColorRGBA(1, 1, 0, 1),
 ]
 
-def spawn_object(i):
-    object.info.name = "object_" + str(i)
-    object.info.type = types[randint(0, len(types) - 1)]
-    object.info.movable = True
+
+def spawn_object(i: int) -> None:
+    object_status.info.name = "object_" + str(i)
+    object_status.info.type = types[randint(0, len(types) - 1)]
+    object_status.info.movable = True
     scale = randint(200, 500) / 100.0
-    object.info.rgba = colors[randint(0, len(colors) - 1)]
-    object.info.mesh = meshes[randint(0, len(meshes) - 1)]
-    object.info.size.x = 1 
-    object.info.size.y = 1
-    object.info.size.z = 1
-    if object.info.type != ObjectInfo.MESH:
-        object.info.size.x = 0.05 * scale
-        object.info.size.y = 0.05 * scale
-        object.info.size.z = 0.05 * scale
-    elif object.info.mesh != "../test/box.xml":
-        object.info.size.x = scale 
-        object.info.size.y = scale
-        object.info.size.z = scale
+    object_status.info.rgba = colors[randint(0, len(colors) - 1)]
+    object_status.info.mesh = meshes[randint(0, len(meshes) - 1)]
+    object_status.info.size.x = 1
+    object_status.info.size.y = 1
+    object_status.info.size.z = 1
+    if object_status.info.type != ObjectInfo.MESH:
+        object_status.info.size.x = 0.05 * scale
+        object_status.info.size.y = 0.05 * scale
+        object_status.info.size.z = 0.05 * scale
+    elif object_status.info.mesh != "../test/box.xml":
+        object_status.info.size.x = scale
+        object_status.info.size.y = scale
+        object_status.info.size.z = scale
     alpha = uniform(-pi, pi)
     r = uniform(1.5, 2)
-    object.pose.position.x = r * sin(alpha)
-    object.pose.position.y = r * cos(alpha)
-    object.pose.position.z = 5
-    object.pose.orientation.x = 0.0
-    object.pose.orientation.y = 0.0
-    object.pose.orientation.z = 0.0
-    object.pose.orientation.w = 1.0
+    object_status.pose.position.x = r * sin(alpha)
+    object_status.pose.position.y = r * cos(alpha)
+    object_status.pose.position.z = 5
+    object_status.pose.orientation.x = 0.0
+    object_status.pose.orientation.y = 0.0
+    object_status.pose.orientation.z = 0.0
+    object_status.pose.orientation.w = 1.0
 
     objects = SpawnObjectRequest()
-    objects.objects = [object]
+    objects.objects = [object_status]
     rospy.wait_for_service("/mujoco/spawn_objects")
     try:
         spawn_objects = rospy.ServiceProxy(
@@ -61,10 +62,11 @@ def spawn_object(i):
         )
         spawn_resp = spawn_objects(objects)
         rospy.loginfo("Spawn response: " + str(spawn_resp))
-    except rospy.ServiceException as e:
-        print("Service call failed: %s" % e)
+    except rospy.ServiceException as error:
+        print(f"Service call failed: {error}")
 
-def destroy_object(i):
+
+def destroy_object(i: int) -> None:
     rospy.wait_for_service("/mujoco/destroy_objects")
     objects = DestroyObjectRequest()
     objects.names = ["object_" + str(i)]
@@ -74,19 +76,19 @@ def destroy_object(i):
         )
         destroy_resp = destroy_objects(objects)
         rospy.loginfo("Destroy response: " + str(destroy_resp))
-    except rospy.ServiceException as e:
-        print("Service call failed: %s" % e)
+    except rospy.ServiceException as error:
+        print(f"Service call failed: {error}")
+
 
 if __name__ == "__main__":
     rospy.init_node("test")
-    i = 0
+    object_id = 0
     while not rospy.is_shutdown():
-        spawn_object(i)
-        if i >= 20:
+        spawn_object(object_id)
+        if object_id >= 20:
             rospy.sleep(0.15)
-            destroy_object(i-20)
+            destroy_object(object_id-20)
             rospy.sleep(0.15)
         else:
             rospy.sleep(0.3)
-        i+=1
-        
+        object_id += 1
