@@ -1718,6 +1718,8 @@ void MjRos::publish_marker_array(const EObjectType object_type)
     marker[object_type] = visualization_msgs::Marker();
     marker_array[object_type] = visualization_msgs::MarkerArray();
     marker[object_type].action = visualization_msgs::Marker::MODIFY;
+    marker[object_type].frame_locked = true;
+    marker[object_type].lifetime = ros::Duration(2.0 / pub_marker_array_rate[object_type]);
 
     std_msgs::Header header;
     header.frame_id = root_frame_id;
