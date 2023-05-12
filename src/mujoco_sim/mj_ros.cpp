@@ -91,6 +91,7 @@ static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const c
 
 static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_body_only, std::function<void(MjRos &, const int, const EObjectType)> function)
 {
+
     for (int body_id = 1; body_id < m->nbody; body_id++)
     {
         const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
@@ -1736,7 +1737,10 @@ void MjRos::publish_marker_array(const EObjectType object_type)
         set_ros_msg(*this, object_type, pub_object_marker_array_of_free_bodies_only, &MjRos::add_marker);
 
         // Publish markers
-        marker_array_pub.publish(marker_array[object_type]);
+        if (marker_array.size() > 0)
+        {
+            marker_array_pub.publish(marker_array[object_type]);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
