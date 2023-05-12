@@ -113,25 +113,36 @@ int filetype(const char *filename)
 }
 
 // add_mujoco_tags
-void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
+void add_mujoco_tags(const boost::filesystem::path &model_path)
 {
     tinyxml2::XMLDocument doc;
-    if (doc.LoadFile(model_urdf_path.c_str()) != tinyxml2::XML_SUCCESS)
+    if (doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
     {
-        mju_error("Couldn't read file in [%s]\n", model_urdf_path.c_str());
+        mju_error("Couldn't read file in [%s]\n", model_path.c_str());
     }
 
     tinyxml2::XMLElement *mujoco_element;
-    if (doc.FirstChildElement("robot") != nullptr && doc.FirstChildElement("robot")->FirstChildElement("mujoco") != nullptr)
+    if (model_path.extension().compare(".urdf") == 0)
     {
-        mujoco_element = doc.FirstChildElement("robot")->FirstChildElement("mujoco");
-    }
-    else
-    {
-        mujoco_element = doc.NewElement("mujoco");
-    }
+        if (doc.FirstChildElement("robot") != nullptr && doc.FirstChildElement("robot")->FirstChildElement("mujoco") != nullptr)
+        {
+            mujoco_element = doc.FirstChildElement("robot")->FirstChildElement("mujoco");
+        }
+        else
+        {
+            mujoco_element = doc.NewElement("mujoco");
+        }
 
-    doc.FirstChildElement("robot")->InsertFirstChild(mujoco_element);
+        doc.FirstChildElement("robot")->InsertFirstChild(mujoco_element);
+    }    
+    else if (model_path.extension().compare(".xml") == 0)
+    {
+        if (doc.FirstChildElement("mujoco") != nullptr)
+        {
+            mujoco_element = doc.FirstChildElement("mujoco");
+        }
+    }    
+    
     tinyxml2::XMLElement *compiler_element = doc.NewElement("compiler");
     if (mujoco_element->FirstChildElement("compiler") != nullptr)
     {
@@ -143,7 +154,7 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
         mujoco_element->LinkEndChild(compiler_element);
     }
 
-    compiler_element->SetAttribute("meshdir", model_urdf_path.parent_path().c_str());
+    compiler_element->SetAttribute("meshdir", model_path.parent_path().c_str());
     compiler_element->SetAttribute("strippath", false);
     compiler_element->SetAttribute("balanceinertia", true);
     compiler_element->SetAttribute("discardvisual", true);
@@ -174,7 +185,7 @@ void add_mujoco_tags(const boost::filesystem::path &model_urdf_path)
         }
     }
 
-    doc.SaveFile(model_urdf_path.c_str());
+    doc.SaveFile(model_path.c_str());
 }
 
 void add_robot_body(const boost::filesystem::path &model_path)
@@ -462,6 +473,8 @@ int main(int argc, char **argv)
     add_mimic_joints(output);
 
     disable_parent_child_collision(output, disable_parent_child_collision_level);
+
+    add_mujoco_tags(output);
 
     // finalize
     return finish("Done");
