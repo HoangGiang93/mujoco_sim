@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from random import uniform, randint
 from math import pi, sin, cos
