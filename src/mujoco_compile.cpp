@@ -134,15 +134,15 @@ void add_mujoco_tags(const boost::filesystem::path &model_path)
         }
 
         doc.FirstChildElement("robot")->InsertFirstChild(mujoco_element);
-    }    
+    }
     else if (model_path.extension().compare(".xml") == 0)
     {
         if (doc.FirstChildElement("mujoco") != nullptr)
         {
             mujoco_element = doc.FirstChildElement("mujoco");
         }
-    }    
-    
+    }
+
     tinyxml2::XMLElement *compiler_element = doc.NewElement("compiler");
     if (mujoco_element->FirstChildElement("compiler") != nullptr)
     {
@@ -154,32 +154,36 @@ void add_mujoco_tags(const boost::filesystem::path &model_path)
         mujoco_element->LinkEndChild(compiler_element);
     }
 
-    compiler_element->SetAttribute("meshdir", model_path.parent_path().c_str());
-    compiler_element->SetAttribute("strippath", false);
     compiler_element->SetAttribute("balanceinertia", true);
     compiler_element->SetAttribute("discardvisual", true);
     compiler_element->SetAttribute("boundmass", "0.000001");
     compiler_element->SetAttribute("boundinertia", "0.000001");
 
-    for (tinyxml2::XMLElement *link_element = doc.FirstChildElement()->FirstChildElement("link");
-         link_element != nullptr;
-         link_element = link_element->NextSiblingElement("link"))
+    if (model_path.extension().compare(".urdf") == 0)
     {
-        for (tinyxml2::XMLElement *collision_element = link_element->FirstChildElement("collision");
-             collision_element != nullptr;
-             collision_element = collision_element->NextSiblingElement("collision"))
-        {
-            for (tinyxml2::XMLElement *geometry_element = collision_element->FirstChildElement("geometry");
-                 geometry_element != nullptr;
-                 geometry_element = geometry_element->NextSiblingElement("geometry"))
-            {
-                for (tinyxml2::XMLElement *mesh_element = geometry_element->FirstChildElement("mesh");
-                     mesh_element != nullptr;
-                     mesh_element = mesh_element->NextSiblingElement("mesh"))
-                {
-                    boost::filesystem::path mesh_path = mesh_element->Attribute("filename");
+        compiler_element->SetAttribute("meshdir", model_path.parent_path().c_str());
+        compiler_element->SetAttribute("strippath", false);
 
-                    mesh_element->SetAttribute("filename", mesh_path.filename().c_str());
+        for (tinyxml2::XMLElement *link_element = doc.FirstChildElement()->FirstChildElement("link");
+             link_element != nullptr;
+             link_element = link_element->NextSiblingElement("link"))
+        {
+            for (tinyxml2::XMLElement *collision_element = link_element->FirstChildElement("collision");
+                 collision_element != nullptr;
+                 collision_element = collision_element->NextSiblingElement("collision"))
+            {
+                for (tinyxml2::XMLElement *geometry_element = collision_element->FirstChildElement("geometry");
+                     geometry_element != nullptr;
+                     geometry_element = geometry_element->NextSiblingElement("geometry"))
+                {
+                    for (tinyxml2::XMLElement *mesh_element = geometry_element->FirstChildElement("mesh");
+                         mesh_element != nullptr;
+                         mesh_element = mesh_element->NextSiblingElement("mesh"))
+                    {
+                        boost::filesystem::path mesh_path = mesh_element->Attribute("filename");
+
+                        mesh_element->SetAttribute("filename", mesh_path.filename().c_str());
+                    }
                 }
             }
         }
