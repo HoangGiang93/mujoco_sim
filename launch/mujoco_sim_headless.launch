@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="robot" />
+    <arg name="robot" default="$(find mujoco_sim)/model/test/bowl.xml" />
     <arg name="use_urdf" default="false" />
     <arg name="world" default="$(find mujoco_sim)/model/world/empty.xml" />
     <arg name="config" default="$(find mujoco_sim)/src/config/robot.yaml" />
