@@ -33,7 +33,7 @@ wstool update -t ~/mujoco_ws/src            # pull the repositories
 ```
 3) Install dependency of all packages in the workspace
 ```
-rosdep install --ignore-src --from-paths ~/mujoco_ws/src/mujoco_sim/ ~/mujoco_ws/src/mujoco_msgs/ ~/mujoco_ws/src/mujoco_world/  # install dependencies available through apt
+rosdep install --ignore-src --from-paths ~/mujoco_ws/src/mujoco_sim/ ~/mujoco_ws/src/mujoco_msgs/ # install dependencies available through apt
 ```
 4) Build packages
 ```
