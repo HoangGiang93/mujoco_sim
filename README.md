@@ -41,6 +41,13 @@ cd ~/mujoco_ws                              # go to the workspace directory
 catkin_make                                 # build packages (or catkin build)
 source ~/mujoco_ws/devel/setup.bash         # source new overlay
 ```
+5) Install some useful ROS packages for control and GUI
+```
+sudo apt install ros-noetic-effort-controllers
+sudo apt install ros-noetic-joint-trajectory-controller
+sudo apt install ros-noetic-rqt-joint-trajectory-controller
+sudo apt install ros-noetic-rqt-robot-steering
+```
 
 ## Troubleshooting
 1) `ERROR: gladLoadGL error`
