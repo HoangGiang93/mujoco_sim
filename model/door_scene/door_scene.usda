@@ -1,0 +1,136 @@
+#usda 1.0
+(
+    defaultPrim = "world"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "world"
+{
+    def Xform "door_frame" (
+        prepend apiSchemas = ["PhysicsMassAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (-0.017535072, 0.13026197, 0.83015037)
+        float3 physics:diagonalInertia = (1920.1279, 1233.6373, 813.31287)
+        float physics:mass = 0
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (9, 2, 0, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "geom_1" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
+            prepend references = @./door_frame/usd/door_frame.usda@
+        )
+        {
+            uniform token physics:approximation = "convexHull"
+            bool physics:collisionEnabled = 1
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            float[] primvars:displayOpacity = [1]
+            matrix4d xformOp:transform = ( (0.9999999821211603, 0.00008058245143795914, 0.00017106766962121146, 0), (-0.00017105124528068053, -0.00020378312932489706, 0.9999999646069532, 0), (0.00008061730929094236, -0.9999999759894521, -0.0002037693419527642, 0), (-0.017535070901252982, 0.13026197317201937, 0.8301503615245581, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def PhysicsRevoluteJoint "door_joint"
+        {
+            uniform token physics:axis = "Z"
+            rel physics:body0 = </world/door_frame>
+            rel physics:body1 = </world/door>
+            bool physics:collisionEnabled = 0
+            point3f physics:localPos0 = (0.005215, -0.26229, 0.97865)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            float physics:lowerLimit = 0
+            float physics:upperLimit = 90.00021
+        }
+    }
+
+    def Xform "door" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0.00002840474, 0.39288357, 0.014543325)
+        float3 physics:diagonalInertia = (18.74264, 15.506419, 3.247147)
+        float physics:mass = 54.3541
+        bool physics:rigidBodyEnabled = 1
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (9, 1.7, 0.98, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "door_geom" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
+            prepend references = @./door/usd/door.usda@
+        )
+        {
+            uniform token physics:approximation = "convexHull"
+            bool physics:collisionEnabled = 1
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            float[] primvars:displayOpacity = [1]
+            matrix4d xformOp:transform = ( (0.9999999925992371, -0.0001208654882428811, -0.000013894584500343797, 0), (0.00012086190268667985, 0.9999999594745241, -0.00025776607713853133, 0), (0.00001392573896002495, 0.00025776439590494593, 0.9999999666817945, 0), (0.000028404740122364398, 0.392883567170298, 0.014543324602871102, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+
+        def Xform "door_lock" (
+            prepend apiSchemas = ["PhysicsMassAPI"]
+        )
+        {
+            point3f physics:centerOfMass = (-0.000032342876, 0.008447911, 0.002994836)
+            float3 physics:diagonalInertia = (0.0012920263, 0.0008306303, 0.00051870063)
+            float physics:mass = 0
+            matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0.721208, 0, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+
+            def Mesh "door_lock_geom" (
+                prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
+                prepend references = @./door_lock/usd/door_lock.usda@
+            )
+            {
+                uniform token physics:approximation = "convexHull"
+                bool physics:collisionEnabled = 1
+                color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+                float[] primvars:displayOpacity = [1]
+                matrix4d xformOp:transform = ( (0.9999969131570663, 0.002436043572420805, 0.0004892525442102614, 0), (-0.002223763109904244, 0.9653009088954354, -0.2611306381167813, 0), (-0.001108401538152098, 0.26112874406575703, 0.9653033463469763, 0), (-0.000032342876045571266, 0.008447910452850068, 0.0029948360701812175, 1) )
+                uniform token[] xformOpOrder = ["xformOp:transform"]
+            }
+
+            def PhysicsRevoluteJoint "door_handle_joint"
+            {
+                uniform token physics:axis = "Z"
+                rel physics:body0 = </world/door/door_lock>
+                rel physics:body1 = </world/door_handle>
+                bool physics:collisionEnabled = 0
+                point3f physics:localPos0 = (0, 0, 0.030325)
+                point3f physics:localPos1 = (0, 0, 0)
+                quatf physics:localRot0 = (0.7071068, 0, 0.7071068, 0)
+                quatf physics:localRot1 = (0.7071068, 0, 0.7071068, 0)
+                float physics:lowerLimit = 0
+                float physics:upperLimit = 90.00021
+            }
+        }
+    }
+
+    def Xform "door_handle" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (-0.062563345, -0.035311054, 0.000017761568)
+        float3 physics:diagonalInertia = (0.00038343162, 0.0003420816, 0.00005188691)
+        float physics:mass = 0.17022942
+        bool physics:rigidBodyEnabled = 1
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (9, 2.5, 1, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        def Mesh "door_handle_geom" (
+            prepend apiSchemas = ["PhysicsCollisionAPI", "PhysicsMeshCollisionAPI"]
+            prepend references = @./door_handle/usd/door_handle.usda@
+        )
+        {
+            uniform token physics:approximation = "convexHull"
+            bool physics:collisionEnabled = 1
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            float[] primvars:displayOpacity = [1]
+            matrix4d xformOp:transform = ( (0.00010146306418745699, 0.00013170724472788553, 0.9999999861792243, 0), (-0.9491591390675426, 0.3147966418447654, 0.000054843597062537164, 0), (-0.3147966302707327, -0.9491591315140262, 0.00015695136689219957, 0), (-0.06256334692408246, -0.035311053546808066, 0.00001776156712040486, 1) )
+            uniform token[] xformOpOrder = ["xformOp:transform"]
+        }
+    }
+}
+

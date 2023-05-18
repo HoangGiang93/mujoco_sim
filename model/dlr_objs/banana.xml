@@ -1,0 +1,14 @@
+<mujoco model="banana">
+    <compiler angle="radian" meshdir="banana/stl" autolimits="true" />
+    <default />
+    <asset>
+        <mesh name="banana" file="banana.stl" />
+    </asset>
+    <worldbody>
+        <body name="banana">
+            <geom type="mesh" mesh="banana" />
+        </body>
+    </worldbody>
+    <equality />
+    <contact />
+</mujoco>

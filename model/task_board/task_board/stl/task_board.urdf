@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<robot name="task_board">
+    <mujoco>
+        <compiler meshdir="/home/giang/mujoco_ws/src/mujoco_sim/model/task_board/task_board/stl" strippath="false" balanceinertia="true" discardvisual="true" boundmass="0.000001" boundinertia="0.000001"/>
+    </mujoco>
+    <link name="shell">
+        <collision>
+            <geometry>
+                <mesh filename="ShellBottom.stl"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 0.075039 -0.039751" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.25655 0.0036 0.079502"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 -0.075039 -0.039751" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.25655 0.0036 0.079502"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.125881 0.0 -0.039751" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.003514 0.15495 0.079502"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="-0.125881 0.0 -0.039751" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.003514 0.15495 0.079502"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 -0.057742 -0.001651" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.25655 0.03819 0.003302"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 0.062595 -0.001651" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.25655 0.028484 0.003302"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.059527 0.0 -0.001651" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.136222 0.15495 0.003302"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="-0.10611 0.0 -0.001651" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.043054 0.15495 0.003302"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="lid_joint" type="revolute">
+        <origin xyz="-0.047251 -0.032897 -0.000802" rpy="0 0 0"/>
+        <parent link="shell"/>
+        <child link="lid"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="0" upper="6.28" velocity="1000" effort="1000"/>
+    </joint>
+    <link name="lid">
+        <collision>
+            <origin xyz="0.0 0.045753 0.005981" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.085002 0.08 0.003"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 0.065755 0.010466" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.004" length="0.006"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.0 0.065755 0.014967" rpy="0 0 0"/>
+            <geometry>
+                <cylinder radius="0.007486" length="0.003"/>
+            </geometry>
+        </collision>
+    </link>
+</robot>

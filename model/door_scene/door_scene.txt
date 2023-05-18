@@ -1,0 +1,492 @@
+MuJoCo version 2.3.5
+model name     MuJoCo Model
+
+nq                    2
+nv                    2
+nbody                 5
+nbvh                  5
+njnt                  2
+ngeom                 5
+nlight                1
+nmesh                 4
+nmeshvert             73257
+nmeshnormal           73257
+nmeshface             145706
+nmeshgraph            13982
+ntex                  1
+ntexdata              786432
+nmat                  1
+nnames                184
+nnames_map            38
+nM                    3
+nD                    4
+nB                    10
+njmax                 -1
+nconmax               -1
+nstack                1703936
+nbuffer               7856344
+
+timestep              0.005   
+apirate               1e+02   
+impratio              1       
+tolerance             1e-08   
+noslip_tolerance      1e-06   
+mpr_tolerance         1e-06   
+density               0       
+viscosity             0       
+o_margin              0       
+integrator            1
+collision             0
+cone                  0
+jacobian              2
+solver                2
+iterations            100
+noslip_iterations     0
+mpr_iterations        50
+disableflags          16
+enableflags           2
+gravity               0         0        -9.8      
+wind                  0         0         0        
+magnetic              0        -0.5       0        
+o_solref              0.02      1        
+o_solimp              0.9       0.95      0.001     0.5       2        
+
+totalmass             2.5e+03 
+
+meaninertia           6       
+meanmass              6.4e+02 
+meansize              0.72    
+extent                12      
+center                4.8      1.4      0.73    
+
+qpos0                 0         0        
+
+qpos_spring           0         0        
+
+
+BODY 0:
+  name                  world
+  body_parentid         0 
+  body_rootid           0 
+  body_weldid           0 
+  body_mocapid          -1 
+  body_jntnum           0 
+  body_jntadr           -1 
+  body_dofnum           0 
+  body_dofadr           -1 
+  body_geomnum          1 
+  body_geomadr          0 
+  body_simple           1 
+  body_sameframe        1 
+  body_pos              0         0         0        
+  body_quat             1         0         0         0        
+  body_ipos             0         0         0        
+  body_iquat            1         0         0         0        
+  body_mass             0        
+  body_subtreemass      2.5e+03  
+  body_inertia          0         0         0        
+  body_invweight0       0         0        
+  body_gravcomp         0        
+  body_plugin           -1 
+  body_bvhadr           0 
+  body_bvhnum           1 
+
+BODY 1:
+  name                  door_frame
+  body_parentid         0 
+  body_rootid           1 
+  body_weldid           0 
+  body_mocapid          -1 
+  body_jntnum           0 
+  body_jntadr           -1 
+  body_dofnum           0 
+  body_dofadr           -1 
+  body_geomnum          1 
+  body_geomadr          1 
+  body_simple           0 
+  body_sameframe        0 
+  body_pos              9         2         0        
+  body_quat             1         0         0         0        
+  body_ipos            -0.018     0.13      0.83     
+  body_iquat            0.71      0.71     -3.2e-05   8.9e-05  
+  body_mass             2.5e+03  
+  body_subtreemass      2.5e+03  
+  body_inertia          1.9e+03   1.2e+03   8.1e+02  
+  body_invweight0       0         0        
+  body_gravcomp         1        
+  body_plugin           -1 
+  body_bvhadr           1 
+  body_bvhnum           1 
+
+BODY 2:
+  name                  door
+  body_parentid         1 
+  body_rootid           1 
+  body_weldid           2 
+  body_mocapid          -1 
+  body_jntnum           1 
+  body_jntadr           0 
+  body_dofnum           1 
+  body_dofadr           0 
+  body_geomnum          1 
+  body_geomadr          2 
+  body_simple           0 
+  body_sameframe        0 
+  body_pos              0.0052   -0.26      0.98     
+  body_quat             1         0         0         0        
+  body_ipos             2.8e-05   0.39      0.015    
+  body_iquat            1        -0.00013   7e-06    -6e-05    
+  body_mass             54       
+  body_subtreemass      55       
+  body_inertia          19        16        3.2      
+  body_invweight0       0.0043    0.028    
+  body_gravcomp         1        
+  body_plugin           -1 
+  body_bvhadr           2 
+  body_bvhnum           1 
+
+BODY 3:
+  name                  door_lock
+  body_parentid         2 
+  body_rootid           1 
+  body_weldid           2 
+  body_mocapid          -1 
+  body_jntnum           0 
+  body_jntadr           -1 
+  body_dofnum           0 
+  body_dofadr           -1 
+  body_geomnum          1 
+  body_geomadr          3 
+  body_simple           0 
+  body_sameframe        0 
+  body_pos              0         0.72      0        
+  body_quat             1         0         0         0        
+  body_ipos            -3.2e-05   0.0084    0.003    
+  body_iquat            0.99     -0.13     -0.0004    0.0012   
+  body_mass             0.45     
+  body_subtreemass      0.63     
+  body_inertia          0.0013    0.00083   0.00052  
+  body_invweight0       0.015     0.028    
+  body_gravcomp         1        
+  body_plugin           -1 
+  body_bvhadr           3 
+  body_bvhnum           1 
+
+BODY 4:
+  name                  door_handle
+  body_parentid         3 
+  body_rootid           1 
+  body_weldid           4 
+  body_mocapid          -1 
+  body_jntnum           1 
+  body_jntadr           1 
+  body_dofnum           1 
+  body_dofadr           1 
+  body_geomnum          1 
+  body_geomadr          4 
+  body_simple           0 
+  body_sameframe        0 
+  body_pos              0         0         0.03     
+  body_quat             1         0         0         0        
+  body_ipos            -0.063    -0.035     1.8e-05  
+  body_iquat            0.57      0.41     -0.57      0.41     
+  body_mass             0.17     
+  body_subtreemass      0.17     
+  body_inertia          0.00038   0.00034   5.2e-05  
+  body_invweight0       0.8       6.3e+02  
+  body_gravcomp         1        
+  body_plugin           -1 
+  body_bvhadr           4 
+  body_bvhnum           1 
+
+
+JOINT 0:
+  name                  door_joint
+  jnt_type              3 
+  jnt_qposadr           0 
+  jnt_dofadr            0 
+  jnt_bodyid            2 
+  jnt_group             0 
+  jnt_limited           1 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              0         0         1        
+  jnt_stiffness         0        
+  jnt_range             0         1.6      
+  jnt_margin            0        
+
+JOINT 1:
+  name                  door_handle_joint
+  jnt_type              3 
+  jnt_qposadr           1 
+  jnt_dofadr            1 
+  jnt_bodyid            4 
+  jnt_group             0 
+  jnt_limited           1 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              1         0         0        
+  jnt_stiffness         0        
+  jnt_range             0         1.6      
+  jnt_margin            0        
+
+
+DOF 0:
+  dof_bodyid            2 
+  dof_jntid             0 
+  dof_parentid          -1 
+  dof_Madr              0 
+  dof_simplenum         0 
+  dof_solref            0.02      1        
+  dof_solimp            0.9       0.95      0.001     0.5       2        
+  dof_frictionloss      0        
+  dof_armature          0        
+  dof_damping           0        
+  dof_invweight0        0.084    
+  dof_M0                12       
+
+DOF 1:
+  dof_bodyid            4 
+  dof_jntid             1 
+  dof_parentid          0 
+  dof_Madr              1 
+  dof_simplenum         0 
+  dof_solref            0.02      1        
+  dof_solimp            0.9       0.95      0.001     0.5       2        
+  dof_frictionloss      0        
+  dof_armature          0        
+  dof_damping           0        
+  dof_invweight0        1.9e+03  
+  dof_M0                0.00053  
+
+
+GEOM 0:
+  name                  floor
+  geom_type             0 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           4 
+  geom_bodyid           0 
+  geom_dataid           -1 
+  geom_matid            0 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        1 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0         0         0.05     
+  geom_aabb             0         0        -5e+09     1e+10     1e+10     5e+09    
+  geom_rbound           0        
+  geom_pos              0         0         0        
+  geom_quat             1         0         0         0        
+  geom_friction         2         0.05      0.01     
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             0.5       0.5       0.5       1        
+
+GEOM 1:
+  name                  
+  geom_type             7 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           3 
+  geom_bodyid           1 
+  geom_dataid           0 
+  geom_matid            -1 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        2 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0.6       1.1       1.1      
+  geom_aabb             0.00012   0.1       0.00021   0.6       0.99      1.1      
+  geom_rbound           1.6      
+  geom_pos             -0.018     0.13      0.83     
+  geom_quat             0.71      0.71     -3.2e-05   8.9e-05  
+  geom_friction         1         0.005     0.0001   
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             0.5       0.5       0.5       1        
+
+GEOM 2:
+  name                  door_geom
+  geom_type             7 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           3 
+  geom_bodyid           2 
+  geom_dataid           1 
+  geom_matid            -1 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        2 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0.038     0.43      0.9      
+  geom_aabb             0.0079    0.008    -0.015     0.03      0.42      0.89     
+  geom_rbound           1        
+  geom_pos              2.8e-05   0.39      0.015    
+  geom_quat             1        -0.00013   7e-06    -6e-05    
+  geom_friction         1         0.005     0.0001   
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             0.5       0.5       0.5       1        
+
+GEOM 3:
+  name                  door_lock_geom
+  geom_type             7 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           3 
+  geom_bodyid           3 
+  geom_dataid           2 
+  geom_matid            -1 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        2 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0.015     0.1       0.082    
+  geom_aabb             1.3e-05   0.018     0.0018    0.015     0.086     0.081    
+  geom_rbound           0.13     
+  geom_pos             -3.2e-05   0.0084    0.003    
+  geom_quat             0.99     -0.13     -0.0004    0.0012   
+  geom_friction         1         0.005     0.0001   
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             0.5       0.5       0.5       1        
+
+GEOM 4:
+  name                  door_handle_geom
+  geom_type             7 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           3 
+  geom_bodyid           4 
+  geom_dataid           3 
+  geom_matid            -1 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        2 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0.015     0.041     0.12     
+  geom_aabb            -8.3e-06   0.0011    0.027     0.015     0.04      0.09     
+  geom_rbound           0.12     
+  geom_pos             -0.063    -0.035     1.8e-05  
+  geom_quat             0.57      0.41     -0.57      0.41     
+  geom_friction         1         0.005     0.0001   
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             0.5       0.5       0.5       1        
+
+
+LIGHT 0:
+  name                  
+  light_mode            0 
+  light_bodyid          0 
+  light_targetbodyid    -1 
+  light_directional     0 
+  light_castshadow      1 
+  light_active          1 
+  light_pos             0         0         5        
+  light_dir             0         0        -1        
+  light_poscom0        -9        -2.1       4.2      
+  light_pos0            0         0         5        
+  light_dir0            0         0        -1        
+  light_attenuation     1         0         0        
+  light_cutoff          45       
+  light_exponent        10       
+  light_ambient         0         0         0        
+  light_diffuse         0.5       0.5       0.5      
+  light_specular        0.3       0.3       0.3      
+
+
+MESH 0:
+  name                  door_frame
+  mesh_vertadr          0 
+  mesh_vertnum          62000 
+  mesh_normaladr        0 
+  mesh_normalnum        62000 
+  mesh_texcoordadr      -1 
+  mesh_texcoordnum      0 
+  mesh_faceadr          0 
+  mesh_facenum          122896 
+  mesh_graphadr         0 
+  qhull face            530
+  qhull vert            267
+
+MESH 1:
+  name                  door
+  mesh_vertadr          62000 
+  mesh_vertnum          10482 
+  mesh_normaladr        62000 
+  mesh_normalnum        10482 
+  mesh_texcoordadr      -1 
+  mesh_texcoordnum      0 
+  mesh_faceadr          122896 
+  mesh_facenum          21268 
+  mesh_graphadr         3983 
+  qhull face            546
+  qhull vert            275
+
+MESH 2:
+  name                  door_lock
+  mesh_vertadr          72482 
+  mesh_vertnum          449 
+  mesh_normaladr        72482 
+  mesh_normalnum        449 
+  mesh_texcoordadr      -1 
+  mesh_texcoordnum      0 
+  mesh_faceadr          144164 
+  mesh_facenum          894 
+  mesh_graphadr         8086 
+  qhull face            476
+  qhull vert            240
+
+MESH 3:
+  name                  door_handle
+  mesh_vertadr          72931 
+  mesh_vertnum          326 
+  mesh_normaladr        72931 
+  mesh_normalnum        326 
+  mesh_texcoordadr      -1 
+  mesh_texcoordnum      0 
+  mesh_faceadr          145058 
+  mesh_facenum          648 
+  mesh_graphadr         11664 
+  qhull face            308
+  qhull vert            156
+
+
+TEXTURE 0:
+  name                  grid
+  tex_type              0 
+  tex_height            512 
+  tex_width             512 
+  tex_adr               0 
+
+
+MATERIAL 0:
+  name                  grid
+  mat_texid             0 
+  mat_texuniform        1 
+  mat_texrepeat         1         1        
+  mat_emission          0        
+  mat_specular          0.5      
+  mat_shininess         0.5      
+  mat_reflectance       0.2      
+  mat_rgba              1         1         1         1        
+

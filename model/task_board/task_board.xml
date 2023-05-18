@@ -1,0 +1,27 @@
+<mujoco model="task_board">
+    <compiler angle="radian" meshdir="task_board/stl/" autolimits="true" balanceinertia="true" discardvisual="true" boundmass="0.000001" boundinertia="0.000001"/>
+    <asset>
+        <mesh name="ShellBottom" file="ShellBottom.stl"/>
+    </asset>
+    <worldbody>
+        <body name="task_board">
+            <freejoint/>
+            <geom type="mesh" mesh="ShellBottom"/>
+            <geom size="0.128275 0.0018 0.039751" pos="0 0.075039 -0.039751" type="box"/>
+            <geom size="0.128275 0.0018 0.039751" pos="0 -0.075039 -0.039751" type="box"/>
+            <geom size="0.001757 0.077475 0.039751" pos="0.125881 0 -0.039751" type="box"/>
+            <geom size="0.001757 0.077475 0.039751" pos="-0.125881 0 -0.039751" type="box"/>
+            <geom size="0.128275 0.019095 0.001651" pos="0 -0.057742 -0.001651" type="box"/>
+            <geom size="0.128275 0.014242 0.001651" pos="0 0.062595 -0.001651" type="box"/>
+            <geom size="0.068111 0.077475 0.001651" pos="0.059527 0 -0.001651" type="box"/>
+            <geom size="0.021527 0.077475 0.001651" pos="-0.10611 0 -0.001651" type="box"/>
+            <body name="lid" pos="-0.047251 -0.032897 -0.000802">
+                <joint name="lid_joint" pos="0 0 0" axis="1 0 0" range="0 6.28"/>
+                <geom size="0.042501 0.04 0.0015" pos="0 0.045753 0.005981" type="box"/>
+                <geom size="0.004 0.003" pos="0 0.065755 0.010466" type="cylinder"/>
+                <geom size="0.007486 0.0015" pos="0 0.065755 0.014967" type="cylinder"/>
+            </body>
+        </body>
+    </worldbody>
+    <equality/>
+</mujoco>

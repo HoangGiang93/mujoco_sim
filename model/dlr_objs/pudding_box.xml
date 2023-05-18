@@ -1,0 +1,14 @@
+<mujoco model="pudding_box">
+    <compiler angle="radian" meshdir="pudding_box/stl" autolimits="true" />
+    <default />
+    <asset>
+        <mesh name="pudding_box" file="pudding_box.stl" />
+    </asset>
+    <worldbody>
+        <body name="pudding_box">
+            <geom type="mesh" mesh="pudding_box" />
+        </body>
+    </worldbody>
+    <equality />
+    <contact />
+</mujoco>

@@ -1,0 +1,14 @@
+<mujoco model="master_chef_can">
+    <compiler angle="radian" meshdir="master_chef_can/stl" autolimits="true" />
+    <default />
+    <asset>
+        <mesh name="master_chef_can" file="master_chef_can.stl" />
+    </asset>
+    <worldbody>
+        <body name="master_chef_can">
+            <geom type="mesh" mesh="master_chef_can" />
+        </body>
+    </worldbody>
+    <equality />
+    <contact />
+</mujoco>
