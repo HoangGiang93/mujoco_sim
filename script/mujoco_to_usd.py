@@ -2,20 +2,20 @@
 
 import os
 import sys
+import xml.etree.ElementTree as ET
+import csv
+from math import degrees
+import numpy
 import rospy
 from std_srvs.srv import Trigger, TriggerResponse
 from pxr import Usd, UsdGeom, Sdf, Gf, UsdPhysics
 import mujoco
-import numpy
-import xml.etree.ElementTree as ET
-import csv
-from math import degrees
 
 
 def get_sum_mass(body_element: ET.Element) -> float:
     mass = float(body_element.attrib.get('mass', '0'))
     for child_body_element in body_element.findall('body'):
-        if child_body_element.find('joint') == None:
+        if child_body_element.find('joint') is None:
             mass += get_sum_mass(child_body_element)
     return mass
 
@@ -127,13 +127,13 @@ def mjcf_to_usd_handle(xml_path: str, usd_file: str):
     data_file = os.path.basename(xml_path)
     data_file = data_file.replace('.xml', '_data.txt')
 
-    with open(os.path.join(data_dir, data_file), newline='') as csvfile:
+    with open(os.path.join(data_dir, data_file), newline='', encoding='utf-8') as csvfile:
         reader = csv.reader(
             csvfile, delimiter=' ', skipinitialspace=True, quoting=csv.QUOTE_NONE
         )
         data = [row for row in reader]
 
-    for i in range(len(data)):
+    for i, _ in enumerate(data):
         if len(data[i]) == 0:
             continue
         if data[i][0] == 'XPOS':
@@ -395,12 +395,12 @@ def mjcf_to_usd_client(usd_file):
         resp: TriggerResponse = screenshot_srv()
         mjcf_to_usd_handle(resp.message, usd_file)
         return
-    except rospy.ServiceException as e:
-        rospy.logwarn('Service call failed: %s' % e)
+    except rospy.ServiceException as error:
+        rospy.logwarn(f'Service call failed: {error}')
 
 
 if __name__ == '__main__':
-    usd_file = None
+    USD_FILE = None
     if len(sys.argv) >= 2:
-        usd_file = sys.argv[1]
-    mjcf_to_usd_client(usd_file)
+        USD_FILE = sys.argv[1]
+    mjcf_to_usd_client(USD_FILE)
