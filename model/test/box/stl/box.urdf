@@ -65,39 +65,39 @@
             </geometry>
         </collision>
     </link>
-    <joint name="box_top_layer_bottom_joint" type="continuous">
+    <joint name="box_flap_side_1_joint" type="continuous">
         <origin xyz="0.17 0 0.166" rpy="0 0 0"/>
         <parent link="box_body"/>
-        <child link="box_top_layer_bottom"/>
+        <child link="box_flap_side_1"/>
         <axis xyz="0 1 0"/>
     </joint>
-    <link name="box_top_layer_bottom">
+    <link name="box_flap_side_1">
         <visual>
             <geometry>
-                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxTopLayerBottom.dae"/>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxFlapSide1.dae"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="BoxTopLayerBottom.stl"/>
+                <mesh filename="BoxFlapSide1.stl"/>
             </geometry>
         </collision>
     </link>
-    <joint name="box_top_layer_top_joint" type="continuous">
+    <joint name="box_flap_side_2_joint" type="continuous">
         <origin xyz="-0.17 0 0.168" rpy="0 0 0"/>
         <parent link="box_body"/>
-        <child link="box_top_layer_top"/>
+        <child link="box_flap_side_2"/>
         <axis xyz="0 -1 0"/>
     </joint>
-    <link name="box_top_layer_top">
+    <link name="box_flap_side_2">
         <visual>
             <geometry>
-                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxTopLayerTop.dae"/>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxFlapSide2.dae"/>
             </geometry>
         </visual>
         <collision>
             <geometry>
-                <mesh filename="BoxTopLayerTop.stl"/>
+                <mesh filename="BoxFlapSide2.stl"/>
             </geometry>
         </collision>
     </link>

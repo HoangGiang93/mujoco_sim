@@ -137,6 +137,19 @@ static void save_mesh_paths(tinyxml2::XMLDocument &doc, const boost::filesystem:
 			 asset_element != nullptr;
 			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
+		for (tinyxml2::XMLElement *texture_element = asset_element->FirstChildElement("texture");
+				 texture_element != nullptr;
+				 texture_element = texture_element->NextSiblingElement("texture"))
+		{
+			if (texture_element->Attribute("file") != nullptr)
+			{
+				const boost::filesystem::path file_path = texture_element->Attribute("file");
+				if (file_path.is_relative())
+				{
+					texture_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+				}
+			}
+		}
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
 				 mesh_element != nullptr;
 				 mesh_element = mesh_element->NextSiblingElement("mesh"))
@@ -407,6 +420,19 @@ static void init_tmp()
 			 asset_element != nullptr;
 			 asset_element = asset_element->NextSiblingElement("asset"))
 	{
+		for (tinyxml2::XMLElement *texture_element = asset_element->FirstChildElement("texture");
+				 texture_element != nullptr;
+				 texture_element = texture_element->NextSiblingElement("texture"))
+		{
+			if (texture_element->Attribute("file") != nullptr)
+			{
+				const boost::filesystem::path file_path = texture_element->Attribute("file");
+				if (file_path.is_relative())
+				{
+					texture_element->SetAttribute("file", (meshdir_abs_path / file_path).c_str());
+				}
+			}
+		}
 		for (tinyxml2::XMLElement *mesh_element = asset_element->FirstChildElement("mesh");
 				 mesh_element != nullptr;
 				 mesh_element = mesh_element->NextSiblingElement("mesh"))
@@ -550,6 +576,15 @@ static void modify_xml(const char *xml_path, const std::set<std::string> &remove
 	}
 
 	mtx.lock();
+
+	std::function<void(tinyxml2::XMLElement *)> add_bound_cb = [&](tinyxml2::XMLElement *compiler_element)
+	{
+		compiler_element->SetAttribute("boundmass", "0.000001");
+		compiler_element->SetAttribute("boundinertia", "0.000001");
+	};
+
+	do_each_child_element(doc.FirstChildElement(), "compiler", add_bound_cb);
+
 	tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement();
 	std::set<tinyxml2::XMLElement *> body_elements_to_delete;
 	for (tinyxml2::XMLElement *worldbody_element = doc.FirstChildElement()->FirstChildElement("worldbody");
@@ -736,7 +771,7 @@ bool save_geom_quat(const char *path)
 																const int mesh_id = mj_name2id(m, mjtObj::mjOBJ_MESH, element->Attribute("mesh"));
 																for (int geom_id = 0; geom_id < m->ngeom; geom_id++)
 																{
-																	if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) != MjSim::geom_pose.end())
+																	if (m->geom_dataid[geom_id] == mesh_id && MjSim::geom_pose.find(geom_id) == MjSim::geom_pose.end())
 																	{
 																		MjSim::geom_pose[geom_id].reserve(7);
 																		MjSim::geom_pose[geom_id].insert(MjSim::geom_pose[geom_id].end(), geom_pos.begin(), geom_pos.end());

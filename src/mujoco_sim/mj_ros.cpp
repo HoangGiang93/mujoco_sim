@@ -91,6 +91,7 @@ static bool init_urdf(urdf::Model &urdf_model, const ros::NodeHandle &n, const c
 
 static void set_ros_msg(MjRos &mj_ros, const EObjectType object_type, bool free_body_only, std::function<void(MjRos &, const int, const EObjectType)> function)
 {
+
     for (int body_id = 1; body_id < m->nbody; body_id++)
     {
         const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
@@ -676,30 +677,39 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         save_path_string = ros::package::getPath("mujoco_sim") + "/" + save_path_string;
     }
 
-    if (boost::filesystem::exists(save_path_string))
+    if (boost::filesystem::exists(save_path_string) && strcmp(save_path.extension().c_str(), ".xml") != 0)
     {
         save_path = save_path_string;
+        save_path /= model_path.stem().string() + ".xml";
     }
     else
     {
-        ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
+        if (!boost::filesystem::exists(save_path_string))
+        {
+            if (!boost::filesystem::create_directory(save_path_string))
+            {
+                ROS_WARN("save_path [%s] is invalid, set to [%s]", save_path_string.c_str(), save_path.c_str());
+            }
+        }
+        save_path = save_path_string;
     }
 
-    save_path /= model_path.stem().string() + ".xml";
-    if (boost::filesystem::exists(save_path))
-    {
-        const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
-        const unsigned short year = time_now.date().year();
-        const unsigned short month = time_now.date().month();
-        const unsigned short day = time_now.date().day();
-        const unsigned short hour = time_now.time_of_day().hours();
-        const unsigned short minute = time_now.time_of_day().minutes();
-        const unsigned short sec = time_now.time_of_day().seconds();
-        const unsigned short msec = time_now.time_of_day().total_milliseconds() % 1000;
-        const std::string time_stamp = std::to_string(year) + "_" + std::to_string(month) + "_" + std::to_string(day) + "_" + std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(sec) + "_" + std::to_string(msec);
-        const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
-        save_path = save_path.parent_path() / filename;
-    }
+    // if (boost::filesystem::exists(save_path))
+    // {
+
+    //     boost::filesystem::remove_all(save_path.parent_path());
+    //     const boost::posix_time::ptime time_now = ros::Time::now().toBoost();
+    //     const unsigned short year = time_now.date().year();
+    //     const unsigned short month = time_now.date().month();
+    //     const unsigned short day = time_now.date().day();
+    //     const unsigned short hour = time_now.time_of_day().hours();
+    //     const unsigned short minute = time_now.time_of_day().minutes();
+    //     const unsigned short sec = time_now.time_of_day().seconds();
+    //     const unsigned short msec = time_now.time_of_day().total_milliseconds() % 1000;
+    //     const std::string time_stamp = std::to_string(year) + "_" + std::to_string(month) + "_" + std::to_string(day) + "_" + std::to_string(hour) + "_" + std::to_string(minute) + "_" + std::to_string(sec) + "_" + std::to_string(msec);
+    //     const std::string filename = model_path.stem().string() + "_" + time_stamp + ".xml";
+    //     save_path = save_path.parent_path() / filename;
+    // }
 
     boost::filesystem::path save_model_path = save_path.parent_path() / (save_path.stem().string() + ".txt");
     boost::filesystem::path save_data_path = save_path.parent_path() / (save_path.stem().string() + "_data.txt");
@@ -730,6 +740,8 @@ bool MjRos::screenshot_service(std_srvs::TriggerRequest &req, std_srvs::TriggerR
         std::function<void(tinyxml2::XMLElement *)> change_meshdir_cb = [&](tinyxml2::XMLElement *compiler_element)
         {
             compiler_element->DeleteAttribute("meshdir");
+            compiler_element->SetAttribute("boundmass", "0.000001");
+            compiler_element->SetAttribute("boundinertia", "0.000001");
         };
 
         tinyxml2::XMLDocument doc;
@@ -869,7 +881,7 @@ bool MjRos::spawn_objects_service(mujoco_msgs::SpawnObjectRequest &req, mujoco_m
 
     std::unique_lock<std::mutex> lk(spawn_mtx);
     spawn_success = false;
-    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 1000ms, [&]
                              { return spawn_success; }))
     {
         MjSim::reload_mesh = true;
@@ -903,6 +915,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         }
 
         tinyxml2::XMLElement *body_element = object_xml_doc.NewElement("body");
+        body_element->SetAttribute("name", object.info.name.c_str());
         if (object.info.movable)
         {
             tinyxml2::XMLElement *joint_element = object_xml_doc.NewElement("freejoint");
@@ -1472,7 +1485,7 @@ bool MjRos::destroy_objects_service(mujoco_msgs::DestroyObjectRequest &req, mujo
     std::unique_lock<std::mutex> lk(destroy_mtx);
 
     destroy_success = false;
-    if (condition.wait_until(lk, std::chrono::system_clock::now() + 100ms, [&]
+    if (condition.wait_until(lk, std::chrono::system_clock::now() + 1000ms, [&]
                              { return destroy_success; }))
     {
         res.object_states = object_states;
@@ -1605,9 +1618,11 @@ void MjRos::spawn_and_destroy_objects()
             condition.notify_all();
         }
 
-        // Publish destroy markers
-
-        marker_array_pub.publish(destroy_marker_array);
+        if (destroy_marker_array.markers.size() > 0)
+        {
+            // Publish destroy markers
+            marker_array_pub.publish(destroy_marker_array);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
@@ -1704,6 +1719,8 @@ void MjRos::publish_marker_array(const EObjectType object_type)
     marker[object_type] = visualization_msgs::Marker();
     marker_array[object_type] = visualization_msgs::MarkerArray();
     marker[object_type].action = visualization_msgs::Marker::MODIFY;
+    marker[object_type].frame_locked = true;
+    marker[object_type].lifetime = ros::Duration(2.0 / pub_marker_array_rate[object_type]);
 
     std_msgs::Header header;
     header.frame_id = root_frame_id;
@@ -1720,7 +1737,10 @@ void MjRos::publish_marker_array(const EObjectType object_type)
         set_ros_msg(*this, object_type, pub_object_marker_array_of_free_bodies_only, &MjRos::add_marker);
 
         // Publish markers
-        marker_array_pub.publish(marker_array[object_type]);
+        if (marker_array.size() > 0)
+        {
+            marker_array_pub.publish(marker_array[object_type]);
+        }
 
         ros::spinOnce();
         loop_rate.sleep();
