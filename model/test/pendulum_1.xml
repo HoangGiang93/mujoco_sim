@@ -1,0 +1,11 @@
+<mujoco>
+    <worldbody>
+        <body name="ball_1" pos="0 0 2">
+            <joint type="ball" />
+            <geom type="sphere" pos="1 0 0" size=".1" rgba="0 .9 0 1" />
+        </body>
+        <body name="ball_2" pos="0 0 2" mocap="true">
+            <geom type="sphere" pos="-1 0 0" size=".1" rgba="0 0 .9 1" />
+        </body>
+    </worldbody>
+</mujoco>
