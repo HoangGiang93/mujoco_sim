@@ -1,0 +1,24 @@
+<launch>
+
+    <arg name="robot" default="$(find mujoco_sim)/model/test/bowl.xml" />
+    <arg name="world_1" default="$(find mujoco_sim)/model/test/pendulum_1.xml" />
+    <arg name="world_2" default="$(find mujoco_sim)/model/test/pendulum_2.xml" />
+    <arg name="config" default="$(find mujoco_sim)/src/config/robot.yaml" />
+
+    <group ns="sim_1">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
+            <rosparam command="load" file="$(arg config)" />
+            <param name="world" value="$(arg world_1)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+    <group ns="sim_2">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
+            <rosparam command="load" file="$(arg config)" />
+            <param name="world" value="$(arg world_2)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+</launch>
