@@ -566,15 +566,15 @@ void MjRos::init()
 
     reset_robot();
 
-    XmlRpc::XmlRpcValue asked_objects;
-    if (ros::param::get("~asks", asked_objects))
+    XmlRpc::XmlRpcValue subscribed_objects;
+    if (ros::param::get("~subscribed_objects", subscribed_objects))
     {
-        std::string log = "Set asked objects: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &asked_object : asked_objects)
+        std::string log = "Set subscribed objects: ";
+        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &subscribed_object : subscribed_objects)
         {
-            log += asked_object.first + " ";
-            MjSocket::asked_objects[asked_object.first] = {};
-            ros::param::get("~asks/" + asked_object.first, MjSocket::asked_objects[asked_object.first]);  
+            log += subscribed_object.first + " ";
+            MjSocket::subscribed_objects[subscribed_object.first] = {};
+            ros::param::get("~subscribed_objects/" + subscribed_object.first, MjSocket::subscribed_objects[subscribed_object.first]);  
         }
         ROS_INFO("%s", log.c_str());
     }

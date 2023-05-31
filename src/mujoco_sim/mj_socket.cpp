@@ -25,10 +25,10 @@
 #include <chrono>
 #include <jsoncpp/json/json.h>
 
-std::map<std::string, std::vector<std::string>> MjSocket::asked_objects;
+std::map<std::string, std::vector<std::string>> MjSocket::subscribed_objects;
 
-int length_told_data = 1;
-int length_asked_data = 1;
+int length_published_data = 1;
+int length_subscribed_data = 1;
 
 MjSocket::~MjSocket()
 {
@@ -55,42 +55,42 @@ void MjSocket::send_header()
 	header_json["time"] = "microseconds";
 	header_json["simulator"] = "mujoco";
 
-	Json::Value told_data_json(Json::arrayValue);
-	told_data_json.append("position");
-	told_data_json.append("quaternion");
+	Json::Value published_data_json(Json::arrayValue);
+	published_data_json.append("position");
+	published_data_json.append("quaternion");
 
-	length_told_data = 1;
-	length_asked_data = 1;
+	length_published_data = 1;
+	length_subscribed_data = 1;
 
 	for (int body_id = 1; body_id < m->nbody; body_id++)
 	{
 		const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-		if (asked_objects.count(body_name) == 0)
+		if (subscribed_objects.count(body_name) == 0)
 		{
 			if (m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
 			{
-				header_json["tells"][body_name] = told_data_json;
-				length_told_data += 7;
-				told_object_ids.push_back(body_id);
+				header_json["published_objects"][body_name] = published_data_json;
+				length_published_data += 7;
+				published_object_ids.push_back(body_id);
 			}
 		}
 		else
 		{
-			Json::Value asked_data_json(Json::arrayValue);
-			for (const std::string &asked_data : asked_objects[body_name])
+			Json::Value subscribed_data_json(Json::arrayValue);
+			for (const std::string &subscribed_data : subscribed_objects[body_name])
 			{
-				asked_data_json.append(asked_data);
-				if (asked_data == "position")
+				subscribed_data_json.append(subscribed_data);
+				if (subscribed_data == "position")
 				{
-					length_asked_data += 3;
+					length_subscribed_data += 3;
 				}
-				else if (asked_data == "quaternion")
+				else if (subscribed_data == "quaternion")
 				{
-					length_asked_data += 4;
+					length_subscribed_data += 4;
 				}
 			}
-			header_json["asks"][body_name] = asked_data_json;
-			asked_object_ids.push_back(m->body_mocapid[mj_name2id(m, mjtObj::mjOBJ_BODY, (body_name + "_ref").c_str())]);
+			header_json["subscribed_objects"][body_name] = subscribed_data_json;
+			subscribed_object_ids.push_back(m->body_mocapid[mj_name2id(m, mjtObj::mjOBJ_BODY, (body_name + "_ref").c_str())]);
 		}
 	}
 
@@ -105,42 +105,42 @@ void MjSocket::send_header()
 void MjSocket::communicate()
 {
 	zmq_sleep(1);
-	double told_data[length_told_data];
-	double asked_data[length_asked_data];
+	double published_data[length_published_data];
+	double subscribed_data[length_subscribed_data];
 	while (ros::ok())
 	{
-		told_data[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+		published_data[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 		int i = 1;
-		for (const int body_id : told_object_ids)
+		for (const int body_id : published_object_ids)
 		{
-			told_data[i] = d->xpos[3 * body_id];
-			told_data[i + 1] = d->xpos[3 * body_id + 1];
-			told_data[i + 2] = d->xpos[3 * body_id + 2];
-			told_data[i + 3] = d->xquat[4 * body_id];
-			told_data[i + 4] = d->xquat[4 * body_id + 1];
-			told_data[i + 5] = d->xquat[4 * body_id + 2];
-			told_data[i + 6] = d->xquat[4 * body_id + 3];
+			published_data[i] = d->xpos[3 * body_id];
+			published_data[i + 1] = d->xpos[3 * body_id + 1];
+			published_data[i + 2] = d->xpos[3 * body_id + 2];
+			published_data[i + 3] = d->xquat[4 * body_id];
+			published_data[i + 4] = d->xquat[4 * body_id + 1];
+			published_data[i + 5] = d->xquat[4 * body_id + 2];
+			published_data[i + 6] = d->xquat[4 * body_id + 3];
 			i += 7;
 		}
 
-		zmq::message_t request(sizeof(told_data));
-		memcpy(request.data(), &told_data, sizeof(told_data));
+		zmq::message_t request(sizeof(published_data));
+		memcpy(request.data(), &published_data, sizeof(published_data));
 		socket_data.send(request, zmq::send_flags::none);
 
-		zmq::message_t reply(sizeof(asked_data));
+		zmq::message_t reply(sizeof(subscribed_data));
 		socket_data.recv(reply);
-		memcpy(&asked_data, reply.data(), sizeof(asked_data));
+		memcpy(&subscribed_data, reply.data(), sizeof(subscribed_data));
 
 		i = 1;		
-		for (const int mocap_id : asked_object_ids)
+		for (const int mocap_id : subscribed_object_ids)
 		{
-			d->mocap_pos[3 * mocap_id] = asked_data[i];
-			d->mocap_pos[3 * mocap_id + 1] = asked_data[i + 1];
-			d->mocap_pos[3 * mocap_id + 2] = asked_data[i + 2];
-			d->mocap_quat[4 * mocap_id] = asked_data[i + 3];
-			d->mocap_quat[4 * mocap_id + 1] = asked_data[i + 4];
-			d->mocap_quat[4 * mocap_id + 2] = asked_data[i + 5];
-			d->mocap_quat[4 * mocap_id + 3] = asked_data[i + 6];
+			d->mocap_pos[3 * mocap_id] = subscribed_data[i];
+			d->mocap_pos[3 * mocap_id + 1] = subscribed_data[i + 1];
+			d->mocap_pos[3 * mocap_id + 2] = subscribed_data[i + 2];
+			d->mocap_quat[4 * mocap_id] = subscribed_data[i + 3];
+			d->mocap_quat[4 * mocap_id + 1] = subscribed_data[i + 4];
+			d->mocap_quat[4 * mocap_id + 2] = subscribed_data[i + 5];
+			d->mocap_quat[4 * mocap_id + 3] = subscribed_data[i + 6];
 			i += 7;
 		}
 	}
