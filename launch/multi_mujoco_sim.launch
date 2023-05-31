@@ -3,20 +3,31 @@
     <arg name="robot" default="$(find mujoco_sim)/model/test/bowl.xml" />
     <arg name="world_1" default="$(find mujoco_sim)/model/test/pendulum_1.xml" />
     <arg name="world_2" default="$(find mujoco_sim)/model/test/pendulum_2.xml" />
-    <arg name="config" default="$(find mujoco_sim)/src/config/robot.yaml" />
+    <arg name="world_3" default="$(find mujoco_sim)/model/test/pendulum_3.xml" />
+    <arg name="asks_1" default="$(find mujoco_sim)/src/config/asks_1.yaml" />
+    <arg name="asks_2" default="$(find mujoco_sim)/src/config/asks_2.yaml" />
+    <arg name="asks_3" default="$(find mujoco_sim)/src/config/asks_3.yaml" />
 
     <group ns="sim_1">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
-            <rosparam command="load" file="$(arg config)" />
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7500 7600">
+            <rosparam command="load" file="$(arg asks_1)" />
             <param name="world" value="$(arg world_1)" />
             <param name="robot" type="str" value="$(arg robot)" />
         </node>
     </group>
 
     <group ns="sim_2">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen">
-            <rosparam command="load" file="$(arg config)" />
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7501 7601">
+            <rosparam command="load" file="$(arg asks_2)" />
             <param name="world" value="$(arg world_2)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+    <group ns="sim_3">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7502 7602">
+            <rosparam command="load" file="$(arg asks_3)" />
+            <param name="world" value="$(arg world_3)" />
             <param name="robot" type="str" value="$(arg robot)" />
         </node>
     </group>

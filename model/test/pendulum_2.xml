@@ -11,25 +11,38 @@
     </worldbody>
 
     <worldbody>
-        <body name="ball_2" pos="0 0 2">
-            <joint type="ball" />
-            <geom type="sphere" pos="-1 0 0" size=".1" rgba="0 .9 0 1" />
+        <body name="cube_2" pos="-0.5 0.866 2">
+            <joint type="ball" pos="0.5 -0.866 0" />
+            <geom type="box" size=".1 .1 .1" rgba="0 .9 0 1" />
         </body>
-        <body name="ball_1_ref" pos="0 0 2" mocap="true">
-            <geom type="sphere" pos="1 0 0" size=".1" rgba="0.5 0.5 0.5 1" />
+        <body name="cube_1_ref" pos="1 0 2" mocap="true">
+            <geom type="box" size=".1 .1 .1" rgba="0.5 0.5 0.5 1" />
         </body>
-        <body name="ball_1" pos="0 0 2">
+        <body name="cube_1" pos="1 0 2">
             <freejoint />
-            <geom type="sphere" pos="1 0 0" size=".1" rgba=".9 0 0 1" />
+            <geom type="box" size=".1 .1 .1" rgba=".9 0 0 1" />
+        </body>
+        <body name="cube_3_ref" pos="-0.5 -0.866 2" mocap="true">
+            <geom type="box" size=".1 .1 .1" rgba="0.5 0.5 0.5 1" />
+        </body>
+        <body name="cube_3" pos="-0.5 -0.866 2">
+            <freejoint />
+            <geom type="box" size=".1 .1 .1" rgba=".9 0 0 1" />
         </body>
     </worldbody>
 
     <equality>
-        <weld body1="ball_1" body2="ball_1_ref" />
+        <weld body1="cube_1" body2="cube_1_ref" torquescale="0.9" />
+        <weld body1="cube_3" body2="cube_3_ref" torquescale="0.9" />
     </equality>
 
     <contact>
-        <exclude body1="ball_1" body2="ball_1_ref" />
-        <exclude body1="ball_2" body2="ball_1_ref" />
+        <exclude body1="cube_1" body2="cube_1_ref" />
+        <exclude body1="cube_2" body2="cube_1_ref" />
+        <exclude body1="cube_3" body2="cube_1_ref" />
+        <exclude body1="cube_1" body2="cube_3_ref" />
+        <exclude body1="cube_2" body2="cube_3_ref" />
+        <exclude body1="cube_3" body2="cube_3_ref" />
+        <exclude body1="cube_1_ref" body2="cube_3_ref" />
     </contact>
 </mujoco>

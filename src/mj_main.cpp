@@ -24,6 +24,7 @@
 #endif
 #include "mj_hw_interface.h"
 #include "mj_ros.h"
+#include "mj_socket.h"
 
 #include <controller_manager/controller_manager.h>
 #include <thread>
@@ -169,17 +170,29 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "mujoco_sim");
     ros::NodeHandle n;
 
-    ROS_INFO("Get ROS parameters from server");
+    ROS_INFO("Get ROS parameters from the server...");
     MjRos::set_params();
 
-    ROS_INFO("Initializing MuJoCo simulator...");
+    ROS_INFO("Initializing the MuJoCo simulator...");
     mj_sim.init();
-    ROS_INFO("Initialize MuJoCo simulator successfully");
+    ROS_INFO("Initialized the MuJoCo simulator successfully.");
 
-    ROS_INFO("Initializing ROS interface...");
+    ROS_INFO("Initializing the ROS interface...");
+    MjSocket &mj_socket = MjSocket::get_instance();
     MjRos &mj_ros = MjRos::get_instance();
     mj_ros.init();
-    ROS_INFO("Initialize ROS interface successfully");
+    ROS_INFO("Initialized the ROS interface successfully.");
+
+    ROS_INFO("Initializing the socket connection...");
+    int port_header = 7500;
+    int port_data = 7600;
+    if (argc > 2)
+    {
+        port_header = std::stoi(argv[1]);
+        port_data = std::stoi(argv[2]);
+    }
+    mj_socket.init(port_header, port_data);
+    ROS_INFO("Initialized the socket connection with port (%d %d) successfully.", port_header, port_data);
 
 #ifdef VISUAL
     ROS_INFO("Initializing OpenGL...");
@@ -197,6 +210,9 @@ int main(int argc, char **argv)
     // start simulation thread
     std::thread sim_thread(simulate);
 
+    // start communication thread only if there are asked objects
+    std::thread socket_thread(&MjSocket::communicate, &mj_socket);
+    
     mjtNum sim_step_start = d->time;
 
 #ifdef VISUAL

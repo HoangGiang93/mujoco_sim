@@ -59,7 +59,7 @@ void MjVisual::init()
         mju_error("Could not initialize GLFW");
 
     // create window, make OpenGL context current, request v-sync
-    window = glfwCreateWindow(1244, 700, "Demo", NULL, NULL);
+    window = glfwCreateWindow(960, 600, "Demo", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -76,7 +76,7 @@ void MjVisual::init()
     glfwSetMouseButtonCallback(window, &MjVisual::mouse_button);
     glfwSetScrollCallback(window, &MjVisual::scroll);
 
-    double arr_view[] = {89.608063, -11.588379, 2, 0.000000, 0.000000, 0.000000};
+    double arr_view[] = {89.608063, -11.588379, 8, 0.000000, 0.000000, 0.000000};
     cam.azimuth = arr_view[0];
     cam.elevation = arr_view[1];
     cam.distance = arr_view[2];

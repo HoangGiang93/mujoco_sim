@@ -94,6 +94,7 @@ add_library(${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_ros.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_sim.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_socket.cpp
 )
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
@@ -103,6 +104,8 @@ target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   $ENV{ROS_ROOT}/../../lib/liburdf.so
   tinyxml2
+  zmq
+  jsoncpp
 )
 
 set(MUJOCO_SIM_NODE mujoco_sim_node)
@@ -119,8 +122,10 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   ${MUJOCO_SIM_NODE}_lib
   ${MUJOCO_SOURCE_DIR}/lib/libmujoco.so
   $ENV{ROS_ROOT}/../../lib/liburdf.so
-  glfw
   tinyxml2
+  zmq
+  jsoncpp
+  glfw
   GL
 )
 

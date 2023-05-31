@@ -20,6 +20,7 @@
 
 #include "mj_ros.h"
 #include "mj_util.cpp"
+#include "mj_socket.h"
 
 #include <condition_variable>
 #include <controller_manager_msgs/ControllerState.h>
@@ -29,6 +30,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <thread>
 #include <urdf/model.h>
+#include <numeric>
 
 using namespace std::chrono_literals;
 
@@ -563,6 +565,19 @@ void MjRos::init()
     sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
 
     reset_robot();
+
+    XmlRpc::XmlRpcValue asked_objects;
+    if (ros::param::get("~asks", asked_objects))
+    {
+        std::string log = "Set asked objects: ";
+        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &asked_object : asked_objects)
+        {
+            log += asked_object.first + " ";
+            MjSocket::asked_objects[asked_object.first] = {};
+            ros::param::get("~asks/" + asked_object.first, MjSocket::asked_objects[asked_object.first]);  
+        }
+        ROS_INFO("%s", log.c_str());
+    }
 }
 
 void MjRos::reset_robot()
