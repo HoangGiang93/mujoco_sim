@@ -185,10 +185,10 @@ static void init_tmp()
 {
 	ROS_INFO("Copying model in %s...", tmp_model_path.parent_path().c_str());
 	// Remove directory tmp_model_path if exist and tmp_model_path doesn't contain model_path
-	if (boost::filesystem::exists(tmp_model_path) && tmp_model_path.parent_path().compare(model_path.parent_path()) != 0)
-	{
-		boost::filesystem::remove_all(tmp_model_path);
-	}
+	// if (boost::filesystem::exists(tmp_model_path) && tmp_model_path.parent_path().compare(model_path.parent_path()) != 0)
+	// {
+	// 	boost::filesystem::remove_all(tmp_model_path);
+	// }
 
 	// Create directory tmp_model_path if not exist
 	if (!boost::filesystem::exists(tmp_model_path))

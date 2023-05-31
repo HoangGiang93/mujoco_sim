@@ -129,5 +129,12 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   GL
 )
 
+add_executable(state_server_node src/state_server.cpp)
+target_link_libraries(state_server_node
+  ${catkin_LIBRARIES}
+  zmq
+  jsoncpp
+)
+
 catkin_install_python(PROGRAMS script/mujoco_to_usd.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
