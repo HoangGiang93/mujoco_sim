@@ -8,7 +8,7 @@
     <arg name="subscribed_objects_2" default="$(find mujoco_sim)/src/config/subscribed_objects_2.yaml" />
     <arg name="subscribed_objects_3" default="$(find mujoco_sim)/src/config/subscribed_objects_3.yaml" />
 
-    <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen"/>
+    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen"/> -->
 
     <group ns="sim_1">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7500 7600">

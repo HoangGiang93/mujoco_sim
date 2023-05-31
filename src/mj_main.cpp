@@ -238,6 +238,7 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
+    socket_thread.join();
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);

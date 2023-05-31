@@ -104,8 +104,6 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         }
     }
 
-
-
     zmq::socket_t socket_data{context, zmq::socket_type::rep};
     socket_data.bind("tcp://127.0.0.1:" + std::to_string(7600 + thread_num));
 
@@ -115,7 +113,7 @@ void worker(const size_t thread_num, const Json::Value &json_header)
     const size_t subscribed_data_size = 1 + subscribed_object_data_vec.size();
     double subscribed_buffer[subscribed_data_size];
 
-    while (true) 
+    while (ros::ok()) 
     {
         zmq::message_t request(sizeof(published_buffer));
         socket_data.recv(request);
@@ -137,6 +135,8 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         memcpy(reply.data(), &subscribed_buffer, sizeof(subscribed_buffer));
         socket_data.send(reply, zmq::send_flags::none);
     }
+
+    socket_data.close();
 }
 
 int main(int argc, char **argv) 
