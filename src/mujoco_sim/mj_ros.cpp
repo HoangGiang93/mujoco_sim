@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 #include "mj_ros.h"
-#include "mj_util.cpp"
+#include "mj_util.h"
 #include "mj_socket.h"
 
 #include <condition_variable>
@@ -565,19 +565,6 @@ void MjRos::init()
     sensors_pub = n.advertise<geometry_msgs::Vector3Stamped>("/mujoco/sensors_3D", 0);
 
     reset_robot();
-
-    XmlRpc::XmlRpcValue subscribed_objects;
-    if (ros::param::get("~subscribed_objects", subscribed_objects))
-    {
-        std::string log = "Set subscribed objects: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &subscribed_object : subscribed_objects)
-        {
-            log += subscribed_object.first + " ";
-            MjSocket::subscribed_objects[subscribed_object.first] = {};
-            ros::param::get("~subscribed_objects/" + subscribed_object.first, MjSocket::subscribed_objects[subscribed_object.first]);  
-        }
-        ROS_INFO("%s", log.c_str());
-    }
 }
 
 void MjRos::reset_robot()

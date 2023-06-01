@@ -1,0 +1,3 @@
+publishers:
+  body: [position, quaternion]
+  joint: [position]

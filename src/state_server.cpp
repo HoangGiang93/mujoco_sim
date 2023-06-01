@@ -25,92 +25,75 @@
 #include <iostream>
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/reader.h>
-#include <map>
 #include <thread>
 #include <mutex>
 
 #include <zmq.hpp>
 
+#include "state_msgs.cpp"
+
 using namespace std::chrono_literals;
+
+int port_header = 7500;
+int port_data = 7600;
 
 zmq::context_t context{1};
 
 std::mutex mtx;
 
-struct attribute
-{
-    double position[3] = {0.0, 0.0, 0.0};
-    double quaternion[4] = {0.0, 0.0, 0.0, 1.0};
-};
-
-std::map<std::string, attribute> published_object_data;
-
+std::map<std::string, std::map<std::string, std::vector<double>>> publisher_data;
 
 void worker(const size_t thread_num, const Json::Value &json_header)
 {
-    Json::Value published_objects = json_header["published_objects"];
+    Json::Value publishers = json_header["publishers"];
 
-    std::vector<double*> published_object_data_vec;
+    std::vector<double*> published_data_vec;
     mtx.lock();
-    for (auto it = published_objects.begin(); it != published_objects.end(); ++it)
+    for (auto it = publishers.begin(); it != publishers.end(); ++it)
     {
         const std::string object_name = it.key().asString();
-        published_object_data[object_name] = attribute();
+        publisher_data[object_name] = {};
         for (const auto& attr : *it)
         {
-            if (attr.asString() == "position")
+            const std::string attribute_name = attr.asString();
+            publisher_data[object_name][attribute_name] = attribute_map[attribute_name];
+            for (double &value : publisher_data[object_name][attribute_name])
             {
-                published_object_data_vec.push_back(&published_object_data[object_name].position[0]);
-                published_object_data_vec.push_back(&published_object_data[object_name].position[1]);
-                published_object_data_vec.push_back(&published_object_data[object_name].position[2]);
-            }
-            else if (attr.asString() == "quaternion")
-            {
-                published_object_data_vec.push_back(&published_object_data[object_name].quaternion[0]);
-                published_object_data_vec.push_back(&published_object_data[object_name].quaternion[1]);
-                published_object_data_vec.push_back(&published_object_data[object_name].quaternion[2]);
-                published_object_data_vec.push_back(&published_object_data[object_name].quaternion[3]);
+                published_data_vec.push_back(&value);
             }
         }
     }
     mtx.unlock();
 
-    Json::Value subscribed_objects = json_header["subscribed_objects"];
-    std::vector<double*> subscribed_object_data_vec;
+    Json::Value subscribers = json_header["subscribers"];
+    std::vector<double*> subscribed_data_vec;
     
-    for (auto it = subscribed_objects.begin(); it != subscribed_objects.end(); ++it)
+    for (auto it = subscribers.begin(); it != subscribers.end(); ++it)
     {
         const std::string object_name = it.key().asString();
-        while (published_object_data.count(object_name) == 0)
+        while (publisher_data.count(object_name) == 0)
         {
-            // std::cout << "Wait for " << object_name << std::endl;
+            zmq_sleep(0.1);
         }
         
         for (const auto& attr : *it)
         {
-            if (attr.asString() == "position")
+            const std::string attribute_name = attr.asString();
+            for (double &value : publisher_data[object_name][attribute_name])
             {
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].position[0]);
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].position[1]);
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].position[2]);
-            }
-            else if (attr.asString() == "quaternion")
-            {
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].quaternion[0]);
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].quaternion[1]);
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].quaternion[2]);
-                subscribed_object_data_vec.push_back(&published_object_data[object_name].quaternion[3]);
+                subscribed_data_vec.push_back(&value);
             }
         }
     }
 
     zmq::socket_t socket_data{context, zmq::socket_type::rep};
-    socket_data.bind("tcp://127.0.0.1:" + std::to_string(7600 + thread_num));
+    const std::string addr = "tcp://127.0.0.1:" + std::to_string(port_data + thread_num);
+    socket_data.bind(addr);
 
-    const size_t published_data_size = 1 + published_object_data_vec.size();
+    const size_t published_data_size = 1 + published_data_vec.size();
     double published_buffer[published_data_size];
 
-    const size_t subscribed_data_size = 1 + subscribed_object_data_vec.size();
+    const size_t subscribed_data_size = 1 + subscribed_data_vec.size();
     double subscribed_buffer[subscribed_data_size];
 
     while (ros::ok()) 
@@ -121,14 +104,14 @@ void worker(const size_t thread_num, const Json::Value &json_header)
 
         for (size_t i = 0; i < published_data_size - 1; i++)
         {
-            *published_object_data_vec[i] = published_buffer[i+1];
+            *published_data_vec[i] = published_buffer[i+1];
         }
 
         subscribed_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
         for (size_t i = 1; i < subscribed_data_size; i++)
         {
-            subscribed_buffer[i] = *subscribed_object_data_vec[i-1];
+            subscribed_buffer[i] = *subscribed_data_vec[i-1];
         }
         
         zmq::message_t reply(sizeof(subscribed_buffer));
@@ -136,12 +119,18 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         socket_data.send(reply, zmq::send_flags::none);
     }
 
-    socket_data.close();
+    socket_data.unbind(addr);
 }
 
 int main(int argc, char **argv) 
 {
     ros::init(argc, argv, "state_server");
+
+    if (argc > 2)
+    {
+        port_header = std::stoi(argv[1]);
+        port_data = std::stoi(argv[2]);
+    }
 
     std::vector<zmq::socket_t> socket_headers;
     std::vector<std::thread> workers;
@@ -149,7 +138,7 @@ int main(int argc, char **argv)
     for (size_t i = 0;; i++)
     {
         socket_headers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
-        socket_headers[i].bind("tcp://127.0.0.1:" + std::to_string(7500 + i));
+        socket_headers[i].bind("tcp://127.0.0.1:" + std::to_string(port_header + i));
         
         zmq::message_t reply_header;
         socket_headers[i].recv(reply_header);

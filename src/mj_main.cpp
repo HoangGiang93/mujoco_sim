@@ -178,12 +178,11 @@ int main(int argc, char **argv)
     ROS_INFO("Initialized the MuJoCo simulator successfully.");
 
     ROS_INFO("Initializing the ROS interface...");
-    MjSocket &mj_socket = MjSocket::get_instance();
     MjRos &mj_ros = MjRos::get_instance();
     mj_ros.init();
     ROS_INFO("Initialized the ROS interface successfully.");
 
-    ROS_INFO("Initializing the socket connection...");
+    MjSocket &mj_socket = MjSocket::get_instance();
     int port_header = 7500;
     int port_data = 7600;
     if (argc > 2)
@@ -192,7 +191,6 @@ int main(int argc, char **argv)
         port_data = std::stoi(argv[2]);
     }
     mj_socket.init(port_header, port_data);
-    ROS_INFO("Initialized the socket connection with port (%d %d) successfully.", port_header, port_data);
 
 #ifdef VISUAL
     ROS_INFO("Initializing OpenGL...");
@@ -211,8 +209,11 @@ int main(int argc, char **argv)
     std::thread sim_thread(simulate);
 
     // start communication thread only if there are asked objects
-    std::thread socket_thread(&MjSocket::communicate, &mj_socket);
-    
+    std::thread socket_thread;
+    if (MjSocket::publishers.size() > 0 || MjSocket::subscribers.size() > 0)
+    {
+        socket_thread = std::thread(&MjSocket::communicate, &mj_socket);
+    }
     mjtNum sim_step_start = d->time;
 
 #ifdef VISUAL
@@ -238,7 +239,10 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
-    socket_thread.join();
+    if (MjSocket::publishers.size() > 0 || MjSocket::subscribers.size() > 0)
+    {
+        socket_thread.join();
+    }
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);
