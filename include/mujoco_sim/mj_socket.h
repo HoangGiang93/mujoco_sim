@@ -69,7 +69,7 @@ public:
 private:
     zmq::context_t context;
 
-    std::string ip_addr = "tcp://127.0.0.1";
+    std::string host = "tcp://127.0.0.1";
 
     zmq::socket_t socket_header;
 

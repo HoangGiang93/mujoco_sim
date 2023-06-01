@@ -132,13 +132,15 @@ int main(int argc, char **argv)
         port_data = std::stoi(argv[2]);
     }
 
+    std::vector<std::string> socket_addrs;
     std::vector<zmq::socket_t> socket_headers;
     std::vector<std::thread> workers;
 
     for (size_t i = 0;; i++)
     {
         socket_headers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
-        socket_headers[i].bind("tcp://127.0.0.1:" + std::to_string(port_header + i));
+        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port_header + i));
+        socket_headers[i].bind(socket_addrs[i]);
         
         zmq::message_t reply_header;
         socket_headers[i].recv(reply_header);
@@ -154,6 +156,11 @@ int main(int argc, char **argv)
     for (std::thread& worker : workers) 
     {
         worker.join();
+    }
+
+    for (size_t i = 0; i < socket_addrs.size(); i++) 
+    {
+        socket_headers[i].unbind(socket_addrs[i]);
     }
 
     return 0;

@@ -34,9 +34,13 @@ std::map<std::string, std::vector<std::string>> MjSocket::subscribers;
 int length_published_data = 1;
 int length_subscribed_data = 1;
 
+std::string socket_header_addr;
+std::string socket_data_addr;
+
 MjSocket::~MjSocket()
 {
-	
+	socket_header.disconnect(socket_header_addr);
+	socket_data.disconnect(socket_data_addr);
 }
 
 void MjSocket::init(const int port_header, const int port_data)
@@ -102,10 +106,12 @@ void MjSocket::init(const int port_header, const int port_data)
 		context = zmq::context_t{1};
 
 		socket_header = zmq::socket_t{context, zmq::socket_type::req};
-		socket_header.connect(ip_addr + ":" + std::to_string(port_header));
+		socket_header_addr = host + ":" + std::to_string(port_header);
+		socket_header.connect(socket_header_addr);
 
 		socket_data = zmq::socket_t{context, zmq::socket_type::req};
-		socket_data.connect(ip_addr + ":" + std::to_string(port_data));
+		socket_data_addr = host + ":" + std::to_string(port_data);
+		socket_data.connect(socket_data_addr);
 
 		send_header();
 		ROS_INFO("Initialized the socket connection with port (%d %d) successfully.", port_header, port_data);
@@ -154,7 +160,7 @@ void MjSocket::send_header()
 
 void MjSocket::communicate()
 {
-	ROS_INFO("Start communication with a publisher of length %d and a subscriber of length %d", length_published_data, length_subscribed_data);
+	ROS_INFO("Start communication on %s with a publisher of length %d and a subscriber of length %d", socket_data_addr.c_str(), length_published_data, length_subscribed_data);
 	double published_data[length_published_data];
 	double subscribed_data[length_subscribed_data];
 	while (ros::ok())
