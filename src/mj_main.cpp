@@ -211,7 +211,7 @@ int main(int argc, char **argv)
 
     // start communication thread only if there are asked objects
     std::thread socket_thread;
-    if (MjSocket::publishers.size() > 0 || MjSocket::subscribers.size() > 0)
+    if (MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0)
     {
         socket_thread = std::thread(&MjSocket::communicate, &mj_socket);
     }
@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
-    if (MjSocket::publishers.size() > 0 || MjSocket::subscribers.size() > 0)
+    if (MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0)
     {
         socket_thread.join();
     }

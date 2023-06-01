@@ -41,37 +41,37 @@ zmq::context_t context{1};
 
 std::mutex mtx;
 
-std::map<std::string, std::map<std::string, std::vector<double>>> publisher_data;
+std::map<std::string, std::map<std::string, std::vector<double>>> send_objects;
 
 void worker(const size_t thread_num, const Json::Value &json_header)
 {
-    Json::Value publishers = json_header["publishers"];
+    Json::Value send_objects_json = json_header["send"];
 
-    std::vector<double*> published_data_vec;
+    std::vector<double*> send_data_vec;
     mtx.lock();
-    for (auto it = publishers.begin(); it != publishers.end(); ++it)
+    for (auto it = send_objects_json.begin(); it != send_objects_json.end(); ++it)
     {
         const std::string object_name = it.key().asString();
-        publisher_data[object_name] = {};
+        send_objects[object_name] = {};
         for (const auto& attr : *it)
         {
             const std::string attribute_name = attr.asString();
-            publisher_data[object_name][attribute_name] = attribute_map[attribute_name];
-            for (double &value : publisher_data[object_name][attribute_name])
+            send_objects[object_name][attribute_name] = attribute_map[attribute_name];
+            for (double &value : send_objects[object_name][attribute_name])
             {
-                published_data_vec.push_back(&value);
+                send_data_vec.push_back(&value);
             }
         }
     }
     mtx.unlock();
 
-    Json::Value subscribers = json_header["subscribers"];
-    std::vector<double*> subscribed_data_vec;
+    Json::Value receive_objects_json = json_header["receive"];
+    std::vector<double*> receive_data_vec;
     
-    for (auto it = subscribers.begin(); it != subscribers.end(); ++it)
+    for (auto it = receive_objects_json.begin(); it != receive_objects_json.end(); ++it)
     {
         const std::string object_name = it.key().asString();
-        while (publisher_data.count(object_name) == 0)
+        while (send_objects.count(object_name) == 0)
         {
             zmq_sleep(0.1);
         }
@@ -79,9 +79,9 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         for (const auto& attr : *it)
         {
             const std::string attribute_name = attr.asString();
-            for (double &value : publisher_data[object_name][attribute_name])
+            for (double &value : send_objects[object_name][attribute_name])
             {
-                subscribed_data_vec.push_back(&value);
+                receive_data_vec.push_back(&value);
             }
         }
     }
@@ -90,32 +90,32 @@ void worker(const size_t thread_num, const Json::Value &json_header)
     const std::string addr = "tcp://127.0.0.1:" + std::to_string(port_data + thread_num);
     socket_data.bind(addr);
 
-    const size_t published_data_size = 1 + published_data_vec.size();
-    double published_buffer[published_data_size];
+    const size_t send_data_size = 1 + send_data_vec.size();
+    double send_buffer[send_data_size];
 
-    const size_t subscribed_data_size = 1 + subscribed_data_vec.size();
-    double subscribed_buffer[subscribed_data_size];
+    const size_t receive_data_size = 1 + receive_data_vec.size();
+    double receive_buffer[receive_data_size];
 
     while (ros::ok()) 
     {
-        zmq::message_t request(sizeof(published_buffer));
+        zmq::message_t request(sizeof(send_buffer));
         socket_data.recv(request);
-        memcpy(&published_buffer, request.data(), sizeof(published_buffer));
+        memcpy(&send_buffer, request.data(), sizeof(send_buffer));
 
-        for (size_t i = 0; i < published_data_size - 1; i++)
+        for (size_t i = 0; i < send_data_size - 1; i++)
         {
-            *published_data_vec[i] = published_buffer[i+1];
+            *send_data_vec[i] = send_buffer[i+1];
         }
 
-        subscribed_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        receive_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
-        for (size_t i = 1; i < subscribed_data_size; i++)
+        for (size_t i = 1; i < receive_data_size; i++)
         {
-            subscribed_buffer[i] = *subscribed_data_vec[i-1];
+            receive_buffer[i] = *receive_data_vec[i-1];
         }
         
-        zmq::message_t reply(sizeof(subscribed_buffer));
-        memcpy(reply.data(), &subscribed_buffer, sizeof(subscribed_buffer));
+        zmq::message_t reply(sizeof(receive_buffer));
+        memcpy(reply.data(), &receive_buffer, sizeof(receive_buffer));
         socket_data.send(reply, zmq::send_flags::none);
     }
 

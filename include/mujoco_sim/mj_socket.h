@@ -58,13 +58,13 @@ public:
     void communicate();
 
 public:
-    std::vector<int> publisher_ids;
+    std::vector<int> send_object_ids;
 
-    std::vector<int> subscriber_ids;
+    std::vector<int> receive_object_ids;
 
-    static std::map<std::string, std::vector<std::string>> publishers;
+    static std::map<std::string, std::vector<std::string>> send_objects;
 
-    static std::map<std::string, std::vector<std::string>> subscribers;
+    static std::map<std::string, std::vector<std::string>> receive_objects;
 
 private:
     zmq::context_t context;

@@ -27,12 +27,12 @@
 
 #include "../state_msgs.cpp"
 
-std::map<std::string, std::vector<std::string>> MjSocket::publishers;
+std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
-std::map<std::string, std::vector<std::string>> MjSocket::subscribers;
+std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
-int length_published_data = 1;
-int length_subscribed_data = 1;
+int length_send_data = 1;
+int length_receive_data = 1;
 
 std::string socket_header_addr;
 std::string socket_data_addr;
@@ -45,52 +45,52 @@ MjSocket::~MjSocket()
 
 void MjSocket::init(const int port_header, const int port_data)
 {
-	XmlRpc::XmlRpcValue subscriber_params;
-    if (ros::param::get("~subscribers", subscriber_params))
+	XmlRpc::XmlRpcValue receive_object_params;
+    if (ros::param::get("~receive", receive_object_params))
     {
-        std::string log = "Set subscribers: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &subscriber_param : subscriber_params)
+        std::string log = "Set receive_objects: ";
+        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &receive_object_param : receive_object_params)
         {
-            log += subscriber_param.first + " ";
-            subscribers[subscriber_param.first] = {};
-            ros::param::get("~subscribers/" + subscriber_param.first, subscribers[subscriber_param.first]);
+            log += receive_object_param.first + " ";
+            receive_objects[receive_object_param.first] = {};
+            ros::param::get("~receive/" + receive_object_param.first, receive_objects[receive_object_param.first]);
         }
         ROS_INFO("%s", log.c_str());
     }
 
-    XmlRpc::XmlRpcValue publisher_params;
-    if (ros::param::get("~publishers", publisher_params))
+    XmlRpc::XmlRpcValue send_object_params;
+    if (ros::param::get("~send", send_object_params))
     {
-        std::string log = "Set publishers: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &publisher_param : publisher_params)
+        std::string log = "Set send_objects: ";
+        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &send_object_param : send_object_params)
         {
 
-            std::vector<std::string> published_data;
-            if (ros::param::get("~publishers/" + publisher_param.first, published_data))
+            std::vector<std::string> send_data;
+            if (ros::param::get("~send/" + send_object_param.first, send_data))
             {
-                if (publisher_param.first == "body")
+                if (send_object_param.first == "body")
                 {
                     for (int body_id = 0; body_id < m->nbody; body_id++)
                     {
                         const char* body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-                        if (subscribers.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
+                        if (receive_objects.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
                         {
                             log += std::string(body_name) + " ";
-                            publishers[body_name] = published_data;
+                            send_objects[body_name] = send_data;
                         }
                     }
                 }
-                else if (publisher_param.first == "joint_1D")
+                else if (send_object_param.first == "joint_1D")
                 {
                     for (int joint_id = 0; joint_id < m->njnt; joint_id++)
                     {
                         if (m->jnt_type[joint_id] == mjtJoint::mjJNT_HINGE || m->jnt_type[joint_id] == mjtJoint::mjJNT_SLIDE)
                         {
                             const char* joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
-                            if (subscribers.count(joint_name) == 0)
+                            if (receive_objects.count(joint_name) == 0)
                             {
                                 log += std::string(joint_name) + " ";
-                                publishers[joint_name] = published_data;
+                                send_objects[joint_name] = send_data;
                             }
                         }
                     }
@@ -100,7 +100,7 @@ void MjSocket::init(const int port_header, const int port_data)
         ROS_INFO("%s", log.c_str());
     }
 	
-	if (publishers.size() > 0 || subscribers.size() > 0)
+	if (send_objects.size() > 0 || receive_objects.size() > 0)
 	{
 		ROS_INFO("Initializing the socket connection...");
 		context = zmq::context_t{1};
@@ -125,28 +125,28 @@ void MjSocket::send_header()
 	header_json["time"] = "microseconds";
 	header_json["simulator"] = "mujoco";
 
-	length_published_data = 1;
-	length_subscribed_data = 1;
+	length_send_data = 1;
+	length_receive_data = 1;
 
-	for (const std::pair<std::string, std::vector<std::string>>& publisher : publishers)
+	for (const std::pair<std::string, std::vector<std::string>>& send_object : send_objects)
 	{
-		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, publisher.first.c_str());
-		publisher_ids.push_back(body_id);
-		for (const std::string &publisher_data : publisher.second)
+		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
+		send_object_ids.push_back(body_id);
+		for (const std::string &send_data : send_object.second)
 		{
-			header_json["publishers"][publisher.first].append(publisher_data);
-			length_published_data += attribute_map[publisher_data].size();
+			header_json["send"][send_object.first].append(send_data);
+			length_send_data += attribute_map[send_data].size();
 		}
 	}
 
-	for (const std::pair<std::string, std::vector<std::string>>& subscriber : subscribers)
+	for (const std::pair<std::string, std::vector<std::string>>& receive_object : receive_objects)
 	{
-		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, subscriber.first.c_str());
-		subscriber_ids.push_back(m->body_mocapid[mj_name2id(m, mjtObj::mjOBJ_BODY, (subscriber.first + "_ref").c_str())]);
-		for (const std::string &subscriber_data : subscriber.second)
+		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, receive_object.first.c_str());
+		receive_object_ids.push_back(m->body_mocapid[mj_name2id(m, mjtObj::mjOBJ_BODY, (receive_object.first + "_ref").c_str())]);
+		for (const std::string &receive_data : receive_object.second)
 		{
-			header_json["subscribers"][subscriber.first].append(subscriber_data);
-			length_subscribed_data += attribute_map[subscriber_data].size();
+			header_json["receive"][receive_object.first].append(receive_data);
+			length_receive_data += attribute_map[receive_data].size();
 		}
 	}
 
@@ -160,42 +160,42 @@ void MjSocket::send_header()
 
 void MjSocket::communicate()
 {
-	ROS_INFO("Start communication on %s with a publisher of length %d and a subscriber of length %d", socket_data_addr.c_str(), length_published_data, length_subscribed_data);
-	double published_data[length_published_data];
-	double subscribed_data[length_subscribed_data];
+	ROS_INFO("Start communication on %s with a send_object of length %d and a receive_object of length %d", socket_data_addr.c_str(), length_send_data, length_receive_data);
+	double send_data[length_send_data];
+	double receive_data[length_receive_data];
 	while (ros::ok())
 	{
-		published_data[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+		send_data[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 		int i = 1;
-		for (const int body_id : publisher_ids)
+		for (const int body_id : send_object_ids)
 		{
-			published_data[i] = d->xpos[3 * body_id];
-			published_data[i + 1] = d->xpos[3 * body_id + 1];
-			published_data[i + 2] = d->xpos[3 * body_id + 2];
-			published_data[i + 3] = d->xquat[4 * body_id];
-			published_data[i + 4] = d->xquat[4 * body_id + 1];
-			published_data[i + 5] = d->xquat[4 * body_id + 2];
-			published_data[i + 6] = d->xquat[4 * body_id + 3];
+			send_data[i] = d->xpos[3 * body_id];
+			send_data[i + 1] = d->xpos[3 * body_id + 1];
+			send_data[i + 2] = d->xpos[3 * body_id + 2];
+			send_data[i + 3] = d->xquat[4 * body_id];
+			send_data[i + 4] = d->xquat[4 * body_id + 1];
+			send_data[i + 5] = d->xquat[4 * body_id + 2];
+			send_data[i + 6] = d->xquat[4 * body_id + 3];
 			i += 7;
 		}
 		
-		zmq::message_t request(sizeof(published_data));
-		memcpy(request.data(), &published_data, sizeof(published_data));
+		zmq::message_t request(sizeof(send_data));
+		memcpy(request.data(), &send_data, sizeof(send_data));
 		socket_data.send(request, zmq::send_flags::none);
 		
-		zmq::message_t reply(sizeof(subscribed_data));
+		zmq::message_t reply(sizeof(receive_data));
 		socket_data.recv(reply);
-		memcpy(&subscribed_data, reply.data(), sizeof(subscribed_data));
+		memcpy(&receive_data, reply.data(), sizeof(receive_data));
 		i = 1;		
-		for (const int mocap_id : subscriber_ids)
+		for (const int mocap_id : receive_object_ids)
 		{
-			d->mocap_pos[3 * mocap_id] = subscribed_data[i];
-			d->mocap_pos[3 * mocap_id + 1] = subscribed_data[i + 1];
-			d->mocap_pos[3 * mocap_id + 2] = subscribed_data[i + 2];
-			d->mocap_quat[4 * mocap_id] = subscribed_data[i + 3];
-			d->mocap_quat[4 * mocap_id + 1] = subscribed_data[i + 4];
-			d->mocap_quat[4 * mocap_id + 2] = subscribed_data[i + 5];
-			d->mocap_quat[4 * mocap_id + 3] = subscribed_data[i + 6];
+			d->mocap_pos[3 * mocap_id] = receive_data[i];
+			d->mocap_pos[3 * mocap_id + 1] = receive_data[i + 1];
+			d->mocap_pos[3 * mocap_id + 2] = receive_data[i + 2];
+			d->mocap_quat[4 * mocap_id] = receive_data[i + 3];
+			d->mocap_quat[4 * mocap_id + 1] = receive_data[i + 4];
+			d->mocap_quat[4 * mocap_id + 2] = receive_data[i + 5];
+			d->mocap_quat[4 * mocap_id + 3] = receive_data[i + 6];
 			i += 7;
 		}
 	}

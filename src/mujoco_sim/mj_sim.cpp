@@ -842,8 +842,8 @@ bool load_tmp_model(bool reset)
 
 static void init_references()
 {
-	XmlRpc::XmlRpcValue subscriber_params;
-	if (ros::param::get("~subscribers", subscriber_params))
+	XmlRpc::XmlRpcValue receive_params;
+	if (ros::param::get("~receive", receive_params))
 	{
 		tinyxml2::XMLDocument xml_doc;
 		if (!load_XML(xml_doc, tmp_model_path.c_str()))
@@ -864,11 +864,11 @@ static void init_references()
 		tinyxml2::XMLElement *worldbody_element = xml_doc.NewElement("worldbody");
 		mujoco_element->LinkEndChild(worldbody_element);
 
-		for (const std::pair<std::string, XmlRpc::XmlRpcValue> &subscriber_param : subscriber_params)
+		for (const std::pair<std::string, XmlRpc::XmlRpcValue> &receive_param : receive_params)
 		{
 			
-			const std::string body_name = subscriber_param.first;
-			const std::string ref_body_name = subscriber_param.first + "_ref";
+			const std::string body_name = receive_param.first;
+			const std::string ref_body_name = receive_param.first + "_ref";
 			
 			const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name.c_str());
 			const int ref_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, ref_body_name.c_str());
