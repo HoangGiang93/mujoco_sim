@@ -218,12 +218,12 @@ void MjRos::set_params()
         if (model_path_path.extension() == ".urdf")
         {
             model_path = model_path.parent_path() / (model_path_path.stem().string() + ".xml");
-            tmp_model_name = "current_" + model_path.filename().string();
+            tmp_model_name = "current_" + std::to_string(ros::Time::now().toBoost().time_of_day().total_microseconds()) + "_" + model_path.filename().string();
         }
         else
         {
             model_path = model_path_string;
-            tmp_model_name = "current_" + model_path.filename().string();
+            tmp_model_name = "current_" + std::to_string(ros::Time::now().toBoost().time_of_day().total_microseconds()) + "_" + model_path.filename().string();
         }
     }
 
@@ -262,7 +262,7 @@ void MjRos::set_params()
         {
             ROS_WARN("Robot names not found in urdf, searching for robot names from mjcf...");
             tinyxml2::XMLDocument cache_model_xml_doc;
-            if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
+            if (!load_XML(cache_model_xml_doc, model_path.c_str()))
             {
                 ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
             }
@@ -970,7 +970,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
                 }
 
                 tinyxml2::XMLDocument mesh_xml_doc;
-                if (load_XML(mesh_xml_doc, object_mesh_path.c_str()) != tinyxml2::XML_SUCCESS)
+                if (!load_XML(mesh_xml_doc, object_mesh_path.c_str()))
                 {
                     ROS_WARN("Failed to load file \"%s\"\n", object_mesh_path.c_str());
                     continue;
@@ -1371,7 +1371,7 @@ void MjRos::spawn_objects(const std::vector<mujoco_msgs::ObjectStatus> objects)
         worldbody_element->LinkEndChild(body_element);
     }
 
-    if (save_XML(object_xml_doc, (tmp_model_path.parent_path() / "add.xml").c_str()) != tinyxml2::XML_SUCCESS)
+    if (!save_XML(object_xml_doc, (tmp_model_path.parent_path() / "add.xml").c_str()))
     {
         ROS_WARN("Failed to save file \"%s\"\n", (tmp_model_path.parent_path() / "add.xml").c_str());
         spawn_success = false;

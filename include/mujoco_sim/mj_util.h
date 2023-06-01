@@ -4,6 +4,7 @@
 #include <sstream>
 #include <tinyxml2.h>
 #include <functional>
+#include <ros/ros.h>
 
 #ifndef TIMEOUT
 #define TIMEOUT 500000 // microsecond
@@ -162,10 +163,14 @@ template <typename T>
 static bool manage_XML(T &arg, const char *path, std::function<bool(T &arg, const char *)> func)
 {
 	auto start = std::chrono::high_resolution_clock::now();
-	bool success = func(arg, path);
-	auto stop = std::chrono::high_resolution_clock::now();
 
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	bool success = func(arg, path);
+	std::chrono::microseconds duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+	while (!success && duration.count() / 1000000.0 < 1.0)
+	{
+		success = func(arg, path);
+		duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+	}
 
 	std::ostringstream oss;
 	if (duration.count() > TIMEOUT)
@@ -190,7 +195,7 @@ static bool load_XML(mjModel *&m, const char *path)
 static bool load_XML(tinyxml2::XMLDocument &doc, const char *path)
 {
 	std::function<bool(tinyxml2::XMLDocument &, const char *)> load_XML_cb = [](tinyxml2::XMLDocument &doc, const char *path)
-	{ return doc.LoadFile(path) != tinyxml2::XML_SUCCESS; };
+	{ return doc.LoadFile(path) == tinyxml2::XML_SUCCESS; };
 	return manage_XML(doc, path, load_XML_cb);
 }
 
@@ -206,6 +211,6 @@ static bool save_XML(mjModel *&m, const char *path)
 static bool save_XML(tinyxml2::XMLDocument &doc, const char *path)
 {
 	std::function<bool(tinyxml2::XMLDocument &, const char *)> save_XML_cb = [](tinyxml2::XMLDocument &doc, const char *path)
-	{ return doc.SaveFile(path) != tinyxml2::XML_SUCCESS; };
+	{ return doc.SaveFile(path) == tinyxml2::XML_SUCCESS; };
 	return manage_XML(doc, path, save_XML_cb);
 }

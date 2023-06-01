@@ -189,13 +189,13 @@ void add_mujoco_tags(const boost::filesystem::path &model_path)
         }
     }
 
-    doc.SaveFile(model_path.c_str());
+    save_XML(doc, model_path.c_str());
 }
 
 void add_robot_body(const boost::filesystem::path &model_path)
 {
     tinyxml2::XMLDocument model_xml_doc;
-    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    if (!load_XML(model_xml_doc, model_path.c_str()))
     {
         mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
@@ -213,13 +213,13 @@ void add_robot_body(const boost::filesystem::path &model_path)
         worldbody_element->LinkEndChild(robot_element);
     }
 
-    model_xml_doc.SaveFile(model_path.c_str());
+    save_XML(model_xml_doc, model_path.c_str());
 }
 
 void add_mimic_joints(const boost::filesystem::path &model_path)
 {
     tinyxml2::XMLDocument model_xml_doc;
-    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    if (!load_XML(model_xml_doc, model_path.c_str()))
     {
         mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
@@ -244,13 +244,13 @@ void add_mimic_joints(const boost::filesystem::path &model_path)
         }
     }
 
-    model_xml_doc.SaveFile(model_path.c_str());
+    save_XML(model_xml_doc, model_path.c_str());
 }
 
 void disable_parent_child_collision(const boost::filesystem::path &model_path, const int disable_parent_child_collision_level)
 {
     tinyxml2::XMLDocument model_xml_doc;
-    if (model_xml_doc.LoadFile(model_path.c_str()) != tinyxml2::XML_SUCCESS)
+    if (!load_XML(model_xml_doc, model_path.c_str()))
     {
         mju_warning("Failed to load file \"%s\"\n", model_path.c_str());
         return;
@@ -310,7 +310,7 @@ void disable_parent_child_collision(const boost::filesystem::path &model_path, c
         }
     }
 
-    model_xml_doc.SaveFile(model_path.c_str());
+    save_XML(model_xml_doc, model_path.c_str());
 }
 
 // modify input file

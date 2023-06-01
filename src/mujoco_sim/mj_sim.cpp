@@ -69,7 +69,7 @@ MjSim::~MjSim()
 static void set_joint_names()
 {
 	tinyxml2::XMLDocument cache_model_xml_doc;
-	if (load_XML(cache_model_xml_doc, model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(cache_model_xml_doc, model_path.c_str()))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", model_path.c_str());
 		return;
@@ -227,7 +227,7 @@ static void init_tmp()
 	// Add world to tmp_model_path
 	tmp_model_path /= tmp_model_name;
 	tinyxml2::XMLDocument current_xml_doc;
-	if (load_XML(current_xml_doc, world_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(current_xml_doc, world_path.c_str()))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", world_path.c_str());
 		return;
@@ -264,7 +264,7 @@ static void init_tmp()
 	save_XML(current_xml_doc, tmp_model_path.c_str());
 
 	tinyxml2::XMLDocument cache_model_xml_doc;
-	if (load_XML(cache_model_xml_doc, cache_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(cache_model_xml_doc, cache_model_path.c_str()))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", cache_model_path.c_str());
 		return;
@@ -569,7 +569,7 @@ static void init_malloc()
 static void modify_xml(const char *xml_path, const std::set<std::string> &remove_body_names = {""})
 {
 	tinyxml2::XMLDocument doc;
-	if (load_XML(doc, xml_path) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(doc, xml_path))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", xml_path);
 		return;
@@ -712,7 +712,7 @@ bool save_geom_quat(const char *path)
 {
 	mtx.lock();
 	tinyxml2::XMLDocument xml_doc;
-	if (load_XML(xml_doc, path) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(xml_doc, path))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", path);
 		return false;
@@ -846,7 +846,7 @@ static void init_references()
 	if (ros::param::get("~subscribers", subscriber_params))
 	{
 		tinyxml2::XMLDocument xml_doc;
-		if (load_XML(xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+		if (!load_XML(xml_doc, tmp_model_path.c_str()))
 		{
 			ROS_WARN("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 			return;
@@ -944,7 +944,7 @@ static void init_references()
 			}
 		}
 
-		if (save_XML(xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+		if (!save_XML(xml_doc, tmp_model_path.c_str()))
 		{
 			ROS_WARN("Failed to save file \"%s\"\n", tmp_model_path.c_str());
 		}
@@ -1018,7 +1018,7 @@ bool MjSim::add_data()
 
 	// Add add.xml to current.xml
 	tinyxml2::XMLDocument current_xml_doc;
-	if (load_XML(current_xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (!load_XML(current_xml_doc, tmp_model_path.c_str()))
 	{
 		ROS_WARN("Failed to load file \"%s\"\n", tmp_model_path.c_str());
 		return false;
@@ -1028,7 +1028,7 @@ bool MjSim::add_data()
 	tinyxml2::XMLElement *include_element = current_xml_doc.NewElement("include");
 	include_element->SetAttribute("file", "add.xml");
 	current_element->LinkEndChild(include_element);
-	if (save_XML(current_xml_doc, tmp_model_path.c_str()) != tinyxml2::XML_SUCCESS)
+	if (!save_XML(current_xml_doc, tmp_model_path.c_str()))
 	{
 		ROS_WARN("Failed to save file \"%s\"\n", tmp_model_path.c_str());
 		return false;

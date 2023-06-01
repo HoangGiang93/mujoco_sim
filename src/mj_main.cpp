@@ -168,6 +168,13 @@ void simulate()
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "mujoco_sim");
+    int port_header = 7500;
+    int port_data = 7600;
+    if (argc > 2)
+    {
+        port_header = std::stoi(argv[1]);
+        port_data = std::stoi(argv[2]);
+    }
     ros::NodeHandle n;
 
     ROS_INFO("Get ROS parameters from the server...");
@@ -183,13 +190,7 @@ int main(int argc, char **argv)
     ROS_INFO("Initialized the ROS interface successfully.");
 
     MjSocket &mj_socket = MjSocket::get_instance();
-    int port_header = 7500;
-    int port_data = 7600;
-    if (argc > 2)
-    {
-        port_header = std::stoi(argv[1]);
-        port_data = std::stoi(argv[2]);
-    }
+    
     mj_socket.init(port_header, port_data);
 
 #ifdef VISUAL

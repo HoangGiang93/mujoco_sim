@@ -7,10 +7,11 @@
     <arg name="subscribers_2" default="$(find mujoco_sim)/src/config/subscribers_2.yaml" />
     <arg name="subscribers_3" default="$(find mujoco_sim)/src/config/subscribers_3.yaml" />
 
-    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen"/> -->
+    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen" /> -->
 
     <group ns="sim_1">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7500 7600" launch-prefix="bash -c 'sleep 0; $0 $@' ">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7500 7600">
             <rosparam command="load" file="$(arg publishers)" />
             <rosparam command="load" file="$(arg subscribers_1)" />
             <param name="world" value="$(arg world)" />
@@ -19,7 +20,8 @@
     </group>
 
     <group ns="sim_2">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7501 7601" launch-prefix="bash -c 'sleep 0.1; $0 $@' ">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7501 7601">
             <rosparam command="load" file="$(arg publishers)" />
             <rosparam command="load" file="$(arg subscribers_2)" />
             <param name="world" value="$(arg world)" />
@@ -28,7 +30,8 @@
     </group>
 
     <group ns="sim_3">
-        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen" args="7502 7602" launch-prefix="bash -c 'sleep 0.2; $0 $@' ">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7502 7602">
             <rosparam command="load" file="$(arg publishers)" />
             <rosparam command="load" file="$(arg subscribers_3)" />
             <param name="world" value="$(arg world)" />
