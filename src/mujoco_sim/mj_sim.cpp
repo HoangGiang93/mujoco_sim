@@ -869,9 +869,10 @@ static void init_references()
 			
 			const std::string body_name = subscriber_param.first;
 			const std::string ref_body_name = subscriber_param.first + "_ref";
-			ROS_WARN("%s", body_name.c_str());
+			
 			const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, body_name.c_str());
 			const int ref_body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, ref_body_name.c_str());
+			
 			if (body_id != -1 && ref_body_id == -1)
 			{
 				tinyxml2::XMLElement *ref_body_element;
