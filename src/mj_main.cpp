@@ -197,7 +197,7 @@ int main(int argc, char **argv)
     ROS_INFO("Initializing OpenGL...");
     mj_visual.init();
     glfwSetKeyCallback(mj_visual.window, keyboard);
-    ROS_INFO("Initialize OpenGL successfully...");
+    ROS_INFO("Initialized OpenGL successfully.");
 #endif
 
     mjcb_control = controller;

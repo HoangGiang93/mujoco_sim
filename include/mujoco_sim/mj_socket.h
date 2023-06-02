@@ -43,13 +43,15 @@ public:
      * @brief Initialize the socket
      *
      */
-    void init(const int port_header, const int port_data);
+    void init(const int header_port, const int data_port);
 
     /**
      * @brief Send the header
      * 
+     * @return true if success
+     * @return false if failed
      */
-    void send_header();
+    bool send_header();
 
     /**
      * @brief Communicate with the server
@@ -65,15 +67,6 @@ public:
     static std::map<std::string, std::vector<std::string>> send_objects;
 
     static std::map<std::string, std::vector<std::string>> receive_objects;
-
-private:
-    zmq::context_t context;
-
-    std::string host = "tcp://127.0.0.1";
-
-    zmq::socket_t socket_header;
-
-    zmq::socket_t socket_data;
 
 private:
     MjSocket() = default;
