@@ -32,9 +32,6 @@ std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
 std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
-size_t send_data_size = 1;
-size_t receive_data_size = 1;
-
 MjSocket::~MjSocket()
 {
 	zmq_disconnect(socket_client, socket_client_addr.c_str());

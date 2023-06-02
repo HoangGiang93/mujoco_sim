@@ -59,15 +59,15 @@ public:
     void communicate();
 
 public:
-    std::vector<mjtNum *> send_data_vec;
-
-    std::vector<mjtNum *> receive_data_vec;
-
     static std::map<std::string, std::vector<std::string>> send_objects;
 
     static std::map<std::string, std::vector<std::string>> receive_objects;
 
 private:
+    std::vector<mjtNum *> send_data_vec;
+
+    std::vector<mjtNum *> receive_data_vec;
+
     void* context;
 
 	void *socket_client;
