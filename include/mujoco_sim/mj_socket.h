@@ -23,7 +23,6 @@
 #include "mj_model.h"
 
 #include <set>
-#include <zmq.hpp>
 
 class MjSocket
 {
@@ -60,13 +59,24 @@ public:
     void communicate();
 
 public:
-    std::vector<int> send_object_ids;
+    std::vector<mjtNum *> send_data_vec;
 
-    std::vector<int> receive_object_ids;
+    std::vector<mjtNum *> receive_data_vec;
 
     static std::map<std::string, std::vector<std::string>> send_objects;
 
     static std::map<std::string, std::vector<std::string>> receive_objects;
+
+private:
+    void* context;
+
+	void *socket_client;
+
+	size_t send_data_size = 1;
+
+	size_t receive_data_size = 1;
+
+    std::string socket_client_addr;
 
 private:
     MjSocket() = default;

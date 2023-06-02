@@ -2,18 +2,16 @@
 
     <arg name="robot" default="$(find mujoco_sim)/model/test/bowl.xml" />
     <arg name="world" default="$(find mujoco_sim)/model/test/pendulum.xml" />
-    <arg name="send" default="$(find mujoco_sim)/src/config/send.yaml" />
-    <arg name="receive_1" default="$(find mujoco_sim)/src/config/receive_1.yaml" />
-    <arg name="receive_2" default="$(find mujoco_sim)/src/config/receive_2.yaml" />
-    <arg name="receive_3" default="$(find mujoco_sim)/src/config/receive_3.yaml" />
+    <arg name="sim_1" default="$(find mujoco_sim)/src/config/sim_1.yaml" />
+    <arg name="sim_2" default="$(find mujoco_sim)/src/config/sim_2.yaml" />
+    <arg name="sim_3" default="$(find mujoco_sim)/src/config/sim_3.yaml" />
 
     <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen" /> -->
 
     <group ns="sim_1">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
-            args="7500 7600">
-            <rosparam command="load" file="$(arg send)" />
-            <rosparam command="load" file="$(arg receive_1)" />
+            args="7500">
+            <rosparam command="load" file="$(arg sim_1)" />
             <param name="world" value="$(arg world)" />
             <param name="robot" type="str" value="$(arg robot)" />
         </node>
@@ -21,9 +19,8 @@
 
     <group ns="sim_2">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
-            args="7501 7601">
-            <rosparam command="load" file="$(arg send)" />
-            <rosparam command="load" file="$(arg receive_2)" />
+            args="7501">
+            <rosparam command="load" file="$(arg sim_2)" />
             <param name="world" value="$(arg world)" />
             <param name="robot" type="str" value="$(arg robot)" />
         </node>
@@ -31,9 +28,8 @@
 
     <group ns="sim_3">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
-            args="7502 7602">
-            <rosparam command="load" file="$(arg send)" />
-            <rosparam command="load" file="$(arg receive_3)" />
+            args="7502">
+            <rosparam command="load" file="$(arg sim_3)" />
             <param name="world" value="$(arg world)" />
             <param name="robot" type="str" value="$(arg robot)" />
         </node>

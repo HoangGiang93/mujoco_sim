@@ -24,14 +24,9 @@
 #include <iostream>
 #include <chrono>
 #include <jsoncpp/json/json.h>
-
-#include "../state_msgs.cpp"
-
-zmq::context_t context;
+#include <zmq.h>
 
 std::string host = "tcp://127.0.0.1";
-
-zmq::socket_t socket_client;
 
 std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
@@ -40,11 +35,9 @@ std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 size_t send_data_size = 1;
 size_t receive_data_size = 1;
 
-std::string socket_client_addr;
-
 MjSocket::~MjSocket()
 {
-	socket_client.disconnect(socket_client_addr);
+	zmq_disconnect(socket_client, socket_client_addr.c_str());
 }
 
 void MjSocket::init(const int port)
@@ -107,11 +100,11 @@ void MjSocket::init(const int port)
 	if (send_objects.size() > 0 || receive_objects.size() > 0)
 	{
 		ROS_INFO("Initializing the socket connection...");
-		context = zmq::context_t{1};
+		context = zmq_ctx_new();
 
-		socket_client = zmq::socket_t{context, zmq::socket_type::req};
+        socket_client = zmq_socket(context, ZMQ_REQ);
 		socket_client_addr = host + ":" + std::to_string(port);
-		socket_client.connect(socket_client_addr);
+		zmq_connect(socket_client, socket_client_addr.c_str());
 	}
 }
 
@@ -122,43 +115,66 @@ bool MjSocket::send_header()
 	header_json["time"] = "microseconds";
 	header_json["simulator"] = "mujoco";
 
-	send_data_size = 1;
-	receive_data_size = 1;
-
+	mtx.lock();
 	for (const std::pair<std::string, std::vector<std::string>>& send_object : send_objects)
 	{
 		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
-		send_object_ids.push_back(body_id);
 		for (const std::string &attribute : send_object.second)
 		{
+			if (strcmp(attribute.c_str(), "position"))
+			{
+				send_data_vec.push_back(&d->xpos[3 * body_id]);
+				send_data_vec.push_back(&d->xpos[3 * body_id + 1]);
+				send_data_vec.push_back(&d->xpos[3 * body_id + 2]);
+			}
+			else if (strcmp(attribute.c_str(), "quaternion"))
+			{
+				send_data_vec.push_back(&d->xquat[4 * body_id]);
+				send_data_vec.push_back(&d->xquat[4 * body_id + 1]);
+				send_data_vec.push_back(&d->xquat[4 * body_id + 2]);
+				send_data_vec.push_back(&d->xquat[4 * body_id + 3]);
+			}
+			
 			header_json["send"][send_object.first].append(attribute);
-			send_data_size += attribute_map[attribute].size();
 		}
 	}
+	mtx.unlock();
+	send_data_size = 1 + send_data_vec.size();
 
+	mtx.lock();
 	for (const std::pair<std::string, std::vector<std::string>>& receive_object : receive_objects)
 	{
-		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, receive_object.first.c_str());
-		receive_object_ids.push_back(m->body_mocapid[mj_name2id(m, mjtObj::mjOBJ_BODY, (receive_object.first + "_ref").c_str())]);
-		for (const std::string &receive_data : receive_object.second)
+		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, (receive_object.first + "_ref").c_str());
+		const int mocap_id = m->body_mocapid[body_id];
+		for (const std::string &attribute : receive_object.second)
 		{
-			header_json["receive"][receive_object.first].append(receive_data);
-			receive_data_size += attribute_map[receive_data].size();
+			if (strcmp(attribute.c_str(), "position"))
+			{
+				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id]);
+				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id + 1]);
+				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id + 2]);
+			}
+			else if (strcmp(attribute.c_str(), "quaternion"))
+			{
+				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id]);
+				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id + 1]);
+				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id + 2]);
+				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id + 3]);
+			}
+
+			header_json["receive"][receive_object.first].append(attribute);
 		}
 	}
-
-	std::string header_str = header_json.toStyledString();
+	mtx.unlock();
+	receive_data_size = 1 + receive_data_vec.size();
 
 	// Send JSON string over ZMQ
-	zmq::message_t request_header(header_str.size());
-	memcpy(request_header.data(), header_str.c_str(), header_str.size());
-	socket_client.send(request_header, zmq::send_flags::none);
+	const std::string header_str = header_json.toStyledString();
+	zmq_send(socket_client, header_str.c_str(), header_str.size(), 0);
 
 	// Receive buffer sizes over ZMQ
 	size_t buffer[2];
-	zmq::message_t reply_header(sizeof(buffer));
-	socket_client.recv(reply_header);
-	memcpy(&buffer, reply_header.data(), sizeof(buffer));
+	zmq_recv(socket_client, buffer, sizeof(buffer), 0);
 
 	if (buffer[0] != send_data_size || buffer[1] != receive_data_size)
 	{
@@ -185,37 +201,19 @@ void MjSocket::communicate()
 	while (ros::ok())
 	{
 		send_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-		int i = 1;
-		for (const int body_id : send_object_ids)
-		{
-			send_buffer[i] = d->xpos[3 * body_id];
-			send_buffer[i + 1] = d->xpos[3 * body_id + 1];
-			send_buffer[i + 2] = d->xpos[3 * body_id + 2];
-			send_buffer[i + 3] = d->xquat[4 * body_id];
-			send_buffer[i + 4] = d->xquat[4 * body_id + 1];
-			send_buffer[i + 5] = d->xquat[4 * body_id + 2];
-			send_buffer[i + 6] = d->xquat[4 * body_id + 3];
-			i += 7;
-		}
 		
-		zmq::message_t request(sizeof(send_buffer));
-		memcpy(request.data(), &send_buffer, sizeof(send_buffer));
-		socket_client.send(request, zmq::send_flags::none);
+		for (size_t i = 0; i < send_data_size - 1; i++)
+        {
+            send_buffer[i + 1] = *send_data_vec[i];
+        }
 		
-		zmq::message_t reply(sizeof(receive_buffer));
-		socket_client.recv(reply);
-		memcpy(&receive_buffer, reply.data(), sizeof(receive_buffer));
-		i = 1;		
-		for (const int mocap_id : receive_object_ids)
-		{
-			d->mocap_pos[3 * mocap_id] = receive_buffer[i];
-			d->mocap_pos[3 * mocap_id + 1] = receive_buffer[i + 1];
-			d->mocap_pos[3 * mocap_id + 2] = receive_buffer[i + 2];
-			d->mocap_quat[4 * mocap_id] = receive_buffer[i + 3];
-			d->mocap_quat[4 * mocap_id + 1] = receive_buffer[i + 4];
-			d->mocap_quat[4 * mocap_id + 2] = receive_buffer[i + 5];
-			d->mocap_quat[4 * mocap_id + 3] = receive_buffer[i + 6];
-			i += 7;
-		}
+		zmq_send(socket_client, send_buffer, sizeof(send_buffer), 0);
+		
+		zmq_recv(socket_client, receive_buffer, sizeof(receive_buffer), 0);
+
+		for (size_t i = 1; i < receive_data_size; i++)
+        {
+            *receive_data_vec[i - 1] = receive_buffer[i];
+        }
 	}
 }

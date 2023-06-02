@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "mujoco_sim");
     int port = 7500;
-    if (argc > 2)
+    if (argc > 1)
     {
         port = std::stoi(argv[1]);
     }
@@ -188,7 +188,6 @@ int main(int argc, char **argv)
     ROS_INFO("Initialized the ROS interface successfully.");
 
     MjSocket &mj_socket = MjSocket::get_instance();
-    
     mj_socket.init(port);
 
 #ifdef VISUAL

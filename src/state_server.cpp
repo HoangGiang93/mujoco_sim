@@ -35,7 +35,9 @@
 using namespace std::chrono_literals;
 
 int port = 7500;
-int port_data = 7600;
+
+std::vector<std::string> socket_addrs;
+std::vector<std::thread> workers;
 
 zmq::context_t context{1};
 
@@ -45,17 +47,23 @@ std::vector<zmq::socket_t> socket_servers;
 
 std::map<std::string, std::map<std::string, std::vector<double>>> send_objects;
 
-void worker(const size_t thread_num, const Json::Value &json_header)
+void run_socket_server(const size_t thread_num);
+
+void communicate(const size_t thread_num, Json::Value json_header)
 {
+    std::vector<double *> send_data_vec;
+    std::vector<double *> receive_data_vec;
+
+receive_header:
+
     Json::Value send_objects_json = json_header["send"];
 
-    std::vector<double*> send_data_vec;
-    mtx.lock();
     for (auto it = send_objects_json.begin(); it != send_objects_json.end(); ++it)
     {
         const std::string object_name = it.key().asString();
+        mtx.lock();
         send_objects[object_name] = {};
-        for (const auto& attr : *it)
+        for (const auto &attr : *it)
         {
             const std::string attribute_name = attr.asString();
             send_objects[object_name][attribute_name] = attribute_map[attribute_name];
@@ -64,11 +72,10 @@ void worker(const size_t thread_num, const Json::Value &json_header)
                 send_data_vec.push_back(&value);
             }
         }
+        mtx.unlock();
     }
-    mtx.unlock();
 
     Json::Value receive_objects_json = json_header["receive"];
-    std::vector<double*> receive_data_vec;
     
     for (auto it = receive_objects_json.begin(); it != receive_objects_json.end(); ++it)
     {
@@ -77,17 +84,19 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         {
             zmq_sleep(0.1);
         }
-        
-        for (const auto& attr : *it)
+
+        for (const auto &attr : *it)
         {
             const std::string attribute_name = attr.asString();
+            mtx.lock();
             for (double &value : send_objects[object_name][attribute_name])
             {
                 receive_data_vec.push_back(&value);
             }
+            mtx.unlock();
         }
     }
-    
+
     const size_t send_data_size = 1 + send_data_vec.size();
     const size_t receive_data_size = 1 + receive_data_vec.size();
 
@@ -100,25 +109,40 @@ void worker(const size_t thread_num, const Json::Value &json_header)
     double send_buffer[send_data_size];
     double receive_buffer[receive_data_size];
 
-    while (ros::ok()) 
+    while (ros::ok())
     {
         // Receive send_data over ZMQ
-        zmq::message_t request(sizeof(send_buffer));
+        zmq::message_t request;
         socket_servers[thread_num].recv(request);
+
+        if (request.to_string()[0] == '{')
+        {
+            Json::Reader reader;
+            reader.parse(request.to_string(), json_header);
+            std::cout << json_header.toStyledString() << std::endl;
+
+            send_data_vec.clear();
+            receive_data_vec.clear();
+
+            goto receive_header;
+        }
+
         memcpy(&send_buffer, request.data(), sizeof(send_buffer));
 
+        const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - send_buffer[0]) / 1000.0;
+        
         for (size_t i = 0; i < send_data_size - 1; i++)
         {
-            *send_data_vec[i] = send_buffer[i+1];
+            *send_data_vec[i] = send_buffer[i + 1];
         }
 
         receive_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
         for (size_t i = 1; i < receive_data_size; i++)
         {
-            receive_buffer[i] = *receive_data_vec[i-1];
+            receive_buffer[i] = *receive_data_vec[i - 1];
         }
-        
+
         // Send receive_data over ZMQ
         zmq::message_t reply(sizeof(receive_buffer));
         memcpy(reply.data(), &receive_buffer, sizeof(receive_buffer));
@@ -126,7 +150,21 @@ void worker(const size_t thread_num, const Json::Value &json_header)
     }
 }
 
-int main(int argc, char **argv) 
+void run_socket_server(const size_t thread_num)
+{
+    // Receive JSON string over ZMQ
+    zmq::message_t request_header;
+    socket_servers[thread_num].recv(request_header);
+
+    Json::Value json_header;
+    Json::Reader reader;
+    reader.parse(request_header.to_string(), json_header);
+    std::cout << json_header.toStyledString() << std::endl;
+
+    workers[thread_num] = std::thread(communicate, thread_num, json_header);
+}
+
+int main(int argc, char **argv)
 {
     ros::init(argc, argv, "state_server");
 
@@ -135,35 +173,24 @@ int main(int argc, char **argv)
         port = std::stoi(argv[1]);
     }
 
-    std::vector<std::string> socket_addrs;
-    std::vector<std::thread> workers;
-
-    for (size_t i = 0;; i++)
+    for (size_t thread_num = 0;; thread_num++)
     {
         socket_servers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
-        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port + i));
-        socket_servers[i].bind(socket_addrs[i]);
-        
-        // Receive JSON string over ZMQ
-        zmq::message_t request_header;
-        socket_servers[i].recv(request_header);
-    
-        Json::Value json_header;
-        Json::Reader reader;
-        reader.parse(request_header.to_string(), json_header);
-        std::cout << json_header.toStyledString() << std::endl;
-        
-        workers.push_back(std::thread(worker, i, json_header));
+        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port + thread_num));
+        socket_servers[thread_num].bind(socket_addrs[thread_num]);
+        workers.push_back(std::thread());
+        run_socket_server(thread_num);
     }
 
-    for (std::thread& worker : workers) 
+    for (std::thread &worker : workers)
     {
         worker.join();
     }
 
-    for (size_t i = 0; i < socket_addrs.size(); i++) 
+    for (size_t i = 0; i < socket_addrs.size(); i++)
     {
         socket_servers[i].unbind(socket_addrs[i]);
+        socket_servers[i].close();
     }
 
     return 0;

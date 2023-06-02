@@ -1,3 +1,7 @@
+send:
+  body: [position, quaternion]
+  joint: [position]
+
 receive:
   cube_1: [position, quaternion]
   cube_3: [position, quaternion]

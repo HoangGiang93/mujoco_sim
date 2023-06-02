@@ -1,3 +1,0 @@
-send:
-  body: [position, quaternion]
-  joint: [position]
