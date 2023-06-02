@@ -34,14 +34,14 @@
 
 using namespace std::chrono_literals;
 
-int port_header = 7500;
+int port = 7500;
 int port_data = 7600;
 
 zmq::context_t context{1};
 
 std::mutex mtx;
 
-std::vector<zmq::socket_t> socket_headers;
+std::vector<zmq::socket_t> socket_servers;
 
 std::map<std::string, std::map<std::string, std::vector<double>>> send_objects;
 
@@ -95,20 +95,16 @@ void worker(const size_t thread_num, const Json::Value &json_header)
     size_t buffer[2] = {send_data_size, receive_data_size};
     zmq::message_t reply_header(sizeof(buffer));
     memcpy(reply_header.data(), buffer, sizeof(buffer));
-    socket_headers[thread_num].send(reply_header, zmq::send_flags::none);
+    socket_servers[thread_num].send(reply_header, zmq::send_flags::none);
 
     double send_buffer[send_data_size];
     double receive_buffer[receive_data_size];
-
-    zmq::socket_t socket_data{context, zmq::socket_type::rep};
-    const std::string addr = "tcp://127.0.0.1:" + std::to_string(port_data + thread_num);
-    socket_data.bind(addr);
 
     while (ros::ok()) 
     {
         // Receive send_data over ZMQ
         zmq::message_t request(sizeof(send_buffer));
-        socket_data.recv(request);
+        socket_servers[thread_num].recv(request);
         memcpy(&send_buffer, request.data(), sizeof(send_buffer));
 
         for (size_t i = 0; i < send_data_size - 1; i++)
@@ -126,20 +122,17 @@ void worker(const size_t thread_num, const Json::Value &json_header)
         // Send receive_data over ZMQ
         zmq::message_t reply(sizeof(receive_buffer));
         memcpy(reply.data(), &receive_buffer, sizeof(receive_buffer));
-        socket_data.send(reply, zmq::send_flags::none);
+        socket_servers[thread_num].send(reply, zmq::send_flags::none);
     }
-
-    socket_data.unbind(addr);
 }
 
 int main(int argc, char **argv) 
 {
     ros::init(argc, argv, "state_server");
 
-    if (argc > 2)
+    if (argc > 1)
     {
-        port_header = std::stoi(argv[1]);
-        port_data = std::stoi(argv[2]);
+        port = std::stoi(argv[1]);
     }
 
     std::vector<std::string> socket_addrs;
@@ -147,13 +140,13 @@ int main(int argc, char **argv)
 
     for (size_t i = 0;; i++)
     {
-        socket_headers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
-        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port_header + i));
-        socket_headers[i].bind(socket_addrs[i]);
+        socket_servers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
+        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port + i));
+        socket_servers[i].bind(socket_addrs[i]);
         
         // Receive JSON string over ZMQ
         zmq::message_t request_header;
-        socket_headers[i].recv(request_header);
+        socket_servers[i].recv(request_header);
     
         Json::Value json_header;
         Json::Reader reader;
@@ -170,7 +163,7 @@ int main(int argc, char **argv)
 
     for (size_t i = 0; i < socket_addrs.size(); i++) 
     {
-        socket_headers[i].unbind(socket_addrs[i]);
+        socket_servers[i].unbind(socket_addrs[i]);
     }
 
     return 0;

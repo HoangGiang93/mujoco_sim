@@ -43,7 +43,7 @@ public:
      * @brief Initialize the socket
      *
      */
-    void init(const int header_port, const int data_port);
+    void init(const int port);
 
     /**
      * @brief Send the header

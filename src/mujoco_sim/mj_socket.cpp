@@ -31,9 +31,7 @@ zmq::context_t context;
 
 std::string host = "tcp://127.0.0.1";
 
-zmq::socket_t socket_header;
-
-zmq::socket_t socket_data;
+zmq::socket_t socket_client;
 
 std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
@@ -42,16 +40,14 @@ std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 size_t send_data_size = 1;
 size_t receive_data_size = 1;
 
-std::string socket_header_addr;
-std::string socket_data_addr;
+std::string socket_client_addr;
 
 MjSocket::~MjSocket()
 {
-	socket_header.disconnect(socket_header_addr);
-	socket_data.disconnect(socket_data_addr);
+	socket_client.disconnect(socket_client_addr);
 }
 
-void MjSocket::init(const int header_port, const int data_port)
+void MjSocket::init(const int port)
 {
 	XmlRpc::XmlRpcValue receive_object_params;
     if (ros::param::get("~receive", receive_object_params))
@@ -113,13 +109,9 @@ void MjSocket::init(const int header_port, const int data_port)
 		ROS_INFO("Initializing the socket connection...");
 		context = zmq::context_t{1};
 
-		socket_header = zmq::socket_t{context, zmq::socket_type::req};
-		socket_header_addr = host + ":" + std::to_string(header_port);
-		socket_header.connect(socket_header_addr);
-
-		socket_data = zmq::socket_t{context, zmq::socket_type::req};
-		socket_data_addr = host + ":" + std::to_string(data_port);
-		socket_data.connect(socket_data_addr);
+		socket_client = zmq::socket_t{context, zmq::socket_type::req};
+		socket_client_addr = host + ":" + std::to_string(port);
+		socket_client.connect(socket_client_addr);
 	}
 }
 
@@ -137,10 +129,10 @@ bool MjSocket::send_header()
 	{
 		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
 		send_object_ids.push_back(body_id);
-		for (const std::string &send_data : send_object.second)
+		for (const std::string &attribute : send_object.second)
 		{
-			header_json["send"][send_object.first].append(send_data);
-			send_data_size += attribute_map[send_data].size();
+			header_json["send"][send_object.first].append(attribute);
+			send_data_size += attribute_map[attribute].size();
 		}
 	}
 
@@ -160,22 +152,22 @@ bool MjSocket::send_header()
 	// Send JSON string over ZMQ
 	zmq::message_t request_header(header_str.size());
 	memcpy(request_header.data(), header_str.c_str(), header_str.size());
-	socket_header.send(request_header, zmq::send_flags::none);
+	socket_client.send(request_header, zmq::send_flags::none);
 
 	// Receive buffer sizes over ZMQ
 	size_t buffer[2];
 	zmq::message_t reply_header(sizeof(buffer));
-	socket_header.recv(reply_header);
+	socket_client.recv(reply_header);
 	memcpy(&buffer, reply_header.data(), sizeof(buffer));
 
 	if (buffer[0] != send_data_size || buffer[1] != receive_data_size)
 	{
-		ROS_ERROR("Failed to initialize the socket header at %s: send_data_size(server = %ld != client = %ld), receive_data_size(server = %ld != client = %ld).", socket_header_addr.c_str(), buffer[0], send_data_size, buffer[1], receive_data_size);
+		ROS_ERROR("Failed to initialize the socket header at %s: send_data_size(server = %ld != client = %ld), receive_data_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_data_size, buffer[1], receive_data_size);
 		return false;
 	}
 	else
 	{
-		ROS_INFO("Initialized the socket header at %s successfully.", socket_header_addr.c_str());
+		ROS_INFO("Initialized the socket header at %s successfully.", socket_client_addr.c_str());
 		return true;
 	}
 }
@@ -187,7 +179,7 @@ void MjSocket::communicate()
 		return;
 	}
 
-	ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_data_addr.c_str(), send_data_size, receive_data_size);
+	ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_data_size, receive_data_size);
 	double send_buffer[send_data_size];
 	double receive_buffer[receive_data_size];
 	while (ros::ok())
@@ -208,10 +200,10 @@ void MjSocket::communicate()
 		
 		zmq::message_t request(sizeof(send_buffer));
 		memcpy(request.data(), &send_buffer, sizeof(send_buffer));
-		socket_data.send(request, zmq::send_flags::none);
+		socket_client.send(request, zmq::send_flags::none);
 		
 		zmq::message_t reply(sizeof(receive_buffer));
-		socket_data.recv(reply);
+		socket_client.recv(reply);
 		memcpy(&receive_buffer, reply.data(), sizeof(receive_buffer));
 		i = 1;		
 		for (const int mocap_id : receive_object_ids)
