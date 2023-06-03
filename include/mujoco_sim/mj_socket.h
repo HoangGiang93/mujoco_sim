@@ -72,9 +72,13 @@ private:
 
 	void *socket_client;
 
-	size_t send_data_size = 1;
+	size_t send_buffer_size = 1;
 
-	size_t receive_data_size = 1;
+	size_t receive_buffer_size = 1;
+
+    double *send_buffer;
+    
+	double *receive_buffer;
 
     std::string socket_client_addr;
 

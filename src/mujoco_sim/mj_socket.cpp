@@ -136,7 +136,7 @@ bool MjSocket::send_header()
 		}
 	}
 	mtx.unlock();
-	send_data_size = 1 + send_data_vec.size();
+	send_buffer_size = 1 + send_data_vec.size();
 
 	mtx.lock();
 	for (const std::pair<std::string, std::vector<std::string>>& receive_object : receive_objects)
@@ -163,7 +163,7 @@ bool MjSocket::send_header()
 		}
 	}
 	mtx.unlock();
-	receive_data_size = 1 + receive_data_vec.size();
+	receive_buffer_size = 1 + receive_data_vec.size();
 
 	// Send JSON string over ZMQ
 	const std::string header_str = header_json.toStyledString();
@@ -173,9 +173,9 @@ bool MjSocket::send_header()
 	size_t buffer[2];
 	zmq_recv(socket_client, buffer, sizeof(buffer), 0);
 
-	if (buffer[0] != send_data_size || buffer[1] != receive_data_size)
+	if (buffer[0] != send_buffer_size || buffer[1] != receive_buffer_size)
 	{
-		ROS_ERROR("Failed to initialize the socket header at %s: send_data_size(server = %ld != client = %ld), receive_data_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_data_size, buffer[1], receive_data_size);
+		ROS_ERROR("Failed to initialize the socket header at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
 		return false;
 	}
 	else
@@ -192,25 +192,29 @@ void MjSocket::communicate()
 		return;
 	}
 
-	ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_data_size, receive_data_size);
-	double send_buffer[send_data_size];
-	double receive_buffer[receive_data_size];
+	ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
+	send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
+	receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
+
 	while (ros::ok())
 	{
 		send_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 		
-		for (size_t i = 0; i < send_data_size - 1; i++)
+		for (size_t i = 0; i < send_buffer_size - 1; i++)
         {
-            send_buffer[i + 1] = *send_data_vec[i];
+            *(send_buffer + i + 1) = *send_data_vec[i];
         }
 		
-		zmq_send(socket_client, send_buffer, sizeof(send_buffer), 0);
+		zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
 		
-		zmq_recv(socket_client, receive_buffer, sizeof(receive_buffer), 0);
+		zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
 
-		for (size_t i = 1; i < receive_data_size; i++)
+		for (size_t i = 0; i < receive_buffer_size - 1; i++)
         {
-            *receive_data_vec[i - 1] = receive_buffer[i];
+            *receive_data_vec[i] = *(receive_buffer + i + 1);
         }
 	}
+
+	free(send_buffer);
+    free(receive_buffer);
 }

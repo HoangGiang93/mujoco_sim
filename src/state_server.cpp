@@ -97,24 +97,24 @@ receive_header:
         }
     }
 
-    const size_t send_data_size = 1 + send_data_vec.size();
-    const size_t receive_data_size = 1 + receive_data_vec.size();
+    const size_t send_buffer_size = 1 + send_data_vec.size();
+    const size_t receive_buffer_size = 1 + receive_data_vec.size();
 
     // Send buffer sizes over ZMQ
-    size_t buffer[2] = {send_data_size, receive_data_size};
+    size_t buffer[2] = {send_buffer_size, receive_buffer_size};
     zmq::message_t reply_header(sizeof(buffer));
     memcpy(reply_header.data(), buffer, sizeof(buffer));
     socket_servers[thread_num].send(reply_header, zmq::send_flags::none);
 
-    double send_buffer[send_data_size];
-    double receive_buffer[receive_data_size];
+    double *send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
+	double *receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 
     while (ros::ok())
     {
         // Receive send_data over ZMQ
-        zmq::message_t request;
+        zmq::message_t request(send_buffer_size);
         socket_servers[thread_num].recv(request);
-
+        
         if (request.to_string()[0] == '{')
         {
             Json::Reader reader;
@@ -126,28 +126,31 @@ receive_header:
 
             goto receive_header;
         }
-
-        memcpy(&send_buffer, request.data(), sizeof(send_buffer));
-
-        const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - send_buffer[0]) / 1000.0;
         
-        for (size_t i = 0; i < send_data_size - 1; i++)
+        memcpy(send_buffer, request.data(), send_buffer_size * sizeof(double));
+        
+        const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - *send_buffer) / 1000.0;
+        
+        for (size_t i = 0; i < send_buffer_size - 1; i++)
         {
             *send_data_vec[i] = send_buffer[i + 1];
         }
 
-        receive_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        *receive_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
-        for (size_t i = 1; i < receive_data_size; i++)
+        for (size_t i = 0; i < receive_buffer_size - 1; i++)
         {
-            receive_buffer[i] = *receive_data_vec[i - 1];
+            receive_buffer[i + 1] = *receive_data_vec[i];
         }
 
         // Send receive_data over ZMQ
-        zmq::message_t reply(sizeof(receive_buffer));
-        memcpy(reply.data(), &receive_buffer, sizeof(receive_buffer));
+        zmq::message_t reply(receive_buffer_size * sizeof(double));
+        memcpy(reply.data(), receive_buffer, receive_buffer_size * sizeof(double));
         socket_servers[thread_num].send(reply, zmq::send_flags::none);
     }
+
+    free(send_buffer);
+    free(receive_buffer);
 }
 
 void run_socket_server(const size_t thread_num)
