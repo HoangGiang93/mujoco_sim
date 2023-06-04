@@ -30,11 +30,14 @@
 #include <thread>
 
 static MjSim &mj_sim = MjSim::get_instance();
+static MjSocket &mj_socket = MjSocket::get_instance();
 #ifdef VISUAL
 static MjVisual &mj_visual = MjVisual::get_instance();
 #endif
 
 static int i = 0;
+
+static bool enable_socket = false;
 
 #ifdef VISUAL
 // keyboard callback
@@ -162,6 +165,11 @@ void simulate()
                 m->opt.timestep /= 2;
             }
         }
+
+        if (enable_socket)
+        {
+            mj_socket.communicate();
+        }
     }
 }
 
@@ -187,15 +195,19 @@ int main(int argc, char **argv)
     mj_ros.init();
     ROS_INFO("Initialized the ROS interface successfully.");
 
-    MjSocket &mj_socket = MjSocket::get_instance();
-    mj_socket.init(port);
-
 #ifdef VISUAL
     ROS_INFO("Initializing OpenGL...");
     mj_visual.init();
     glfwSetKeyCallback(mj_visual.window, keyboard);
     ROS_INFO("Initialized OpenGL successfully.");
 #endif
+
+    MjSocket &mj_socket = MjSocket::get_instance();
+    mj_socket.init(port);
+    if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0) && mj_socket.send_header())
+    {
+        enable_socket = true;
+    }
 
     mjcb_control = controller;
 
@@ -206,12 +218,6 @@ int main(int argc, char **argv)
     // start simulation thread
     std::thread sim_thread(simulate);
 
-    // start communication thread only if there are asked objects
-    std::thread socket_thread;
-    if (MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0)
-    {
-        socket_thread = std::thread(&MjSocket::communicate, &mj_socket);
-    }
     mjtNum sim_step_start = d->time;
 
 #ifdef VISUAL
@@ -237,10 +243,6 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
-    if (MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0)
-    {
-        socket_thread.join();
-    }
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);

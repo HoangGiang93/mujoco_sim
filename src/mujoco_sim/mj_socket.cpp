@@ -34,72 +34,75 @@ std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
 MjSocket::~MjSocket()
 {
+	free(send_buffer);
+	free(receive_buffer);
+
 	zmq_disconnect(socket_client, socket_client_addr.c_str());
 }
 
 void MjSocket::init(const int port)
 {
 	XmlRpc::XmlRpcValue receive_object_params;
-    if (ros::param::get("~receive", receive_object_params))
-    {
-        std::string log = "Set receive_objects: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &receive_object_param : receive_object_params)
-        {
-            log += receive_object_param.first + " ";
-            receive_objects[receive_object_param.first] = {};
-            ros::param::get("~receive/" + receive_object_param.first, receive_objects[receive_object_param.first]);
-        }
-        ROS_INFO("%s", log.c_str());
-    }
+	if (ros::param::get("~receive", receive_object_params))
+	{
+		std::string log = "Set receive_objects: ";
+		for (const std::pair<std::string, XmlRpc::XmlRpcValue> &receive_object_param : receive_object_params)
+		{
+			log += receive_object_param.first + " ";
+			receive_objects[receive_object_param.first] = {};
+			ros::param::get("~receive/" + receive_object_param.first, receive_objects[receive_object_param.first]);
+		}
+		ROS_INFO("%s", log.c_str());
+	}
 
-    XmlRpc::XmlRpcValue send_object_params;
-    if (ros::param::get("~send", send_object_params))
-    {
-        std::string log = "Set send_objects: ";
-        for (const std::pair<std::string, XmlRpc::XmlRpcValue> &send_object_param : send_object_params)
-        {
+	XmlRpc::XmlRpcValue send_object_params;
+	if (ros::param::get("~send", send_object_params))
+	{
+		std::string log = "Set send_objects: ";
+		for (const std::pair<std::string, XmlRpc::XmlRpcValue> &send_object_param : send_object_params)
+		{
 
-            std::vector<std::string> send_data;
-            if (ros::param::get("~send/" + send_object_param.first, send_data))
-            {
-                if (send_object_param.first == "body")
-                {
-                    for (int body_id = 0; body_id < m->nbody; body_id++)
-                    {
-                        const char* body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-                        if (receive_objects.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
-                        {
-                            log += std::string(body_name) + " ";
-                            send_objects[body_name] = send_data;
-                        }
-                    }
-                }
-                else if (send_object_param.first == "joint_1D")
-                {
-                    for (int joint_id = 0; joint_id < m->njnt; joint_id++)
-                    {
-                        if (m->jnt_type[joint_id] == mjtJoint::mjJNT_HINGE || m->jnt_type[joint_id] == mjtJoint::mjJNT_SLIDE)
-                        {
-                            const char* joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
-                            if (receive_objects.count(joint_name) == 0)
-                            {
-                                log += std::string(joint_name) + " ";
-                                send_objects[joint_name] = send_data;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        ROS_INFO("%s", log.c_str());
-    }
-	
+			std::vector<std::string> send_data;
+			if (ros::param::get("~send/" + send_object_param.first, send_data))
+			{
+				if (send_object_param.first == "body")
+				{
+					for (int body_id = 0; body_id < m->nbody; body_id++)
+					{
+						const char *body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+						if (receive_objects.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
+						{
+							log += std::string(body_name) + " ";
+							send_objects[body_name] = send_data;
+						}
+					}
+				}
+				else if (send_object_param.first == "joint_1D")
+				{
+					for (int joint_id = 0; joint_id < m->njnt; joint_id++)
+					{
+						if (m->jnt_type[joint_id] == mjtJoint::mjJNT_HINGE || m->jnt_type[joint_id] == mjtJoint::mjJNT_SLIDE)
+						{
+							const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
+							if (receive_objects.count(joint_name) == 0)
+							{
+								log += std::string(joint_name) + " ";
+								send_objects[joint_name] = send_data;
+							}
+						}
+					}
+				}
+			}
+		}
+		ROS_INFO("%s", log.c_str());
+	}
+
 	if (send_objects.size() > 0 || receive_objects.size() > 0)
 	{
 		ROS_INFO("Initializing the socket connection...");
 		context = zmq_ctx_new();
 
-        socket_client = zmq_socket(context, ZMQ_REQ);
+		socket_client = zmq_socket(context, ZMQ_REQ);
 		socket_client_addr = host + ":" + std::to_string(port);
 		zmq_connect(socket_client, socket_client_addr.c_str());
 	}
@@ -113,7 +116,7 @@ bool MjSocket::send_header()
 	header_json["simulator"] = "mujoco";
 
 	mtx.lock();
-	for (const std::pair<std::string, std::vector<std::string>>& send_object : send_objects)
+	for (const std::pair<std::string, std::vector<std::string>> &send_object : send_objects)
 	{
 		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
 		for (const std::string &attribute : send_object.second)
@@ -131,7 +134,7 @@ bool MjSocket::send_header()
 				send_data_vec.push_back(&d->xquat[4 * body_id + 2]);
 				send_data_vec.push_back(&d->xquat[4 * body_id + 3]);
 			}
-			
+
 			header_json["send"][send_object.first].append(attribute);
 		}
 	}
@@ -139,7 +142,7 @@ bool MjSocket::send_header()
 	send_buffer_size = 1 + send_data_vec.size();
 
 	mtx.lock();
-	for (const std::pair<std::string, std::vector<std::string>>& receive_object : receive_objects)
+	for (const std::pair<std::string, std::vector<std::string>> &receive_object : receive_objects)
 	{
 		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, (receive_object.first + "_ref").c_str());
 		const int mocap_id = m->body_mocapid[body_id];
@@ -181,40 +184,28 @@ bool MjSocket::send_header()
 	else
 	{
 		ROS_INFO("Initialized the socket header at %s successfully.", socket_client_addr.c_str());
+		ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
+		send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
+		receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 		return true;
 	}
 }
 
 void MjSocket::communicate()
 {
-	if (!send_header())
+	*send_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+
+	for (size_t i = 0; i < send_buffer_size - 1; i++)
 	{
-		return;
+		*(send_buffer + i + 1) = *send_data_vec[i];
 	}
 
-	ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
-	send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
-	receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
+	zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
 
-	while (ros::ok())
+	zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
+
+	for (size_t i = 0; i < receive_buffer_size - 1; i++)
 	{
-		send_buffer[0] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-		
-		for (size_t i = 0; i < send_buffer_size - 1; i++)
-        {
-            *(send_buffer + i + 1) = *send_data_vec[i];
-        }
-		
-		zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
-		
-		zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
-
-		for (size_t i = 0; i < receive_buffer_size - 1; i++)
-        {
-            *receive_data_vec[i] = *(receive_buffer + i + 1);
-        }
+		*receive_data_vec[i] = *(receive_buffer + i + 1);
 	}
-
-	free(send_buffer);
-    free(receive_buffer);
 }
