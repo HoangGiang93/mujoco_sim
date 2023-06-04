@@ -79,6 +79,10 @@ void simulate()
 
     while (ros::ok())
     {
+        if (enable_socket)
+        {
+            mj_socket.communicate();
+        }
         {
             ros::Time sim_time = (ros::Time)(MjRos::ros_start.toSec() + d->time);
             ros::Duration sim_period = sim_time - last_sim_time;
@@ -165,11 +169,6 @@ void simulate()
                 m->opt.timestep /= 2;
             }
         }
-
-        if (enable_socket)
-        {
-            mj_socket.communicate();
-        }
     }
 }
 
@@ -204,10 +203,12 @@ int main(int argc, char **argv)
 
     MjSocket &mj_socket = MjSocket::get_instance();
     mj_socket.init(port);
-    if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0) && mj_socket.send_header())
-    {
-        enable_socket = true;
-    }
+    std::thread init_socket_thread([&mj_socket](){
+        if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0) && mj_socket.send_header())
+        {
+            enable_socket = true;
+        }
+    });
 
     mjcb_control = controller;
 
@@ -243,6 +244,7 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
+    init_socket_thread.join();
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);
