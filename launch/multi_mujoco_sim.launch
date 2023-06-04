@@ -6,8 +6,6 @@
     <arg name="sim_2" default="$(find mujoco_sim)/src/config/sim_2.yaml" />
     <arg name="sim_3" default="$(find mujoco_sim)/src/config/sim_3.yaml" />
 
-    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen" /> -->
-
     <group ns="sim_1">
         <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
             args="7500">
@@ -34,5 +32,7 @@
             <param name="robot" type="str" value="$(arg robot)" />
         </node>
     </group>
+
+    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen" args="7500 7501 7502"/> -->
 
 </launch>

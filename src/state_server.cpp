@@ -34,8 +34,6 @@
 
 using namespace std::chrono_literals;
 
-int port = 7500;
-
 std::vector<std::string> socket_addrs;
 std::vector<std::thread> workers;
 
@@ -130,7 +128,7 @@ receive_header:
         memcpy(send_buffer, request.data(), send_buffer_size * sizeof(double));
         
         const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - *send_buffer) / 1000.0;
-        
+
         for (size_t i = 0; i < send_buffer_size - 1; i++)
         {
             *send_data_vec[i] = send_buffer[i + 1];
@@ -171,15 +169,11 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "state_server");
 
-    if (argc > 1)
+    for (size_t thread_num = 0; thread_num < argc - 1; thread_num++)
     {
-        port = std::stoi(argv[1]);
-    }
-
-    for (size_t thread_num = 0;; thread_num++)
-    {
+        int port = std::stoi(argv[thread_num + 1]);
         socket_servers.push_back(zmq::socket_t(context, zmq::socket_type::rep));
-        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port + thread_num));
+        socket_addrs.push_back("tcp://127.0.0.1:" + std::to_string(port));
         socket_servers[thread_num].bind(socket_addrs[thread_num]);
         workers.push_back(std::thread());
         run_socket_server(thread_num);

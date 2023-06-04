@@ -118,13 +118,13 @@ bool MjSocket::send_header()
 		const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
 		for (const std::string &attribute : send_object.second)
 		{
-			if (strcmp(attribute.c_str(), "position"))
+			if (strcmp(attribute.c_str(), "position") == 0)
 			{
 				send_data_vec.push_back(&d->xpos[3 * body_id]);
 				send_data_vec.push_back(&d->xpos[3 * body_id + 1]);
 				send_data_vec.push_back(&d->xpos[3 * body_id + 2]);
 			}
-			else if (strcmp(attribute.c_str(), "quaternion"))
+			else if (strcmp(attribute.c_str(), "quaternion") == 0)
 			{
 				send_data_vec.push_back(&d->xquat[4 * body_id]);
 				send_data_vec.push_back(&d->xquat[4 * body_id + 1]);
@@ -145,13 +145,13 @@ bool MjSocket::send_header()
 		const int mocap_id = m->body_mocapid[body_id];
 		for (const std::string &attribute : receive_object.second)
 		{
-			if (strcmp(attribute.c_str(), "position"))
+			if (strcmp(attribute.c_str(), "position") == 0)
 			{
 				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id]);
 				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id + 1]);
 				receive_data_vec.push_back(&d->mocap_pos[3 * mocap_id + 2]);
 			}
-			else if (strcmp(attribute.c_str(), "quaternion"))
+			else if (strcmp(attribute.c_str(), "quaternion") == 0)
 			{
 				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id]);
 				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id + 1]);
