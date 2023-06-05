@@ -33,8 +33,6 @@ std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
 std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
-bool MjSocket::enable = false;
-
 MjSocket::~MjSocket()
 {
 	free(send_buffer);
@@ -194,33 +192,36 @@ void MjSocket::send_meta_data()
 		ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
 		send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
 		receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
-		enable = true;
+		is_enabled = true;
 	} });
 	send_meta_data_thread.detach();
 }
 
 void MjSocket::communicate()
 {
-	*send_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-
-	for (size_t i = 0; i < send_buffer_size - 1; i++)
+	if (is_enabled)
 	{
-		*(send_buffer + i + 1) = *send_data_vec[i];
-	}
+		*send_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
-	zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
+		for (size_t i = 0; i < send_buffer_size - 1; i++)
+		{
+			*(send_buffer + i + 1) = *send_data_vec[i];
+		}
 
-	zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
+		zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
 
-	if (*receive_buffer < 0)
-	{
-		enable = false;
-		send_meta_data();
-		return;
-	}
+		zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
 
-	for (size_t i = 0; i < receive_buffer_size - 1; i++)
-	{
-		*receive_data_vec[i] = *(receive_buffer + i + 1);
+		if (*receive_buffer < 0)
+		{
+			is_enabled = false;
+			send_meta_data();
+			return;
+		}
+
+		for (size_t i = 0; i < receive_buffer_size - 1; i++)
+		{
+			*receive_data_vec[i] = *(receive_buffer + i + 1);
+		}
 	}
 }

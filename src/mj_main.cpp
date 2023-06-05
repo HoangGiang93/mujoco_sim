@@ -77,10 +77,7 @@ void simulate()
 
     while (ros::ok())
     {
-        if (MjSocket::enable)
-        {
-            mj_socket.communicate();          
-        }
+        mj_socket.communicate(); 
         {
             ros::Time sim_time = (ros::Time)(MjRos::ros_start.toSec() + d->time);
             ros::Duration sim_period = sim_time - last_sim_time;
