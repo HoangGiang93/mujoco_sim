@@ -255,15 +255,14 @@ void worker(int port)
 
 int main(int argc, char **argv)
 {
-    // register signal SIGINT and signal handler  
+    // register signal SIGINT and signal handler
     signal(SIGINT, [](int signum)
-    {
+           {
         ROS_INFO("Interrupt signal (%d) received.", signum);
-        should_shut_down = true;
-    }); 
+        should_shut_down = true; });
 
     ros::init(argc, argv, "state_server");
-    
+
     for (size_t thread_num = 0; thread_num < argc - 1; thread_num++)
     {
         std::thread worker_thread(worker, std::stoi(argv[thread_num + 1]));
@@ -272,8 +271,8 @@ int main(int argc, char **argv)
 
     while (!should_shut_down)
     {
-        
     }
+
     zmq_sleep(1);
 
     return 0;
