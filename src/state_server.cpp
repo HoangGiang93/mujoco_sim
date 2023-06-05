@@ -73,19 +73,19 @@ public:
     void communicate()
     {
         // Receive JSON string over ZMQ
-        zmq::message_t request_header;
-        socket_server.recv(request_header, zmq::recv_flags::none);
+        zmq::message_t request_meta_data;
+        socket_server.recv(request_meta_data, zmq::recv_flags::none);
 
         Json::Reader reader;
-        reader.parse(request_header.to_string(), json_header);
-        std::cout << json_header.toStyledString() << std::endl;
+        reader.parse(request_meta_data.to_string(), meta_data_json);
+        std::cout << meta_data_json.toStyledString() << std::endl;
 
         std::vector<double *> send_data_vec;
         std::vector<double *> receive_data_vec;
         bool is_received_data_sent = false;
 
-    receive_header:
-        Json::Value send_objects_json = json_header["send"];
+    receive_meta_data:
+        Json::Value send_objects_json = meta_data_json["send"];
 
         for (auto it = send_objects_json.begin(); it != send_objects_json.end(); ++it)
         {
@@ -104,7 +104,7 @@ public:
             mtx.unlock();
         }
 
-        Json::Value receive_objects_json = json_header["receive"];
+        Json::Value receive_objects_json = meta_data_json["receive"];
 
         for (auto it = receive_objects_json.begin(); it != receive_objects_json.end(); ++it)
         {
@@ -124,9 +124,9 @@ public:
                 }
             }
 
-            for (const auto &attr : *it)
+            for (const Json::Value &attribute_json : *it)
             {
-                const std::string attribute_name = attr.asString();
+                const std::string attribute_name = attribute_json.asString();
                 mtx.lock();
                 for (double &value : send_objects[object_name][attribute_name].first)
                 {
@@ -141,9 +141,9 @@ public:
 
         // Send buffer sizes over ZMQ
         size_t buffer[2] = {send_buffer_size, receive_buffer_size};
-        zmq::message_t reply_header(sizeof(buffer));
-        memcpy(reply_header.data(), buffer, sizeof(buffer));
-        socket_server.send(reply_header, zmq::send_flags::none);
+        zmq::message_t reply_meta_data(sizeof(buffer));
+        memcpy(reply_meta_data.data(), buffer, sizeof(buffer));
+        socket_server.send(reply_meta_data, zmq::send_flags::none);
 
         send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
         receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
@@ -151,22 +151,22 @@ public:
         while (ros::ok())
         {
             // Receive send_data over ZMQ
-            zmq::message_t request;
-            socket_server.recv(request);
+            zmq::message_t request_data;
+            socket_server.recv(request_data);
 
-            if (request.to_string()[0] == '{')
+            if (request_data.to_string()[0] == '{')
             {
                 Json::Reader reader;
-                reader.parse(request.to_string(), json_header);
-                std::cout << json_header.toStyledString() << std::endl;
+                reader.parse(request_data.to_string(), meta_data_json);
+                std::cout << meta_data_json.toStyledString() << std::endl;
 
                 send_data_vec.clear();
                 receive_data_vec.clear();
 
-                goto receive_header;
+                goto receive_meta_data;
             }
 
-            memcpy(send_buffer, request.data(), send_buffer_size * sizeof(double));
+            memcpy(send_buffer, request_data.data(), send_buffer_size * sizeof(double));
 
             const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - *send_buffer) / 1000.0;
 
@@ -222,9 +222,9 @@ public:
             }
 
             // Send receive_data over ZMQ
-            zmq::message_t reply(receive_buffer_size * sizeof(double));
-            memcpy(reply.data(), receive_buffer, receive_buffer_size * sizeof(double));
-            socket_server.send(reply, zmq::send_flags::none);
+            zmq::message_t reply_data(receive_buffer_size * sizeof(double));
+            memcpy(reply_data.data(), receive_buffer, receive_buffer_size * sizeof(double));
+            socket_server.send(reply_data, zmq::send_flags::none);
 
             if (terminate)
             {
@@ -240,7 +240,7 @@ private:
 
     zmq::socket_t socket_server;
 
-    Json::Value json_header;
+    Json::Value meta_data_json;
 
     double *send_buffer;
 

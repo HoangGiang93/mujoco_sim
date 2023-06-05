@@ -45,12 +45,10 @@ public:
     void init(const int port);
 
     /**
-     * @brief Send the header
+     * @brief Send the meta_data
      * 
-     * @return true if success
-     * @return false if failed
      */
-    bool send_header();
+    void send_meta_data();
 
     /**
      * @brief Communicate with the server

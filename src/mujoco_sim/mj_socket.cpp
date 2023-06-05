@@ -25,6 +25,7 @@
 #include <chrono>
 #include <jsoncpp/json/json.h>
 #include <zmq.h>
+#include <thread>
 
 std::string host = "tcp://127.0.0.1";
 
@@ -110,12 +111,17 @@ void MjSocket::init(const int port)
 	}
 }
 
-bool MjSocket::send_header()
+void MjSocket::send_meta_data()
 {
+	std::thread send_meta_data_thread([this]()
+									  {
+	send_data_vec.clear();
+	receive_data_vec.clear();
+
 	// Create JSON object and populate it
-	Json::Value header_json;
-	header_json["time"] = "microseconds";
-	header_json["simulator"] = "mujoco";
+	Json::Value meta_data_json;
+	meta_data_json["time"] = "microseconds";
+	meta_data_json["simulator"] = "mujoco";
 
 	mtx.lock();
 	for (const std::pair<std::string, std::vector<std::string>> &send_object : send_objects)
@@ -137,7 +143,7 @@ bool MjSocket::send_header()
 				send_data_vec.push_back(&d->xquat[4 * body_id + 3]);
 			}
 
-			header_json["send"][send_object.first].append(attribute);
+			meta_data_json["send"][send_object.first].append(attribute);
 		}
 	}
 	mtx.unlock();
@@ -164,15 +170,15 @@ bool MjSocket::send_header()
 				receive_data_vec.push_back(&d->mocap_quat[4 * mocap_id + 3]);
 			}
 
-			header_json["receive"][receive_object.first].append(attribute);
+			meta_data_json["receive"][receive_object.first].append(attribute);
 		}
 	}
 	mtx.unlock();
 	receive_buffer_size = 1 + receive_data_vec.size();
 
 	// Send JSON string over ZMQ
-	const std::string header_str = header_json.toStyledString();
-	zmq_send(socket_client, header_str.c_str(), header_str.size(), 0);
+	const std::string meta_data_str = meta_data_json.toStyledString();
+	zmq_send(socket_client, meta_data_str.c_str(), meta_data_str.size(), 0);
 
 	// Receive buffer sizes over ZMQ
 	size_t buffer[2];
@@ -180,17 +186,17 @@ bool MjSocket::send_header()
 
 	if (buffer[0] != send_buffer_size || buffer[1] != receive_buffer_size)
 	{
-		ROS_ERROR("Failed to initialize the socket header at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
-		return false;
+		ROS_ERROR("Failed to initialize the socket meta_data at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
 	}
 	else
 	{
-		ROS_INFO("Initialized the socket header at %s successfully.", socket_client_addr.c_str());
+		ROS_INFO("Initialized the socket meta_data at %s successfully.", socket_client_addr.c_str());
 		ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
 		send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
 		receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
-		return true;
-	}
+		enable = true;
+	} });
+	send_meta_data_thread.detach();
 }
 
 void MjSocket::communicate()
@@ -209,6 +215,8 @@ void MjSocket::communicate()
 	if (*receive_buffer < 0)
 	{
 		enable = false;
+		send_meta_data();
+		return;
 	}
 
 	for (size_t i = 0; i < receive_buffer_size - 1; i++)

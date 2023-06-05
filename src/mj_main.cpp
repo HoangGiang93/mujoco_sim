@@ -201,12 +201,10 @@ int main(int argc, char **argv)
 
     MjSocket &mj_socket = MjSocket::get_instance();
     mj_socket.init(port);
-    std::thread init_socket_thread([&mj_socket](){
-        if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0) && mj_socket.send_header())
-        {
-            MjSocket::enable = true;
-        }
-    });
+    if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0))
+    {
+        mj_socket.send_meta_data();
+    }
 
     mjcb_control = controller;
 
@@ -242,7 +240,6 @@ int main(int argc, char **argv)
     ros_thread2.join();
     ros_thread3.join();
     sim_thread.join();
-    init_socket_thread.join();
 
     // free MuJoCo model and data, deactivate
     mj_deleteData(d);
