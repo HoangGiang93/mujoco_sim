@@ -63,6 +63,8 @@ public:
 
     static std::map<std::string, std::vector<std::string>> receive_objects;
 
+    static bool enable;
+
 private:
     std::vector<mjtNum *> send_data_vec;
 

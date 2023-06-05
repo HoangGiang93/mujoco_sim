@@ -37,8 +37,6 @@ static MjVisual &mj_visual = MjVisual::get_instance();
 
 static int i = 0;
 
-static bool enable_socket = false;
-
 #ifdef VISUAL
 // keyboard callback
 void keyboard(GLFWwindow *window, int key, int scancode, int act, int mods)
@@ -79,9 +77,9 @@ void simulate()
 
     while (ros::ok())
     {
-        if (enable_socket)
+        if (MjSocket::enable)
         {
-            mj_socket.communicate();
+            mj_socket.communicate();          
         }
         {
             ros::Time sim_time = (ros::Time)(MjRos::ros_start.toSec() + d->time);
@@ -206,7 +204,7 @@ int main(int argc, char **argv)
     std::thread init_socket_thread([&mj_socket](){
         if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0) && mj_socket.send_header())
         {
-            enable_socket = true;
+            MjSocket::enable = true;
         }
     });
 
