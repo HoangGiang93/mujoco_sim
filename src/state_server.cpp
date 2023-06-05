@@ -45,12 +45,15 @@ std::vector<zmq::socket_t> socket_servers;
 
 std::map<std::string, std::map<std::string, std::vector<double>>> send_objects;
 
+std::map<std::string, bool> send_flags;
+
 void run_socket_server(const size_t thread_num);
 
 void communicate(const size_t thread_num, Json::Value json_header)
 {
     std::vector<double *> send_data_vec;
     std::vector<double *> receive_data_vec;
+    bool is_received_data_sent = false;
 
 receive_header:
 
@@ -61,6 +64,7 @@ receive_header:
         const std::string object_name = it.key().asString();
         mtx.lock();
         send_objects[object_name] = {};
+        send_flags[object_name] = false;
         for (const auto &attr : *it)
         {
             const std::string attribute_name = attr.asString();
@@ -134,6 +138,19 @@ receive_header:
             *send_data_vec[i] = send_buffer[i + 1];
         }
 
+        if (!is_received_data_sent)
+        {
+            for (auto it = receive_objects_json.begin(); it != receive_objects_json.end(); ++it)
+            {
+                const std::string object_name = it.key().asString();
+                while (!send_flags[object_name])
+                {
+                    /* code */
+                }
+            }
+            is_received_data_sent = true;
+        }
+        
         *receive_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
         for (size_t i = 0; i < receive_buffer_size - 1; i++)
