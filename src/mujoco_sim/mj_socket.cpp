@@ -32,6 +32,8 @@ std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
 std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
+bool MjSocket::enable = false;
+
 MjSocket::~MjSocket()
 {
 	free(send_buffer);
@@ -203,6 +205,11 @@ void MjSocket::communicate()
 	zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
 
 	zmq_recv(socket_client, receive_buffer, receive_buffer_size * sizeof(double), 0);
+
+	if (*receive_buffer < 0)
+	{
+		enable = false;
+	}
 
 	for (size_t i = 0; i < receive_buffer_size - 1; i++)
 	{
