@@ -198,10 +198,6 @@ int main(int argc, char **argv)
 
     MjSocket &mj_socket = MjSocket::get_instance();
     mj_socket.init(port);
-    if ((MjSocket::send_objects.size() > 0 || MjSocket::receive_objects.size() > 0))
-    {
-        mj_socket.send_meta_data();
-    }
 
     mjcb_control = controller;
 

@@ -106,6 +106,8 @@ void MjSocket::init(const int port)
 		socket_client = zmq_socket(context, ZMQ_REQ);
 		socket_client_addr = host + ":" + std::to_string(port);
 		zmq_connect(socket_client, socket_client_addr.c_str());
+
+		send_meta_data();
 	}
 }
 

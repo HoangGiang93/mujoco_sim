@@ -41,7 +41,7 @@ std::mutex mtx;
 
 std::map<std::string, std::map<std::string, std::pair<std::vector<double>, bool>>> send_objects;
 
-bool terminate = false;
+bool should_shut_down = false;
 
 class StateHandle
 {
@@ -211,7 +211,7 @@ public:
             }
 
             *receive_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-            if (terminate)
+            if (should_shut_down)
             {
                 *receive_buffer = -1.0;
             }
@@ -226,7 +226,7 @@ public:
             memcpy(reply_data.data(), receive_buffer, receive_buffer_size * sizeof(double));
             socket_server.send(reply_data, zmq::send_flags::none);
 
-            if (terminate)
+            if (should_shut_down)
             {
                 return;
             }
@@ -259,7 +259,7 @@ int main(int argc, char **argv)
     signal(SIGINT, [](int signum)
     {
         ROS_INFO("Interrupt signal (%d) received.", signum);
-        terminate = true;
+        should_shut_down = true;
     }); 
 
     ros::init(argc, argv, "state_server");
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
         worker_thread.detach();
     }
 
-    while (!terminate)
+    while (!should_shut_down)
     {
         
     }

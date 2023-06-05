@@ -45,12 +45,6 @@ public:
     void init(const int port);
 
     /**
-     * @brief Send the meta_data
-     * 
-     */
-    void send_meta_data();
-
-    /**
      * @brief Communicate with the server
      * 
      */
@@ -81,6 +75,9 @@ private:
 	double *receive_buffer;
 
     std::string socket_client_addr;
+
+private:
+    void send_meta_data();
 
 private:
     MjSocket() = default;
