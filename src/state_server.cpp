@@ -35,8 +35,6 @@
 
 using namespace std::chrono_literals;
 
-std::vector<std::thread> workers;
-
 std::mutex mtx;
 
 std::map<std::string, std::map<std::string, std::pair<std::vector<double>, bool>>> send_objects;
@@ -56,17 +54,7 @@ public:
     ~StateHandle()
     {
         socket_server.unbind(socket_addr);
-        ROS_INFO("Unbind server socket from address %s", socket_addr.c_str());
-
-        if (send_buffer != nullptr)
-        {
-            free(send_buffer);
-        }
-
-        if (receive_buffer != nullptr)
-        {
-            free(receive_buffer);
-        }
+        ROS_INFO("Unbinding server socket from address %s", socket_addr.c_str());
     }
 
 public:
@@ -152,7 +140,7 @@ public:
         {
             // Receive send_data over ZMQ
             zmq::message_t request_data;
-            socket_server.recv(request_data);
+            socket_server.recv(request_data, zmq::recv_flags::none);
 
             if (request_data.to_string()[0] == '{')
             {
@@ -211,11 +199,6 @@ public:
             }
 
             *receive_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-            if (should_shut_down)
-            {
-                *receive_buffer = -1.0;
-            }
-
             for (size_t i = 0; i < receive_buffer_size - 1; i++)
             {
                 receive_buffer[i + 1] = *receive_data_vec[i];
@@ -223,19 +206,23 @@ public:
 
             // Send receive_data over ZMQ
             zmq::message_t reply_data(receive_buffer_size * sizeof(double));
+            if (should_shut_down)
+            {
+                *receive_buffer = -1.0;
+            }
             memcpy(reply_data.data(), receive_buffer, receive_buffer_size * sizeof(double));
             socket_server.send(reply_data, zmq::send_flags::none);
 
             if (should_shut_down)
             {
+                free(send_buffer);
+                free(receive_buffer);
                 return;
             }
         }
     }
 
 private:
-    zmq::context_t context{1};
-
     std::string socket_addr;
 
     zmq::socket_t socket_server;
@@ -245,6 +232,8 @@ private:
     double *send_buffer;
 
     double *receive_buffer;
+
+    zmq::context_t context{1};
 };
 
 void worker(int port)
@@ -255,15 +244,14 @@ void worker(int port)
 
 int main(int argc, char **argv)
 {
-    // register signal SIGINT and signal handler  
+    // register signal SIGINT and signal handler
     signal(SIGINT, [](int signum)
-    {
+           {
         ROS_INFO("Interrupt signal (%d) received.", signum);
-        should_shut_down = true;
-    }); 
+        should_shut_down = true; });
 
     ros::init(argc, argv, "state_server");
-    
+
     for (size_t thread_num = 0; thread_num < argc - 1; thread_num++)
     {
         std::thread worker_thread(worker, std::stoi(argv[thread_num + 1]));
@@ -272,9 +260,9 @@ int main(int argc, char **argv)
 
     while (!should_shut_down)
     {
-        
     }
-    zmq_sleep(1);
+
+    zmq_sleep(1); // Wait for all state handles to clean up
 
     return 0;
 }
