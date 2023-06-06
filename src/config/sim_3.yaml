@@ -3,5 +3,6 @@ send:
   joint: [position]
 
 receive:
-  cube_1: [position, quaternion]
-  cube_2: [position, quaternion]
+  sphere: [position, quaternion]
+  cube: [position, quaternion]
+  # slider: [position, quaternion]

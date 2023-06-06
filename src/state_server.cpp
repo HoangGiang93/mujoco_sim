@@ -78,7 +78,12 @@ public:
 public:
     void communicate()
     {
+        std::vector<double *> send_data_vec;
+        std::vector<double *> receive_data_vec;
+        bool is_received_data_sent;
+
     request_meta_data:
+        is_received_data_sent = false;
 
         // Receive JSON string over ZMQ
         zmq::message_t request_meta_data;
@@ -97,10 +102,6 @@ public:
         Json::Reader reader;
         reader.parse(request_meta_data.to_string(), meta_data_json);
         std::cout << meta_data_json.toStyledString() << std::endl;
-
-        std::vector<double *> send_data_vec;
-        std::vector<double *> receive_data_vec;
-        bool is_received_data_sent = false;
 
     receive_meta_data:
         Json::Value send_objects_json = meta_data_json["send"];
@@ -131,7 +132,7 @@ public:
             {
                 const std::string attribute_name = attribute_json.asString();
                 int start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-                while ((send_objects.count(object_name) == 0 || send_objects[object_name].count(attribute_name) == 0) && ros::ok())
+                while ((send_objects.count(object_name) == 0 || send_objects[object_name].count(attribute_name) == 0) && !should_shut_down)
                 {
                     const int now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
                     if (now - start > 1)
@@ -172,7 +173,7 @@ public:
         receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 
         sockets_need_clean_up[socket_addr] = true;
-        while (ros::ok())
+        while (!should_shut_down)
         {
             // Receive send_data over ZMQ
             zmq::message_t request_data;
@@ -226,7 +227,7 @@ public:
                     {
                         const std::string attribute_name = attribute_json.asString();
                         int start = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
-                        while ((send_objects.count(object_name) == 0 || send_objects[object_name].count(attribute_name) == 0 || !send_objects[object_name][attribute_name].second) && ros::ok())
+                        while ((send_objects.count(object_name) == 0 || send_objects[object_name].count(attribute_name) == 0 || !send_objects[object_name][attribute_name].second) && !should_shut_down)
                         {
                             const int now = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
                             if (now - start > 1)
