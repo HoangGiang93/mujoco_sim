@@ -54,7 +54,7 @@ public:
      * @brief Send close signal to the server
      * 
      */
-    void close();
+    void deinit();
 
 public:
     static std::map<std::string, std::vector<std::string>> send_objects;

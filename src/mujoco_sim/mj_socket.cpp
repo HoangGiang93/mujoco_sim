@@ -227,7 +227,7 @@ void MjSocket::communicate()
 	}
 }
 
-void MjSocket::close()
+void MjSocket::deinit()
 {
 	if (is_enabled)
 	{
