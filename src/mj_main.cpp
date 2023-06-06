@@ -165,6 +165,7 @@ void simulate()
             }
         }
     }
+    mj_socket.close(); 
 }
 
 int main(int argc, char **argv)

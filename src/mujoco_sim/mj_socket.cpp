@@ -186,12 +186,12 @@ void MjSocket::send_meta_data()
 
 	if (buffer[0] != send_buffer_size || buffer[1] != receive_buffer_size)
 	{
-		ROS_ERROR("Failed to initialize the socket meta_data at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
+		ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
 	}
 	else
 	{
-		ROS_INFO("Initialized the socket meta_data at %s successfully.", socket_client_addr.c_str());
-		ROS_INFO("Start communication on %s with a send_object of length %ld and a receive_object of length %ld", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
+		ROS_INFO("Initialized the socket at %s successfully.", socket_client_addr.c_str());
+		ROS_INFO("Start communication on %s (send: %ld, receive: %ld)", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
 		send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
 		receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 		is_enabled = true;
@@ -217,6 +217,7 @@ void MjSocket::communicate()
 		if (*receive_buffer < 0)
 		{
 			is_enabled = false;
+			ROS_WARN("Stop communication on %s", socket_client_addr.c_str());
 			send_meta_data();
 			return;
 		}
@@ -225,5 +226,15 @@ void MjSocket::communicate()
 		{
 			*receive_data_vec[i] = *(receive_buffer + i + 1);
 		}
+	}
+}
+
+void MjSocket::close()
+{
+	if (is_enabled)
+	{
+		const std::string close_data = "{}";
+
+		zmq_send(socket_client, close_data.c_str(), close_data.size(), 0);
 	}
 }

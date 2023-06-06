@@ -50,6 +50,12 @@ public:
      */
     void communicate();
 
+    /**
+     * @brief Send close signal to the server
+     * 
+     */
+    void close();
+
 public:
     static std::map<std::string, std::vector<std::string>> send_objects;
 

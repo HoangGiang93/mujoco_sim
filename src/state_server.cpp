@@ -43,6 +43,10 @@ std::map<std::string, std::map<std::string, std::pair<std::vector<double>, bool>
 
 bool should_shut_down = false;
 
+std::map<std::string, bool> sockets_need_clean_up;
+
+zmq::context_t context{1};
+
 class StateHandle
 {
 public:
@@ -50,13 +54,13 @@ public:
     {
         socket_server = zmq::socket_t(context, zmq::socket_type::rep);
         socket_server.bind(socket_addr);
+        sockets_need_clean_up[socket_addr] = false;
         ROS_INFO("Bind server socket to address %s", socket_addr.c_str());
     }
 
     ~StateHandle()
     {
-        socket_server.unbind(socket_addr);
-        ROS_INFO("Unbind server socket from address %s", socket_addr.c_str());
+        ROS_INFO("Close server socket %s", socket_addr.c_str());
 
         if (send_buffer != nullptr)
         {
@@ -67,14 +71,28 @@ public:
         {
             free(receive_buffer);
         }
+
+        sockets_need_clean_up[socket_addr] = false;
     }
 
 public:
     void communicate()
     {
+    request_meta_data:
+
         // Receive JSON string over ZMQ
         zmq::message_t request_meta_data;
-        socket_server.recv(request_meta_data, zmq::recv_flags::none);
+        try
+        {
+            sockets_need_clean_up[socket_addr] = false;
+            socket_server.recv(request_meta_data, zmq::recv_flags::none);
+            sockets_need_clean_up[socket_addr] = true;
+        }
+        catch (const zmq::error_t &e)
+        {
+            ROS_INFO("%s, server socket %s prepares to close", e.what(), socket_addr.c_str());
+            return;
+        }
 
         Json::Reader reader;
         reader.parse(request_meta_data.to_string(), meta_data_json);
@@ -145,14 +163,27 @@ public:
         memcpy(reply_meta_data.data(), buffer, sizeof(buffer));
         socket_server.send(reply_meta_data, zmq::send_flags::none);
 
+        if (send_buffer_size == 1 && receive_buffer_size == 1)
+        {
+            goto request_meta_data;
+        }
+
         send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
         receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 
+        sockets_need_clean_up[socket_addr] = true;
         while (ros::ok())
         {
             // Receive send_data over ZMQ
             zmq::message_t request_data;
-            socket_server.recv(request_data);
+            try
+            {
+                socket_server.recv(request_data, zmq::recv_flags::none);
+            }
+            catch (const zmq::error_t &e)
+            {
+                ROS_INFO("%s, server socket %s prepares to close", e.what(), socket_addr.c_str());
+            }
 
             if (request_data.to_string()[0] == '{')
             {
@@ -228,14 +259,14 @@ public:
 
             if (should_shut_down)
             {
+                socket_server.unbind(socket_addr);
+                ROS_INFO("Unbind server socket from address %s", socket_addr.c_str());
                 return;
             }
         }
     }
 
 private:
-    zmq::context_t context{1};
-
     std::string socket_addr;
 
     zmq::socket_t socket_server;
@@ -247,7 +278,7 @@ private:
     double *receive_buffer;
 };
 
-void worker(int port)
+void start_state_handle(int port)
 {
     StateHandle state_handle("tcp://127.0.0.1:" + std::to_string(port));
     state_handle.communicate();
@@ -265,15 +296,31 @@ int main(int argc, char **argv)
 
     for (size_t thread_num = 0; thread_num < argc - 1; thread_num++)
     {
-        std::thread worker_thread(worker, std::stoi(argv[thread_num + 1]));
-        worker_thread.detach();
+        workers.emplace_back(start_state_handle, std::stoi(argv[thread_num + 1]));
     }
 
     while (!should_shut_down)
     {
     }
 
-    zmq_sleep(1);
+    bool can_shut_down = true;
+    do
+    {
+        can_shut_down = true;
+        for (const std::pair<std::string, bool> &socket_needs_clean_up : sockets_need_clean_up)
+        {
+            if (socket_needs_clean_up.second)
+            {
+                can_shut_down = false;
+                break;
+            }
+        }
+    } while (!can_shut_down);
 
-    return 0;
+    context.shutdown();
+
+    for (std::thread &worker : workers)
+    {
+        worker.join();
+    }
 }
