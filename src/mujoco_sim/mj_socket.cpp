@@ -35,10 +35,7 @@ std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
 
 MjSocket::~MjSocket()
 {
-	free(send_buffer);
-	free(receive_buffer);
-
-	zmq_disconnect(socket_client, socket_client_addr.c_str());
+	
 }
 
 void MjSocket::init(const int port)
@@ -187,6 +184,7 @@ void MjSocket::send_meta_data()
 	if (buffer[0] != send_buffer_size || buffer[1] != receive_buffer_size)
 	{
 		ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), buffer[0], send_buffer_size, buffer[1], receive_buffer_size);
+		zmq_disconnect(socket_client, socket_client_addr.c_str());
 	}
 	else
 	{
@@ -236,5 +234,10 @@ void MjSocket::close()
 		const std::string close_data = "{}";
 
 		zmq_send(socket_client, close_data.c_str(), close_data.size(), 0);
+
+		free(send_buffer);
+		free(receive_buffer);
+
+		zmq_disconnect(socket_client, socket_client_addr.c_str());
 	}
 }
