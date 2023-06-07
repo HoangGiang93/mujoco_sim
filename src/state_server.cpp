@@ -81,6 +81,7 @@ public:
         std::vector<double *> send_data_vec;
         std::vector<double *> receive_data_vec;
         bool is_received_data_sent;
+        bool continue_state = false;
 
     request_meta_data:
         is_received_data_sent = false;
@@ -124,6 +125,8 @@ public:
                 }
                 else
                 {
+                    ROS_INFO("Continue state on socker %s", socket_addr.c_str());
+                    continue_state = true;
                     send_objects[object_name][attribute_name].second = true;
                 }
                 
@@ -170,11 +173,32 @@ public:
         const size_t send_buffer_size = 1 + send_data_vec.size();
         const size_t receive_buffer_size = 1 + receive_data_vec.size();
 
-        // Send buffer sizes over ZMQ
-        size_t buffer[2] = {send_buffer_size, receive_buffer_size};
-        zmq::message_t reply_meta_data(sizeof(buffer));
-        memcpy(reply_meta_data.data(), buffer, sizeof(buffer));
-        socket_server.send(reply_meta_data, zmq::send_flags::none);
+        double *buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
+        buffer[0] = send_buffer_size;
+        buffer[1] = receive_buffer_size;
+
+        if (continue_state)
+        {
+            buffer[2] = -1.0;
+
+            for (size_t i = 0; i < send_buffer_size - 1; i++)
+            {
+                buffer[i + 3] = *send_data_vec[i];
+            }
+
+            continue_state = false;
+        }
+        else
+        {   
+            buffer[2] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        }
+
+        // Send buffer sizes and send_data (if exists) over ZMQ
+        zmq::message_t reply_data((send_buffer_size  + 2)* sizeof(double));
+        memcpy(reply_data.data(), buffer, (send_buffer_size + 2) * sizeof(double));
+        socket_server.send(reply_data, zmq::send_flags::none);
+
+        free(buffer);
 
         if (send_buffer_size == 1 && receive_buffer_size == 1)
         {
@@ -184,7 +208,7 @@ public:
         send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
         receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 
-        sockets_need_clean_up[socket_addr] = true;
+        sockets_need_clean_up[socket_addr] = true;        
         while (!should_shut_down)
         {
             // Receive send_data over ZMQ
@@ -212,7 +236,7 @@ public:
 
             memcpy(send_buffer, request_data.data(), send_buffer_size * sizeof(double));
 
-            const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - *send_buffer) / 1000.0;
+            const double delay_ms = (std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count() - send_buffer[0]) / 1000.0;
 
             for (size_t i = 0; i < send_buffer_size - 1; i++)
             {
@@ -257,7 +281,7 @@ public:
             *receive_buffer = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
             if (should_shut_down)
             {
-                *receive_buffer = -1.0;
+                receive_buffer[0] = -1.0;
             }
 
             for (size_t i = 0; i < receive_buffer_size - 1; i++)
