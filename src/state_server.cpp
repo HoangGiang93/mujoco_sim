@@ -177,6 +177,12 @@ public:
         buffer[0] = send_buffer_size;
         buffer[1] = receive_buffer_size;
 
+        if (should_shut_down)
+        {
+            buffer[0] = -1.0;
+            buffer[1] = -1.0;
+        }
+
         if (continue_state)
         {
             buffer[2] = -1.0;
