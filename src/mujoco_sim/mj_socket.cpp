@@ -58,7 +58,6 @@ void MjSocket::init(const int port)
 		std::string log = "Set send_objects: ";
 		for (const std::pair<std::string, XmlRpc::XmlRpcValue> &send_object_param : send_object_params)
 		{
-
 			std::vector<std::string> send_data;
 			if (ros::param::get("~send/" + send_object_param.first, send_data))
 			{
@@ -192,7 +191,8 @@ void MjSocket::send_meta_data()
 			{
 				ROS_INFO("Continue state on socket %s", socket_client_addr.c_str());
 				mtx.lock();
-				int buffer_id = 3;
+
+				double *buffer_addr = buffer + 3;
 				
 				for (const std::pair<std::string, std::vector<std::string>> &send_object : send_objects)
 				{
@@ -206,16 +206,16 @@ void MjSocket::send_meta_data()
 						{
 							if (strcmp(attribute.c_str(), "position") == 0)
 							{
-								xpos_desired[0] = buffer[buffer_id++];
-								xpos_desired[1] = buffer[buffer_id++];
-								xpos_desired[2] = buffer[buffer_id++];
+								xpos_desired[0] = *buffer_addr++;
+								xpos_desired[1] = *buffer_addr++;
+								xpos_desired[2] = *buffer_addr++;
 							}
 							else if (strcmp(attribute.c_str(), "quaternion") == 0)
 							{
-								xquat_desired[0] = buffer[buffer_id++];
-								xquat_desired[1] = buffer[buffer_id++];
-								xquat_desired[2] = buffer[buffer_id++];
-								xquat_desired[2] = buffer[buffer_id++];
+								xquat_desired[0] = *buffer_addr++;
+								xquat_desired[1] = *buffer_addr++;
+								xquat_desired[2] = *buffer_addr++;
+								xquat_desired[2] = *buffer_addr++;
 							}
 						}
 
@@ -234,11 +234,11 @@ void MjSocket::send_meta_data()
 						{
 							if (strcmp(attribute.c_str(), "position") == 0)
 							{
-								buffer_id+=3;
+								buffer_addr += 3;
 							}
 							else if (strcmp(attribute.c_str(), "quaternion") == 0)
 							{
-								const mjtNum xquat_desired[4] = {buffer[buffer_id++], buffer[buffer_id++], buffer[buffer_id++], buffer[buffer_id++]};
+								const mjtNum xquat_desired[4] = {*buffer_addr++, *buffer_addr++, *buffer_addr++, *buffer_addr++};
 								mjtNum xquat_current_neg[4] = {d->xquat[4 * body_id], d->xquat[4 * body_id + 1], d->xquat[4 * body_id + 2], d->xquat[4 * body_id + 3]};
 								mju_negQuat(xquat_current_neg, xquat_current_neg);
 								mjtNum qpos[4] = {1.0, 0.0, 0.0, 0.0};
@@ -276,7 +276,7 @@ void MjSocket::communicate()
 
 		for (size_t i = 0; i < send_buffer_size - 1; i++)
 		{
-			*(send_buffer + i + 1) = *send_data_vec[i];
+			send_buffer[i + 1] = *send_data_vec[i];
 		}
 
 		zmq_send(socket_client, send_buffer, send_buffer_size * sizeof(double), 0);
@@ -293,7 +293,7 @@ void MjSocket::communicate()
 
 		for (size_t i = 0; i < receive_buffer_size - 1; i++)
 		{
-			*receive_data_vec[i] = *(receive_buffer + i + 1);
+			*receive_data_vec[i] = receive_buffer[i + 1];
 		}
 	}
 }
