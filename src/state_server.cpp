@@ -124,7 +124,7 @@ public:
                 }
                 else
                 {
-                    send_objects[object_name][attribute_name].second = false;
+                    send_objects[object_name][attribute_name].second = true;
                 }
                 
                 for (double &value : send_objects[object_name][attribute_name].first)
