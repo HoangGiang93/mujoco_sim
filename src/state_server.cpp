@@ -110,11 +110,23 @@ public:
         {
             const std::string object_name = it.key().asString();
             mtx.lock();
-            send_objects[object_name] = {};
+            if (send_objects.count(object_name) == 0)
+            {
+                send_objects[object_name] = {};
+            } 
+            
             for (const Json::Value &attribute_json : *it)
             {
                 const std::string attribute_name = attribute_json.asString();
-                send_objects[object_name][attribute_name] = {attribute_map[attribute_name], false};
+                if (send_objects[object_name].count(attribute_name) == 0)
+                {
+                    send_objects[object_name][attribute_name] = {attribute_map[attribute_name], false};
+                }
+                else
+                {
+                    send_objects[object_name][attribute_name].second = false;
+                }
+                
                 for (double &value : send_objects[object_name][attribute_name].first)
                 {
                     send_data_vec.push_back(&value);
