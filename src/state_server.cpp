@@ -127,7 +127,7 @@ public:
                 {
                     ROS_INFO("Continue state on socker %s", socket_addr.c_str());
                     continue_state = true;
-                    send_objects[object_name][attribute_name].second = true;
+                    send_objects[object_name][attribute_name].second = false;
                 }
                 
                 for (double &value : send_objects[object_name][attribute_name].first)

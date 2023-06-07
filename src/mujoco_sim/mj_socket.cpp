@@ -190,14 +190,45 @@ void MjSocket::send_meta_data()
 		{
 			if (buffer[2] < 0.0)
 			{
-				ROS_INFO("Continue state on socker %s", socket_client_addr.c_str());
+				ROS_INFO("Continue state on socket %s", socket_client_addr.c_str());
 				mtx.lock();
-				int buffer_id = 2;
+				int buffer_id = 3;
 				
 				for (const std::pair<std::string, std::vector<std::string>> &send_object : send_objects)
 				{
 					const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
-					if (m->body_dofnum[body_id] == 3 && m->body_jntadr[body_id] != -1 && m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_BALL)
+					if (body_id != -1 && m->body_dofnum[body_id] == 6 && m->body_jntadr[body_id] != -1 && m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_FREE)
+					{
+						mjtNum xpos_desired[3] = {d->xpos[3 * body_id], d->xpos[3 * body_id + 1], d->xpos[3 * body_id + 2]};
+						mjtNum xquat_desired[4] = {d->xquat[4 * body_id], d->xquat[4 * body_id + 1], d->xquat[4 * body_id + 2], d->xquat[4 * body_id + 3]};
+
+						for (const std::string &attribute : send_object.second)
+						{
+							if (strcmp(attribute.c_str(), "position") == 0)
+							{
+								xpos_desired[0] = buffer[buffer_id++];
+								xpos_desired[1] = buffer[buffer_id++];
+								xpos_desired[2] = buffer[buffer_id++];
+							}
+							else if (strcmp(attribute.c_str(), "quaternion") == 0)
+							{
+								xquat_desired[0] = buffer[buffer_id++];
+								xquat_desired[1] = buffer[buffer_id++];
+								xquat_desired[2] = buffer[buffer_id++];
+								xquat_desired[2] = buffer[buffer_id++];
+							}
+						}
+
+						const int qpos_id = m->jnt_qposadr[m->body_jntadr[body_id]];
+						d->qpos[qpos_id] = xpos_desired[0];
+						d->qpos[qpos_id + 1] = xpos_desired[1];
+						d->qpos[qpos_id + 2] = xpos_desired[2];
+						d->qpos[qpos_id + 3] = xquat_desired[0];
+						d->qpos[qpos_id + 4] = xquat_desired[1];
+						d->qpos[qpos_id + 5] = xquat_desired[2];
+						d->qpos[qpos_id + 6] = xquat_desired[3];
+					}
+					else if (body_id != -1 && m->body_dofnum[body_id] == 3 && m->body_jntadr[body_id] != -1 && m->jnt_type[m->body_jntadr[body_id]] == mjtJoint::mjJNT_BALL)
 					{
 						for (const std::string &attribute : send_object.second)
 						{
@@ -208,24 +239,20 @@ void MjSocket::send_meta_data()
 							else if (strcmp(attribute.c_str(), "quaternion") == 0)
 							{
 								const mjtNum xquat_desired[4] = {buffer[buffer_id++], buffer[buffer_id++], buffer[buffer_id++], buffer[buffer_id++]};
-								const mjtNum xquat_current[4] = {d->xquat[3 * body_id], d->xquat[3 * body_id + 1], d->xquat[3 * body_id + 2], d->xquat[3 * body_id + 3]};
-								mjtNum xquat_current_neg[4] = {1.0, 0.0, 0.0, 0.0};
-								mju_negQuat(xquat_current_neg, xquat_current);
-								mjtNum quat_diff[4] = {1.0, 0.0, 0.0, 0.0};
-								mju_mulQuat(quat_diff, xquat_current_neg, xquat_desired);
-								int dof_id = m->jnt_qposadr[m->body_jntadr[body_id]];
-								ROS_WARN("%s - current: [%f %f %f %f] - desired: [%f %f %f %f]", socket_client_addr.c_str(), xquat_current[0], xquat_current[1], xquat_current[2], xquat_current[3],
-								xquat_desired[0], xquat_desired[1], xquat_desired[2], xquat_desired[3]);
-								ROS_WARN("%s - %d Before: [%f %f %f %f]", socket_client_addr.c_str(), dof_id, d->qpos[dof_id], d->qpos[dof_id+1], d->qpos[dof_id+2], d->qpos[dof_id+3]);
-								d->qpos[dof_id] = quat_diff[0];
-								d->qpos[dof_id + 1] = quat_diff[1];
-								d->qpos[dof_id + 2] = quat_diff[2];
-								d->qpos[dof_id + 3] = quat_diff[3];
-								ROS_WARN("%s - %d After: [%f %f %f %f]", socket_client_addr.c_str(), dof_id, d->qpos[dof_id], d->qpos[dof_id+1], d->qpos[dof_id+2], d->qpos[dof_id+3]);
+								mjtNum xquat_current_neg[4] = {d->xquat[4 * body_id], d->xquat[4 * body_id + 1], d->xquat[4 * body_id + 2], d->xquat[4 * body_id + 3]};
+								mju_negQuat(xquat_current_neg, xquat_current_neg);
+								mjtNum qpos[4] = {1.0, 0.0, 0.0, 0.0};
+								mju_mulQuat(qpos, xquat_current_neg, xquat_desired);
+								const int qpos_id = m->jnt_qposadr[m->body_jntadr[body_id]];
+								d->qpos[qpos_id] = qpos[0];
+								d->qpos[qpos_id + 1] = qpos[1];
+								d->qpos[qpos_id + 2] = qpos[2];
+								d->qpos[qpos_id + 3] = qpos[3];
 							}
 						}
 					}
 				}
+
 				mtx.unlock();
 			}
 
