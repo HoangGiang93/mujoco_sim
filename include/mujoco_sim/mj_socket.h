@@ -22,8 +22,8 @@
 
 #include "mj_model.h"
 
-#include <thread>
 #include <set>
+#include <thread>
 
 class MjSocket
 {
@@ -47,13 +47,13 @@ public:
 
     /**
      * @brief Communicate with the server
-     * 
+     *
      */
     void communicate();
 
     /**
      * @brief Send close signal to the server
-     * 
+     *
      */
     void deinit();
 
@@ -61,7 +61,7 @@ public:
     static std::map<std::string, std::vector<std::string>> send_objects;
 
     static std::map<std::string, std::vector<std::string>> receive_objects;
-   
+
 private:
     bool is_enabled = false;
 
@@ -69,17 +69,17 @@ private:
 
     std::vector<mjtNum *> receive_data_vec;
 
-    void* context;
+    void *context;
 
-	void *socket_client;
+    void *socket_client;
 
-	size_t send_buffer_size = 1;
+    size_t send_buffer_size = 1;
 
-	size_t receive_buffer_size = 1;
+    size_t receive_buffer_size = 1;
 
     double *send_buffer;
-    
-	double *receive_buffer;
+
+    double *receive_buffer;
 
     std::string socket_addr;
 

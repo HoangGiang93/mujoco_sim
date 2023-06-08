@@ -77,7 +77,7 @@ void simulate()
 
     while (ros::ok())
     {
-        mj_socket.communicate(); 
+        mj_socket.communicate();
         {
             ros::Time sim_time = (ros::Time)(MjRos::ros_start.toSec() + d->time);
             ros::Duration sim_period = sim_time - last_sim_time;
@@ -165,7 +165,7 @@ void simulate()
             }
         }
     }
-    mj_socket.deinit(); 
+    mj_socket.deinit();
 }
 
 int main(int argc, char **argv)

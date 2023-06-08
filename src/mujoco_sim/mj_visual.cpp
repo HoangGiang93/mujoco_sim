@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 #include "mj_visual.h"
+
 #include "GL/gl.h"
 
 mjvCamera MjVisual::cam;  // abstract camera

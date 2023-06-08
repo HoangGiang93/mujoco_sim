@@ -20,12 +20,12 @@
 
 #include "mj_socket.h"
 
-#include <ros/ros.h>
-#include <iostream>
 #include <chrono>
-#include <jsoncpp/json/json.h>
-#include <zmq.hpp>
 #include <csignal>
+#include <iostream>
+#include <jsoncpp/json/json.h>
+#include <ros/ros.h>
+#include <zmq.hpp>
 
 std::string host = "tcp://127.0.0.1";
 
@@ -101,7 +101,7 @@ void MjSocket::init(const int port)
 
 		socket_client = zmq_socket(context, ZMQ_REQ);
 		socket_addr = host + ":" + std::to_string(port);
-		
+
 		ROS_INFO("Open the socket connection on %s", socket_addr.c_str());
 		send_meta_data();
 	}

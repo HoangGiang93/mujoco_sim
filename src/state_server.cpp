@@ -20,15 +20,14 @@
 
 #include <ros/ros.h>
 
-#include <string>
 #include <chrono>
+#include <csignal>
 #include <iostream>
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/reader.h>
-#include <thread>
 #include <mutex>
-#include <csignal>
-
+#include <string>
+#include <thread>
 #include <zmq.hpp>
 
 #include "state_msgs.cpp"
@@ -114,8 +113,8 @@ public:
             if (send_objects.count(object_name) == 0)
             {
                 send_objects[object_name] = {};
-            } 
-            
+            }
+
             for (const Json::Value &attribute_json : *it)
             {
                 const std::string attribute_name = attribute_json.asString();
@@ -129,7 +128,7 @@ public:
                     continue_state = true;
                     send_objects[object_name][attribute_name].second = false;
                 }
-                
+
                 for (double &value : send_objects[object_name][attribute_name].first)
                 {
                     send_data_vec.push_back(&value);
@@ -195,12 +194,12 @@ public:
             continue_state = false;
         }
         else
-        {   
+        {
             buffer[2] = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
         }
 
         // Send buffer sizes and send_data (if exists) over ZMQ
-        zmq::message_t reply_data((send_buffer_size  + 2)* sizeof(double));
+        zmq::message_t reply_data((send_buffer_size + 2) * sizeof(double));
         memcpy(reply_data.data(), buffer, (send_buffer_size + 2) * sizeof(double));
         socket_server.send(reply_data, zmq::send_flags::none);
 
@@ -214,7 +213,7 @@ public:
         send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
         receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 
-        sockets_need_clean_up[socket_addr] = true;        
+        sockets_need_clean_up[socket_addr] = true;
         while (!should_shut_down)
         {
             // Receive send_data over ZMQ

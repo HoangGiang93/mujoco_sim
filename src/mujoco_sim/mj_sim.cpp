@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 #include "mj_sim.h"
+
 #include "mj_util.h"
 
 #include <ros/package.h>

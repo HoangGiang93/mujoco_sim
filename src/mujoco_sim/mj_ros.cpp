@@ -19,18 +19,19 @@
 // SOFTWARE.
 
 #include "mj_ros.h"
-#include "mj_util.h"
+
 #include "mj_socket.h"
+#include "mj_util.h"
 
 #include <condition_variable>
 #include <controller_manager_msgs/ControllerState.h>
 #include <controller_manager_msgs/ListControllers.h>
 #include <controller_manager_msgs/SwitchController.h>
+#include <numeric>
 #include <ros/package.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <thread>
 #include <urdf/model.h>
-#include <numeric>
 
 using namespace std::chrono_literals;
 
