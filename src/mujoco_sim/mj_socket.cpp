@@ -102,7 +102,6 @@ void MjSocket::init(const int port)
 
 		socket_client = zmq_socket(context, ZMQ_REQ);
 		socket_client_addr = host + ":" + std::to_string(port);
-		zmq_connect(socket_client, socket_client_addr.c_str());
 
 		send_meta_data();
 	}
@@ -110,6 +109,8 @@ void MjSocket::init(const int port)
 
 void MjSocket::send_meta_data()
 {
+	zmq_disconnect(socket_client, socket_client_addr.c_str());
+	zmq_connect(socket_client, socket_client_addr.c_str());
 	send_meta_data_thread = std::thread([this]()
 										{
 		send_data_vec.clear();
@@ -174,22 +175,27 @@ void MjSocket::send_meta_data()
 		receive_buffer_size = 1 + receive_data_vec.size();
 
 		double *buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
-		do
+		const std::string meta_data_str = meta_data_json.toStyledString();
+		while (true)
 		{
-			if (*buffer < 0)
-			{
-				ROS_WARN("The socket server at %s has been terminated, preparing to resend the message...", socket_client_addr.c_str());
-				zmq_sleep(1);
-				ROS_INFO("Ready to send the message");
-			}
-			
 			// Send JSON string over ZMQ
-			const std::string meta_data_str = meta_data_json.toStyledString();
 			zmq_send(socket_client, meta_data_str.c_str(), meta_data_str.size(), 0);
 
 			// Receive buffer sizes and send_data (if exists) over ZMQ
 			zmq_recv(socket_client, buffer, (send_buffer_size + 2) * sizeof(double), 0);
-		} while (*buffer < 0);
+			if (*buffer < 0)
+			{
+				free(buffer);
+				buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
+				ROS_WARN("The socket server at %s has been terminated, resend the message", socket_client_addr.c_str());
+				zmq_disconnect(socket_client, socket_client_addr.c_str());
+				zmq_connect(socket_client, socket_client_addr.c_str());
+			}
+			else
+			{
+				break;
+			}
+		}
 
 		size_t recv_buffer_size[2] = {(size_t)buffer[0], (size_t)buffer[1]};
 		if (recv_buffer_size[0] != send_buffer_size || recv_buffer_size[1] != receive_buffer_size)
@@ -296,7 +302,8 @@ void MjSocket::communicate()
 		if (*receive_buffer < 0)
 		{
 			is_enabled = false;
-			ROS_WARN("Stop communication on %s", socket_client_addr.c_str());
+			ROS_WARN("The socket server at %s has been terminated, resend the message", socket_client_addr.c_str());
+			send_meta_data_thread.join();
 			send_meta_data();
 			return;
 		}
