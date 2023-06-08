@@ -25,12 +25,15 @@
 #include <chrono>
 #include <jsoncpp/json/json.h>
 #include <zmq.hpp>
+#include <csignal>
 
 std::string host = "tcp://127.0.0.1";
 
 std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
 
 std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
+
+bool should_shut_down = false;
 
 MjSocket::~MjSocket()
 {
@@ -170,23 +173,23 @@ void MjSocket::send_meta_data()
 		mtx.unlock();
 		receive_buffer_size = 1 + receive_data_vec.size();
 
-resend:
-		// Send JSON string over ZMQ
-		const std::string meta_data_str = meta_data_json.toStyledString();
-		zmq_send(socket_client, meta_data_str.c_str(), meta_data_str.size(), 0);
-
-		// Receive buffer sizes and send_data (if exists) over ZMQ
 		double *buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
-		zmq_recv(socket_client, buffer, (send_buffer_size + 2) * sizeof(double), 0);
-
-		if (*buffer < 0)
+		do
 		{
-			ROS_WARN("The socket server at %s has been terminated, preparing to resend the message...", socket_client_addr.c_str());
-			free(buffer);
-			zmq_sleep(1);
-			ROS_INFO("Ready to send the message");
-			goto resend;
-		}
+			if (*buffer < 0)
+			{
+				ROS_WARN("The socket server at %s has been terminated, preparing to resend the message...", socket_client_addr.c_str());
+				zmq_sleep(1);
+				ROS_INFO("Ready to send the message");
+			}
+			
+			// Send JSON string over ZMQ
+			const std::string meta_data_str = meta_data_json.toStyledString();
+			zmq_send(socket_client, meta_data_str.c_str(), meta_data_str.size(), 0);
+
+			// Receive buffer sizes and send_data (if exists) over ZMQ
+			zmq_recv(socket_client, buffer, (send_buffer_size + 2) * sizeof(double), 0);
+		} while (*buffer < 0);
 
 		size_t recv_buffer_size[2] = {(size_t)buffer[0], (size_t)buffer[1]};
 		if (recv_buffer_size[0] != send_buffer_size || recv_buffer_size[1] != receive_buffer_size)
