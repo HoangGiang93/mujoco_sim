@@ -81,7 +81,7 @@ private:
     
 	double *receive_buffer;
 
-    std::string socket_client_addr;
+    std::string socket_addr;
 
     std::thread send_meta_data_thread;
 

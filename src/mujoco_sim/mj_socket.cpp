@@ -97,25 +97,26 @@ void MjSocket::init(const int port)
 
 	if (send_objects.size() > 0 || receive_objects.size() > 0)
 	{
-		ROS_INFO("Initializing the socket connection...");
 		context = zmq_ctx_new();
 
 		socket_client = zmq_socket(context, ZMQ_REQ);
-		socket_client_addr = host + ":" + std::to_string(port);
-
+		socket_addr = host + ":" + std::to_string(port);
+		
+		ROS_INFO("Open the socket connection on %s", socket_addr.c_str());
 		send_meta_data();
 	}
 }
 
 void MjSocket::send_meta_data()
 {
-	zmq_disconnect(socket_client, socket_client_addr.c_str());
-	zmq_connect(socket_client, socket_client_addr.c_str());
+	zmq_disconnect(socket_client, socket_addr.c_str());
+	zmq_connect(socket_client, socket_addr.c_str());
+
+	send_data_vec.clear();
+	receive_data_vec.clear();
+
 	send_meta_data_thread = std::thread([this]()
 										{
-		send_data_vec.clear();
-		receive_data_vec.clear();
-
 		// Create JSON object and populate it
 		Json::Value meta_data_json;
 		meta_data_json["time"] = "microseconds";
@@ -176,6 +177,9 @@ void MjSocket::send_meta_data()
 
 		double *buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
 		const std::string meta_data_str = meta_data_json.toStyledString();
+
+		ROS_INFO("%s", meta_data_str.c_str());
+		
 		while (true)
 		{
 			// Send JSON string over ZMQ
@@ -187,9 +191,9 @@ void MjSocket::send_meta_data()
 			{
 				free(buffer);
 				buffer = (double *)calloc(send_buffer_size + 2, sizeof(double));
-				ROS_WARN("The socket server at %s has been terminated, resend the message", socket_client_addr.c_str());
-				zmq_disconnect(socket_client, socket_client_addr.c_str());
-				zmq_connect(socket_client, socket_client_addr.c_str());
+				ROS_WARN("The socket server at %s has been terminated, resend the message", socket_addr.c_str());
+				zmq_disconnect(socket_client, socket_addr.c_str());
+				zmq_connect(socket_client, socket_addr.c_str());
 			}
 			else
 			{
@@ -200,14 +204,14 @@ void MjSocket::send_meta_data()
 		size_t recv_buffer_size[2] = {(size_t)buffer[0], (size_t)buffer[1]};
 		if (recv_buffer_size[0] != send_buffer_size || recv_buffer_size[1] != receive_buffer_size)
 		{
-			ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_client_addr.c_str(), recv_buffer_size[0], send_buffer_size, recv_buffer_size[1], receive_buffer_size);
-			zmq_disconnect(socket_client, socket_client_addr.c_str());
+			ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_addr.c_str(), recv_buffer_size[0], send_buffer_size, recv_buffer_size[1], receive_buffer_size);
+			zmq_disconnect(socket_client, socket_addr.c_str());
 		}
 		else
 		{
 			if (buffer[2] < 0.0)
 			{
-				ROS_INFO("Continue state on socket %s", socket_client_addr.c_str());
+				ROS_INFO("Continue state on socket %s", socket_addr.c_str());
 				mtx.lock();
 
 				double *buffer_addr = buffer + 3;
@@ -274,8 +278,8 @@ void MjSocket::send_meta_data()
 				mtx.unlock();
 			}
 
-			ROS_INFO("Initialized the socket at %s successfully.", socket_client_addr.c_str());
-			ROS_INFO("Start communication on %s (send: %ld, receive: %ld)", socket_client_addr.c_str(), send_buffer_size, receive_buffer_size);
+			ROS_INFO("Initialized the socket at %s successfully.", socket_addr.c_str());
+			ROS_INFO("Start communication on %s (send: %ld, receive: %ld)", socket_addr.c_str(), send_buffer_size, receive_buffer_size);
 			send_buffer = (double *)calloc(send_buffer_size, sizeof(double));
 			receive_buffer = (double *)calloc(receive_buffer_size, sizeof(double));
 			is_enabled = true;
@@ -302,8 +306,11 @@ void MjSocket::communicate()
 		if (*receive_buffer < 0)
 		{
 			is_enabled = false;
-			ROS_WARN("The socket server at %s has been terminated, resend the message", socket_client_addr.c_str());
-			send_meta_data_thread.join();
+			ROS_WARN("The socket server at %s has been terminated, resend the message", socket_addr.c_str());
+			if (send_meta_data_thread.joinable())
+			{
+				send_meta_data_thread.join();
+			}
 			send_meta_data();
 			return;
 		}
@@ -317,6 +324,7 @@ void MjSocket::communicate()
 
 void MjSocket::deinit()
 {
+	ROS_INFO("Closing the socket client on %s", socket_addr.c_str());
 	if (is_enabled)
 	{
 		const std::string close_data = "{}";
@@ -326,7 +334,7 @@ void MjSocket::deinit()
 		free(send_buffer);
 		free(receive_buffer);
 
-		zmq_disconnect(socket_client, socket_client_addr.c_str());
+		zmq_disconnect(socket_client, socket_addr.c_str());
 	}
 	else if (send_meta_data_thread.joinable())
 	{
