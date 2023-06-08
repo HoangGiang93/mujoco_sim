@@ -33,7 +33,7 @@
         </node>
     </group>
 
-    <!-- <node pkg="mujoco_sim" type="state_server_node" name="state_server" output="screen"
-    args="7500 7501 7502"/> -->
+    <node pkg="universim_server" type="universim_server_node" name="universim_server" output="screen"
+    args="7500 7501 7502"/>
 
 </launch>
