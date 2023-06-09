@@ -30,7 +30,7 @@ if (DOXYGEN_FOUND)
         COMMENT "Generating API documentation with Doxygen"
         VERBATIM )
 else (DOXYGEN_FOUND)
-  message("Doxygen need to be installed to generate the doxygen documentation")
+  message(VERBOSE "Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
 
 set(MUJOCO mujoco)
@@ -89,7 +89,7 @@ add_library(${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_ros.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_sim.cpp
-  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_socket.cpp
+  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_state_manager.cpp
 )
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}

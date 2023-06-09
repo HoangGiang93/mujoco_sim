@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "mj_socket.h"
+#include "mj_state_manager.h"
 
 #include <chrono>
 #include <csignal>
@@ -29,17 +29,17 @@
 
 std::string host = "tcp://127.0.0.1";
 
-std::map<std::string, std::vector<std::string>> MjSocket::send_objects;
+std::map<std::string, std::vector<std::string>> MjStateManager::send_objects;
 
-std::map<std::string, std::vector<std::string>> MjSocket::receive_objects;
+std::map<std::string, std::vector<std::string>> MjStateManager::receive_objects;
 
 bool should_shut_down = false;
 
-MjSocket::~MjSocket()
+MjStateManager::~MjStateManager()
 {
 }
 
-void MjSocket::init(const int port)
+void MjStateManager::init(const int port)
 {
 	XmlRpc::XmlRpcValue receive_object_params;
 	if (ros::param::get("~receive", receive_object_params))
@@ -107,7 +107,7 @@ void MjSocket::init(const int port)
 	}
 }
 
-void MjSocket::send_meta_data()
+void MjStateManager::send_meta_data()
 {
 	zmq_disconnect(socket_client, socket_addr.c_str());
 	zmq_connect(socket_client, socket_addr.c_str());
@@ -288,7 +288,7 @@ void MjSocket::send_meta_data()
 		free(buffer); });
 }
 
-void MjSocket::communicate()
+void MjStateManager::communicate()
 {
 	if (is_enabled)
 	{
@@ -322,7 +322,7 @@ void MjSocket::communicate()
 	}
 }
 
-void MjSocket::deinit()
+void MjStateManager::deinit()
 {
 	ROS_INFO("Closing the socket client on %s", socket_addr.c_str());
 	if (is_enabled)

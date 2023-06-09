@@ -25,17 +25,17 @@
 #include <set>
 #include <thread>
 
-class MjSocket
+class MjStateManager
 {
 public:
-    MjSocket(const MjSocket &) = delete;
+    MjStateManager(const MjStateManager &) = delete;
 
-    void operator=(MjSocket const &) = delete;
+    void operator=(MjStateManager const &) = delete;
 
-    static MjSocket &get_instance()
+    static MjStateManager &get_instance()
     {
-        static MjSocket mj_socket;
-        return mj_socket;
+        static MjStateManager mj_state_manager;
+        return mj_state_manager;
     }
 
 public:
@@ -89,7 +89,7 @@ private:
     void send_meta_data();
 
 private:
-    MjSocket() = default;
+    MjStateManager() = default;
 
-    ~MjSocket();
+    ~MjStateManager();
 };
