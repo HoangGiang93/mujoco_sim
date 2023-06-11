@@ -1,6 +1,7 @@
 send:
   body: [position, quaternion]
-  joint: [position]
+  joint_1D: [joint_position]
+  joint_3D: [joint_quaternion]
 
 receive:
   cube: [position, quaternion]

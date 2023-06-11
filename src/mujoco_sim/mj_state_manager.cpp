@@ -67,7 +67,7 @@ void MjStateManager::init(const int port)
 				{
 					for (int body_id = 0; body_id < m->nbody; body_id++)
 					{
-						const char *body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
+						const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
 						if (receive_objects.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
 						{
 							log += std::string(body_name) + " ";
@@ -81,7 +81,22 @@ void MjStateManager::init(const int port)
 					{
 						if (m->jnt_type[joint_id] == mjtJoint::mjJNT_HINGE || m->jnt_type[joint_id] == mjtJoint::mjJNT_SLIDE)
 						{
-							const char *joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
+							const std::string joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
+							if (receive_objects.count(joint_name) == 0)
+							{
+								log += std::string(joint_name) + " ";
+								send_objects[joint_name] = send_data;
+							}
+						}
+					}
+				}
+				else if (send_object_param.first == "joint_3D")
+				{
+					for (int joint_id = 0; joint_id < m->njnt; joint_id++)
+					{
+						if (m->jnt_type[joint_id] == mjtJoint::mjJNT_BALL)
+						{
+							const std::string joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
 							if (receive_objects.count(joint_name) == 0)
 							{
 								log += std::string(joint_name) + " ";
@@ -126,6 +141,7 @@ void MjStateManager::send_meta_data()
 		for (const std::pair<std::string, std::vector<std::string>> &send_object : send_objects)
 		{
 			const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object.first.c_str());
+			const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, send_object.first.c_str());
 			for (const std::string &attribute : send_object.second)
 			{
 				if (strcmp(attribute.c_str(), "position") == 0)
@@ -140,6 +156,19 @@ void MjStateManager::send_meta_data()
 					send_data_vec.push_back(&d->xquat[4 * body_id + 1]);
 					send_data_vec.push_back(&d->xquat[4 * body_id + 2]);
 					send_data_vec.push_back(&d->xquat[4 * body_id + 3]);
+				}
+				else if (strcmp(attribute.c_str(), "joint_position") == 0)
+				{
+					const int qpos_id = m->jnt_qposadr[joint_id];
+					send_data_vec.push_back(&d->qpos[qpos_id]);
+				}
+				else if (strcmp(attribute.c_str(), "joint_quaternion") == 0)
+				{
+					const int qpos_id = m->jnt_qposadr[joint_id];
+					send_data_vec.push_back(&d->qpos[qpos_id]);
+					send_data_vec.push_back(&d->qpos[qpos_id + 1]);
+					send_data_vec.push_back(&d->qpos[qpos_id + 2]);
+					send_data_vec.push_back(&d->qpos[qpos_id + 3]);
 				}
 
 				meta_data_json["send"][send_object.first].append(attribute);
