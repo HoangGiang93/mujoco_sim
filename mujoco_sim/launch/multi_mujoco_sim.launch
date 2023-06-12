@@ -1,0 +1,39 @@
+<launch>
+
+    <arg name="robot" default="$(find mujoco_sim)/model/test/bowl.xml" />
+    <arg name="world" default="$(find mujoco_sim)/model/test/pendulum.xml" />
+    <arg name="sim_1" default="$(find mujoco_sim)/src/config/sim_1.yaml" />
+    <arg name="sim_2" default="$(find mujoco_sim)/src/config/sim_2.yaml" />
+    <arg name="sim_3" default="$(find mujoco_sim)/src/config/sim_3.yaml" />
+
+    <group ns="sim_1">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7500">
+            <rosparam command="load" file="$(arg sim_1)" />
+            <param name="world" value="$(arg world)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+    <group ns="sim_2">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7501">
+            <rosparam command="load" file="$(arg sim_2)" />
+            <param name="world" value="$(arg world)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+    <group ns="sim_3">
+        <node name="mujoco_sim" pkg="mujoco_sim" type="mujoco_sim_node" output="screen"
+            args="7502">
+            <rosparam command="load" file="$(arg sim_3)" />
+            <param name="world" value="$(arg world)" />
+            <param name="robot" type="str" value="$(arg robot)" />
+        </node>
+    </group>
+
+    <!-- <node pkg="universim_server" type="universim_server_node" name="universim_server" output="screen"
+    args="7500 7501 7502"/> -->
+
+</launch>

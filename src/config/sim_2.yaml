@@ -1,8 +1,0 @@
-send:
-  body: [position, quaternion]
-  joint: [position]
-
-receive:
-  sphere: [position, quaternion]
-  cylinder: [position, quaternion]
-  # slider: [position, quaternion]
