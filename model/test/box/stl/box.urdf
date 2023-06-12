@@ -1,0 +1,104 @@
+<?xml version="1.0" ?>
+<robot name="box">
+    <mujoco>
+        <compiler meshdir="/home/giangnguyen/Workspace/mujoco_ws/src/mujoco_world/mujoco_world/model/box/box/box/stl" strippath="false" balanceinertia="true" discardvisual="true"/>
+    </mujoco>
+    <link name="box_body">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxBottom.dae"/>
+            </geometry>
+        </visual>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxWall1.dae"/>
+            </geometry>
+        </visual>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxWall2.dae"/>
+            </geometry>
+        </visual>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxWall3.dae"/>
+            </geometry>
+        </visual>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxWall4.dae"/>
+            </geometry>
+        </visual>
+        <collision>
+            <origin xyz="0 0 -0.1675" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.34 0.32 0.005"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0.167578  0 -0.0025" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.005156 0.32 0.335"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="-0.167578  0 -0.0025" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.005156 0.32 0.335"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0 0.1575 -0.0025" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.340312 0.005 0.335"/>
+            </geometry>
+        </collision>
+        <collision>
+            <origin xyz="0 -0.1575 -0.0025" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.340312 0.005 0.335"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="box_flap_side_1_joint" type="continuous">
+        <origin xyz="0.17 0 0.166" rpy="0 0 0"/>
+        <parent link="box_body"/>
+        <child link="box_flap_side_1"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+    <link name="box_flap_side_1">
+        <visual>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxFlapSide1.dae"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="BoxFlapSide1.stl"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="box_flap_side_2_joint" type="continuous">
+        <origin xyz="-0.17 0 0.168" rpy="0 0 0"/>
+        <parent link="box_body"/>
+        <child link="box_flap_side_2"/>
+        <axis xyz="0 -1 0"/>
+    </joint>
+    <link name="box_flap_side_2">
+        <visual>
+            <geometry>
+                <mesh filename="package://mujoco_world/model/box/urdf/meshes/BoxFlapSide2.dae"/>
+            </geometry>
+        </visual>
+        <collision>
+            <geometry>
+                <mesh filename="BoxFlapSide2.stl"/>
+            </geometry>
+        </collision>
+    </link>
+</robot>

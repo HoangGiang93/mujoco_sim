@@ -1,0 +1,48 @@
+<mujoco>
+  <compiler angle="radian" />
+  <compiler meshdir="bowl_small/stl/" />
+  <asset>
+      <mesh name="bowl_small_cone" file="bowl_small_cone.stl" />
+      <mesh name="bowl_small_bottom" file="bowl_small_bottom.stl" />
+      <mesh name="bowl_small_side" file="bowl_small_side.stl" />
+  </asset>
+  <worldbody>
+      <body name="bowl" pos="0 0 0">
+          <freejoint />
+          <geom type="mesh" mesh="bowl_small_bottom" rgba="1 0 0 1" />
+          <geom type="mesh" mesh="bowl_small_cone" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0.19634954084936207" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0.39269908169872414" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0.5890486225480862" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0.7853981633974483" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 0.9817477042468103" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 1.1780972450961724" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 1.3744467859455345" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 1.5707963267948966" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 1.7671458676442586" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 1.9634954084936207" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 2.1598449493429825" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 2.356194490192345" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 2.552544031041707" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 2.748893571891069" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 2.945243112740431" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 3.141592653589793" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -2.945243112740431" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -2.748893571891069" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -2.552544031041707" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -2.356194490192345" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -2.1598449493429825" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -1.9634954084936207" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -1.7671458676442586" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -1.5707963267948966" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -1.3744467859455345" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -1.1780972450961724" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -0.9817477042468103" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -0.7853981633974483" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -0.5890486225480862" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -0.39269908169872414" mesh="bowl_small_side" rgba="1 0 0 1" />
+          <geom type="mesh" euler="0 0 -0.19634954084936207" mesh="bowl_small_side" rgba="1 0 0 1" />
+      </body>
+  </worldbody>
+</mujoco>

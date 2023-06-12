@@ -1,0 +1,46 @@
+robots: [box]
+
+pose_init: [0, 0, 0.17, 0, 0, 0]
+
+joint_inits:
+  box_flap_1_joint: 0
+  box_flap_2_joint: 0
+
+save_path: "model/save/box_scenario.xml" # Path to save screenshot, either a relative path to mujoco_sim or an absolute path
+
+disable_gravity: True # Disable gravity or not
+
+max_time_step: 0.005 # Maximal time step (bigger value <=> faster but more unstable)
+
+pub_object_marker_array:
+  free_bodies_only: True # Only publish the marker array of free objects
+  robot_bodies_rate: 0.0 # The frequency to publish the marker array of robot
+  world_bodies_rate: 0.0 # The frequency to publish the marker array of world
+  spawned_object_bodies_rate: 0.0 # The frequency to publish the marker array of spawned objects
+
+pub_tf:
+  free_bodies_only: True # Only publish the tf of free objects
+  robot_bodies_rate: 0.0 # The frequency to publish the tf of robot
+  world_bodies_rate: 0.0 # The frequency to publish the tf of world
+  spawned_object_bodies_rate: 60.0 # The frequency to publish the tf of spawned objects
+
+pub_object_state_array:
+  free_bodies_only: True # Only publish the object state of free objects
+  robot_bodies_rate: 0.0 # The frequency to publish the object state of robot
+  world_bodies_rate: 0.0 # The frequency to publish the object state of world
+  spawned_object_bodies_rate: 60.0 # The frequency to publish the object state of spawned objects
+
+pub_joint_states: 
+  robot_bodies_rate: 0.0 # The frequency to publish the joint states of robot
+  world_bodies_rate: 60.0 # The frequency to publish the joint states of world
+  spawned_object_bodies_rate: 60.0 # The frequency to publish the joint states of spawned objects
+
+pub_base_pose_rate: 0.0 # The frequency to publish the base pose of the robot
+
+pub_sensor_data_rate: 60 # The frequency to publish the sensor data
+
+spawn_and_destroy_objects_rate: 10.0 # The frequency to spawn and destroy the objects
+
+spawn_object_count_per_cycle: 20 # The maximal number of objects to spawn per cycle
+
+root_frame_id: map # The frame id of the world (normally 'map' for fixed-based robots and 'odom' for mobile robots)

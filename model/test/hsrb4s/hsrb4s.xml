@@ -1,0 +1,161 @@
+<mujoco model="hsrb">
+    <compiler angle="radian" meshdir="hsrb4s/stl/" />
+    <default />
+    <asset>
+        <mesh name="base" file="base.stl" />
+        <mesh name="laser" file="laser.stl" />
+        <mesh name="torso" file="torso.stl" />
+        <mesh name="head_pan" file="head_pan.stl" />
+        <mesh name="head" file="head.stl" />
+        <mesh name="tablet" file="tablet.stl" />
+        <mesh name="rgbd" file="rgbd.stl" />
+        <mesh name="shoulder" file="shoulder.stl" />
+        <mesh name="arm_flex" file="arm_flex.stl" />
+        <mesh name="arm_roll" file="arm_roll.stl" />
+        <mesh name="wrist_roll" file="wrist_roll.stl" />
+        <mesh name="palm" file="palm.stl" />
+        <mesh name="l_proximal" file="l_proximal.stl" />
+        <mesh name="l_distal" file="l_distal.stl" />
+        <mesh name="r_proximal" file="r_proximal.stl" />
+        <mesh name="r_distal" file="r_distal.stl" />
+    </asset>
+    <worldbody>
+        <body name="hsrb4s">
+            <freejoint />
+            <geom type="mesh" mesh="base" />
+            <geom pos="0.1675 0 0.1844" type="mesh" mesh="laser" />
+            <body name="base_roll_link" pos="0 0 0">
+                <inertial pos="-0.019482 0.002191 0.071013" quat="-0.163088 0.695987 0.176074 0.676759" mass="10.2394" diaginertia="0.145076 0.0958414 0.0713624" />
+                <joint name="base_roll_joint" pos="0 0 0" axis="0 0 1" damping="0.7" />
+                <body name="base_r_drive_wheel_link" pos="-0.11 -0.133 0.04">
+                    <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                    <joint name="base_r_drive_wheel_joint" pos="0 0 0" axis="0 1 0" damping="1" />
+                    <geom size="0.04 0.015" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.2 0.2 0.2 1" />
+                </body>
+                <body name="base_l_drive_wheel_link" pos="-0.11 0.133 0.04">
+                    <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                    <joint name="base_l_drive_wheel_joint" pos="0 0 0" axis="0 1 0" damping="1" />
+                    <geom size="0.04 0.015" quat="0.707107 0.707107 0 0" type="cylinder" rgba="0.2 0.2 0.2 1" />
+                </body>
+                <body name="base_r_passive_wheel_x_frame" pos="0.1495 -0.055 0.03">
+                    <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                    <joint name="base_r_passive_wheel_x_frame_joint" pos="0 0 0" axis="1 0 0" damping="1" />
+                    <body name="base_r_passive_wheel_y_frame" pos="0 0 0">
+                        <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                        <joint name="base_r_passive_wheel_y_frame_joint" pos="0 0 0" axis="0 1 0" />
+                        <body name="base_r_passive_wheel_z_link" pos="0 0 0">
+                            <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                            <joint name="base_r_passive_wheel_z_joint" pos="0 0 0" axis="0 0 1" />
+                            <geom size="0.03" rgba="0.2 0.2 0.2 1" />
+                        </body>
+                    </body>
+                </body>
+                <body name="base_l_passive_wheel_x_frame" pos="0.1495 0.055 0.03">
+                    <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                    <joint name="base_l_passive_wheel_x_frame_joint" pos="0 0 0" axis="1 0 0" damping="1" />
+                    <body name="base_l_passive_wheel_y_frame" pos="0 0 0">
+                        <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                        <joint name="base_l_passive_wheel_y_frame_joint" pos="0 0 0" axis="0 1 0" />
+                        <body name="base_l_passive_wheel_z_link" pos="0 0 0">
+                            <inertial pos="0 0 0" mass="0.2" diaginertia="0.015 0.015 0.015" />
+                            <joint name="base_l_passive_wheel_z_joint" pos="0 0 0" axis="0 0 1" />
+                            <geom size="0.03" rgba="0.2 0.2 0.2 1" />
+                        </body>
+                    </body>
+                </body>
+            </body>
+            <body name="torso_lift_link" pos="0 0 0.752">
+                <inertial pos="-0.051142 0.003454 -0.2905" quat="0.511154 0.00760492 -0.0140194 0.859341" mass="3.42078" diaginertia="0.105342 0.104252 0.0127461" />
+                <joint name="torso_lift_joint" pos="0 0 0" axis="0 0 1" type="slide" limited="true" range="0 0.345" damping="500" />
+                <geom type="mesh" mesh="torso" />
+                <body name="head_pan_link" pos="0 0 0">
+                    <inertial pos="0.001724 -0.001969 -0.028886" quat="0.865343 0.459592 0.192259 -0.0547077" mass="0.571903" diaginertia="0.00102408 0.00077623 0.000589392" />
+                    <joint name="head_pan_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-3.84 1.75" damping="1" />
+                    <geom type="mesh" mesh="head_pan" />
+                    <body name="head_tilt_link" pos="0.02 0 0">
+                        <inertial pos="-0.0585755 -0.00226398 0.125377" quat="0.974727 0.00825867 -0.223204 -0.00429581" mass="2.31102" diaginertia="0.0241287 0.016816 0.00963915" />
+                        <joint name="head_tilt_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-1.57 0.52" damping="10" />
+                        <geom type="mesh" mesh="head" />
+                        <geom type="mesh" mesh="tablet" />
+                        <geom pos="-0.079796 0.022 0.215172" quat="0.5 -0.5 0.5 -0.5" type="mesh" mesh="rgbd" />
+                    </body>
+                </body>
+            </body>
+            <body name="arm_lift_link" pos="0 0 0.34">
+                <inertial pos="0.051549 0.042438 -0.064145" quat="-0.111496 0.499152 -0.110462 0.852182" mass="1.27582" diaginertia="0.00909548 0.00799354 0.00328099" />
+                <joint name="arm_lift_joint" pos="0 0 0" axis="0 0 1" type="slide" limited="true" range="0 0.69" damping="1" />
+                <geom type="mesh" mesh="shoulder" />
+                <body name="arm_flex_link" pos="0.141 0.078 0">
+                    <inertial pos="0.000632 0.006404 0.118529" quat="0.999966 -0.00826681 1.5355e-06 -1.33584e-06" mass="1.33929" diaginertia="2.51222 2.51222 2.51222" />
+                    <joint name="arm_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-2.62 0" damping="1" />
+                    <geom type="mesh" mesh="arm_flex" />
+                    <body name="arm_roll_link" pos="0.005 0 0.345">
+                        <inertial pos="-0.006927 0.002039 -0.064837" quat="0.704471 0.707171 -0.0444888 0.0406182" mass="0.247936" diaginertia="0.00426928 0.00411787 0.00078077" />
+                        <joint name="arm_roll_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-2.09 3.84" damping="0.1" />
+                        <geom type="mesh" mesh="arm_roll" />
+                        <body name="wrist_flex_link" pos="0 0 0">
+                            <inertial pos="0.000131 -0.003929 0.00217" quat="0.672298 0.740248 0.0055614 0.00418043" mass="0.681225" diaginertia="7.43604e-05 6.49274e-05 3.81796e-05" />
+                            <joint name="wrist_flex_joint" pos="0 0 0" axis="0 -1 0" limited="true" range="-1.92 1.22" damping="1" />
+                            <geom size="0.017 0.02" pos="0 0 0.03" type="cylinder" rgba="0.3333 0.3333 0.3333 1" />
+                            <body name="wrist_roll_link" pos="0 0 0">
+                                <inertial pos="0.000791324 -0.00129247 0.0913651" quat="0.966045 -0.00554233 0.0457183 -0.254238" mass="0.911692" diaginertia="0.016256 0.0162141 0.0154697" />
+                                <joint name="wrist_roll_joint" pos="0 0 0" axis="0 0 1" limited="true" range="-1.92 3.67" damping="1" />
+                                <geom type="mesh" mesh="wrist_roll" />
+                                <geom pos="0.012 0 0.1405" quat="0 0 0 1" type="mesh" rgba="0.3333 0.3333 0.3333 1" mesh="palm" />
+                                <body name="hand_motor_dummy_link" pos="0.012 0 0.1405" quat="0 0 0 1">
+                                    <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015" />
+                                    <joint name="hand_motor_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.798 1.24" damping="1" />
+                                </body>
+                                <body name="hand_l_proximal_link" pos="0.02875 0.0245 0.123" quat="0 0 0 1">
+                                    <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015" />
+                                    <joint name="hand_l_proximal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.798 1.24" damping="1" />
+                                    <body name="hand_l_spring_proximal_link" pos="0 0 0">
+                                        <inertial pos="0.021418 0.00248 0.022688" quat="0.701927 0.0145759 0.051882 0.710208" mass="0.043589" diaginertia="2.88931e-05 2.62201e-05 4.88149e-06" />
+                                        <joint name="hand_l_spring_proximal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="0 0.698" damping="1" />
+                                        <geom type="mesh" rgba="0.3333 0.3333 0.3333 1" mesh="l_proximal" />
+                                        <body name="hand_l_mimic_distal_link" pos="0 0 0.07">
+                                            <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015" />
+                                            <joint name="hand_l_mimic_distal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-0.698 0" damping="1" />
+                                            <body name="hand_l_distal_link" pos="0 0 0">
+                                                <inertial pos="0.010781 0.00403268 0.0340346" quat="0.641751 0.74464 -0.133185 -0.126206" mass="0.327731" diaginertia="0.0300952 0.0300869 0.0300115" />
+                                                <joint name="hand_l_distal_joint" pos="0 0 0" axis="1 0 0" limited="true" range="-1.24 0.798" damping="1" />
+                                                <geom type="mesh" rgba="0.3333 0.3333 0.3333 1" mesh="l_distal" />
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                                <body name="hand_r_proximal_link" pos="0.02875 -0.0245 0.123" quat="0 0 0 1">
+                                    <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015" />
+                                    <joint name="hand_r_proximal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="-0.798 1.24" damping="1" />
+                                    <body name="hand_r_spring_proximal_link" pos="0 0 0">
+                                        <inertial pos="0.013203 0.002096 0.023311" quat="0.696227 -0.0447896 0.0033388 0.716415" mass="0.043956" diaginertia="2.89497e-05 2.63111e-05 4.7712e-06" />
+                                        <joint name="hand_r_spring_proximal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="0 0.698" damping="1" />
+                                        <geom type="mesh" rgba="0.3333 0.3333 0.3333 1" mesh="r_proximal" />
+                                        <body name="hand_r_mimic_distal_link" pos="0 0 0.07">
+                                            <inertial pos="0 0 0" mass="0.15" diaginertia="0.015 0.015 0.015" />
+                                            <joint name="hand_r_mimic_distal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="-0.698 0" damping="1" />
+                                            <body name="hand_r_distal_link" pos="0 0 0">
+                                                <inertial pos="0.0164447 -0.0179558 0.0351687" quat="0.670492 0.190108 -0.131473 0.704992" mass="0.170927" diaginertia="0.015016 0.0150145 0.0150024" />
+                                                <joint name="hand_r_distal_joint" pos="0 0 0" axis="-1 0 0" limited="true" range="-1.24 0.798" damping="1" />
+                                                <geom type="mesh" rgba="0.3333 0.3333 0.3333 1" mesh="r_distal" />
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <equality>
+        <joint joint1="hand_l_distal_joint" joint2="hand_motor_joint" polycoef="-0.087000 -1.000000  0 0 0" />
+        <joint joint1="hand_l_mimic_distal_joint" joint2="hand_l_spring_proximal_joint" polycoef="0.000000 -1.000000  0 0 0" />
+        <joint joint1="hand_l_proximal_joint" joint2="hand_motor_joint" polycoef="0.000000 1.000000  0 0 0" />
+        <joint joint1="hand_r_distal_joint" joint2="hand_motor_joint" polycoef="-0.087000 -1.000000  0 0 0" />
+        <joint joint1="hand_r_mimic_distal_joint" joint2="hand_r_spring_proximal_joint" polycoef="0.000000 -1.000000  0 0 0" />
+        <joint joint1="hand_r_proximal_joint" joint2="hand_motor_joint" polycoef="0.000000 1.000000  0 0 0" />
+        <joint joint1="torso_lift_joint" joint2="arm_lift_joint" polycoef="0.000000 0.500000  0 0 0" />
+    </equality>
+</mujoco>

@@ -1,0 +1,150 @@
+<mujoco model="armar6">
+    <compiler angle="radian" autolimits="true"/>
+    <default/>
+    <asset>
+        <mesh name="platform" file="armar6/stl/platform.stl"/>
+        <mesh name="torso" file="armar6/stl/torso.stl"/>
+        <mesh name="lower_neck" file="armar6/stl/lower_neck.stl"/>
+        <mesh name="middle_neck" file="armar6/stl/middle_neck.stl"/>
+        <mesh name="upper_neck" file="armar6/stl/upper_neck.stl"/>
+        <mesh name="arml_cla" file="armar6/stl/arml_cla.stl"/>
+        <mesh name="arml_t12" file="armar6/stl/arml_t12.stl"/>
+        <mesh name="arml_t23" file="armar6/stl/arml_t23.stl"/>
+        <mesh name="arml_t34" file="armar6/stl/arml_t34.stl"/>
+        <mesh name="arml_t45" file="armar6/stl/arml_t45.stl"/>
+        <mesh name="arml_t56" file="armar6/stl/arml_t56.stl"/>
+        <mesh name="arml_t67" file="armar6/stl/arml_t67.stl"/>
+        <mesh name="arml_t78" file="armar6/stl/arml_t78.stl"/>
+        <mesh name="arml_t8" file="armar6/stl/arml_t8.stl"/>
+        <mesh name="left_hand_fixed" file="armar6/stl/left_hand_fixed.stl"/>
+        <mesh name="right_hand_fixed" file="armar6/stl/right_hand_fixed.stl"/>
+    </asset>
+    <worldbody>
+        <body name="armar6" >
+            <freejoint />
+            <geom quat="0.707107 0 0 -0.707107" type="mesh" rgba="1 1 1 1" mesh="platform"/>
+            <body name="torso" pos="0 0 1.195" quat="0.707107 0 0 -0.707107" gravcomp="0">
+                <inertial pos="0 0 0.0857093" quat="0.707127 1.453e-05 4.25075e-06 0.707087" mass="12.3799" diaginertia="0.156754 0.139381 0.132809"/>
+                <joint name="torso_joint" pos="0 0 0" axis="0 0 1" type="slide" range="-0.365 0" damping="0.5"/>
+                <geom type="mesh" rgba="1 1 1 1" mesh="torso"/>
+                <geom pos="0 0 0.3685" quat="0.707107 0 0 0.707107" type="mesh" rgba="1 1 1 1" mesh="lower_neck"/>
+                <geom pos="-0.09 0 0.1" quat="0.707107 0 0 0.707107" type="mesh" rgba="1 1 1 1" mesh="arml_cla"/>
+                <geom pos="0.09 0 0.1" quat="0.707107 0 0 -0.707107" type="mesh" rgba="1 1 1 1" mesh="arml_cla"/>
+                <body name="middle_neck" pos="0 0 0.3685" quat="0.707107 0 0 0.707107" gravcomp="0">
+                    <inertial pos="0 0 0" quat="0.344321 0.618307 -0.342768 0.617778" mass="0.304" diaginertia="0.00109402 0.000881954 0.000718409"/>
+                    <joint name="middle_neck_joint" pos="0 0 0" axis="0 0 1" range="-0.785398 0.785398"/>
+                    <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="middle_neck"/>
+                    <body name="upper_neck" pos="0 0 0" quat="0.5 0.5 0.5 0.5" gravcomp="0">
+                        <inertial pos="0 0.129 0.088" quat="0.44131 0.598571 -0.535904 0.399706" mass="3.307" diaginertia="0.0282836 0.0282836 0.0282836"/>
+                        <joint name="upper_neck_joint" pos="0 0 0" axis="1 0 0" range="-0.785398 0.785398"/>
+                        <geom type="mesh" rgba="1 1 1 1" mesh="upper_neck"/>
+                    </body>
+                </body>
+                <body name="arm_t12_r0" pos="-0.09 0 0.1" quat="0.707107 0 0 0.707107" gravcomp="0">
+                    <inertial pos="0 0.1419 0.0283" quat="0.977472 -0.210468 -0.0136787 -0.00802018" mass="3.5488" diaginertia="0.0183891 0.015228 0.00978586"/>
+                    <joint name="arm_t12_joint_r0" pos="0 0 0" axis="0 0 1" range="-1.39626 1.39626" damping="0.5"/>
+                    <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t12"/>
+                    <body name="arm_t23_r0" pos="0 0.289778 0.0776457" quat="0.793353 -0.608761 0 0" gravcomp="0">
+                        <inertial pos="0.00015 -0.0036 0.0211" quat="-0.097078 0.700593 -0.0934397 0.700724" mass="3.03804" diaginertia="0.013153 0.0129431 0.00940091"/>
+                        <joint name="arm_t23_joint_r0" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                        <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t23"/>
+                        <body name="arm_t34_r0" pos="0 0 0" quat="0.701057 0.092296 0.701057 0.092296" gravcomp="0">
+                            <inertial pos="-0.01285 0.11 0.00467" quat="0.993781 0.0859292 -0.0618007 0.0345924" mass="3.46206" diaginertia="0.0153298 0.0118422 0.00926601"/>
+                            <joint name="arm_t34_joint_r0" pos="0 0 0" axis="0 0 1" range="-0.24 3.1" damping="0.5"/>
+                            <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t34"/>
+                            <body name="arm_t45_r0" pos="0 0 0" quat="0.707107 -0.707107 0 0" gravcomp="0">
+                                <inertial pos="0.0163 -0.0332 0.315" quat="0.575745 0.399618 -0.341861 0.626062" mass="3.31477" diaginertia="0.0197874 0.0187322 0.00964545"/>
+                                <joint name="arm_t45_joint_r0" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                                <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t45"/>
+                                <body name="arm_t56_r0" pos="0 -0.055 0.409" quat="0.707107 0 0.707107 0" gravcomp="0">
+                                    <inertial pos="-0.09107 0.00476 -0.00899" quat="0.0686621 0.715794 -0.0603954 0.692298" mass="2.63888" diaginertia="0.0113023 0.00955045 0.00747825"/>
+                                    <joint name="arm_t56_joint_r0" pos="0 0 0" axis="0 0 1" range="0 2.51" damping="0.5"/>
+                                    <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t56"/>
+                                    <body name="arm_t67_r0" pos="0 0 0" quat="0.707107 0 -0.707107 0" gravcomp="0">
+                                        <inertial pos="0.00107 0.01939 0.25303" quat="0.509435 0.860337 -0.00835149 0.0150646" mass="2.71787" diaginertia="0.0118569 0.0105067 0.00613933"/>
+                                        <joint name="arm_t67_joint_r0" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                                        <geom type="mesh" rgba="1 1 1 1" mesh="arml_t67"/>
+                                        <body name="arm_t78_r0" pos="0 0 0.364" quat="0.707107 0.707107 0 0" gravcomp="0">
+                                            <inertial pos="-0.00657 -0.00467 0.01181" quat="0.0134359 0.699389 -0.0109214 0.714531" mass="1.62346" diaginertia="0.00239239 0.00195948 0.00155113"/>
+                                            <joint name="arm_t78_joint_r0" pos="0 0 0" axis="0 0 1" range="-0.64 0.64" damping="0.5"/>
+                                            <geom type="mesh" rgba="1 1 1 1" mesh="arml_t78"/>
+                                            <body name="arm_t8_r0" pos="0 0 0" quat="0.5 -0.5 0.5 0.5" gravcomp="0">
+                                                <inertial pos="-0.00874416 0.00931379 0.188745" quat="0.993294 0.0648778 0.00406993 0.0956135" mass="1.51384" diaginertia="0.0171241 0.0170171 0.00448581"/>
+                                                <joint name="arm_t8_joint_r0" pos="0 0 0" axis="0 -1 0" range="-1.52 1.52" damping="0.5"/>
+                                                <geom type="mesh" rgba="1 1 1 1" mesh="arml_t8"/>
+                                                <geom pos="-0.022 0 0.2645" type="mesh" rgba="0.251 0.251 0.251 1" mesh="left_hand_fixed"/>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+                <body name="arm_t12_r1" pos="0.09 0 0.1" quat="0.707107 0 0 -0.707107" gravcomp="0">
+                    <inertial pos="0 0.1419 0.0283" quat="0.977472 -0.210468 -0.0136787 -0.00802018" mass="3.5488" diaginertia="0.0183891 0.015228 0.00978586"/>
+                    <joint name="arm_t12_joint_r1" pos="0 0 0" axis="0 0 1" range="-1.39626 1.39626" damping="0.5"/>
+                    <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t12"/>
+                    <body name="arm_t23_r1" pos="0 0.289778 0.0776457" quat="0.793353 -0.608761 0 0" gravcomp="0">
+                        <inertial pos="0.00015 -0.0036 0.0211" quat="-0.097078 0.700593 -0.0934397 0.700724" mass="3.03804" diaginertia="0.013153 0.0129431 0.00940091"/>
+                        <joint name="arm_t23_joint_r1" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                        <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t23"/>
+                        <body name="arm_t34_r1" pos="0 0 0" quat="0.701057 0.092296 0.701057 0.092296" gravcomp="0">
+                            <inertial pos="-0.01285 0.11 0.00467" quat="0.993781 0.0859292 -0.0618007 0.0345924" mass="3.46206" diaginertia="0.0153298 0.0118422 0.00926601"/>
+                            <joint name="arm_t34_joint_r1" pos="0 0 0" axis="0 0 1" range="-0.24 3.1" damping="0.5"/>
+                            <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t34"/>
+                            <body name="arm_t45_r1" pos="0 0 0" quat="0.707107 -0.707107 0 0" gravcomp="0">
+                                <inertial pos="0.0163 -0.0332 0.315" quat="0.575745 0.399618 -0.341861 0.626062" mass="3.31477" diaginertia="0.0197874 0.0187322 0.00964545"/>
+                                <joint name="arm_t45_joint_r1" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                                <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t45"/>
+                                <body name="arm_t56_r1" pos="0 -0.055 0.409" quat="0.707107 0 0.707107 0" gravcomp="0">
+                                    <inertial pos="-0.09107 0.00476 -0.00899" quat="0.0686621 0.715794 -0.0603954 0.692298" mass="2.63888" diaginertia="0.0113023 0.00955045 0.00747825"/>
+                                    <joint name="arm_t56_joint_r1" pos="0 0 0" axis="0 0 1" range="0 2.51" damping="0.5"/>
+                                    <geom type="mesh" rgba="0.0392157 0.447059 0.4 1" mesh="arml_t56"/>
+                                    <body name="arm_t67_r1" pos="0 0 0" quat="0.707107 0 -0.707107 0" gravcomp="0">
+                                        <inertial pos="0.00107 0.01939 0.25303" quat="0.509435 0.860337 -0.00835149 0.0150646" mass="2.71787" diaginertia="0.0118569 0.0105067 0.00613933"/>
+                                        <joint name="arm_t67_joint_r1" pos="0 0 0" axis="0 0 1" damping="0.5"/>
+                                        <geom type="mesh" rgba="1 1 1 1" mesh="arml_t67"/>
+                                        <body name="arm_t78_r1" pos="0 0 0.364" quat="0.707107 0.707107 0 0" gravcomp="0">
+                                            <inertial pos="-0.00657 -0.00467 0.01181" quat="0.0134359 0.699389 -0.0109214 0.714531" mass="1.62346" diaginertia="0.00239239 0.00195948 0.00155113"/>
+                                            <joint name="arm_t78_joint_r1" pos="0 0 0" axis="0 0 1" range="-0.64 0.64" damping="0.5"/>
+                                            <geom type="mesh" rgba="1 1 1 1" mesh="arml_t78"/>
+                                            <body name="arm_t8_r1" pos="0 0 0" quat="0.5 -0.5 0.5 0.5" gravcomp="0">
+                                                <inertial pos="-0.00874416 0.00931379 0.188745" quat="0.988473 0.0647707 0.00139168 0.136832" mass="1.51384" diaginertia="0.0171878 0.0171109 0.00453894"/>
+                                                <joint name="arm_t8_joint_r1" pos="0 0 0" axis="0 -1 0" range="-1.52 1.52" damping="0.5"/>
+                                                <geom type="mesh" rgba="1 1 1 1" mesh="arml_t8"/>
+                                                <geom pos="-0.022 0 0.2645" type="mesh" rgba="0.251 0.251 0.251 1" mesh="right_hand_fixed"/>
+                                            </body>
+                                        </body>
+                                    </body>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <equality/>
+    <contact>
+        <exclude body1="armar6" body2="torso"/>
+        <exclude body1="torso" body2="middle_neck"/>
+        <exclude body1="middle_neck" body2="upper_neck"/>
+        <exclude body1="torso" body2="arm_t12_r0"/>
+        <exclude body1="arm_t12_r0" body2="arm_t23_r0"/>
+        <exclude body1="arm_t23_r0" body2="arm_t34_r0"/>
+        <exclude body1="arm_t34_r0" body2="arm_t45_r0"/>
+        <exclude body1="arm_t45_r0" body2="arm_t56_r0"/>
+        <exclude body1="arm_t56_r0" body2="arm_t67_r0"/>
+        <exclude body1="arm_t67_r0" body2="arm_t78_r0"/>
+        <exclude body1="arm_t78_r0" body2="arm_t8_r0"/>
+        <exclude body1="torso" body2="arm_t12_r1"/>
+        <exclude body1="arm_t12_r1" body2="arm_t23_r1"/>
+        <exclude body1="arm_t23_r1" body2="arm_t34_r1"/>
+        <exclude body1="arm_t34_r1" body2="arm_t45_r1"/>
+        <exclude body1="arm_t45_r1" body2="arm_t56_r1"/>
+        <exclude body1="arm_t56_r1" body2="arm_t67_r1"/>
+        <exclude body1="arm_t67_r1" body2="arm_t78_r1"/>
+        <exclude body1="arm_t78_r1" body2="arm_t8_r1"/>
+    </contact>
+</mujoco>

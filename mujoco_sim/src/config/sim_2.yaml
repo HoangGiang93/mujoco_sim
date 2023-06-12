@@ -1,8 +1,0 @@
-send:
-  cube: [position, quaternion]
-  cube_joint: [joint_quaternion]
-
-receive:
-  sphere: [position, quaternion]
-  cylinder: [position, quaternion]
-  # slider: [position, quaternion]
