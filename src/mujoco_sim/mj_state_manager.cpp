@@ -63,46 +63,14 @@ void MjStateManager::init(const int port)
 			std::vector<std::string> send_data;
 			if (ros::param::get("~send/" + send_object_param.first, send_data))
 			{
-				if (send_object_param.first == "body")
+				const int body_id = mj_name2id(m, mjtObj::mjOBJ_BODY, send_object_param.first.c_str());
+				const int joint_id = mj_name2id(m, mjtObj::mjOBJ_JOINT, send_object_param.first.c_str());
+				if (body_id != -1 || joint_id != -1)
 				{
-					for (int body_id = 0; body_id < m->nbody; body_id++)
+					if (receive_objects.count(send_object_param.first) == 0)
 					{
-						const std::string body_name = mj_id2name(m, mjtObj::mjOBJ_BODY, body_id);
-						if (receive_objects.count(body_name) == 0 && m->body_mocapid[body_id] == -1 && m->body_dofnum[body_id] != 0)
-						{
-							log += std::string(body_name) + " ";
-							send_objects[body_name] = send_data;
-						}
-					}
-				}
-				else if (send_object_param.first == "joint_1D")
-				{
-					for (int joint_id = 0; joint_id < m->njnt; joint_id++)
-					{
-						if (m->jnt_type[joint_id] == mjtJoint::mjJNT_HINGE || m->jnt_type[joint_id] == mjtJoint::mjJNT_SLIDE)
-						{
-							const std::string joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
-							if (receive_objects.count(joint_name) == 0)
-							{
-								log += std::string(joint_name) + " ";
-								send_objects[joint_name] = send_data;
-							}
-						}
-					}
-				}
-				else if (send_object_param.first == "joint_3D")
-				{
-					for (int joint_id = 0; joint_id < m->njnt; joint_id++)
-					{
-						if (m->jnt_type[joint_id] == mjtJoint::mjJNT_BALL)
-						{
-							const std::string joint_name = mj_id2name(m, mjtObj::mjOBJ_JOINT, joint_id);
-							if (receive_objects.count(joint_name) == 0)
-							{
-								log += std::string(joint_name) + " ";
-								send_objects[joint_name] = send_data;
-							}
-						}
+						log += send_object_param.first + " ";
+						send_objects[send_object_param.first] = send_data;
 					}
 				}
 			}
@@ -233,7 +201,12 @@ void MjStateManager::send_meta_data()
 		size_t recv_buffer_size[2] = {(size_t)buffer[0], (size_t)buffer[1]};
 		if (recv_buffer_size[0] != send_buffer_size || recv_buffer_size[1] != receive_buffer_size)
 		{
-			ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld != client = %ld), receive_buffer_size(server = %ld != client = %ld).", socket_addr.c_str(), recv_buffer_size[0], send_buffer_size, recv_buffer_size[1], receive_buffer_size);
+			ROS_ERROR("Failed to initialize the socket at %s: send_buffer_size(server = %ld, client = %ld), receive_buffer_size(server = %ld, client = %ld).", 
+				socket_addr.c_str(), 
+				recv_buffer_size[0], 
+				send_buffer_size, 
+				recv_buffer_size[1], 
+				receive_buffer_size);
 			zmq_disconnect(socket_client, socket_addr.c_str());
 		}
 		else

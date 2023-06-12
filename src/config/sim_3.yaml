@@ -1,7 +1,6 @@
 send:
-  body: [position, quaternion]
-  joint_1D: [joint_position]
-  joint_3D: [joint_quaternion]
+  cylinder: [position, quaternion]
+  cylinder_joint: [joint_quaternion]
 
 receive:
   sphere: [position, quaternion]
