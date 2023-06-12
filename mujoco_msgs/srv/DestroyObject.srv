@@ -1,0 +1,3 @@
+string[] names
+---
+mujoco_msgs/ObjectState[] object_states
