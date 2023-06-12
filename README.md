@@ -19,29 +19,6 @@ ROS interface for MuJoCo simulator
 - Offers velocity control for the base
 - Supports mimic joints from URDF format
 
-## Installation
-1) Create a workspace
-```
-source /opt/ros/<ros-version>/setup.bash    # source ROS
-mkdir -p ~/mujoco_ws/src                    # create directory for workspace
-```
-2) Initialize the workspace from this [file](https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/noetic.rosinstall) and update the workspace
-```
-wstool init ~/mujoco_ws/src                 # initialize .rosinstall
-wstool merge -t ~/mujoco_ws/src https://raw.githubusercontent.com/HoangGiang93/mujoco_ws/main/noetic.rosinstall
-wstool update -t ~/mujoco_ws/src            # pull the repositories
-```
-3) Install dependency of all packages in the workspace
-```
-rosdep install --ignore-src --from-paths ~/mujoco_ws/src/mujoco_sim/ ~/mujoco_ws/src/mujoco_msgs/ ~/mujoco_ws/src/mujoco_world/  # install dependencies available through apt
-```
-4) Build packages
-```
-cd ~/mujoco_ws                              # go to the workspace directory
-catkin_make                                 # build packages (or catkin build)
-source ~/mujoco_ws/devel/setup.bash         # source new overlay
-```
-
 ## Troubleshooting
 1) `ERROR: gladLoadGL error`
 - Solution: `sudo apt install nvidia-driver-515`
