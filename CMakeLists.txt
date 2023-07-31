@@ -62,7 +62,7 @@ catkin_package(
 ## Build ##
 ###########
 
-set(MUJOCO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/build/mujoco-2.3.5)
+set(MUJOCO_SOURCE_DIR ${PROJECT_SOURCE_DIR}/build/mujoco-2.3.7)
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
