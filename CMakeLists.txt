@@ -89,7 +89,6 @@ add_library(${MUJOCO_SIM_HEADLESS_NODE}_lib
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_ros.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_model.cpp
   ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_sim.cpp
-  ${PROJECT_SOURCE_DIR}/src/mujoco_sim/mj_socket.cpp
 )
 add_dependencies(${MUJOCO_SIM_HEADLESS_NODE}_lib ${MUJOCO})
 target_link_libraries(${MUJOCO_SIM_HEADLESS_NODE}
@@ -120,13 +119,6 @@ target_link_libraries(${MUJOCO_SIM_NODE}
   jsoncpp
   glfw
   GL
-)
-
-add_executable(state_server_node src/state_server.cpp)
-target_link_libraries(state_server_node
-  ${catkin_LIBRARIES}
-  zmq
-  jsoncpp
 )
 
 catkin_install_python(PROGRAMS script/mujoco_to_usd.py

@@ -24,13 +24,11 @@
 #endif
 #include "mj_hw_interface.h"
 #include "mj_ros.h"
-#include "mj_socket.h"
 
 #include <controller_manager/controller_manager.h>
 #include <thread>
 
 static MjSim &mj_sim = MjSim::get_instance();
-static MjSocket &mj_socket = MjSocket::get_instance();
 #ifdef VISUAL
 static MjVisual &mj_visual = MjVisual::get_instance();
 #endif
@@ -77,7 +75,6 @@ void simulate()
 
     while (ros::ok())
     {
-        mj_socket.communicate();
         {
             ros::Time sim_time = (ros::Time)(MjRos::ros_start.toSec() + d->time);
             ros::Duration sim_period = sim_time - last_sim_time;
@@ -165,7 +162,6 @@ void simulate()
             }
         }
     }
-    mj_socket.deinit();
 }
 
 int main(int argc, char **argv)
@@ -196,9 +192,6 @@ int main(int argc, char **argv)
     glfwSetKeyCallback(mj_visual.window, keyboard);
     ROS_INFO("Initialized OpenGL successfully.");
 #endif
-
-    MjSocket &mj_socket = MjSocket::get_instance();
-    mj_socket.init(port);
 
     mjcb_control = controller;
 

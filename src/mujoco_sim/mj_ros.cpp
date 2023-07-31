@@ -20,7 +20,6 @@
 
 #include "mj_ros.h"
 
-#include "mj_socket.h"
 #include "mj_util.h"
 
 #include <condition_variable>
