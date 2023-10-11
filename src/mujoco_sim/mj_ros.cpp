@@ -569,6 +569,8 @@ void MjRos::init()
 
 void MjRos::reset_robot()
 {
+    d = mj_makeData(m);
+    
     for (const std::string &robot : MjSim::robot_names)
     {
         for (const std::string &joint_name : MjSim::joint_names[robot])
