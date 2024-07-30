@@ -51,6 +51,10 @@ add_odom_joints: false # true for mobile robots, false for fixed-based robots
 
 max_time_step: 0.005 # Maximal time step (bigger value <=> faster but more unstable)
 
+# Only specify a custom controller type if not using 'position_controllers', 'velocity_controllers', or 'effort_controllers'
+# For example, a skid steer vehicle might use 'diff_drive_controller/DiffDriveController'.
+# custom_controller_type: "diff_drive_controller/DiffDriveController"
+
 pub_object_marker_array:
   free_bodies_only: True # Only publish the marker array of free objects
   robot_bodies_rate: 0.0 # The frequency to publish the marker array of robot
