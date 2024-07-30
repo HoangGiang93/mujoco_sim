@@ -46,5 +46,9 @@ source ~/mujoco_ws/devel/setup.bash         # source new overlay
 1) `ERROR: gladLoadGL error`
 - Solution: `sudo apt install nvidia-driver-515`
 
+2) Model errors when using a custom controller
+- Specify the controller in `robot.yaml`
+- Load the URDF to the parameter server **after** spawning the mujoco_sim node
+
 ## Software architecture
 ![Picture](docs/html/mj__main_8cpp__incl.png)
