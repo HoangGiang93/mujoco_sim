@@ -186,4 +186,6 @@ private:
     tf2_ros::StaticTransformBroadcaster static_br;
 
     std::map<std::string, float> joint_inits;
+
+    std::string custom_controller_type;
 };

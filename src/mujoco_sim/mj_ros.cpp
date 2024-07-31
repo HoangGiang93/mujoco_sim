@@ -457,6 +457,9 @@ void MjRos::init()
         }
     }
 
+    if (!ros::param::get("~custom_controller_type", custom_controller_type)) {
+        custom_controller_type = "";
+    }
     if (!ros::param::get("~pub_base_pose_rate", pub_base_pose_rate))
     {
         pub_base_pose_rate = 60.0;
@@ -648,7 +651,11 @@ void MjRos::get_controlled_joints()
         {
             for (const controller_manager_msgs::ControllerState &controller_state : list_controllers_srv.response.controller)
             {
-                if (controller_state.state.compare("running") == 0 && (controller_state.type.find("position_controllers") != std::string::npos || controller_state.type.find("velocity_controllers") != std::string::npos || controller_state.type.find("effort_controllers") != std::string::npos))
+                if (controller_state.state.compare("running") == 0 && 
+                    (controller_state.type.find("position_controllers") != std::string::npos ||
+                    controller_state.type.find("velocity_controllers") != std::string::npos ||
+                    controller_state.type.find("effort_controllers") != std::string::npos ||
+                    (custom_controller_type != "" && controller_state.type.find(custom_controller_type) != std::string::npos)))
                 {
                     for (const controller_manager_msgs::HardwareInterfaceResources &claimed_resources : controller_state.claimed_resources)
                     {
