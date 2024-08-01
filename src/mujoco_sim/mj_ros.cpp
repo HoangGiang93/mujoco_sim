@@ -311,10 +311,6 @@ void MjRos::set_params()
             {
                 MjSim::pose_inits[robot] = pose_init;
             }
-            else
-            {
-                MjSim::pose_inits[robot] = std::vector<float>(6, 0.0);
-            }
         }
     }
 
