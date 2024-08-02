@@ -314,7 +314,10 @@ static void init_tmp()
 			 robot_body = robot_body->NextSiblingElement("body"))
 		{
 			const char *robot = robot_body->Attribute("name");
-			if (robot != nullptr && MjSim::robot_names.find(robot) != MjSim::robot_names.end() && MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() && MjSim::pose_inits[robot].size() == 6)
+			if (robot != nullptr &&
+				MjSim::robot_names.find(robot) != MjSim::robot_names.end() &&
+				MjSim::pose_inits.find(robot) != MjSim::pose_inits.end() &&
+				MjSim::pose_inits[robot].size() == 6)
 			{
 				robot_body->SetAttribute("pos", (std::to_string(MjSim::pose_inits[robot][0]) + " " +
 												 std::to_string(MjSim::pose_inits[robot][1]) + " " +
