@@ -296,11 +296,21 @@ void MjRos::set_params()
     ROS_INFO("%s", log.c_str());
 
     std::vector<float> pose_init;
-    for (const std::string &robot : MjSim::robot_names)
+    if (ros::param::get("~pose_init", pose_init) && pose_init.size() == 6)
     {
-        if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
+        for (const std::string &robot : MjSim::robot_names)
         {
             MjSim::pose_inits[robot] = pose_init;
+        }
+    }
+    else
+    {
+        for (const std::string &robot : MjSim::robot_names)
+        {
+            if (ros::param::get("~pose_init/" + robot, pose_init) && pose_init.size() == 6)
+            {
+                MjSim::pose_inits[robot] = pose_init;
+            }
         }
     }
 

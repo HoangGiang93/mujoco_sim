@@ -2,10 +2,9 @@
 #   - robot1
 #   - robot2
 
-# Override the pose(s) and orientation(s) specified by the robot description(s).
-# pose_init:
-#   robot1: [5, 0, 0, 0, 0, 0] # for robot1
-#   robot2: [0, 1, 2, 0, 0, 0.79] # for robot2
+# pose_init: [0, 0, 0, 0, 0, 0] # Overrides xml specification
+#   - robot1: [0, 0, 0, 0, 0, 0] for robot1
+#   - robot2: [0, 1, 2, 0, 0, 3.14] for robot2
 
 # joint_inits: # Initialize the joint positions
 #   joint1: 0
