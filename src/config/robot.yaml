@@ -2,9 +2,13 @@
 #   - robot1
 #   - robot2
 
-# pose_init: [0, 0, 0, 0, 0, 0] # Overrides xml specification
-#   - robot1: [0, 0, 0, 0, 0, 0] for robot1
-#   - robot2: [0, 1, 2, 0, 0, 3.14] for robot2
+# Uncomment exactly one of the following blocks to set an initial pose which overrides 
+# the xml specification. The first block applies to all robots, the second block 
+# applies by name.
+# pose_init: [0, 0, 0, 0, 0, 0]
+# pose_init:
+#   robot1: [0, 0, 0, 0, 0, 0]  # for robot1
+#   robot2: [0, 1, 2, 0, 0, 3.14] # for robot2
 
 # joint_inits: # Initialize the joint positions
 #   joint1: 0
